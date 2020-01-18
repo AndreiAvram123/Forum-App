@@ -1,12 +1,10 @@
 package com.example.bookapp;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.SearchView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -14,8 +12,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.bookapp.Adapters.AdapterRecyclerView;
 import com.example.bookapp.fragments.ExpandedItemFragment;
-import com.example.bookapp.fragments.FragmentRecipesList;
-import com.example.bookapp.fragments.SearchHistoryFragment;
+import com.example.bookapp.fragments.MainFragment;
 import com.example.bookapp.models.Recipe;
 
 import org.json.JSONArray;
@@ -24,165 +21,87 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * The main activity acts as the controller
  * for the main screen
  */
 
-public class MainActivity extends AppCompatActivity implements AdapterRecyclerView.AdapterInterface {
-    private ConstraintLayout containerMain;
-    private SearchView searchView;
+public class MainActivity extends AppCompatActivity implements AdapterRecyclerView.AdapterInterface, MainFragment.MainFragmentInterface {
     private static final String URL_RANDOM_RECIPES = "https://api.spoonacular.com/recipes/random?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=1";
     private static final String URL_SEARCH_RECIPES_LIMIT_10 = "https://api.spoonacular.com/recipes/search?query=%s&number=10&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
 
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
     private RequestQueue requestQueue;
-    private Set<String> oldSearches = new TreeSet<>();
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editorSharedPreferences;
-    private FragmentRecipesList randomRecipesFragment;
+    private MainFragment mainFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_main);
-        initializeViews();
+        setContentView(R.layout.layout_main_activity);
         requestQueue = Volley.newRequestQueue(this);
-        pushRequest();
+        pushRequestRandomRecipes();
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         editorSharedPreferences = sharedPreferences.edit();
     }
 
-    private void getSearchHistory() {
-        if (sharedPreferences.getStringSet(getString(R.string.search_history_key), null) == null) {
-            oldSearches.add("No search history");
-        } else {
-            oldSearches =  sharedPreferences.getStringSet(getString(R.string.search_history_key), null);
-        }
-    }
 
-    private void pushRequest() {
+    private void pushRequestRandomRecipes() {
         //compose the request string to get the random recipes
         StringRequest randomRecipesRequest = new StringRequest(Request.Method.GET, URL_RANDOM_RECIPES,
                 (response) -> {
                     //once the data is fetched process it
-                    runOnUiThread(() -> processRequest(response));
+                    runOnUiThread(() -> processRequestRandomRecipes(response));
                 }, (error) -> error.printStackTrace());
         requestQueue.add(randomRecipesRequest);
     }
 
-    private void processRequest(String response) {
-        randomRecipes.addAll(getRecipesFromJson(response));
-        randomRecipesFragment = FragmentRecipesList.getInstance(randomRecipes);
-        displayRandomRecipesFragment();
-    }
-
-    private ArrayList<Recipe> getRecipesFromJson(String json) {
-        ArrayList<Recipe> results = new ArrayList<>();
-        try {
-            JSONObject jsonObject = new JSONObject(json);
-            //get the recipes array
-            JSONArray recipes = jsonObject.getJSONArray("recipes");
-            for (int i = 0; i < recipes.length(); i++) {
-                JSONObject recipeJson = recipes.getJSONObject(i);
-                Recipe recipeObject = new Recipe(recipeJson.getString("title"),
-                        recipeJson.getString("image"));
-                results.add(recipeObject);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+    private ArrayList<String> getSearchHistory() {
+        Set<String> searchHistorySet = sharedPreferences.getStringSet(getString(R.string.search_history_key ), null);
+        ArrayList<String> searchHistoryArrayList = new ArrayList<>();
+        if (searchHistorySet != null) {
+            searchHistoryArrayList.addAll(searchHistorySet);
+            Collections.reverse(searchHistoryArrayList);
+            return searchHistoryArrayList;
         }
-        return results;
+        searchHistoryArrayList.add("No search history");
+        return searchHistoryArrayList;
     }
 
-    private ArrayList<Recipe> getSearchResultsFromJson(String json){
-        ArrayList<Recipe> results = new ArrayList<>();
-        String apiImagePath ="https://spoonacular.com/recipeImages/%s";
-        try {
-            JSONObject jsonObject = new JSONObject(json);
-            //get the recipes array
-            JSONArray recipes = jsonObject.getJSONArray("results");
-            for (int i = 0; i < recipes.length(); i++) {
-                JSONObject recipeJson = recipes.getJSONObject(i);
-                Recipe recipeObject = new Recipe(recipeJson.getString("title"),
-                        String.format(apiImagePath,recipeJson.getString("image")));
-                results.add(recipeObject);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return results;
-    }
-
-    private void displayRandomRecipesFragment() {
-        if (randomRecipesFragment != null) {
-            getSupportFragmentManager()
-                    .beginTransaction().
-                    replace(R.id.container_main, randomRecipesFragment)
-                    .commit();
-        }
-    }
-
-    private void initializeViews() {
-        containerMain = findViewById(R.id.container_main);
-        searchView = findViewById(R.id.searchView);
-        configureSearch();
+    private void processRequestRandomRecipes(String response) {
+        randomRecipes.addAll(RecipeUtil.getRecipesListFromJson(response));
+        mainFragment = MainFragment.getInstance(randomRecipes, getSearchHistory());
+        displayMainFragment();
 
     }
 
-    private void configureSearch() {
-        searchView.setOnClickListener(view -> {
-            if (searchView.isIconified()) {
-                searchView.setBackground(getDrawable(R.drawable.search_background_highlighted));
-                displayOldSearchList();
-                searchView.setIconified(false);
-            }
-
-        });
-        searchView.setOnCloseListener(() -> {
-            searchView.setBackground(getDrawable(R.drawable.search_background));
-            displayRandomRecipesFragment();
-            return false;
-        });
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                if (!query.trim().equals("")) {
-                    oldSearches.add(query);
-                    editorSharedPreferences.putStringSet(getString(R.string.search_history_key), new TreeSet<>(oldSearches));
-                    editorSharedPreferences.commit();
-                    performSearch(query);
-                }
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
+    private void displayMainFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container_main_activity,mainFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
 
-    /**
-     * This method is used in order to perform a
-     * search query
-     *
-     * @param query
-     */
-    private void performSearch(String query) {
+    @Override
+    public void insertSearchInDatabase(String search) {
+      //todo
+        //not done yet
+    }
+
+    @Override
+    public void performSearch(String query) {
         //build query
         String formattedSearchURL = String.format(URL_SEARCH_RECIPES_LIMIT_10, query);
 
         //push request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedSearchURL, (response) ->
         {//process response
-            displaySearchFragment(getSearchResultsFromJson(response));
+            mainFragment.displaySearchResults(RecipeUtil.getSearchResultsFromJson(response));
         },
                 (error) -> {
                 });
@@ -190,33 +109,10 @@ public class MainActivity extends AppCompatActivity implements AdapterRecyclerVi
 
     }
 
-    private void displaySearchFragment(ArrayList<Recipe> searchResults) {
-        //reuse the RandomRecipesFragment
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container_main, FragmentRecipesList.getInstance(searchResults))
-                .addToBackStack(null)
-                .commit();
-    }
-
-    private void displayOldSearchList() {
-        //display the newest searches first
-        getSearchHistory();
-        getSupportFragmentManager().beginTransaction().
-                replace(R.id.container_main, SearchHistoryFragment.getInstance(processSet(oldSearches))).
-                addToBackStack(null).commit();
-    }
-    private ArrayList<String> processSet(Set<String> set){
-        ArrayList<String> searches = new ArrayList<>(set);
-        Collections.reverse(searches);
-        return searches;
-    }
-
-
     @Override
     public void expandItem(Recipe recipe) {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.layout_main, ExpandedItemFragment.getInstance(recipe))
+                .replace(R.id.container_main_activity, ExpandedItemFragment.getInstance(recipe))
                 .addToBackStack(null)
                 .commit();
     }
