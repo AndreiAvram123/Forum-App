@@ -6,15 +6,15 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.bookapp.fragments.MainFragment;
+import com.example.bookapp.Adapters.AdapterRecyclerView;
+import com.example.bookapp.fragments.ExpandedItemFragment;
+import com.example.bookapp.fragments.FragmentRecipesList;
 import com.example.bookapp.fragments.SearchHistoryFragment;
 import com.example.bookapp.models.Recipe;
 
@@ -23,7 +23,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
@@ -33,10 +32,10 @@ import java.util.TreeSet;
  * for the main screen
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements AdapterRecyclerView.AdapterInterface {
     private ConstraintLayout containerMain;
     private SearchView searchView;
-    private static final String URL_RANDOM_RECIPES = "https://api.spoonacular.com/recipes/random?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=10";
+    private static final String URL_RANDOM_RECIPES = "https://api.spoonacular.com/recipes/random?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=1";
     private static final String URL_SEARCH_RECIPES_LIMIT_10 = "https://api.spoonacular.com/recipes/search?query=%s&number=10&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
 
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
@@ -44,12 +43,12 @@ public class MainActivity extends AppCompatActivity {
     private Set<String> oldSearches = new TreeSet<>();
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editorSharedPreferences;
-    private MainFragment randomRecipesFragment;
+    private FragmentRecipesList randomRecipesFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.fragment_main);
         initializeViews();
         requestQueue = Volley.newRequestQueue(this);
         pushRequest();
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void processRequest(String response) {
         randomRecipes.addAll(getRecipesFromJson(response));
-        randomRecipesFragment = MainFragment.getInstance(randomRecipes);
+        randomRecipesFragment = FragmentRecipesList.getInstance(randomRecipes);
         displayRandomRecipesFragment();
     }
 
@@ -195,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
         //reuse the RandomRecipesFragment
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container_main, MainFragment.getInstance(searchResults))
+                .replace(R.id.container_main, FragmentRecipesList.getInstance(searchResults))
                 .addToBackStack(null)
                 .commit();
     }
@@ -214,6 +213,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
+    @Override
+    public void expandItem(Recipe recipe) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.layout_main, ExpandedItemFragment.getInstance(recipe))
+                .addToBackStack(null)
+                .commit();
+    }
 }

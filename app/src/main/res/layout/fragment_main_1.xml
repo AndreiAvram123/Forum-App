@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:background="#F0F1F2"
+    android:id ="@+id/layout_main_fragment"
 
     >
 

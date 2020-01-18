@@ -1,5 +1,6 @@
 package com.example.bookapp.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.text.Layout;
 import android.view.LayoutInflater;
@@ -20,9 +21,11 @@ import java.util.ArrayList;
 public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder> {
    private ArrayList<Recipe> recipes;
    private Context context;
+   private AdapterInterface adapterInterface;
 
-    public AdapterRecyclerView(@NonNull ArrayList<Recipe> recipes){
+    public AdapterRecyclerView(@NonNull ArrayList<Recipe> recipes, Activity activity){
         this.recipes = recipes;
+        adapterInterface = (AdapterInterface) activity;
     }
 
 
@@ -31,6 +34,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
        context = parent.getContext();
        View itemLayout = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_recipe,parent,false);
+
         return new ViewHolder(itemLayout);
     }
 
@@ -41,6 +45,9 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
                .load(recipes.get(position).getImageUrl())
                .centerInside()
                .into(holder.recipeImage);
+        //when the user clicks on an item
+        //display the extended item fragment
+         holder.itemView.setOnClickListener(view->adapterInterface.expandItem(recipes.get(position)));
     }
 
     @Override
@@ -55,11 +62,16 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
+
             bindValuesToViews(itemView);
         }
         private void bindValuesToViews(View itemLayout){
           recipeImage = itemLayout.findViewById(R.id.recipe_image_list_item);
           recipeName = itemLayout.findViewById(R.id.recipe_name_list_item);
         }
+    }
+    public interface AdapterInterface{
+        void expandItem(Recipe recipe);
     }
 }

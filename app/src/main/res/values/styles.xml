@@ -14,4 +14,20 @@
 
     </style>
 
+    <style name="ImportantText">
+        <item name="android:textSize">20sp</item>
+        <item name="android:color">#000000</item>
+        <item name="android:textStyle">bold</item>
+
+    </style>
+
+    <style name="important_text_small">
+        <item name="android:textSize">16sp</item>
+        <item name="android:color">#000000</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/opensans_bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+
 </resources>
