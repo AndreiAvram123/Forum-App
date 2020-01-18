@@ -6,13 +6,15 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.SearchView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.bookapp.fragments.RandomRacipesFragment;
+import com.example.bookapp.fragments.MainFragment;
 import com.example.bookapp.fragments.SearchHistoryFragment;
 import com.example.bookapp.models.Recipe;
 
@@ -21,6 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -33,12 +37,15 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout containerMain;
     private SearchView searchView;
     private static final String URL_RANDOM_RECIPES = "https://api.spoonacular.com/recipes/random?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=10";
+    private static final String URL_SEARCH_RECIPES_LIMIT_10 = "https://api.spoonacular.com/recipes/search?query=%s&number=10&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
+
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
     private RequestQueue requestQueue;
     private Set<String> oldSearches = new TreeSet<>();
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editorSharedPreferences;
-    private RandomRacipesFragment randomRacipesFragment;
+    private MainFragment randomRecipesFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         if (sharedPreferences.getStringSet(getString(R.string.search_history_key), null) == null) {
             oldSearches.add("No search history");
         } else {
-            oldSearches= (sharedPreferences.getStringSet(getString(R.string.search_history_key), null));
+            oldSearches =  sharedPreferences.getStringSet(getString(R.string.search_history_key), null);
         }
     }
 
@@ -69,29 +76,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void processRequest(String response) {
+        randomRecipes.addAll(getRecipesFromJson(response));
+        randomRecipesFragment = MainFragment.getInstance(randomRecipes);
+        displayRandomRecipesFragment();
+    }
+
+    private ArrayList<Recipe> getRecipesFromJson(String json) {
+        ArrayList<Recipe> results = new ArrayList<>();
         try {
-            JSONObject jsonObject = new JSONObject(response);
+            JSONObject jsonObject = new JSONObject(json);
             //get the recipes array
             JSONArray recipes = jsonObject.getJSONArray("recipes");
             for (int i = 0; i < recipes.length(); i++) {
                 JSONObject recipeJson = recipes.getJSONObject(i);
                 Recipe recipeObject = new Recipe(recipeJson.getString("title"),
                         recipeJson.getString("image"));
-                randomRecipes.add(recipeObject);
+                results.add(recipeObject);
             }
-            randomRacipesFragment = RandomRacipesFragment.getInstance(randomRecipes);
-            displayRandomRecipesFragment();
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return results;
+    }
+
+    private ArrayList<Recipe> getSearchResultsFromJson(String json){
+        ArrayList<Recipe> results = new ArrayList<>();
+        String apiImagePath ="https://spoonacular.com/recipeImages/%s";
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            //get the recipes array
+            JSONArray recipes = jsonObject.getJSONArray("results");
+            for (int i = 0; i < recipes.length(); i++) {
+                JSONObject recipeJson = recipes.getJSONObject(i);
+                Recipe recipeObject = new Recipe(recipeJson.getString("title"),
+                        String.format(apiImagePath,recipeJson.getString("image")));
+                results.add(recipeObject);
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return results;
     }
 
     private void displayRandomRecipesFragment() {
-        if(randomRacipesFragment!=null) {
+        if (randomRecipesFragment != null) {
             getSupportFragmentManager()
                     .beginTransaction().
-                    replace(R.id.container_main, randomRacipesFragment)
+                    replace(R.id.container_main, randomRecipesFragment)
                     .commit();
         }
     }
@@ -99,6 +132,11 @@ public class MainActivity extends AppCompatActivity {
     private void initializeViews() {
         containerMain = findViewById(R.id.container_main);
         searchView = findViewById(R.id.searchView);
+        configureSearch();
+
+    }
+
+    private void configureSearch() {
         searchView.setOnClickListener(view -> {
             if (searchView.isIconified()) {
                 searchView.setBackground(getDrawable(R.drawable.search_background_highlighted));
@@ -115,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (query.trim() != "") {
+                if (!query.trim().equals("")) {
                     oldSearches.add(query);
                     editorSharedPreferences.putStringSet(getString(R.string.search_history_key), new TreeSet<>(oldSearches));
                     editorSharedPreferences.commit();
@@ -129,24 +167,53 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             }
         });
-
     }
+
 
     /**
      * This method is used in order to perform a
      * search query
+     *
      * @param query
      */
     private void performSearch(String query) {
+        //build query
+        String formattedSearchURL = String.format(URL_SEARCH_RECIPES_LIMIT_10, query);
 
+        //push request
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedSearchURL, (response) ->
+        {//process response
+            displaySearchFragment(getSearchResultsFromJson(response));
+        },
+                (error) -> {
+                });
+        requestQueue.add(stringRequest);
+
+    }
+
+    private void displaySearchFragment(ArrayList<Recipe> searchResults) {
+        //reuse the RandomRecipesFragment
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container_main, MainFragment.getInstance(searchResults))
+                .addToBackStack(null)
+                .commit();
     }
 
     private void displayOldSearchList() {
+        //display the newest searches first
         getSearchHistory();
         getSupportFragmentManager().beginTransaction().
-                replace(R.id.container_main, SearchHistoryFragment.getInstance(new ArrayList<>(oldSearches))).
+                replace(R.id.container_main, SearchHistoryFragment.getInstance(processSet(oldSearches))).
                 addToBackStack(null).commit();
     }
+    private ArrayList<String> processSet(Set<String> set){
+        ArrayList<String> searches = new ArrayList<>(set);
+        Collections.reverse(searches);
+        return searches;
+    }
+
+
 
 
 }

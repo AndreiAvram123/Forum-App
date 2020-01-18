@@ -19,20 +19,20 @@ import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
 
-public class RandomRacipesFragment extends Fragment {
+public class MainFragment extends Fragment {
     private static final String  KEY_POPULAR_RECIPES = "KEY_POPULAR_BOOKS";
     private RecyclerView recyclerView;
     private ArrayList<Recipe> popularRecipes;
 
-    public static RandomRacipesFragment getInstance(@NonNull ArrayList<Recipe> popularRecipes){
-        RandomRacipesFragment randomRacipesFragment = new RandomRacipesFragment();
+    public static MainFragment getInstance(@NonNull ArrayList<Recipe> popularRecipes){
+        MainFragment randomRacipesFragment = new MainFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(KEY_POPULAR_RECIPES, popularRecipes);
         randomRacipesFragment.setArguments(bundle);
         return randomRacipesFragment;
     }
 
-    public RandomRacipesFragment() {
+    public MainFragment() {
         // Required empty public constructor
     }
 

@@ -15,6 +15,9 @@ import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
 
+//todo
+//maybe reuse this fragment
+
 /**
  * This fragment is used to
  * display a list of search results
@@ -22,6 +25,7 @@ import java.util.ArrayList;
 public class SearchResultsFragment extends Fragment {
 private static final String  SEARCH_RESULTS_KEY = "SEARCH_RESULTS_KEY";
 private RecyclerView resultsRecyclerView;
+
     public SearchResultsFragment getInstance(ArrayList<Recipe> searchResults) {
         // Required empty public constructor
         SearchResultsFragment searchHistoryFragment = new SearchResultsFragment();
@@ -39,6 +43,9 @@ private RecyclerView resultsRecyclerView;
         View layout = inflater.inflate(R.layout.fragment_search_results, container, false);
         resultsRecyclerView = layout.findViewById(R.id.recycler_view_search_results);
         return layout;
+    }
+    private void initializeRecyclerView(){
+
     }
 
 
