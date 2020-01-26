@@ -3,15 +3,12 @@ package com.example.bookapp.fragments;
 
 import android.os.Bundle;
 
-import androidx.annotation.IntegerRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +18,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
+import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.Recipe;
 
 import java.util.Map;
 
-public class ExpandedItemFragment extends Fragment {
+public class ExpandedItemFragment extends Fragment  {
     private static final String KEY_EXPANDED_ITEM = "KEY_EXPANDED_ITEM";
     private ImageView recipeImage;
     private TextView recipeName;
@@ -35,9 +33,12 @@ public class ExpandedItemFragment extends Fragment {
     private LinearLayout features;
     private TextView dishType;
     private ViewPager viewPager;
+    private ActionsInterface actionsInterface;
+    private Recipe recipe;
 
 
-    public static ExpandedItemFragment getInstance(Recipe selectedRecipe){
+
+    public static ExpandedItemFragment getInstance(@NonNull Recipe selectedRecipe){
 
         ExpandedItemFragment expandedItemFragment = new ExpandedItemFragment();
         Bundle bundle = new Bundle();
@@ -57,8 +58,13 @@ public class ExpandedItemFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View layout =  inflater.inflate(R.layout.fragment_expanded_item, container, false);
-        initialiseViews(layout);
-        bindDataToView(getArguments().getParcelable(KEY_EXPANDED_ITEM));
+        recipe =getArguments().getParcelable(KEY_EXPANDED_ITEM);
+        if(recipe!=null) {
+            initialiseViews(layout);
+            bindDataToView(recipe);
+            actionsInterface = (ActionsInterface) getActivity();
+
+        }
         return layout;
     }
 
@@ -71,19 +77,21 @@ public class ExpandedItemFragment extends Fragment {
         features = layout.findViewById(R.id.layout_features_expanded);
         dishType = layout.findViewById(R.id.dish_type);
         viewPager = layout.findViewById(R.id.view_pager_expanded);
+        ImageView backButton = layout.findViewById(R.id.back_button_expanded);
+        backButton.setOnClickListener((view)-> getActivity().getSupportFragmentManager().popBackStack());
+        ImageView shareButton = layout.findViewById(R.id.share_button_expanded);
+        shareButton.setOnClickListener(view-> actionsInterface.shareRecipe(recipe));
+        ImageView saveButton = layout.findViewById(R.id.save_button_expanded);
+        saveButton.setOnClickListener(view->actionsInterface.saveRecipe(recipe));
     }
 
+
     private void bindDataToView(Recipe recipe) {
-        Glide.with(getContext())
-                  .load("https://spoonacular.com/recipeImages/318041-556x370.jpeg")
-                  .centerInside()
-                .into(recipeImage);
+        insertImageInView();
         recipeName.setText(recipe.getName());
-        //todo
-        //this operaton should not concern the view
-        cookingTime.setText(Integer.toString(recipe.getCookingTime()));
-        healthPoints.setText(Integer.toString(recipe.getHealthPoints()));
-        numberPeople.setText(Integer.toString(recipe.getNumberOfPeople()));
+        cookingTime.setText(recipe.getCookingTime());
+        healthPoints.setText(recipe.getHealthPoints());
+        numberPeople.setText(recipe.getNumberOfPeople());
         dishType.setText(recipe.getDishType());
         viewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager()) {
             @Override
@@ -92,7 +100,7 @@ public class ExpandedItemFragment extends Fragment {
                     return FragmentRecyclerView.getInstance(recipe.getIngredients());
                 }else{
                     if(position==1){
-                        return FragmentRecyclerView.getInstance(recipe.getIngredients());
+                        return FragmentRecyclerView.getInstance(recipe.getInstructions());
                     }
                 }
                 return null;
@@ -122,6 +130,13 @@ public class ExpandedItemFragment extends Fragment {
            }
         }
 
+    }
+
+    private void insertImageInView() {
+        Glide.with(getContext())
+                  .load("https://spoonacular.com/recipeImages/318041-556x370.jpeg")
+                  .centerInside()
+                .into(recipeImage);
     }
 
 }

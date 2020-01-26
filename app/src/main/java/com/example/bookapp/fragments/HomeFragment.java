@@ -19,7 +19,7 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MainFragment extends Fragment {
+public class HomeFragment extends Fragment {
 
     private static final String KEY_RECIPES = "KEY_RECIPES";
     private static final String KEY_SEARCH_HISTORY = "KEY_SEARCH_HISTORY";
@@ -29,13 +29,13 @@ public class MainFragment extends Fragment {
     private MainFragmentInterface mainFragmentInterface;
     private ArrayList<Recipe> randomRecipes;
 
-    public static MainFragment getInstance(ArrayList<Recipe> recipes,ArrayList<String> searchHistory){
-      MainFragment mainFragment = new MainFragment();
+    public static HomeFragment getInstance(ArrayList<Recipe> recipes, ArrayList<String> searchHistory){
+      HomeFragment homeFragment = new HomeFragment();
       Bundle bundle = new Bundle();
       bundle.putParcelableArrayList(KEY_RECIPES,recipes);
       bundle.putStringArrayList(KEY_SEARCH_HISTORY,searchHistory);
-      mainFragment.setArguments(bundle);
-      return mainFragment;
+      homeFragment.setArguments(bundle);
+      return homeFragment;
     }
 
     @Override
@@ -98,7 +98,6 @@ public class MainFragment extends Fragment {
     private void displayRandomRecipesFragment(){
         getActivity().getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container_main_fragment,FragmentRecipesList.getInstance(randomRecipes))
-                .addToBackStack(null)
                 .commit();
     }
 

@@ -1,5 +1,7 @@
 package com.example.bookapp;
 
+import androidx.annotation.NonNull;
+
 import com.example.bookapp.models.Recipe;
 
 import org.json.JSONArray;
@@ -7,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class RecipeUtil {
@@ -36,14 +39,15 @@ public class RecipeUtil {
 
 
 
-                Recipe recipeObject = new Recipe(recipeJson.getString("title"),
+                Recipe recipeObject = new Recipe(recipeJson.getInt("id"),recipeJson.getString("title"),
                         recipeJson.getString("image"),
-                        recipeJson.getInt("healthScore"),
-                        recipeJson.getInt("readyInMinutes"),
-                        recipeJson.getInt("servings"),
+                        Integer.toString(recipeJson.getInt("healthScore")),
+                        Integer.toString(recipeJson.getInt("readyInMinutes")),
+                        Integer.toString(recipeJson.getInt("servings")),
                         RecipeUtil.getRecipeFeatures(recipeJson),
                         RecipeUtil.getDishType(recipeJson),
-                        getIngredientsFromJsonArray(recipeJson.getJSONArray("extendedIngredients"))
+                        getIngredientsFromJsonArray(recipeJson.getJSONArray("extendedIngredients")),
+                        getInstructionsFromJsonArray((recipeJson.getJSONArray("analyzedInstructions")))
                 );
 
                 results.add(recipeObject);
@@ -58,7 +62,7 @@ public class RecipeUtil {
     //todo
     //don't pass null
 
-    public static  ArrayList<Recipe> getSearchResultsFromJson(String json) {
+    public static  ArrayList<Recipe> getSearchResultsFromJson(@NonNull String json) {
         ArrayList<Recipe> results = new ArrayList<>();
         String apiImagePath = "https://spoonacular.com/recipeImages/%s";
         try {
@@ -67,14 +71,16 @@ public class RecipeUtil {
             JSONArray recipes = jsonObject.getJSONArray("results");
             for (int i = 0; i < recipes.length(); i++) {
                 JSONObject recipeJson = recipes.getJSONObject(i);
-                Recipe recipeObject = new Recipe(recipeJson.getString("title"),
+                Recipe recipeObject = new Recipe(
+                        recipeJson.getInt("id"),recipeJson.getString("title"),
                         String.format(apiImagePath, recipeJson.getString("image")),
-                        recipeJson.getInt("healthScore"),
-                        recipeJson.getInt("readyInMinutes"),
-                        recipeJson.getInt("servings"),
+                        Integer.toString(recipeJson.getInt("healthScore")),
+                        Integer.toString(recipeJson.getInt("readyInMinutes")),
+                        Integer.toString(recipeJson.getInt("servings")),
                         RecipeUtil.getRecipeFeatures(recipeJson),
                         RecipeUtil.getDishType(recipeJson),
-                       null
+                       null,
+                        getInstructionsFromJsonArray((recipeJson.getJSONArray("analyzedInstructions")))
                 );
                 results.add(recipeObject);
             }
@@ -85,7 +91,19 @@ public class RecipeUtil {
         return results;
     }
 
-    public static ArrayList<String>getIngredientsFromJsonArray(JSONArray ingredients) throws JSONException {
+    public static ArrayList<String>getInstructionsFromJsonArray(@NonNull JSONArray instructionsJson) throws JSONException {
+         JSONObject firstInstructionsObject = instructionsJson.getJSONObject(0);
+        JSONArray steps = firstInstructionsObject.getJSONArray("steps");
+        ArrayList<String> instructionsStringList = new ArrayList<>();
+        for(int i=0;i<steps.length();i++){
+            JSONObject step = steps.getJSONObject(i);
+            instructionsStringList.add(step.getString("step"));
+        }
+        Collections.reverse(instructionsStringList);
+        return instructionsStringList;
+    }
+
+    public static ArrayList<String>getIngredientsFromJsonArray(@NonNull JSONArray ingredients) throws JSONException {
         ArrayList<String> formattedIngredients = new ArrayList<>();
         for(int i=0;i<ingredients.length();i++){
             JSONObject ingredientJson = ingredients.getJSONObject(i);
