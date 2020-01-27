@@ -17,7 +17,7 @@ import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.DataFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
 import com.example.bookapp.fragments.HomeFragment;
-import com.example.bookapp.fragments.SavedRecipesObject;
+import com.example.bookapp.fragments.SavedRecipesDataObject;
 import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.Recipe;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -59,10 +59,8 @@ public class MainActivity extends AppCompatActivity implements
     private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
-    private SavedRecipesObject savedRecipesObject = new SavedRecipesObject();
     private DataFragment savedRecipesFragment;
     private ArrayList<Recipe> savedRecipes;
-    private boolean waitForFirebaseFetch = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +68,20 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.layout_main_activity);
         configureDefaultParameters();
         savedRecipes = new ArrayList<>();
+        configureFirebaseParameters();
         savedRecipesFragment = DataFragment.getInstance(savedRecipes);
-        if (!waitForFirebaseFetch) {
+        if(firebaseUser!=null){
+            getSavedRecipesForCurrentUser(firebaseUser.getUid());
+        }else{
             pushRequestRandomRecipes();
         }
 
+    }
+
+    private void configureFirebaseParameters() {
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
     }
 
     private void configureDefaultParameters() {
@@ -82,11 +89,7 @@ public class MainActivity extends AppCompatActivity implements
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
-    private void initializeLocalDatabase() {
-//        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-//                AppDatabase.class, "app-database").build();
 
-    }
 
 
     private void pushRequestRandomRecipes() {
@@ -202,23 +205,29 @@ public class MainActivity extends AppCompatActivity implements
         if (firebaseUser == null) {
             requestLogIn();
         } else {
-            savedRecipesObject.addRecipe(recipe);
-            DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
-            documentReference.set(savedRecipesObject, SetOptions.merge());
+            savedRecipes.add(recipe);
+            updateUserFirebaseDocument();
         }
     }
 
     @Override
     public void deleteSaveRecipe(Recipe recipe) {
-        savedRecipesObject.addRecipe(recipe);
+        if (firebaseUser == null) {
+            requestLogIn();
+        } else {
+            savedRecipes.remove(recipe);
+           updateUserFirebaseDocument();
+        }
+    }
+    private void updateUserFirebaseDocument(){
+        savedRecipesFragment = DataFragment.getInstance(savedRecipes);
         DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
-        documentReference.u
+        documentReference.set(new SavedRecipesDataObject(savedRecipes), SetOptions.merge());
     }
 
     private void requestLogIn() {
         BottomSheetPromptLogin bottomSheetPromptLogin = BottomSheetPromptLogin.newInstance();
         bottomSheetPromptLogin.show(getSupportFragmentManager(), BottomSheetPromptLogin.TAG);
-
 
     }
 
@@ -226,14 +235,11 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        initializeLocalDatabase();
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
-        firebaseFirestore = FirebaseFirestore.getInstance();
-        if (firebaseUser != null) {
-            waitForFirebaseFetch = true;
-            getSavedRecipesForCurrentUser(firebaseUser.getUid());
-        }
+         firebaseUser = firebaseAuth.getCurrentUser();
+        updateUIWithUserInfo();
+    }
+
+    private void updateUIWithUserInfo() {
     }
 
     private void getSavedRecipesForCurrentUser(String uId) {
@@ -242,10 +248,11 @@ public class MainActivity extends AppCompatActivity implements
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
-                    SavedRecipesObject savedRecipesObject = document.toObject(SavedRecipesObject.class);
-                    if (savedRecipesObject != null) {
-                        savedRecipesObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
-                        savedRecipesFragment = DataFragment.getInstance(new ArrayList<>(savedRecipesObject.getSavedRecipes().values()));
+                    SavedRecipesDataObject savedRecipesDataObject = document.toObject(SavedRecipesDataObject.class);
+                    if (savedRecipesDataObject != null) {
+                        savedRecipesDataObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
+                        savedRecipes.addAll(savedRecipesDataObject.getSavedRecipes().values());
+                        savedRecipesFragment = DataFragment.getInstance(savedRecipes);
                     }
                 }
             }

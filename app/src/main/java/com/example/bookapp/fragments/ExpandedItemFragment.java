@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
 import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.Recipe;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Map;
 
@@ -81,7 +82,11 @@ public class ExpandedItemFragment extends Fragment  {
         backButton.setOnClickListener((view) -> getActivity().getSupportFragmentManager().popBackStack());
         ImageView shareButton = layout.findViewById(R.id.share_button_expanded);
         shareButton.setOnClickListener(view -> actionsInterface.shareRecipe(recipe));
+        configureSaveButton(layout);
 
+    }
+
+    private void configureSaveButton(View layout) {
         //get the save button
         //and attach a listener to it
         ImageView saveButton = layout.findViewById(R.id.save_button_expanded);
@@ -90,14 +95,18 @@ public class ExpandedItemFragment extends Fragment  {
         }
         saveButton.setOnClickListener(view ->{
              if(recipe.isSaved()){
-                 actionsInterface.deleteSaveRecipe();
+                 recipe.setSaved(false);
+                 saveButton.setImageResource(R.drawable.ic_favorite_border_black_32dp);
+                 actionsInterface.deleteSaveRecipe(recipe);
+                 Snackbar.make(layout,"Recipe deleted from favorites",Snackbar.LENGTH_SHORT).show();
              }else{
+                 recipe.setSaved(true);
+                 saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
                  actionsInterface.saveRecipe(recipe);
-
+                 Snackbar.make(layout,"Recipe added to favorites",Snackbar.LENGTH_SHORT).show();
              }
 
                 });
-
     }
 
 
