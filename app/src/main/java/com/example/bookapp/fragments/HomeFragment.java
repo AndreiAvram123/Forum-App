@@ -24,7 +24,6 @@ public class HomeFragment extends Fragment {
     private static final String KEY_RECIPES = "KEY_RECIPES";
     private static final String KEY_SEARCH_HISTORY = "KEY_SEARCH_HISTORY";
     private SearchView searchView;
-    private ConstraintLayout mainContainer;
     private ArrayList<String> searchHistory;
     private MainFragmentInterface mainFragmentInterface;
     private ArrayList<Recipe> randomRecipes;
@@ -52,7 +51,6 @@ public class HomeFragment extends Fragment {
         return layout;
     }
     private void initializeViews(View layout) {
-        mainContainer = layout.findViewById(R.id.container_main_fragment);
         searchView = layout.findViewById(R.id.searchView);
         configureSearch();
 
@@ -103,11 +101,18 @@ public class HomeFragment extends Fragment {
 
 
     public void displaySearchResults(ArrayList<Recipe> results){
+        //clear search
+        clearSearch();
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_main_fragment,FragmentRecipesList.getInstance(results))
+                .replace(R.id.container_main_fragment,DataFragment.getInstance(results))
                 .addToBackStack(null)
                 .commit();
     }
+   private void clearSearch(){
+       searchView.onActionViewCollapsed();
+       searchView.setBackground(getActivity().getDrawable(R.drawable.search_background));
+   }
+
     public interface MainFragmentInterface{
         void insertSearchInDatabase(String search);
         void performSearch(String query);

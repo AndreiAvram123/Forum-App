@@ -1,6 +1,7 @@
 package com.example.bookapp.fragments;
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,18 +25,14 @@ public class DataFragment extends Fragment {
     private static final String KEY_DATA = "KEY_DATA";
     private RecyclerView recyclerView;
     private ArrayList<Recipe> data;
-    private static DataFragment instance;
 
-    //make the fragment a singleton
     public static DataFragment getInstance(@NonNull ArrayList<Recipe> recipes) {
-
+        DataFragment dataFragment = new DataFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(KEY_DATA, recipes);
-        if (instance == null) {
-            instance = new DataFragment();
-        }
-        instance.setArguments(bundle);
-        return instance;
+
+        dataFragment.setArguments(bundle);
+        return dataFragment;
     }
 
     @Override

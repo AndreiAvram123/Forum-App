@@ -50,8 +50,8 @@ public class MainActivity extends AppCompatActivity implements
         AdapterRecyclerView.AdapterInterface, ActionsInterface, HomeFragment.MainFragmentInterface,
         BottomSheetPromptLogin.BottomSheetInterface {
     private static final String URL_RANDOM_RECIPES = "https://api.spoonacular.com/recipes/random?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=1";
-    private static final String URL_SEARCH_RECIPES_LIMIT_10 = "https://api.spoonacular.com/recipes/search?query=%s&number=10&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
-
+    private static final String URL_SEARCH_RECIPES_LIMIT_20 = "https://api.spoonacular.com/recipes/search?query=%s&number=20&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
+    private static final String URL_SEARCH_RECIPE_ID = "https://api.spoonacular.com/recipes/%s/information?includeNutrition=false&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
     private RequestQueue requestQueue;
     private SharedPreferences sharedPreferences;
@@ -61,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements
     private FirebaseFirestore firebaseFirestore;
     private DataFragment savedRecipesFragment;
     private ArrayList<Recipe> savedRecipes;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,9 +69,9 @@ public class MainActivity extends AppCompatActivity implements
         savedRecipes = new ArrayList<>();
         configureFirebaseParameters();
         savedRecipesFragment = DataFragment.getInstance(savedRecipes);
-        if(firebaseUser!=null){
+        if (firebaseUser != null) {
             getSavedRecipesForCurrentUser(firebaseUser.getUid());
-        }else{
+        } else {
             pushRequestRandomRecipes();
         }
 
@@ -88,8 +87,6 @@ public class MainActivity extends AppCompatActivity implements
         requestQueue = Volley.newRequestQueue(this);
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
-
-
 
 
     private void pushRequestRandomRecipes() {
@@ -141,6 +138,10 @@ public class MainActivity extends AppCompatActivity implements
                     displayFragment(homeFragment);
                     break;
                 }
+                case R.id.search_item:{
+
+                    break;
+                }
                 case R.id.saved_items: {
                     displayFragment(savedRecipesFragment);
                     break;
@@ -167,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void performSearch(String query) {
         //build query
-        String formattedSearchURL = String.format(URL_SEARCH_RECIPES_LIMIT_10, query);
+        String formattedSearchURL = String.format(URL_SEARCH_RECIPES_LIMIT_20, query);
 
         //push request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedSearchURL, (response) ->
@@ -182,11 +183,35 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void expandItem(Recipe recipe) {
+        if (recipe.getIngredients() == null) {
+            //get the full data from the api
+            pushRequestGetRecipeDetails(recipe.getId());
+        } else {
+           displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe));
+        }
+    }
+
+    private void displayFragmentAddToBackStack(Fragment fragment){
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_main_activity, ExpandedItemFragment.getInstance(recipe))
+                .replace(R.id.container_main_activity, fragment)
                 .addToBackStack(null)
                 .commit();
     }
+
+    private void pushRequestGetRecipeDetails(int id) {
+        String formattedRecipeURL = String.format(URL_SEARCH_RECIPE_ID, id);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedRecipeURL, (response) ->
+        {//process response
+            Recipe recipe = RecipeUtil.getRecipeFromJson(response);
+            if (recipe != null) {
+                displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe));
+            }
+        },
+                (error) -> {
+                });
+        requestQueue.add(stringRequest);
+    }
+
 
     @Override
     public void shareRecipe(Recipe recipe) {
@@ -216,10 +241,11 @@ public class MainActivity extends AppCompatActivity implements
             requestLogIn();
         } else {
             savedRecipes.remove(recipe);
-           updateUserFirebaseDocument();
+            updateUserFirebaseDocument();
         }
     }
-    private void updateUserFirebaseDocument(){
+
+    private void updateUserFirebaseDocument() {
         savedRecipesFragment = DataFragment.getInstance(savedRecipes);
         DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
         documentReference.set(new SavedRecipesDataObject(savedRecipes), SetOptions.merge());
@@ -235,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-         firebaseUser = firebaseAuth.getCurrentUser();
+        firebaseUser = firebaseAuth.getCurrentUser();
         updateUIWithUserInfo();
     }
 

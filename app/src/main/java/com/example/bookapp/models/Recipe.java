@@ -40,13 +40,31 @@ public class Recipe implements Parcelable {
     @Exclude
     private boolean isSaved;
 
-    //empty constructor required by room
+    //empty constructor required by room and firebase
     public Recipe(){
 
     }
 
 
+    public Recipe(int id, String name, String imageUrl) {
+        this.id = id;
+        this.name = name;
+        this.imageUrl = imageUrl;
+    }
 
+    /**
+     * Constructor used to the full details of a recipe
+     * @param id
+     * @param name
+     * @param imageUrl
+     * @param healthPoints
+     * @param cookingTime
+     * @param numberOfPeople
+     * @param features
+     * @param dishType
+     * @param ingredients
+     * @param instructions
+     */
     public Recipe(@NonNull int id, @NonNull String name, @NonNull String imageUrl, String healthPoints, String cookingTime, String numberOfPeople, HashMap<String, Boolean> features, @NonNull String dishType,
                   ArrayList<String>ingredients, ArrayList<String>instructions) {
         this.id = id;
@@ -201,19 +219,13 @@ public class Recipe implements Parcelable {
         Recipe recipe = (Recipe) o;
 
         if (id != recipe.id) return false;
-        if (!name.equals(recipe.name)) return false;
-        if (!imageUrl.equals(recipe.imageUrl)) return false;
-        if (!healthPoints.equals(recipe.healthPoints)) return false;
-        return dishType.equals(recipe.dishType);
+        return name.equals(recipe.name);
     }
 
     @Override
     public int hashCode() {
         int result = id;
         result = 31 * result + name.hashCode();
-        result = 31 * result + imageUrl.hashCode();
-        result = 31 * result + healthPoints.hashCode();
-        result = 31 * result + dishType.hashCode();
         return result;
     }
 }

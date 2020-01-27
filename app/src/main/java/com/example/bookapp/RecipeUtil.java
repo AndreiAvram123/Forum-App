@@ -3,6 +3,7 @@ package com.example.bookapp;
 import androidx.annotation.NonNull;
 
 import com.example.bookapp.models.Recipe;
+import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,14 +74,7 @@ public class RecipeUtil {
                 JSONObject recipeJson = recipes.getJSONObject(i);
                 Recipe recipeObject = new Recipe(
                         recipeJson.getInt("id"),recipeJson.getString("title"),
-                        String.format(apiImagePath, recipeJson.getString("image")),
-                        Integer.toString(recipeJson.getInt("healthScore")),
-                        Integer.toString(recipeJson.getInt("readyInMinutes")),
-                        Integer.toString(recipeJson.getInt("servings")),
-                        RecipeUtil.getRecipeFeatures(recipeJson),
-                        RecipeUtil.getDishType(recipeJson),
-                       null,
-                        getInstructionsFromJsonArray((recipeJson.getJSONArray("analyzedInstructions")))
+                        String.format(apiImagePath, recipeJson.getString("image"))
                 );
                 results.add(recipeObject);
             }
@@ -114,5 +108,26 @@ public class RecipeUtil {
 
         }
         return formattedIngredients;
+    }
+
+    public static Recipe getRecipeFromJson(String jsonString) {
+        try {
+            JSONObject recipeJson = new JSONObject(jsonString);
+            return new Recipe(recipeJson.getInt("id"),recipeJson.getString("title"),
+                    recipeJson.getString("image"),
+                    Integer.toString(recipeJson.getInt("healthScore")),
+                    Integer.toString(recipeJson.getInt("readyInMinutes")),
+                    Integer.toString(recipeJson.getInt("servings")),
+                    RecipeUtil.getRecipeFeatures(recipeJson),
+                    RecipeUtil.getDishType(recipeJson),
+                    getIngredientsFromJsonArray(recipeJson.getJSONArray("extendedIngredients")),
+                    getInstructionsFromJsonArray((recipeJson.getJSONArray("analyzedInstructions")))
+            );
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+       return null;
+
+
     }
 }
