@@ -1,12 +1,12 @@
 package com.example.bookapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -28,22 +28,17 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -61,22 +56,30 @@ public class MainActivity extends AppCompatActivity implements
     private RequestQueue requestQueue;
     private SharedPreferences sharedPreferences;
     private HomeFragment homeFragment;
-    private BottomNavigationView bottomNavigationView;
     private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private SavedRecipesObject savedRecipesObject = new SavedRecipesObject();
-    private DataFragment savedRecipesFragment = DataFragment.getInstance(new ArrayList<>());
-
+    private DataFragment savedRecipesFragment;
+    private ArrayList<Recipe> savedRecipes;
+    private boolean waitForFirebaseFetch = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
-        requestQueue = Volley.newRequestQueue(this);
-        pushRequestRandomRecipes();
-        sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        configureDefaultParameters();
+        savedRecipes = new ArrayList<>();
+        savedRecipesFragment = DataFragment.getInstance(savedRecipes);
+        if (!waitForFirebaseFetch) {
+            pushRequestRandomRecipes();
+        }
 
+    }
+
+    private void configureDefaultParameters() {
+        requestQueue = Volley.newRequestQueue(this);
+        sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
     private void initializeLocalDatabase() {
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements
                 (response) -> {
                     //once the data is fetched process it
                     runOnUiThread(() -> processRequestRandomRecipes(response));
-                }, (error) -> error.printStackTrace());
+                }, Throwable::printStackTrace);
         requestQueue.add(randomRecipesRequest);
     }
 
@@ -110,13 +113,22 @@ public class MainActivity extends AppCompatActivity implements
 
     private void processRequestRandomRecipes(String response) {
         randomRecipes.addAll(RecipeUtil.getRecipesListFromJson(response));
+        checkWhichRandomRecipeIsSaved();
         homeFragment = HomeFragment.getInstance(randomRecipes, getSearchHistory());
         configureNavigationView();
 
     }
 
+    private void checkWhichRandomRecipeIsSaved() {
+        for (Recipe recipe : randomRecipes) {
+            if (savedRecipes.contains(recipe)) {
+                recipe.setSaved(true);
+            }
+        }
+    }
+
     private void configureNavigationView() {
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         //display home fragment
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
         displayFragment(homeFragment);
@@ -189,11 +201,18 @@ public class MainActivity extends AppCompatActivity implements
     public void saveRecipe(Recipe recipe) {
         if (firebaseUser == null) {
             requestLogIn();
-        }else{
-           savedRecipesObject.addRecipe(recipe);
-           DocumentReference documentReference= firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
-           documentReference.set(savedRecipesObject,SetOptions.merge());
+        } else {
+            savedRecipesObject.addRecipe(recipe);
+            DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
+            documentReference.set(savedRecipesObject, SetOptions.merge());
         }
+    }
+
+    @Override
+    public void deleteSaveRecipe(Recipe recipe) {
+        savedRecipesObject.addRecipe(recipe);
+        DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
+        documentReference.u
     }
 
     private void requestLogIn() {
@@ -211,35 +230,35 @@ public class MainActivity extends AppCompatActivity implements
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         firebaseFirestore = FirebaseFirestore.getInstance();
-        if(firebaseUser!=null){
-            getSavedRecipesFromUser(firebaseUser.getUid());
+        if (firebaseUser != null) {
+            waitForFirebaseFetch = true;
+            getSavedRecipesForCurrentUser(firebaseUser.getUid());
         }
     }
 
-    private void getSavedRecipesFromUser(String uId) {
+    private void getSavedRecipesForCurrentUser(String uId) {
         DocumentReference userRecipesReferences = firebaseFirestore.collection("users_saved_recipes").document(uId);
         userRecipesReferences.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
                     SavedRecipesObject savedRecipesObject = document.toObject(SavedRecipesObject.class);
-
-                    savedRecipesFragment = DataFragment.getInstance(new ArrayList<>(savedRecipesObject.getSavedRecipes().values()));
-
-                } else {
-
+                    if (savedRecipesObject != null) {
+                        savedRecipesObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
+                        savedRecipesFragment = DataFragment.getInstance(new ArrayList<>(savedRecipesObject.getSavedRecipes().values()));
+                    }
                 }
-            } else {
-
             }
-        });
+            pushRequestRandomRecipes();
+        }).addOnFailureListener(e -> pushRequestRandomRecipes());
+
     }
 
 
     @Override
     public void onItemClick(int itemId) {
-        switch (itemId){
-            case R.id.sign_in_google_item:{
+        switch (itemId) {
+            case R.id.sign_in_google_item: {
                 GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestIdToken(getString(R.string.default_web_client_id))
                         .requestEmail()

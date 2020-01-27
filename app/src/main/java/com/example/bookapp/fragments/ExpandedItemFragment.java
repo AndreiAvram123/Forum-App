@@ -78,11 +78,26 @@ public class ExpandedItemFragment extends Fragment  {
         dishType = layout.findViewById(R.id.dish_type);
         viewPager = layout.findViewById(R.id.view_pager_expanded);
         ImageView backButton = layout.findViewById(R.id.back_button_expanded);
-        backButton.setOnClickListener((view)-> getActivity().getSupportFragmentManager().popBackStack());
+        backButton.setOnClickListener((view) -> getActivity().getSupportFragmentManager().popBackStack());
         ImageView shareButton = layout.findViewById(R.id.share_button_expanded);
-        shareButton.setOnClickListener(view-> actionsInterface.shareRecipe(recipe));
+        shareButton.setOnClickListener(view -> actionsInterface.shareRecipe(recipe));
+
+        //get the save button
+        //and attach a listener to it
         ImageView saveButton = layout.findViewById(R.id.save_button_expanded);
-        saveButton.setOnClickListener(view->actionsInterface.saveRecipe(recipe));
+        if(recipe.isSaved()){
+            saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
+        }
+        saveButton.setOnClickListener(view ->{
+             if(recipe.isSaved()){
+                 actionsInterface.deleteSaveRecipe();
+             }else{
+                 actionsInterface.saveRecipe(recipe);
+
+             }
+
+                });
+
     }
 
 

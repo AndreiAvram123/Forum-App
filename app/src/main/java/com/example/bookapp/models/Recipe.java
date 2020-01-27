@@ -3,10 +3,14 @@ package com.example.bookapp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +29,7 @@ public class Recipe implements Parcelable {
     private String cookingTime;
     @ColumnInfo(name = "number_of_people")
     private String numberOfPeople;
-  @Ignore
+    @Ignore
     private HashMap<String,Boolean>features;
     @ColumnInfo(name = "dish_type")
     private String dishType;
@@ -33,13 +37,18 @@ public class Recipe implements Parcelable {
     private ArrayList<String> ingredients;
     @Ignore
     private ArrayList<String> instructions;
+    @Exclude
+    private boolean isSaved;
 
     //empty constructor required by room
     public Recipe(){
 
     }
-    public Recipe(int id,String name, String imageUrl, String healthPoints, String cookingTime, String numberOfPeople, HashMap<String, Boolean> features, String dishType,
-    ArrayList<String>ingredients,ArrayList<String>instructions) {
+
+
+
+    public Recipe(@NonNull int id, @NonNull String name, @NonNull String imageUrl, String healthPoints, String cookingTime, String numberOfPeople, HashMap<String, Boolean> features, @NonNull String dishType,
+                  ArrayList<String>ingredients, ArrayList<String>instructions) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
@@ -168,12 +177,44 @@ public class Recipe implements Parcelable {
         this.instructions = instructions;
     }
 
+    public boolean isSaved() {
+        return isSaved;
+    }
+
+    public void setSaved(boolean saved) {
+        isSaved = saved;
+    }
+
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Recipe recipe = (Recipe) o;
+
+        if (id != recipe.id) return false;
+        if (!name.equals(recipe.name)) return false;
+        if (!imageUrl.equals(recipe.imageUrl)) return false;
+        if (!healthPoints.equals(recipe.healthPoints)) return false;
+        return dishType.equals(recipe.dishType);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + name.hashCode();
+        result = 31 * result + imageUrl.hashCode();
+        result = 31 * result + healthPoints.hashCode();
+        result = 31 * result + dishType.hashCode();
+        return result;
     }
 }
 
