@@ -29,7 +29,7 @@
     </SearchView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/container_main_fragment"
+        android:id="@+id/container_search_fragment"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="24dp"

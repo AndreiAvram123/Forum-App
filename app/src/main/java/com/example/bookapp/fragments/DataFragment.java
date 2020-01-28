@@ -1,13 +1,14 @@
 package com.example.bookapp.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,7 +19,6 @@ import com.example.bookapp.R;
 import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class DataFragment extends Fragment {
 
@@ -30,7 +30,6 @@ public class DataFragment extends Fragment {
         DataFragment dataFragment = new DataFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(KEY_DATA, recipes);
-
         dataFragment.setArguments(bundle);
         return dataFragment;
     }
@@ -39,10 +38,9 @@ public class DataFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = null;
-        if (getArguments() != null && getArguments().getParcelableArrayList(KEY_DATA).size() != 0) {
-// Inflate the layout for this fragment
+
+        if (data != null) {
             view = inflater.inflate(R.layout.fragment_popular_books, container, false);
-            this.data = getArguments().getParcelableArrayList(KEY_DATA);
             recyclerView = view.findViewById(R.id.recycler_view_popular_books);
             initializeRecyclerViewAdapter();
 
@@ -52,6 +50,16 @@ public class DataFragment extends Fragment {
             errorMessage.setText("You do not have any data");
         }
         return view;
+    }
+
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (getArguments() != null && getArguments().getParcelableArrayList(KEY_DATA).size() != 0) {
+            // Inflate the layout for this fragment
+            this.data = getArguments().getParcelableArrayList(KEY_DATA);
+        }
     }
 
     /**

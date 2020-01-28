@@ -16,8 +16,8 @@ import com.example.bookapp.Adapters.AdapterRecyclerView;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.DataFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
-import com.example.bookapp.fragments.HomeFragment;
 import com.example.bookapp.fragments.SavedRecipesDataObject;
+import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.Recipe;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -32,6 +32,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.core.utilities.Tree;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -40,6 +41,7 @@ import com.google.firebase.firestore.SetOptions;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * The main activity acts as the controller
@@ -47,20 +49,22 @@ import java.util.Set;
  */
 
 public class MainActivity extends AppCompatActivity implements
-        AdapterRecyclerView.AdapterInterface, ActionsInterface, HomeFragment.MainFragmentInterface,
-        BottomSheetPromptLogin.BottomSheetInterface {
+        AdapterRecyclerView.AdapterInterface, ActionsInterface,
+        BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface {
     private static final String URL_RANDOM_RECIPES = "https://api.spoonacular.com/recipes/random?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=1";
     private static final String URL_SEARCH_RECIPES_LIMIT_20 = "https://api.spoonacular.com/recipes/search?query=%s&number=20&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
     private static final String URL_SEARCH_RECIPE_ID = "https://api.spoonacular.com/recipes/%s/information?includeNutrition=false&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
     private RequestQueue requestQueue;
     private SharedPreferences sharedPreferences;
-    private HomeFragment homeFragment;
     private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private DataFragment savedRecipesFragment;
+    private DataFragment homeFragment;
+    private SearchFragment searchFragment;
     private ArrayList<Recipe> savedRecipes;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,6 +73,7 @@ public class MainActivity extends AppCompatActivity implements
         savedRecipes = new ArrayList<>();
         configureFirebaseParameters();
         savedRecipesFragment = DataFragment.getInstance(savedRecipes);
+        searchFragment = SearchFragment.getInstance(getSearchHistory());
         if (firebaseUser != null) {
             getSavedRecipesForCurrentUser(firebaseUser.getUid());
         } else {
@@ -107,14 +112,13 @@ public class MainActivity extends AppCompatActivity implements
             Collections.reverse(searchHistoryArrayList);
             return searchHistoryArrayList;
         }
-        searchHistoryArrayList.add("No search history");
         return searchHistoryArrayList;
     }
 
     private void processRequestRandomRecipes(String response) {
         randomRecipes.addAll(RecipeUtil.getRecipesListFromJson(response));
         checkWhichRandomRecipeIsSaved();
-        homeFragment = HomeFragment.getInstance(randomRecipes, getSearchHistory());
+        homeFragment = DataFragment.getInstance(randomRecipes);
         configureNavigationView();
 
     }
@@ -139,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements
                     break;
                 }
                 case R.id.search_item:{
-
+                    displayFragment(searchFragment);
                     break;
                 }
                 case R.id.saved_items: {
@@ -159,10 +163,14 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    @Override
+     @Override
     public void insertSearchInDatabase(String search) {
-        //todo
-        //not done yet
+        Set<String> currentSearchHistory = new TreeSet<>(getSearchHistory());
+        currentSearchHistory.add(search);
+       SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+       sharedPreferencesEditor.putStringSet(getString(R.string.search_history_key),currentSearchHistory);
+       sharedPreferencesEditor.apply();
+
     }
 
     @Override
@@ -173,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements
         //push request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedSearchURL, (response) ->
         {//process response
-            homeFragment.displaySearchResults(RecipeUtil.getSearchResultsFromJson(response));
+            searchFragment.displaySearchResults(RecipeUtil.getSearchResultsFromJson(response));
         },
                 (error) -> {
                 });

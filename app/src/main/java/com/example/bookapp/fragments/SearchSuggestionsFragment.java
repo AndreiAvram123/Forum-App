@@ -1,24 +1,41 @@
 package com.example.bookapp.fragments;
 
 
+
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.bookapp.Adapters.SuggestionsRecyclerView;
 import com.example.bookapp.R;
 
-/**
- * A simple {@link Fragment} subclass.
- */
-public class SearchSuggestionsFragment extends Fragment {
+import java.util.ArrayList;
 
+
+public class SearchSuggestionsFragment extends Fragment {
+private static final String KEY_SUGGESTIONS_ARRAY ="KEY_SUGGESTIONS_ARRAY";
+private ArrayList<String> suggestions;
+    //the default suggestions given are the old ones
+    //that the user entered
+    public static SearchSuggestionsFragment getInstance(ArrayList<String>suggestions){
+        SearchSuggestionsFragment oldSearchSuggestionsFragment = new SearchSuggestionsFragment();
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList(KEY_SUGGESTIONS_ARRAY,suggestions);
+        oldSearchSuggestionsFragment.setArguments(bundle);
+        return oldSearchSuggestionsFragment;
+    }
 
     public SearchSuggestionsFragment() {
         // Required empty public constructor
+
     }
 
 
@@ -26,7 +43,19 @@ public class SearchSuggestionsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search_suggestions, container, false);
+        View view = inflater.inflate(R.layout.fragment_old_searches, container, false);
+        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_past_searches);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setAdapter(new SuggestionsRecyclerView(suggestions,getActivity()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+
+        return view;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.suggestions = getArguments().getStringArrayList(KEY_SUGGESTIONS_ARRAY);
+    }
 }

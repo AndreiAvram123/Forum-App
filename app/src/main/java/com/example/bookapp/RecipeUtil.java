@@ -86,14 +86,16 @@ public class RecipeUtil {
     }
 
     public static ArrayList<String>getInstructionsFromJsonArray(@NonNull JSONArray instructionsJson) throws JSONException {
-         JSONObject firstInstructionsObject = instructionsJson.getJSONObject(0);
-        JSONArray steps = firstInstructionsObject.getJSONArray("steps");
         ArrayList<String> instructionsStringList = new ArrayList<>();
-        for(int i=0;i<steps.length();i++){
-            JSONObject step = steps.getJSONObject(i);
-            instructionsStringList.add(step.getString("step"));
+        if(instructionsJson.length() !=0) {
+            JSONObject firstInstructionsObject = instructionsJson.getJSONObject(0);
+            JSONArray steps = firstInstructionsObject.getJSONArray("steps");
+            for (int i = 0; i < steps.length(); i++) {
+                JSONObject step = steps.getJSONObject(i);
+                instructionsStringList.add(step.getString("step"));
+            }
+            Collections.reverse(instructionsStringList);
         }
-        Collections.reverse(instructionsStringList);
         return instructionsStringList;
     }
 
