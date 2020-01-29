@@ -6,12 +6,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.bookapp.fragments.ExpandedItemFragment;
 import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class DataApiManager {
     private Activity activity;
@@ -21,7 +19,7 @@ public class DataApiManager {
     private static final String URL_SEARCH_RECIPES_LIMIT_20 = "https://api.spoonacular.com/recipes/search?query=%s&number=20&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
     private static final String URL_SEARCH_RECIPE_ID = "https://api.spoonacular.com/recipes/%s/information?includeNutrition=false&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
     private static final String URL_RECIPE_AUTOCOMPLETE = "https://api.spoonacular.com/recipes/autocomplete?number=6&query=%s&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
-
+    private static  final String URL_SIMILAR_RECIPES = "https://api.spoonacular.com/recipes/%s/similar?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=5";
     public DataApiManager(Activity activity) {
         this.activity = activity;
         requestQueue = Volley.newRequestQueue(activity);
@@ -45,7 +43,10 @@ public class DataApiManager {
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedRecipeURL, (response) ->
         {//process response
             Recipe recipe = RecipeUtil.getRecipeFromJson(response);
-            activity.runOnUiThread(() -> dataApiManagerCallback.onRecipeDetailsReady(recipe));
+            if(recipe!=null){
+                pushRequestSimilarRecipes(recipe);
+            }
+
         },
                 (error) -> {
                 });
@@ -79,10 +80,25 @@ public class DataApiManager {
         requestQueue.add(stringRequest);
     }
 
+    void pushRequestSimilarRecipes(Recipe recipe){
+        String formattedAutocompleteURl = String.format(URL_SIMILAR_RECIPES,recipe.getId());
+        //push request
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedAutocompleteURl, (response) ->
+        {
+            ArrayList<Recipe> similarRecipes = RecipeUtil.getSimilarRecipesFromJson(response);
+
+            activity.runOnUiThread(() -> dataApiManagerCallback.onRecipeDetailsReady(recipe,similarRecipes));
+
+        },
+                (error) -> {
+                });
+        requestQueue.add(stringRequest);
+    }
+
     public interface DataApiManagerCallback {
         void onRandomRecipesDataReady(ArrayList<Recipe> data);
 
-        void onRecipeDetailsReady(Recipe recipe);
+        void onRecipeDetailsReady(Recipe recipe,ArrayList<Recipe> similarRecipes);
 
         void onRecipeSearchReady(ArrayList<Recipe>data);
 

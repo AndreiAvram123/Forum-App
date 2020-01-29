@@ -53,7 +53,7 @@ import java.util.TreeSet;
  */
 
 public class MainActivity extends AppCompatActivity implements
-        AdapterRecyclerView.AdapterInterface, ActionsInterface,
+        ActionsInterface,
         BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface, DataApiManager.DataApiManagerCallback {
 
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
@@ -116,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onRecipeDetailsReady(Recipe recipe) {
+    public void onRecipeDetailsReady(Recipe recipe,ArrayList<Recipe> similarRecipes) {
         if (recipe != null) {
-            displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe));
+            displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe,similarRecipes));
         }
     }
 
@@ -199,15 +199,6 @@ public class MainActivity extends AppCompatActivity implements
        dataApiManager.pushRequestAutocomplete(query);
     }
 
-    @Override
-    public void expandItem(Recipe recipe) {
-        if (recipe.getIngredients() == null) {
-            //get the full data from the api
-            dataApiManager.pushRequestGetRecipeDetails(recipe.getId());
-        } else {
-           displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe));
-        }
-    }
 
     private void displayFragmentAddToBackStack(Fragment fragment){
         getSupportFragmentManager().beginTransaction()
@@ -248,6 +239,16 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             savedRecipes.remove(recipe);
             updateUserFirebaseDocument();
+        }
+    }
+
+    @Override
+    public void expandRecipe(Recipe recipe) {
+        if (recipe.getIngredients() == null) {
+            //get the full data from the api
+            dataApiManager.pushRequestGetRecipeDetails(recipe.getId());
+        } else {
+           dataApiManager.pushRequestSimilarRecipes(recipe);
         }
     }
 

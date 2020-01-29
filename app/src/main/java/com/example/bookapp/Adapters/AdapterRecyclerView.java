@@ -2,7 +2,6 @@ package com.example.bookapp.Adapters;
 
 import android.app.Activity;
 import android.content.Context;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
+import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
@@ -21,11 +21,11 @@ import java.util.ArrayList;
 public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder> {
    private ArrayList<Recipe> recipes;
    private Context context;
-   private AdapterInterface adapterInterface;
+   private ActionsInterface actionsInterface;
 
     public AdapterRecyclerView(@NonNull ArrayList<Recipe> recipes, Activity activity){
         this.recipes = recipes;
-        adapterInterface = (AdapterInterface) activity;
+        actionsInterface = (ActionsInterface) activity;
     }
 
 
@@ -47,7 +47,7 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
                .into(holder.recipeImage);
         //when the user clicks on an item
         //display the extended item fragment
-         holder.itemView.setOnClickListener(view->adapterInterface.expandItem(recipes.get(position)));
+         holder.itemView.setOnClickListener(view-> actionsInterface.expandRecipe(recipes.get(position)));
     }
 
     @Override
@@ -70,8 +70,5 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
           recipeImage = itemLayout.findViewById(R.id.recipe_image_list_item);
           recipeName = itemLayout.findViewById(R.id.recipe_name_list_item);
         }
-    }
-    public interface AdapterInterface{
-        void expandItem(Recipe recipe);
     }
 }

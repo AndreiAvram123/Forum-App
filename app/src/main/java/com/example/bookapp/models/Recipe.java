@@ -45,7 +45,7 @@ public class Recipe implements Parcelable {
 
     }
 
-      @Ignore
+    @Ignore
     public Recipe(int id, String name, String imageUrl) {
         this.id = id;
         this.name = name;

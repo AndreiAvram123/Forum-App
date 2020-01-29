@@ -11,7 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.bookapp.Adapters.AdapterRecyclerViewIngredients;
+import com.example.bookapp.Adapters.AdapterStrings;
 import com.example.bookapp.R;
 
 /**
@@ -32,7 +32,7 @@ public class FragmentIngredients extends StringDataFragment {
     @Override
     public void initializeRecyclerViewAdapter() {
 
-        recyclerView.setAdapter(new AdapterRecyclerViewIngredients(data));
+        recyclerView.setAdapter(new AdapterStrings(data));
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()){
             @Override
             public boolean canScrollHorizontally() {
