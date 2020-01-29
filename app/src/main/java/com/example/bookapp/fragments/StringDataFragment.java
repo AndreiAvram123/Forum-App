@@ -20,21 +20,21 @@ import com.example.bookapp.R;
 import java.util.ArrayList;
 
 
-public class SearchSuggestionsFragment extends Fragment {
+public class StringDataFragment extends Fragment {
 private static final String KEY_SUGGESTIONS_ARRAY ="KEY_SUGGESTIONS_ARRAY";
-private ArrayList<String> suggestions;
-private SuggestionsRecyclerView suggestionsRecyclerView;
+ArrayList<String> data;
+RecyclerView recyclerView;
 
 
-    public static SearchSuggestionsFragment getInstance(ArrayList<String>suggestions){
-        SearchSuggestionsFragment oldSearchSuggestionsFragment = new SearchSuggestionsFragment();
+    public static StringDataFragment getInstance(ArrayList<String>suggestions){
+        StringDataFragment oldStringDataFragment = new StringDataFragment();
         Bundle bundle = new Bundle();
         bundle.putStringArrayList(KEY_SUGGESTIONS_ARRAY,suggestions);
-        oldSearchSuggestionsFragment.setArguments(bundle);
-        return oldSearchSuggestionsFragment;
+        oldStringDataFragment.setArguments(bundle);
+        return oldStringDataFragment;
     }
 
-    public SearchSuggestionsFragment() {
+    public StringDataFragment() {
         // Required empty public constructor
 
     }
@@ -44,24 +44,33 @@ private SuggestionsRecyclerView suggestionsRecyclerView;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_old_searches, container, false);
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view_past_searches);
+        View view = inflater.inflate(R.layout.layout_fragment_string_data, container, false);
+        recyclerView = view.findViewById(R.id.recycler_view_past_searches);
+        initializeRecyclerViewAdapter();
+        return view;
+    }
+
+    public void initializeRecyclerViewAdapter(){
+        SuggestionsRecyclerView suggestionsRecyclerView = new SuggestionsRecyclerView(data, getActivity());
         recyclerView.setHasFixedSize(true);
         recyclerView.setAdapter(suggestionsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
-
-        return view;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        suggestions = getArguments().getStringArrayList(KEY_SUGGESTIONS_ARRAY);
-        if(suggestions == null){
-            suggestions = new ArrayList<>();
+        data = getArguments().getStringArrayList(KEY_SUGGESTIONS_ARRAY);
+        if(data == null){
+            data = new ArrayList<>();
         }
-        suggestionsRecyclerView = new SuggestionsRecyclerView(suggestions,getActivity());
+
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        initializeRecyclerViewAdapter();
+    }
 }

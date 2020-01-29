@@ -121,10 +121,10 @@ public class ExpandedItemFragment extends Fragment  {
             @Override
             public Fragment getItem(int position) {
                 if(position==0){
-                    return FragmentRecyclerView.getInstance(recipe.getIngredients());
+                    return FragmentIngredients.getInstance(recipe.getIngredients());
                 }else{
                     if(position==1){
-                        return FragmentRecyclerView.getInstance(recipe.getInstructions());
+                        return FragmentIngredients.getInstance(recipe.getInstructions());
                     }
                 }
                 return null;
@@ -162,5 +162,7 @@ public class ExpandedItemFragment extends Fragment  {
                   .centerInside()
                 .into(recipeImage);
     }
+
+
 
 }

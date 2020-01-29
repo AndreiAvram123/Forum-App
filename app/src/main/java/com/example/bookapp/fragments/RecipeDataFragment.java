@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -20,18 +19,18 @@ import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
 
-public class DataFragment extends Fragment {
+public class RecipeDataFragment extends Fragment {
 
     private static final String KEY_DATA = "KEY_DATA";
     private RecyclerView recyclerView;
     private ArrayList<Recipe> data;
 
-    public static DataFragment getInstance(@NonNull ArrayList<Recipe> recipes) {
-        DataFragment dataFragment = new DataFragment();
+    public static RecipeDataFragment getInstance(@NonNull ArrayList<Recipe> recipes) {
+        RecipeDataFragment recipeDataFragment = new RecipeDataFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(KEY_DATA, recipes);
-        dataFragment.setArguments(bundle);
-        return dataFragment;
+        recipeDataFragment.setArguments(bundle);
+        return recipeDataFragment;
     }
 
     @Override

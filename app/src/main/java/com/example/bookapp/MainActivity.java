@@ -14,7 +14,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.bookapp.Adapters.AdapterRecyclerView;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
-import com.example.bookapp.fragments.DataFragment;
+import com.example.bookapp.fragments.RecipeDataFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
 import com.example.bookapp.fragments.SavedRecipesDataObject;
 import com.example.bookapp.fragments.SearchFragment;
@@ -32,13 +32,10 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.core.utilities.Tree;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -69,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements
     private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
-    private DataFragment savedRecipesFragment;
-    private DataFragment homeFragment;
+    private RecipeDataFragment savedRecipesFragment;
+    private RecipeDataFragment homeFragment;
     private SearchFragment searchFragment;
     private ArrayList<Recipe> savedRecipes;
 
@@ -81,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements
         configureDefaultParameters();
         savedRecipes = new ArrayList<>();
         configureFirebaseParameters();
-        savedRecipesFragment = DataFragment.getInstance(savedRecipes);
+        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
         searchFragment = SearchFragment.getInstance(getSearchHistory());
         if (firebaseUser != null) {
             getSavedRecipesForCurrentUser(firebaseUser.getUid());
@@ -127,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements
     private void processRequestRandomRecipes(String response) {
         randomRecipes.addAll(RecipeUtil.getRecipesListFromJson(response));
         checkWhichRandomRecipeIsSaved();
-        homeFragment = DataFragment.getInstance(randomRecipes);
+        homeFragment = RecipeDataFragment.getInstance(randomRecipes);
         configureNavigationView();
 
     }
@@ -293,7 +290,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void updateUserFirebaseDocument() {
-        savedRecipesFragment = DataFragment.getInstance(savedRecipes);
+        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
         DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
         documentReference.set(new SavedRecipesDataObject(savedRecipes), SetOptions.merge());
     }
@@ -325,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements
                     if (savedRecipesDataObject != null) {
                         savedRecipesDataObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
                         savedRecipes.addAll(savedRecipesDataObject.getSavedRecipes().values());
-                        savedRecipesFragment = DataFragment.getInstance(savedRecipes);
+                        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
                     }
                 }
             }

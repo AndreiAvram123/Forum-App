@@ -1,14 +1,10 @@
 package com.example.bookapp.fragments;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +14,6 @@ import com.example.bookapp.R;
 import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 
 public class SearchFragment extends Fragment {
@@ -74,12 +69,12 @@ public class SearchFragment extends Fragment {
     }
     private void displaySearchResultsFragment(){
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_search_fragment,DataFragment.getInstance(lastResults))
+                .replace(R.id.container_search_fragment, RecipeDataFragment.getInstance(lastResults))
                 .commit();
     }
     private void displaySearchSuggestions(@NonNull ArrayList<String>suggestions){
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_search_fragment,SearchSuggestionsFragment.getInstance(suggestions))
+                .replace(R.id.container_search_fragment, StringDataFragment.getInstance(suggestions))
                 .commit();
 
     }

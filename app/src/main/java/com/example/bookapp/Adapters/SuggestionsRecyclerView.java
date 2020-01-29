@@ -45,12 +45,10 @@ public class SuggestionsRecyclerView  extends RecyclerView.Adapter<SuggestionsRe
 
 
     class ViewHolder extends RecyclerView.ViewHolder{
-      ImageView deleteSuggestionImage;
       TextView suggestionName;
 
        ViewHolder(@NonNull View itemView) {
            super(itemView);
-           deleteSuggestionImage = itemView.findViewById(R.id.delete_suggestion_image);
            suggestionName = itemView.findViewById(R.id.suggestion_item_name);
        }
    }
