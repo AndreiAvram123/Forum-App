@@ -99,7 +99,7 @@ public class RecipeUtil {
         return instructionsStringList;
     }
 
-    public static ArrayList<String>getIngredientsFromJsonArray(@NonNull JSONArray ingredients) throws JSONException {
+     static ArrayList<String>getIngredientsFromJsonArray(@NonNull JSONArray ingredients) throws JSONException {
         ArrayList<String> formattedIngredients = new ArrayList<>();
         for(int i=0;i<ingredients.length();i++){
             JSONObject ingredientJson = ingredients.getJSONObject(i);
@@ -112,7 +112,7 @@ public class RecipeUtil {
         return formattedIngredients;
     }
 
-    public static Recipe getRecipeFromJson(String jsonString) {
+     static Recipe getRecipeFromJson(String jsonString) {
         try {
             JSONObject recipeJson = new JSONObject(jsonString);
             return new Recipe(recipeJson.getInt("id"),recipeJson.getString("title"),
@@ -132,4 +132,19 @@ public class RecipeUtil {
 
 
     }
+     static  HashMap<Integer,String> getAutocompleteSuggestionFromJson(String fetchedData) {
+        HashMap<Integer,String> fetchedSuggestions = new HashMap<>();
+        try {
+            JSONArray result = new JSONArray(fetchedData);
+            for(int index=0;index<result.length();index++){
+                JSONObject suggestion = result.getJSONObject(index);
+                fetchedSuggestions.put(suggestion.getInt("id"),suggestion.getString("title"));
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return fetchedSuggestions;
+    }
+
 }

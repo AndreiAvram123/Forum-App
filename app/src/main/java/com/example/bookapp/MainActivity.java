@@ -54,14 +54,9 @@ import java.util.TreeSet;
 
 public class MainActivity extends AppCompatActivity implements
         AdapterRecyclerView.AdapterInterface, ActionsInterface,
-        BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface {
-    private static final String URL_RANDOM_RECIPES = "https://api.spoonacular.com/recipes/random?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=1";
-    private static final String URL_SEARCH_RECIPES_LIMIT_20 = "https://api.spoonacular.com/recipes/search?query=%s&number=20&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
-    private static final String URL_SEARCH_RECIPE_ID = "https://api.spoonacular.com/recipes/%s/information?includeNutrition=false&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
-    private static final String URL_RECIPE_AUTOCOMPLETE = "https://api.spoonacular.com/recipes/autocomplete?number=5&query=%s&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
+        BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface, DataApiManager.DataApiManagerCallback {
 
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
-    private RequestQueue requestQueue;
     private SharedPreferences sharedPreferences;
     private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
@@ -69,21 +64,21 @@ public class MainActivity extends AppCompatActivity implements
     private RecipeDataFragment savedRecipesFragment;
     private RecipeDataFragment homeFragment;
     private SearchFragment searchFragment;
-    private ArrayList<Recipe> savedRecipes;
+    private ArrayList<Recipe> savedRecipes = new ArrayList<>();
+    private DataApiManager dataApiManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
         configureDefaultParameters();
-        savedRecipes = new ArrayList<>();
         configureFirebaseParameters();
         savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
         searchFragment = SearchFragment.getInstance(getSearchHistory());
         if (firebaseUser != null) {
             getSavedRecipesForCurrentUser(firebaseUser.getUid());
         } else {
-            pushRequestRandomRecipes();
+            dataApiManager.pushRequestRandomRecipes();
         }
 
     }
@@ -95,20 +90,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void configureDefaultParameters() {
-        requestQueue = Volley.newRequestQueue(this);
+        dataApiManager  = new DataApiManager(this);
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
-
-    private void pushRequestRandomRecipes() {
-        //compose the request string to get the random recipes
-        StringRequest randomRecipesRequest = new StringRequest(Request.Method.GET, URL_RANDOM_RECIPES,
-                (response) -> {
-                    //once the data is fetched process it
-                    runOnUiThread(() -> processRequestRandomRecipes(response));
-                }, Throwable::printStackTrace);
-        requestQueue.add(randomRecipesRequest);
-    }
 
     private ArrayList<String> getSearchHistory() {
         Set<String> searchHistorySet = sharedPreferences.getStringSet(getString(R.string.search_history_key), null);
@@ -121,12 +106,30 @@ public class MainActivity extends AppCompatActivity implements
         return searchHistoryArrayList;
     }
 
-    private void processRequestRandomRecipes(String response) {
-        randomRecipes.addAll(RecipeUtil.getRecipesListFromJson(response));
+//
+    @Override
+    public void onRandomRecipesDataReady(ArrayList<Recipe> data) {
+        randomRecipes.addAll(data);
         checkWhichRandomRecipeIsSaved();
         homeFragment = RecipeDataFragment.getInstance(randomRecipes);
         configureNavigationView();
+    }
 
+    @Override
+    public void onRecipeDetailsReady(Recipe recipe) {
+        if (recipe != null) {
+            displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe));
+        }
+    }
+
+    @Override
+    public void onRecipeSearchReady(ArrayList<Recipe> data) {
+        searchFragment.displaySearchResults(data);
+    }
+
+    @Override
+    public void onAutocompleteSuggestionsReady(HashMap<Integer,String>data) {
+        searchFragment.displayFetchedSuggestions(data);
     }
 
     private void checkWhichRandomRecipeIsSaved() {
@@ -185,51 +188,22 @@ public class MainActivity extends AppCompatActivity implements
     public void performSearch(String query) {
 
         insertSearchInDatabase(query);
-        //build query
-        String formattedSearchURL = String.format(URL_SEARCH_RECIPES_LIMIT_20, query);
+        dataApiManager.pushRequestPerformSearch(query);
 
-        //push request
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedSearchURL, (response) ->
-        {//process response
-            searchFragment.displaySearchResults(RecipeUtil.getSearchResultsFromJson(response));
-        },
-                (error) -> {
-                });
-        requestQueue.add(stringRequest);
 
     }
 
 
     @Override
     public void fetchSuggestions(String query) {
-        //push request
-        String processedURL = String.format(URL_RECIPE_AUTOCOMPLETE,query);
-        //process response
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, processedURL, this::processSearchSuggestions,
-                (error) -> {
-                });
-        requestQueue.add(stringRequest);
-    }
-
-    private void processSearchSuggestions(String fetchedData) {
-        HashMap<Integer,String> fetchedSuggestions = new HashMap<>();
-        try {
-            JSONArray result = new JSONArray(fetchedData);
-            for(int index=0;index<result.length();index++){
-                 JSONObject suggestion = result.getJSONObject(index);
-                fetchedSuggestions.put(suggestion.getInt("id"),suggestion.getString("title"));
-            }
-          searchFragment.displayFetchedSuggestions(fetchedSuggestions);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+       dataApiManager.pushRequestAutocomplete(query);
     }
 
     @Override
     public void expandItem(Recipe recipe) {
         if (recipe.getIngredients() == null) {
             //get the full data from the api
-            pushRequestGetRecipeDetails(recipe.getId());
+            dataApiManager.pushRequestGetRecipeDetails(recipe.getId());
         } else {
            displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe));
         }
@@ -242,19 +216,7 @@ public class MainActivity extends AppCompatActivity implements
                 .commit();
     }
 
-    private void pushRequestGetRecipeDetails(int id) {
-        String formattedRecipeURL = String.format(URL_SEARCH_RECIPE_ID, id);
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedRecipeURL, (response) ->
-        {//process response
-            Recipe recipe = RecipeUtil.getRecipeFromJson(response);
-            if (recipe != null) {
-                displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe));
-            }
-        },
-                (error) -> {
-                });
-        requestQueue.add(stringRequest);
-    }
+
 
 
     @Override
@@ -326,8 +288,8 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
             }
-            pushRequestRandomRecipes();
-        }).addOnFailureListener(e -> pushRequestRandomRecipes());
+          dataApiManager.pushRequestRandomRecipes();
+        }).addOnFailureListener(e -> dataApiManager.pushRequestRandomRecipes());
 
     }
 
@@ -385,5 +347,6 @@ public class MainActivity extends AppCompatActivity implements
                     // ...
                 });
     }
+
 
 }
