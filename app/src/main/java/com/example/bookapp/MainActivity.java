@@ -37,9 +37,16 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -54,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements
     private static final String URL_RANDOM_RECIPES = "https://api.spoonacular.com/recipes/random?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=1";
     private static final String URL_SEARCH_RECIPES_LIMIT_20 = "https://api.spoonacular.com/recipes/search?query=%s&number=20&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
     private static final String URL_SEARCH_RECIPE_ID = "https://api.spoonacular.com/recipes/%s/information?includeNutrition=false&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
+    private static final String URL_RECIPE_AUTOCOMPLETE = "https://api.spoonacular.com/recipes/autocomplete?number=5&query=%s&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
+
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
     private RequestQueue requestQueue;
     private SharedPreferences sharedPreferences;
@@ -163,8 +172,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-     @Override
-    public void insertSearchInDatabase(String search) {
+
+    //todo
+    //check for duplicates
+    private void insertSearchInDatabase(String search) {
         Set<String> currentSearchHistory = new TreeSet<>(getSearchHistory());
         currentSearchHistory.add(search);
        SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
@@ -175,6 +186,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void performSearch(String query) {
+
+        insertSearchInDatabase(query);
         //build query
         String formattedSearchURL = String.format(URL_SEARCH_RECIPES_LIMIT_20, query);
 
@@ -187,6 +200,32 @@ public class MainActivity extends AppCompatActivity implements
                 });
         requestQueue.add(stringRequest);
 
+    }
+
+
+    @Override
+    public void fetchSuggestions(String query) {
+        //push request
+        String processedURL = String.format(URL_RECIPE_AUTOCOMPLETE,query);
+        //process response
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, processedURL, this::processSearchSuggestions,
+                (error) -> {
+                });
+        requestQueue.add(stringRequest);
+    }
+
+    private void processSearchSuggestions(String fetchedData) {
+        HashMap<Integer,String> fetchedSuggestions = new HashMap<>();
+        try {
+            JSONArray result = new JSONArray(fetchedData);
+            for(int index=0;index<result.length();index++){
+                 JSONObject suggestion = result.getJSONObject(index);
+                fetchedSuggestions.put(suggestion.getInt("id"),suggestion.getString("title"));
+            }
+          searchFragment.displayFetchedSuggestions(fetchedSuggestions);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

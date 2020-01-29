@@ -2,11 +2,15 @@ package com.example.bookapp.fragments;
 
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -14,13 +18,14 @@ import com.example.bookapp.R;
 import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 
 public class SearchFragment extends Fragment {
     private static final String KEY_SEARCH_HISTORY = "KEY_SEARCH_HISTORY";
     private SearchView searchView;
     private ArrayList<String> searchHistory;
     private SearchFragmentInterface searchFragmentInterface;
-    private DataFragment searchResultsFragment;
     private ArrayList<Recipe>lastResults ;
 
     public static SearchFragment getInstance(ArrayList<String> searchHistory){
@@ -56,7 +61,7 @@ public class SearchFragment extends Fragment {
         if(lastResults!=null){
             displaySearchResultsFragment();
         }else{
-            displaySearchHistory();
+            displaySearchSuggestions(searchHistory);
         }
 
     }
@@ -64,7 +69,6 @@ public class SearchFragment extends Fragment {
     public void displaySearchResults(ArrayList<Recipe> results){
         //clear search
         clearSearch();
-        searchResultsFragment = DataFragment.getInstance(results);
         lastResults = results;
         displaySearchResultsFragment();
     }
@@ -73,10 +77,11 @@ public class SearchFragment extends Fragment {
                 .replace(R.id.container_search_fragment,DataFragment.getInstance(lastResults))
                 .commit();
     }
-    private void displaySearchHistory(){
+    private void displaySearchSuggestions(@NonNull ArrayList<String>suggestions){
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_search_fragment,SearchSuggestionsFragment.getInstance(searchHistory))
+                .replace(R.id.container_search_fragment,SearchSuggestionsFragment.getInstance(suggestions))
                 .commit();
+
     }
 
     private void clearSearch(){
@@ -87,7 +92,7 @@ public class SearchFragment extends Fragment {
     private void configureSearch() {
         searchView.setOnClickListener(view -> {
             if (searchView.isIconified()) {
-                displaySearchHistory();
+                displaySearchSuggestions(searchHistory);
                 searchView.setBackground(getActivity().getDrawable(R.drawable.search_background_highlighted));
                 searchView.setIconified(false);
             }
@@ -95,40 +100,51 @@ public class SearchFragment extends Fragment {
         });
         searchView.setOnCloseListener(() -> {
             searchView.setBackground(getActivity().getDrawable(R.drawable.search_background));
-            if(searchResultsFragment!=null){
+            if(lastResults!=null){
               displaySearchResultsFragment();
             }else{
-                displaySearchHistory();
+                displaySearchSuggestions(searchHistory);
             }
             return false;
         });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (!query.trim().equals("")) {
                     searchHistory.add(query);
-                    searchFragmentInterface.insertSearchInDatabase(query);
                     searchFragmentInterface.performSearch(query);
                 }
                 return true;
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
-//                if(newText.trim().equals("")){
-//                    displaySearchHistory();
-//                }else{
-//                    //todo
-//                    //maybe have local suggestions?
-//                }
+            public boolean onQueryTextChange(String newQuery) {
+                    if (!newQuery.trim().equals("")) {
+                        //check weather the a suggestion in search history matches the query
+                        searchFragmentInterface.fetchSuggestions(newQuery);
+                    } else {
+                        displaySearchSuggestions(searchHistory);
+                    }
+
                 return false;
             }
+
         });
+    }
+    public void displayFetchedSuggestions(@NonNull HashMap<Integer,String> suggestions){
+        if(searchView.getQuery().toString().trim().equals("")){
+            displaySearchSuggestions(searchHistory);
+        }else{
+            //check current query entered
+            displaySearchSuggestions(new ArrayList<>(suggestions.values()));
+        }
     }
 
 
     public interface SearchFragmentInterface{
-        void insertSearchInDatabase(String search);
         void performSearch(String query);
+        void fetchSuggestions(String query);
     }
 }

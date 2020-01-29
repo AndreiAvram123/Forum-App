@@ -23,8 +23,9 @@ import java.util.ArrayList;
 public class SearchSuggestionsFragment extends Fragment {
 private static final String KEY_SUGGESTIONS_ARRAY ="KEY_SUGGESTIONS_ARRAY";
 private ArrayList<String> suggestions;
-    //the default suggestions given are the old ones
-    //that the user entered
+private SuggestionsRecyclerView suggestionsRecyclerView;
+
+
     public static SearchSuggestionsFragment getInstance(ArrayList<String>suggestions){
         SearchSuggestionsFragment oldSearchSuggestionsFragment = new SearchSuggestionsFragment();
         Bundle bundle = new Bundle();
@@ -46,7 +47,7 @@ private ArrayList<String> suggestions;
         View view = inflater.inflate(R.layout.fragment_old_searches, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.recycler_view_past_searches);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(new SuggestionsRecyclerView(suggestions,getActivity()));
+        recyclerView.setAdapter(suggestionsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
 
@@ -56,6 +57,11 @@ private ArrayList<String> suggestions;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.suggestions = getArguments().getStringArrayList(KEY_SUGGESTIONS_ARRAY);
+        suggestions = getArguments().getStringArrayList(KEY_SUGGESTIONS_ARRAY);
+        if(suggestions == null){
+            suggestions = new ArrayList<>();
+        }
+        suggestionsRecyclerView = new SuggestionsRecyclerView(suggestions,getActivity());
     }
+
 }

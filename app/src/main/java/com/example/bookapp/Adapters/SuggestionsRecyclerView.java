@@ -19,7 +19,7 @@ public class SuggestionsRecyclerView  extends RecyclerView.Adapter<SuggestionsRe
    private ArrayList<String>suggestions;
    private SearchFragment.SearchFragmentInterface searchFragmentInterface;
 
-   public SuggestionsRecyclerView(ArrayList<String> suggestions, Activity activity){
+   public SuggestionsRecyclerView(@NonNull ArrayList<String> suggestions,@NonNull Activity activity){
        this.suggestions = suggestions;
        searchFragmentInterface = (SearchFragment.SearchFragmentInterface) activity;
    }
@@ -43,6 +43,7 @@ public class SuggestionsRecyclerView  extends RecyclerView.Adapter<SuggestionsRe
         return suggestions.size();
     }
 
+
     class ViewHolder extends RecyclerView.ViewHolder{
       ImageView deleteSuggestionImage;
       TextView suggestionName;
@@ -51,7 +52,6 @@ public class SuggestionsRecyclerView  extends RecyclerView.Adapter<SuggestionsRe
            super(itemView);
            deleteSuggestionImage = itemView.findViewById(R.id.delete_suggestion_image);
            suggestionName = itemView.findViewById(R.id.suggestion_item_name);
-           deleteSuggestionImage.setOnClickListener(view->{});
        }
    }
 }
