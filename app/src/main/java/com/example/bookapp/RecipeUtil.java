@@ -19,7 +19,11 @@ public class RecipeUtil {
 
     public static String getDishType(JSONObject recipeJson) throws JSONException {
         JSONArray dishTypes = recipeJson.getJSONArray("dishTypes");
-        return "#" + dishTypes.get(0).toString();
+        if(dishTypes.length()>0) {
+            return "#" + dishTypes.get(0).toString();
+        }else {
+            return "unknown";
+        }
     }
 
     public static HashMap<String, Boolean> getRecipeFeatures(JSONObject recipeJson) throws JSONException {
@@ -95,7 +99,7 @@ public class RecipeUtil {
                 jsonObject = jsonArray.getJSONObject(i);
                 Recipe recipe = new Recipe(
                         jsonObject.getInt("id"), jsonObject.getString("title"),
-                        String.format(apiImagePath, jsonObject.getString("image")));
+                        String.format(apiImagePath, "Baked-Cheese-Manicotti-633508.jpg"));
                 similarRecipes.add(recipe);
 
 

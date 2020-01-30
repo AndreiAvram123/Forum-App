@@ -14,14 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.bookapp.Adapters.SuggestionsRecyclerView;
+import com.example.bookapp.Adapters.AdapterStrings;
 import com.example.bookapp.R;
 
 import java.util.ArrayList;
 
 
 public class StringDataFragment extends Fragment {
-private static final String KEY_SUGGESTIONS_ARRAY ="KEY_SUGGESTIONS_ARRAY";
+    static final String KEY_SUGGESTIONS_ARRAY ="KEY_SUGGESTIONS_ARRAY";
 ArrayList<String> data;
 RecyclerView recyclerView;
 
@@ -45,15 +45,20 @@ RecyclerView recyclerView;
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.layout_fragment_string_data, container, false);
-        recyclerView = view.findViewById(R.id.recycler_view_past_searches);
-        initializeRecyclerViewAdapter();
+        recyclerView = view.findViewById(R.id.recycler_view_string_data);
+        setRecyclerViewAdapter();
+        initializeRecyclerView();
         return view;
     }
 
-    public void initializeRecyclerViewAdapter(){
-        SuggestionsRecyclerView suggestionsRecyclerView = new SuggestionsRecyclerView(data, getActivity());
+
+    public void setRecyclerViewAdapter() {
+        AdapterStrings adapterStrings = new AdapterStrings(data);
+        recyclerView.setAdapter(adapterStrings);
+    }
+
+    public void initializeRecyclerView(){
         recyclerView.setHasFixedSize(true);
-        recyclerView.setAdapter(suggestionsRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
     }
@@ -61,7 +66,9 @@ RecyclerView recyclerView;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        data = getArguments().getStringArrayList(KEY_SUGGESTIONS_ARRAY);
+        if (getArguments() != null) {
+            data = getArguments().getStringArrayList(KEY_SUGGESTIONS_ARRAY);
+        }
         if(data == null){
             data = new ArrayList<>();
         }
@@ -71,6 +78,6 @@ RecyclerView recyclerView;
     @Override
     public void onStart() {
         super.onStart();
-        initializeRecyclerViewAdapter();
+        initializeRecyclerView();
     }
 }

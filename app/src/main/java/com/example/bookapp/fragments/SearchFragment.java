@@ -74,7 +74,7 @@ public class SearchFragment extends Fragment {
     }
     private void displaySearchSuggestions(@NonNull ArrayList<String>suggestions){
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_search_fragment, StringDataFragment.getInstance(suggestions))
+                .replace(R.id.container_search_fragment, RecipeSuggestionsFragment.getInstance(suggestions))
                 .commit();
 
     }

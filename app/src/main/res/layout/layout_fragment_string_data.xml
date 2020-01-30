@@ -8,7 +8,7 @@
 
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_past_searches"
+        android:id="@+id/recycler_view_string_data"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="1dp"

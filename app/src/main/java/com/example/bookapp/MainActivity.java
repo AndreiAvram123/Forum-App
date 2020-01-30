@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firebaseFirestore;
     private RecipeDataFragment savedRecipesFragment;
-    private RecipeDataFragment homeFragment;
+    private HomeFragment homeFragment;
     private SearchFragment searchFragment;
     private ArrayList<Recipe> savedRecipes = new ArrayList<>();
     private DataApiManager dataApiManager;
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onRandomRecipesDataReady(ArrayList<Recipe> data) {
         randomRecipes.addAll(data);
         checkWhichRandomRecipeIsSaved();
-        homeFragment = RecipeDataFragment.getInstance(randomRecipes);
+        homeFragment = HomeFragment.getInstance(data);
         configureNavigationView();
     }
 

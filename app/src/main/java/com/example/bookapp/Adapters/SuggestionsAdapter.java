@@ -9,14 +9,13 @@ import androidx.annotation.NonNull;
 
 import com.example.bookapp.R;
 import com.example.bookapp.fragments.SearchFragment;
-import com.example.bookapp.interfaces.ActionsInterface;
 
 import java.util.ArrayList;
 
-public class SuggestionsRecyclerView  extends AdapterStrings {
+public class SuggestionsAdapter extends AdapterStrings {
     private SearchFragment.SearchFragmentInterface searchFragmentInterface;
 
-    public SuggestionsRecyclerView(ArrayList<String> data, Activity activity) {
+    public SuggestionsAdapter(ArrayList<String> data, Activity activity) {
         super(data);
         searchFragmentInterface = (SearchFragment.SearchFragmentInterface) activity;
     }
@@ -24,7 +23,7 @@ public class SuggestionsRecyclerView  extends AdapterStrings {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.suggestion_item,parent,false);
+        View layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_suggestion_item,parent,false);
         ViewHolder viewHolder = new ViewHolder(layout);
         viewHolder.text = layout.findViewById(R.id.suggestion_item_name);
         return viewHolder;
