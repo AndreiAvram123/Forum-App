@@ -1,4 +1,4 @@
-<TextView style="@style/important_text_small"
+<TextView style="@style/important_text"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginLeft="10dp"

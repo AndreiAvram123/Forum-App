@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void configureDefaultParameters() {
-        dataApiManager  = new DataApiManager(this);
+        dataApiManager = new DataApiManager(this);
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements
         return searchHistoryArrayList;
     }
 
-//
+    //
     @Override
     public void onRandomRecipesDataReady(ArrayList<Recipe> data) {
         randomRecipes.addAll(data);
@@ -107,9 +108,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onRecipeDetailsReady(Recipe recipe,ArrayList<Recipe> similarRecipes) {
+    public void onRecipeDetailsReady(Recipe recipe, ArrayList<Recipe> similarRecipes) {
         if (recipe != null) {
-            displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe,similarRecipes));
+            displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe, similarRecipes),
+                    ExpandedItemFragment.TAG_EXPANDED_ITEM_FRAGMENT);
         }
     }
 
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onAutocompleteSuggestionsReady(HashMap<Integer,String>data) {
+    public void onAutocompleteSuggestionsReady(HashMap<Integer, String> data) {
         searchFragment.displayFetchedSuggestions(data);
     }
 
@@ -142,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements
                     displayFragment(homeFragment);
                     break;
                 }
-                case R.id.search_item:{
+                case R.id.search_item: {
                     displayFragment(searchFragment);
                     break;
                 }
@@ -163,15 +165,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
-    //todo
-    //check for duplicates
     private void insertSearchInDatabase(String search) {
         Set<String> currentSearchHistory = new TreeSet<>(getSearchHistory());
         currentSearchHistory.add(search);
-       SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-       sharedPreferencesEditor.putStringSet(getString(R.string.search_history_key),currentSearchHistory);
-       sharedPreferencesEditor.apply();
+        SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putStringSet(getString(R.string.search_history_key), currentSearchHistory);
+        sharedPreferencesEditor.apply();
 
     }
 
@@ -187,18 +186,16 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void fetchSuggestions(String query) {
-       dataApiManager.pushRequestAutocomplete(query);
+        dataApiManager.pushRequestAutocomplete(query);
     }
 
 
-    private void displayFragmentAddToBackStack(Fragment fragment){
+    private void displayFragmentAddToBackStack(Fragment fragment, @Nullable String tag) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container_main_activity, fragment)
-                .addToBackStack(null)
+                .addToBackStack(tag)
                 .commit();
     }
-
-
 
 
     @Override
@@ -220,6 +217,11 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             savedRecipes.add(recipe);
             updateUserFirebaseDocument();
+            //check if we need to update the UI for the expandedItemFragment
+            Fragment backStackFragment = getSupportFragmentManager().findFragmentByTag(ExpandedItemFragment.TAG_EXPANDED_ITEM_FRAGMENT);
+            if (backStackFragment != null) {
+                ((ExpandedItemFragment) backStackFragment).informUserRecipeAddedToFavorited();
+            }
         }
     }
 
@@ -230,6 +232,12 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             savedRecipes.remove(recipe);
             updateUserFirebaseDocument();
+            //check if we need to update the UI for the expandedItemFragment
+            Fragment backStackFragment = getSupportFragmentManager().findFragmentByTag(ExpandedItemFragment.TAG_EXPANDED_ITEM_FRAGMENT);
+            if (backStackFragment != null) {
+                ((ExpandedItemFragment) backStackFragment).informUserRecipeRemovedFromFavorites();
+            }
+
         }
     }
 
@@ -239,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements
             //get the full data from the api
             dataApiManager.pushRequestGetRecipeDetails(recipe.getId());
         } else {
-           dataApiManager.pushRequestSimilarRecipes(recipe);
+            dataApiManager.pushRequestSimilarRecipes(recipe);
         }
     }
 
@@ -280,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements
                     }
                 }
             }
-          dataApiManager.pushRequestRandomRecipes();
+            dataApiManager.pushRequestRandomRecipes();
         }).addOnFailureListener(e -> dataApiManager.pushRequestRandomRecipes());
 
     }

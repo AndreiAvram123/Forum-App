@@ -1,7 +1,9 @@
 package com.example.bookapp.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,7 +32,7 @@ public class RecipeDataFragment extends Fragment {
     private TextView sortTextView;
     private Spinner sortOptionsSpinner;
     private AdapterRecipesData adapterRecipesData;
-    private boolean spinnerInitialized = false;
+    private TextView numberResults;
 
     public static RecipeDataFragment getInstance(@NonNull ArrayList<Recipe> recipes) {
         RecipeDataFragment recipeDataFragment = new RecipeDataFragment();
@@ -58,6 +60,7 @@ public class RecipeDataFragment extends Fragment {
     }
 
     private void bindDataToViews() {
+        numberResults.setText(Integer.toString(data.size()));
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getContext(),R.array.sort_parameters,
                 R.layout.custom_item_spinner);
         sortOptionsSpinner.setAdapter(spinnerAdapter);
@@ -65,11 +68,10 @@ public class RecipeDataFragment extends Fragment {
         sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(spinnerInitialized) {
-                    String sortCriteria = parent.getItemAtPosition(position).toString();
-                    adapterRecipesData.sort(sortCriteria);
-                }
-                spinnerInitialized = true;
+                //highlight selected item
+                String sortCriteria = parent.getItemAtPosition(position).toString();
+                   adapterRecipesData.sort(sortCriteria);
+
             }
 
             @Override
@@ -84,6 +86,7 @@ public class RecipeDataFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view_popular_books);
         sortTextView = view.findViewById(R.id.sort_text);
         sortOptionsSpinner = view.findViewById(R.id.spinner_search_options);
+        numberResults = view.findViewById(R.id.text_number_results);
     }
 
     private void displayErrorMessage(View view) {

@@ -8,7 +8,7 @@
 
 
     <TextView
-        style="@style/ImportantText"
+        style="@style/important_text_large"
         android:gravity="center"
         android:id="@+id/textView4"
         android:layout_width="wrap_content"

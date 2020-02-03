@@ -7,7 +7,7 @@
 
     <TextView
         android:id="@+id/ingredient_text_view_item"
-        style="@style/ImportantText"
+        style="@style/important_text_large"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
