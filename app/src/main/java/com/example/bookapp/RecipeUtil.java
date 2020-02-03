@@ -3,8 +3,7 @@ package com.example.bookapp;
 import androidx.annotation.NonNull;
 
 import com.example.bookapp.models.Recipe;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.example.bookapp.models.RecipeBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,19 +13,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class RecipeUtil {
+//todo
+//test method return values
+class RecipeUtil {
     private static String apiImagePath = "https://spoonacular.com/recipeImages/%s";
 
-    public static String getDishType(JSONObject recipeJson) throws JSONException {
+    private static String getDishType(JSONObject recipeJson) throws JSONException {
         JSONArray dishTypes = recipeJson.getJSONArray("dishTypes");
-        if(dishTypes.length()>0) {
+        if (dishTypes.length() > 0) {
             return "#" + dishTypes.get(0).toString();
-        }else {
+        } else {
             return "unknown";
         }
     }
 
-    public static HashMap<String, Boolean> getRecipeFeatures(JSONObject recipeJson) throws JSONException {
+    private static HashMap<String, Boolean> getRecipeFeatures(JSONObject recipeJson) throws JSONException {
         HashMap<String, Boolean> features = new HashMap<>();
 
 
@@ -36,7 +37,7 @@ public class RecipeUtil {
         return features;
     }
 
-    public static ArrayList<Recipe> getRecipesListFromJson(String json) {
+    static ArrayList<Recipe> getRecipesListFromJson(String json) {
         ArrayList<Recipe> results = new ArrayList<>();
         try {
             JSONObject jsonObject = new JSONObject(json);
@@ -46,16 +47,18 @@ public class RecipeUtil {
                 JSONObject recipeJson = recipes.getJSONObject(i);
 
 
-                Recipe recipeObject = new Recipe(recipeJson.getInt("id"), recipeJson.getString("title"),
-                        recipeJson.getString("image"),
-                        Integer.toString(recipeJson.getInt("healthScore")),
-                        Integer.toString(recipeJson.getInt("readyInMinutes")),
-                        Integer.toString(recipeJson.getInt("servings")),
-                        RecipeUtil.getRecipeFeatures(recipeJson),
-                        RecipeUtil.getDishType(recipeJson),
-                        getIngredientsFromJsonArray(recipeJson.getJSONArray("extendedIngredients")),
-                        getInstructionsFromJsonArray((recipeJson.getJSONArray("analyzedInstructions")))
-                );
+                Recipe recipeObject = new RecipeBuilder()
+                        .setId(recipeJson.getInt("id"))
+                        .setName(recipeJson.getString("title"))
+                        .setImageUrl(recipeJson.getString("image"))
+                        .setHealthPoints(Integer.toString(recipeJson.getInt("healthScore")))
+                        .setReadyInMinutes(Integer.toString(recipeJson.getInt("readyInMinutes")))
+                        .setServings(Integer.toString(recipeJson.getInt("servings")))
+                        .setFeatures(RecipeUtil.getRecipeFeatures(recipeJson))
+                        .setDishType(RecipeUtil.getDishType(recipeJson))
+                        .setIngredients(getIngredientsFromJsonArray(recipeJson.getJSONArray("extendedIngredients")))
+                        .setInstructions(getInstructionsFromJsonArray((recipeJson.getJSONArray("analyzedInstructions"))))
+                        .createRecipe();
 
                 results.add(recipeObject);
             }
@@ -75,10 +78,14 @@ public class RecipeUtil {
             JSONArray recipes = jsonObject.getJSONArray("results");
             for (int i = 0; i < recipes.length(); i++) {
                 JSONObject recipeJson = recipes.getJSONObject(i);
-                Recipe recipeObject = new Recipe(
-                        recipeJson.getInt("id"), recipeJson.getString("title"),
-                        String.format(apiImagePath, recipeJson.getString("image"))
-                );
+                Recipe recipeObject = new RecipeBuilder()
+                        .setId(recipeJson.getInt("id"))
+                        .setName(recipeJson.getString("title"))
+                        .setImageUrl(String.format(apiImagePath, recipeJson.getString("image")))
+                        .setReadyInMinutes(Integer.toString(recipeJson.getInt("readyInMinutes")))
+                        .setServings(Integer.toString(recipeJson.getInt("servings")))
+                        .createRecipe();
+
                 results.add(recipeObject);
             }
 
@@ -97,9 +104,15 @@ public class RecipeUtil {
                 JSONObject jsonObject = null;
 
                 jsonObject = jsonArray.getJSONObject(i);
-                Recipe recipe = new Recipe(
-                        jsonObject.getInt("id"), jsonObject.getString("title"),
-                        String.format(apiImagePath, "Baked-Cheese-Manicotti-633508.jpg"));
+                Recipe recipe = new RecipeBuilder()
+                        .setId(jsonObject.getInt("id"))
+                        .setName(jsonObject.getString("title"))
+                        //todo
+                        //what the fuck????
+                        .setImageUrl(String.format(apiImagePath, "Baked-Cheese-Manicotti-633508.jpg"))
+                        .setReadyInMinutes(Integer.toString(jsonObject.getInt("readyInMinutes")))
+                        .setServings(Integer.toString(jsonObject.getInt("servings")))
+                        .createRecipe();
                 similarRecipes.add(recipe);
 
 
@@ -140,16 +153,17 @@ public class RecipeUtil {
     static Recipe getRecipeFromJson(String jsonString) {
         try {
             JSONObject recipeJson = new JSONObject(jsonString);
-            return new Recipe(recipeJson.getInt("id"), recipeJson.getString("title"),
-                    recipeJson.getString("image"),
-                    Integer.toString(recipeJson.getInt("healthScore")),
-                    Integer.toString(recipeJson.getInt("readyInMinutes")),
-                    Integer.toString(recipeJson.getInt("servings")),
-                    RecipeUtil.getRecipeFeatures(recipeJson),
-                    RecipeUtil.getDishType(recipeJson),
-                    getIngredientsFromJsonArray(recipeJson.getJSONArray("extendedIngredients")),
-                    getInstructionsFromJsonArray((recipeJson.getJSONArray("analyzedInstructions")))
-            );
+            return new RecipeBuilder().setId(recipeJson.getInt("id"))
+                    .setName(recipeJson.getString("title"))
+                    .setImageUrl(String.format(apiImagePath, recipeJson.getString("image")))
+                    .setHealthPoints(Integer.toString(recipeJson.getInt("healthScore")))
+                    .setReadyInMinutes(Integer.toString(recipeJson.getInt("readyInMinutes")))
+                    .setServings(Integer.toString(recipeJson.getInt("servings")))
+                    .setFeatures(RecipeUtil.getRecipeFeatures(recipeJson))
+                    .setDishType(RecipeUtil.getDishType(recipeJson))
+                    .setIngredients(getIngredientsFromJsonArray(recipeJson.getJSONArray("extendedIngredients")))
+                    .setInstructions(getInstructionsFromJsonArray((recipeJson.getJSONArray("analyzedInstructions"))))
+                    .createRecipe();
         } catch (JSONException e) {
             e.printStackTrace();
         }

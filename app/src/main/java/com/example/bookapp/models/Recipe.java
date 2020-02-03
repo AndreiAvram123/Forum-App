@@ -10,7 +10,6 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.google.firebase.database.Exclude;
-import com.google.firebase.database.IgnoreExtraProperties;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,9 +25,9 @@ public class Recipe implements Parcelable {
     @ColumnInfo(name = "health_points")
     private String healthPoints;
     @ColumnInfo(name = "cooking_time")
-    private String cookingTime;
+    private String readyInMinutes;
     @ColumnInfo(name = "number_of_people")
-    private String numberOfPeople;
+    private String servings;
     @Ignore
     private HashMap<String,Boolean>features;
     @ColumnInfo(name = "dish_type")
@@ -46,10 +45,12 @@ public class Recipe implements Parcelable {
     }
 
     @Ignore
-    public Recipe(int id, String name, String imageUrl) {
+    public Recipe(int id, String name, String imageUrl,String readyInMinutes,String servings) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
+        this.readyInMinutes = readyInMinutes;
+        this.servings = servings;
     }
 
     /**
@@ -58,21 +59,21 @@ public class Recipe implements Parcelable {
      * @param name
      * @param imageUrl
      * @param healthPoints
-     * @param cookingTime
-     * @param numberOfPeople
+     * @param readyInMinutes
+     * @param servings
      * @param features
      * @param dishType
      * @param ingredients
      * @param instructions
      */
-    public Recipe(@NonNull int id, @NonNull String name, @NonNull String imageUrl, String healthPoints, String cookingTime, String numberOfPeople, HashMap<String, Boolean> features, @NonNull String dishType,
+    public Recipe(@NonNull int id, @NonNull String name, @NonNull String imageUrl, String healthPoints, String readyInMinutes, String servings, HashMap<String, Boolean> features, @NonNull String dishType,
                   ArrayList<String>ingredients, ArrayList<String>instructions) {
         this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
         this.healthPoints = healthPoints;
-        this.cookingTime = cookingTime;
-        this.numberOfPeople = numberOfPeople;
+        this.readyInMinutes = readyInMinutes;
+        this.servings = servings;
         this.features = features;
         this.dishType = dishType;
         this.ingredients = ingredients;
@@ -84,8 +85,8 @@ public class Recipe implements Parcelable {
         name = in.readString();
         imageUrl = in.readString();
         healthPoints = in.readString();
-        cookingTime = in.readString();
-        numberOfPeople = in.readString();
+        readyInMinutes = in.readString();
+        servings = in.readString();
         features = in.readHashMap(Boolean.class.getClassLoader());
         dishType = in.readString();
         in.readStringList(ingredients);
@@ -95,7 +96,7 @@ public class Recipe implements Parcelable {
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
         @Override
         public Recipe createFromParcel(Parcel in) {
-            return new Recipe(in);
+            return new RecipeBuilder().setIn(in).createRecipe();
         }
 
         @Override
@@ -115,8 +116,8 @@ public class Recipe implements Parcelable {
         dest.writeString(name);
         dest.writeString(imageUrl);
         dest.writeString(healthPoints);
-        dest.writeString(cookingTime);
-        dest.writeString(numberOfPeople);
+        dest.writeString(readyInMinutes);
+        dest.writeString(servings);
         dest.writeMap(features);
         dest.writeString(dishType);
         dest.writeStringList(ingredients);
@@ -135,12 +136,12 @@ public class Recipe implements Parcelable {
         return healthPoints;
     }
 
-    public String getCookingTime() {
-        return cookingTime;
+    public String getReadyInMinutes() {
+        return readyInMinutes;
     }
 
-    public String getNumberOfPeople() {
-        return numberOfPeople;
+    public String getServings() {
+        return servings;
     }
 
     public HashMap<String, Boolean> getFeatures() {
@@ -171,12 +172,12 @@ public class Recipe implements Parcelable {
         this.healthPoints = healthPoints;
     }
 
-    public void setCookingTime(String cookingTime) {
-        this.cookingTime = cookingTime;
+    public void setReadyInMinutes(String readyInMinutes) {
+        this.readyInMinutes = readyInMinutes;
     }
 
-    public void setNumberOfPeople(String numberOfPeople) {
-        this.numberOfPeople = numberOfPeople;
+    public void setServings(String servings) {
+        this.servings = servings;
     }
 
     public void setFeatures(HashMap<String, Boolean> features) {

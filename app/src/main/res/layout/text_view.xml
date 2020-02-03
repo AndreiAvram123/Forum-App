@@ -4,6 +4,6 @@
     android:layout_marginLeft="10dp"
     android:layout_marginRight="10dp"
     android:layout_weight="1"
-    android:background="@drawable/round_text"
+    android:background="@drawable/round_shape"
     android:textColor="#ffffff"
     xmlns:android="http://schemas.android.com/apk/res/android" />

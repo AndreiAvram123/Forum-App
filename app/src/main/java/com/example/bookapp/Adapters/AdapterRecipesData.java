@@ -18,12 +18,12 @@ import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
 
-public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerView.ViewHolder> {
+public class AdapterRecipesData extends RecyclerView.Adapter<AdapterRecipesData.ViewHolder> {
    private ArrayList<Recipe> recipes;
    private Context context;
    private ActionsInterface actionsInterface;
 
-    public AdapterRecyclerView(@NonNull ArrayList<Recipe> recipes, Activity activity){
+    public AdapterRecipesData(@NonNull ArrayList<Recipe> recipes, Activity activity){
         this.recipes = recipes;
         actionsInterface = (ActionsInterface) activity;
     }
@@ -53,6 +53,32 @@ public class AdapterRecyclerView extends RecyclerView.Adapter<AdapterRecyclerVie
     @Override
     public int getItemCount() {
         return recipes.size();
+    }
+
+    public void sort(String sortCriteria) {
+        final  String[] allSortCriteria = context.getResources().getStringArray(R.array.sort_parameters);
+
+       if(sortCriteria.equals(allSortCriteria[1])){
+          //quickest
+           recipes.sort((r1,r2)->{
+               int r1CookingTime = Integer.parseInt(r1.getReadyInMinutes());
+               int r2CookingTime = Integer.parseInt(r2.getReadyInMinutes());
+               return Integer.compare(r1CookingTime, r2CookingTime);
+           });
+           notifyDataSetChanged();
+       }
+        if(sortCriteria.equals(allSortCriteria[2])){
+            //Number of servings
+            recipes.sort((r1,r2)->{
+                int r1Servings = Integer.parseInt(r1.getServings());
+                int r2Servings = Integer.parseInt(r2.getServings());
+                //the compare method return 1 if the first number is smaller than
+                //the first one
+                return Integer.compare(r2Servings, r1Servings);
+            });
+            notifyDataSetChanged();
+        }
+
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

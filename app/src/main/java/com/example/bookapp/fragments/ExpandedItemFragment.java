@@ -127,11 +127,14 @@ public class ExpandedItemFragment extends Fragment  {
 
 
     private void bindDataToView(Recipe recipe) {
-        insertImageInView();
+        Glide.with(getContext())
+                .load(recipe.getImageUrl())
+                .centerInside()
+                .into(recipeImage);
         recipeName.setText(recipe.getName());
-        cookingTime.setText(recipe.getCookingTime());
+        cookingTime.setText(recipe.getReadyInMinutes());
         healthPoints.setText(recipe.getHealthPoints());
-        numberPeople.setText(recipe.getNumberOfPeople());
+        numberPeople.setText(recipe.getServings());
         dishType.setText(recipe.getDishType());
         fragmentIngredients = StringDataFragment.getInstance(recipe.getIngredients());
         fragmentInstructions = StringDataFragment.getInstance(recipe.getInstructions());
@@ -174,12 +177,6 @@ public class ExpandedItemFragment extends Fragment  {
 
     }
 
-    private void insertImageInView() {
-        Glide.with(getContext())
-                  .load("https://spoonacular.com/recipeImages/318041-556x370.jpeg")
-                  .centerInside()
-                .into(recipeImage);
-    }
 
 
 

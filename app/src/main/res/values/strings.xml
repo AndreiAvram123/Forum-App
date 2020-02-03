@@ -14,4 +14,12 @@
     <string name="action_print">Print</string>
     <string name="sign_in_google">Sign in with Google</string>
     <string name="log_in_wanted_text">To use this feature \n please log in first</string>
+    <string name="sort">Sort</string>
+
+    <string-array name="sort_parameters">
+        <item>Default</item>
+        <item>Quickest</item>
+        <item>Servings</item>
+
+    </string-array>
 </resources>
