@@ -20,6 +20,7 @@ public class DataApiManager {
     private static final String URL_SEARCH_RECIPE_ID = "https://api.spoonacular.com/recipes/%s/information?includeNutrition=false&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
     private static final String URL_RECIPE_AUTOCOMPLETE = "https://api.spoonacular.com/recipes/autocomplete?number=6&query=%s&apiKey=8d7003ab81714ae7b9d6e003a61ee0c4";
     private static  final String URL_SIMILAR_RECIPES = "https://api.spoonacular.com/recipes/%s/similar?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=5";
+
     public DataApiManager(Activity activity) {
         this.activity = activity;
         requestQueue = Volley.newRequestQueue(activity);
@@ -53,7 +54,7 @@ public class DataApiManager {
         requestQueue.add(stringRequest);
     }
 
-    void pushRequestPerformSearch(String query){
+   void pushRequestPerformSearch(String query){
         //build query
         String formattedSearchURL = String.format(URL_SEARCH_RECIPES_LIMIT_20, query);
 
@@ -67,6 +68,7 @@ public class DataApiManager {
                 });
         requestQueue.add(stringRequest);
     }
+
     void pushRequestAutocomplete(String query){
         String formattedAutocompleteURl = String.format(URL_RECIPE_AUTOCOMPLETE,query);
         //push request

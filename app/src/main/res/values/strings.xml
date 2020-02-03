@@ -16,6 +16,8 @@
     <string name="log_in_wanted_text">To use this feature \n please log in first</string>
     <string name="sort">Sort</string>
     <string name="results">Results : </string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="retry_text">Retry</string>
 
     <string-array name="sort_parameters">
         <item>Default</item>

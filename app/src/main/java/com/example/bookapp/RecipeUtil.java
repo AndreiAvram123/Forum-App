@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-//todo
-//test method return values
 class RecipeUtil {
     private static String apiImagePath = "https://spoonacular.com/recipeImages/%s";
 
@@ -101,15 +99,11 @@ class RecipeUtil {
 
             JSONArray jsonArray = new JSONArray(json);
             for (int i = 0; i < jsonArray.length(); i++) {
-                JSONObject jsonObject = null;
-
-                jsonObject = jsonArray.getJSONObject(i);
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
                 Recipe recipe = new RecipeBuilder()
                         .setId(jsonObject.getInt("id"))
                         .setName(jsonObject.getString("title"))
-                        //todo
-                        //what the fuck????
-                        .setImageUrl(String.format(apiImagePath, "Baked-Cheese-Manicotti-633508.jpg"))
+                        .setImageUrl(String.format(apiImagePath, jsonObject.getString("image")))
                         .setReadyInMinutes(Integer.toString(jsonObject.getInt("readyInMinutes")))
                         .setServings(Integer.toString(jsonObject.getInt("servings")))
                         .createRecipe();
@@ -150,7 +144,7 @@ class RecipeUtil {
         return formattedIngredients;
     }
 
-    static Recipe getRecipeFromJson(String jsonString) {
+    static Recipe getRecipeFromJson(@NonNull String jsonString) {
         try {
             JSONObject recipeJson = new JSONObject(jsonString);
             return new RecipeBuilder().setId(recipeJson.getInt("id"))

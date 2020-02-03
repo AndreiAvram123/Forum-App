@@ -16,6 +16,7 @@ import com.example.bookapp.models.Recipe;
 import java.util.ArrayList;
 
 public class HomeFragment  extends Fragment {
+    public static final String TAG = "TAG_HOME_FRAGMENT";
     private static final String KEY_DATA = "KEY_DATA";
     private static HomeFragment instance;
     private ArrayList<Recipe> data;

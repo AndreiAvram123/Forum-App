@@ -53,8 +53,10 @@ public class RecipeDataFragment extends Fragment {
             initializeRecyclerViewAdapter();
             bindDataToViews();
         } else {
-            view = inflater.inflate(R.layout.layout_fragment_error_message, container, false);
-            displayErrorMessage(view);
+            //todo
+            //display proper error
+//            view = inflater.inflate(R.layout.layout_fragment_error_message, container, false);
+//            displayErrorMessage(view);
         }
         return view;
     }
@@ -87,11 +89,6 @@ public class RecipeDataFragment extends Fragment {
         sortTextView = view.findViewById(R.id.sort_text);
         sortOptionsSpinner = view.findViewById(R.id.spinner_search_options);
         numberResults = view.findViewById(R.id.text_number_results);
-    }
-
-    private void displayErrorMessage(View view) {
-        TextView errorMessage = view.findViewById(R.id.error_message_fragment_error);
-        errorMessage.setText("You do not have any data");
     }
 
 

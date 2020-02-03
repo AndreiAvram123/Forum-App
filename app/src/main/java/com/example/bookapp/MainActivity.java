@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
+import com.example.bookapp.fragments.ErrorFragment;
 import com.example.bookapp.fragments.RecipeDataFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
 import com.example.bookapp.fragments.SavedRecipesDataObject;
@@ -46,7 +47,9 @@ import java.util.TreeSet;
 
 public class MainActivity extends AppCompatActivity implements
         ActionsInterface,
-        BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface, DataApiManager.DataApiManagerCallback {
+        BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface,
+        DataApiManager.DataApiManagerCallback
+        , ErrorFragment.ErrorFragmentInterface {
 
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
     private SharedPreferences sharedPreferences;
@@ -64,25 +67,28 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
         configureDefaultParameters();
-        configureFirebaseParameters();
-        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
-        searchFragment = SearchFragment.getInstance(getSearchHistory());
-        if (firebaseUser != null) {
-            getSavedRecipesForCurrentUser(firebaseUser.getUid());
-        } else {
+        initializeFragments();
+        configureDatabaseParameters();
+        if (AppUtilities.isNetworkAvailable(this)) {
             dataApiManager.pushRequestRandomRecipes();
+        } else {
+            displayFragment(ErrorFragment.getInstance(getString(R.string.no_internet_connection), R.drawable.ic_no_wifi));
         }
 
     }
 
-    private void configureFirebaseParameters() {
-        firebaseAuth = FirebaseAuth.getInstance();
+
+    private void initializeFragments() {
+        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
+        searchFragment = SearchFragment.getInstance(getSearchHistory());
+    }
+
+    private void configureDatabaseParameters() {
+        dataApiManager = new DataApiManager(this);
         firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
     }
 
     private void configureDefaultParameters() {
-        dataApiManager = new DataApiManager(this);
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
@@ -176,11 +182,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void performSearch(String query) {
-
         insertSearchInDatabase(query);
         dataApiManager.pushRequestPerformSearch(query);
-
-
     }
 
 
@@ -267,47 +270,50 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        firebaseUser = firebaseAuth.getCurrentUser();
-        updateUIWithUserInfo();
+        firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() != null) {
+            firebaseUser = firebaseAuth.getCurrentUser();
+            if (AppUtilities.isNetworkAvailable(this)) {
+                getSavedRecipesForCurrentUser(firebaseUser);
+            }
+            updateUIWithUserInfo();
+        }
     }
 
     private void updateUIWithUserInfo() {
     }
 
-    private void getSavedRecipesForCurrentUser(String uId) {
-        DocumentReference userRecipesReferences = firebaseFirestore.collection("users_saved_recipes").document(uId);
-        userRecipesReferences.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    SavedRecipesDataObject savedRecipesDataObject = document.toObject(SavedRecipesDataObject.class);
-                    if (savedRecipesDataObject != null) {
-                        savedRecipesDataObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
-                        savedRecipes.addAll(savedRecipesDataObject.getSavedRecipes().values());
-                        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
+    private void getSavedRecipesForCurrentUser(FirebaseUser firebaseUser) {
+        if (firebaseUser != null) {
+            DocumentReference userRecipesReferences = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
+            userRecipesReferences.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        SavedRecipesDataObject savedRecipesDataObject = document.toObject(SavedRecipesDataObject.class);
+                        if (savedRecipesDataObject != null) {
+                            savedRecipesDataObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
+                            savedRecipes.addAll(savedRecipesDataObject.getSavedRecipes().values());
+                            savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
+                        }
                     }
                 }
-            }
-            dataApiManager.pushRequestRandomRecipes();
-        }).addOnFailureListener(e -> dataApiManager.pushRequestRandomRecipes());
-
+                dataApiManager.pushRequestRandomRecipes();
+            }).addOnFailureListener(e -> dataApiManager.pushRequestRandomRecipes());
+        }
     }
 
 
     @Override
     public void onItemClick(int itemId) {
-        switch (itemId) {
-            case R.id.sign_in_google_item: {
-                GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                        .requestIdToken(getString(R.string.default_web_client_id))
-                        .requestEmail()
-                        .build();
-                GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
-                Intent signInIntent = googleSignInClient.getSignInIntent();
-                startActivityForResult(signInIntent, 1);
-                break;
-            }
-
+        if (itemId == R.id.sign_in_google_item) {
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.default_web_client_id))
+                    .requestEmail()
+                    .build();
+            GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, 1);
         }
 
     }
@@ -349,4 +355,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
+    @Override
+    public void refreshErrorState(String error) {
+        if (error.equals(getString(R.string.no_internet_connection))) {
+            if (AppUtilities.isNetworkAvailable(this)) {
+                dataApiManager.pushRequestRandomRecipes();
+                getSavedRecipesForCurrentUser(firebaseUser);
+            }
+        }
+    }
 }

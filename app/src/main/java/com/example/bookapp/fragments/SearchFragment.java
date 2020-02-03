@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SearchFragment extends Fragment {
+    public static final String TAG = "SEARCH_FRAGMENT";
     private static final String KEY_SEARCH_HISTORY = "KEY_SEARCH_HISTORY";
     private SearchView searchView;
     private ArrayList<String> searchHistory;
@@ -117,7 +118,6 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newQuery) {
                     if (!newQuery.trim().equals("")) {
-                        //check weather the a suggestion in search history matches the query
                         searchFragmentInterface.fetchSuggestions(newQuery);
                     } else {
                         displaySearchSuggestions(searchHistory);
