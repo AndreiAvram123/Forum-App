@@ -16,6 +16,7 @@ import com.example.bookapp.fragments.ExpandedItemFragment;
 import com.example.bookapp.fragments.SavedRecipesDataObject;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.ActionsInterface;
+import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.Recipe;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -305,15 +306,9 @@ public class MainActivity extends AppCompatActivity implements
 
 
     @Override
-    public void onItemClick(int itemId) {
-        if (itemId == R.id.sign_in_google_item) {
-            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(getString(R.string.default_web_client_id))
-                    .requestEmail()
-                    .build();
-            GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, gso);
-            Intent signInIntent = googleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, 1);
+    public void onBottomSheetItemClicked(int itemId) {
+        if (itemId == R.id.login_with_google_item) {
+            startActivityForResult(AuthenticationService.getInstance().getGoogleSignInIntent(this), 1);
         }
 
     }

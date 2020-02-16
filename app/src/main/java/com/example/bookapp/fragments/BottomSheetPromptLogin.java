@@ -28,10 +28,10 @@ public class BottomSheetPromptLogin extends BottomSheetDialogFragment
     }
     @Override public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ConstraintLayout layout1 = view.findViewById(R.id.sign_in_google_item);
+        ConstraintLayout layout1 = view.findViewById(R.id.login_with_google_item);
         layout1.setOnClickListener(layout->{
             dismiss();
-            mListener.onItemClick(layout1.getId());
+            mListener.onBottomSheetItemClicked(layout1.getId());
         });
     }
     @Override
@@ -51,6 +51,6 @@ public class BottomSheetPromptLogin extends BottomSheetDialogFragment
     }
 
     public interface BottomSheetInterface {
-        void onItemClick(int itemId);
+        void onBottomSheetItemClicked(int itemId);
     }
 }

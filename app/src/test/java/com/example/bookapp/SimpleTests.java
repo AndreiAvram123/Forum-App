@@ -3,7 +3,7 @@ package com.example.bookapp;
 import android.content.Intent;
 import android.os.Build;
 
-import com.example.bookapp.activities.WelcomeActivity;
+import com.example.bookapp.activities.HomeActivity;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,11 +19,11 @@ import static junit.framework.TestCase.assertEquals;
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.O_MR1)
 public class SimpleTests {
-    private WelcomeActivity welcomeActivity;
+    private HomeActivity homeActivity;
 
     @Before
     public void setUp() {
-        welcomeActivity = Robolectric.buildActivity(WelcomeActivity.class)
+        homeActivity = Robolectric.buildActivity(HomeActivity.class)
                 .create()
                 .resume()
                 .get();
@@ -31,8 +31,8 @@ public class SimpleTests {
 
     @Test
     public void clickingLogin_shouldStartLoginActivity() {
-        welcomeActivity.findViewById(R.id.test_button).performClick();
-        Intent expectedIntent = new Intent(welcomeActivity, MainActivity.class);
+        homeActivity.findViewById(R.id.test_button).performClick();
+        Intent expectedIntent = new Intent(homeActivity, MainActivity.class);
         Intent actual = Shadows.shadowOf(RuntimeEnvironment.application).getNextStartedActivity();
         assertEquals(expectedIntent.getComponent(), actual.getComponent());
     }

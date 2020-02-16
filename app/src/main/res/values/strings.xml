@@ -18,6 +18,21 @@
     <string name="results">Results : </string>
     <string name="no_internet_connection">No internet connection</string>
     <string name="retry_text">Retry</string>
+    <string name="sign_in_text">SIGN IN</string>
+    <string name="log_in_button_text">Sign in</string>
+    <string name="sign_up_bottom_text">REGISTER</string>
+    <string name="enter_nickname">Nickname</string>
+    <string name="finish">Finish</string>
+    <string name="reenter_password">Confirm password</string>
+    <string name="choose_password">Password</string>
+    <string name="enter_email">Email</string>
+    <string name="create_account_hint">Create account</string>
+    <string name="error_invalid_email">Invalid Email</string>
+    <string name="no_password">No password entered</string>
+    <string name="password_match">The passwords do not match</string>
+    <string name="error_no_nickname">You must enter a nickname</string>
+    <string name="sign_in_facebook">Continue with Facebook</string>
+    <string name="sign_in_email">Continue with Email</string>
 
     <string-array name="sort_parameters">
         <item>Default</item>
