@@ -1,26 +1,42 @@
 package com.example.bookapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.SearchView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.example.bookapp.fragments.RandomRacipesFragment;
-import com.example.bookapp.fragments.SearchHistoryFragment;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+
+import com.example.bookapp.activities.WelcomeActivity;
+import com.example.bookapp.fragments.BottomSheetPromptLogin;
+import com.example.bookapp.fragments.ErrorFragment;
+import com.example.bookapp.fragments.RecipeDataFragment;
+import com.example.bookapp.fragments.ExpandedItemFragment;
+import com.example.bookapp.fragments.SavedRecipesDataObject;
+import com.example.bookapp.fragments.SearchFragment;
+import com.example.bookapp.interfaces.ActionsInterface;
+import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.Recipe;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -29,124 +45,347 @@ import java.util.TreeSet;
  * for the main screen
  */
 
-public class MainActivity extends AppCompatActivity {
-    private ConstraintLayout containerMain;
-    private SearchView searchView;
-    private static final String URL_RANDOM_RECIPES = "https://api.spoonacular.com/recipes/random?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=10";
+public class MainActivity extends AppCompatActivity implements
+        ActionsInterface,
+        BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface,
+        DataApiManager.DataApiManagerCallback
+        , ErrorFragment.ErrorFragmentInterface {
+
     private ArrayList<Recipe> randomRecipes = new ArrayList<>();
-    private RequestQueue requestQueue;
-    private Set<String> oldSearches = new TreeSet<>();
     private SharedPreferences sharedPreferences;
-    private SharedPreferences.Editor editorSharedPreferences;
-    private RandomRacipesFragment randomRacipesFragment;
+    private FirebaseUser firebaseUser;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firebaseFirestore;
+    private RecipeDataFragment savedRecipesFragment;
+    private HomeFragment homeFragment;
+    private SearchFragment searchFragment;
+    private ArrayList<Recipe> savedRecipes = new ArrayList<>();
+    private DataApiManager dataApiManager;
+    private ExpandedItemFragment currentExpandedItemFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        initializeViews();
-        requestQueue = Volley.newRequestQueue(this);
-        pushRequest();
-        sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        editorSharedPreferences = sharedPreferences.edit();
-    }
-
-    private void getSearchHistory() {
-        if (sharedPreferences.getStringSet(getString(R.string.search_history_key), null) == null) {
-            oldSearches.add("No search history");
+        setContentView(R.layout.layout_main_activity);
+        configureDefaultParameters();
+        if (shouldShowWelcomeActivity()) {
+            startWelcomeActivity();
         } else {
-            oldSearches= (sharedPreferences.getStringSet(getString(R.string.search_history_key), null));
-        }
-    }
-
-    private void pushRequest() {
-        //compose the request string to get the random recipes
-        StringRequest randomRecipesRequest = new StringRequest(Request.Method.GET, URL_RANDOM_RECIPES,
-                (response) -> {
-                    //once the data is fetched process it
-                    runOnUiThread(() -> processRequest(response));
-                }, (error) -> error.printStackTrace());
-        requestQueue.add(randomRecipesRequest);
-    }
-
-    private void processRequest(String response) {
-        try {
-            JSONObject jsonObject = new JSONObject(response);
-            //get the recipes array
-            JSONArray recipes = jsonObject.getJSONArray("recipes");
-            for (int i = 0; i < recipes.length(); i++) {
-                JSONObject recipeJson = recipes.getJSONObject(i);
-                Recipe recipeObject = new Recipe(recipeJson.getString("title"),
-                        recipeJson.getString("image"));
-                randomRecipes.add(recipeObject);
+            initializeFragments();
+            configureDatabaseParameters();
+            if (AppUtilities.isNetworkAvailable(this)) {
+                dataApiManager.pushRequestRandomRecipes();
+            } else {
+                displayFragment(ErrorFragment.getInstance(getString(R.string.no_internet_connection), R.drawable.ic_no_wifi));
             }
-            randomRacipesFragment = RandomRacipesFragment.getInstance(randomRecipes);
-            displayRandomRecipesFragment();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
+
     }
 
-    private void displayRandomRecipesFragment() {
-        if(randomRacipesFragment!=null) {
-            getSupportFragmentManager()
-                    .beginTransaction().
-                    replace(R.id.container_main, randomRacipesFragment)
-                    .commit();
-        }
+
+    private boolean shouldShowWelcomeActivity() {
+
+        return !sharedPreferences.getBoolean(getString(R.string.welcome_activity_shown_key), false);
+
     }
 
-    private void initializeViews() {
-        containerMain = findViewById(R.id.container_main);
-        searchView = findViewById(R.id.searchView);
-        searchView.setOnClickListener(view -> {
-            if (searchView.isIconified()) {
-                searchView.setBackground(getDrawable(R.drawable.search_background_highlighted));
-                displayOldSearchList();
-                searchView.setIconified(false);
+    private void startWelcomeActivity() {
+        markWelcomeActivityAsShown();
+        Intent intent = new Intent(this, WelcomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    private void markWelcomeActivityAsShown() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getString(R.string.welcome_activity_shown_key), true);
+        editor.apply();
+    }
+
+
+    private void initializeFragments() {
+        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
+        searchFragment = SearchFragment.getInstance(getSearchHistory());
+    }
+
+    private void configureDatabaseParameters() {
+        dataApiManager = new DataApiManager(this);
+        firebaseFirestore = FirebaseFirestore.getInstance();
+    }
+
+    private void configureDefaultParameters() {
+        sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+    }
+
+
+    private ArrayList<String> getSearchHistory() {
+        Set<String> searchHistorySet = sharedPreferences.getStringSet(getString(R.string.search_history_key), null);
+        ArrayList<String> searchHistoryArrayList = new ArrayList<>();
+        if (searchHistorySet != null) {
+            searchHistoryArrayList.addAll(searchHistorySet);
+            Collections.reverse(searchHistoryArrayList);
+            return searchHistoryArrayList;
+        }
+        return searchHistoryArrayList;
+    }
+
+    //
+    @Override
+    public void onRandomRecipesDataReady(ArrayList<Recipe> data) {
+        randomRecipes.addAll(data);
+        checkWhichRandomRecipeIsSaved();
+        homeFragment = HomeFragment.getInstance(data);
+        configureNavigationView();
+    }
+
+    @Override
+    public void onRecipeDetailsReady(@NonNull Recipe recipe, ArrayList<Recipe> similarRecipes) {
+        displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe, similarRecipes));
+
+    }
+
+    @Override
+    public void onRecipeSearchReady(ArrayList<Recipe> data) {
+        searchFragment.displaySearchResults(data);
+    }
+
+    @Override
+    public void onAutocompleteSuggestionsReady(HashMap<Integer, String> data) {
+        searchFragment.displayFetchedSuggestions(data);
+    }
+
+    private void checkWhichRandomRecipeIsSaved() {
+        for (Recipe recipe : randomRecipes) {
+            if (savedRecipes.contains(recipe)) {
+                recipe.setSaved(true);
             }
+        }
+    }
 
-        });
-        searchView.setOnCloseListener(() -> {
-            searchView.setBackground(getDrawable(R.drawable.search_background));
-            displayRandomRecipesFragment();
-            return false;
-        });
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                if (query.trim() != "") {
-                    oldSearches.add(query);
-                    editorSharedPreferences.putStringSet(getString(R.string.search_history_key), new TreeSet<>(oldSearches));
-                    editorSharedPreferences.commit();
-                    performSearch(query);
+    private void configureNavigationView() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        //display home fragment
+        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
+        displayFragment(homeFragment);
+        bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getItemId()) {
+                case R.id.navigation_home: {
+                    displayFragment(homeFragment);
+                    break;
                 }
-                return true;
+                case R.id.search_item: {
+                    displayFragment(searchFragment);
+                    break;
+                }
+                case R.id.saved_items: {
+                    displayFragment(savedRecipesFragment);
+                    break;
+                }
             }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
+            return true;
         });
+    }
 
+    private void displayFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container_main_activity, fragment)
+                .commit();
+    }
+
+
+    private void insertSearchInDatabase(String search) {
+        Set<String> currentSearchHistory = new TreeSet<>(getSearchHistory());
+        currentSearchHistory.add(search);
+        SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+        sharedPreferencesEditor.putStringSet(getString(R.string.search_history_key), currentSearchHistory);
+        sharedPreferencesEditor.apply();
+
+    }
+
+    @Override
+    public void performSearch(String query) {
+        insertSearchInDatabase(query);
+        dataApiManager.pushRequestPerformSearch(query);
+    }
+
+
+    @Override
+    public void fetchSuggestions(String query) {
+        dataApiManager.pushRequestAutocomplete(query);
+    }
+
+
+    private void displayFragmentAddToBackStack(Fragment fragment) {
+        if (fragment instanceof ExpandedItemFragment) {
+            currentExpandedItemFragment = (ExpandedItemFragment) fragment;
+        }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.container_main_activity, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+
+    @Override
+    public void shareRecipe(Recipe recipe) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
+        sendIntent.setType("text/plain");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        startActivity(shareIntent);
+    }
+
+
+    @Override
+    public void saveRecipe(Recipe recipe) {
+        if (firebaseUser == null) {
+            requestLogIn();
+        } else {
+            savedRecipes.add(recipe);
+            updateUserFirebaseDocument();
+            //check if we need to update the UI for the expandedItemFragment
+
+            if (currentExpandedItemFragment != null) {
+                currentExpandedItemFragment.informUserRecipeAddedToFavorited();
+            }
+        }
+    }
+
+    @Override
+    public void deleteSaveRecipe(Recipe recipe) {
+        savedRecipes.remove(recipe);
+        updateUserFirebaseDocument();
+
+        if (currentExpandedItemFragment != null) {
+            currentExpandedItemFragment.informUserRecipeRemovedFromFavorites();
+
+        }
+    }
+
+    @Override
+    public void expandRecipe(Recipe recipe) {
+        if (recipe.getIngredients() == null) {
+            //get the full data from the api
+            dataApiManager.pushRequestGetRecipeDetails(recipe.getId());
+        } else {
+            dataApiManager.pushRequestSimilarRecipes(recipe);
+        }
+    }
+
+    private void updateUserFirebaseDocument() {
+        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
+        DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
+        documentReference.set(new SavedRecipesDataObject(savedRecipes), SetOptions.merge());
     }
 
     /**
-     * This method is used in order to perform a
-     * search query
-     * @param query
+     * Use this method in order to display a bottom
+     * sheet for the user to select a login option
      */
-    private void performSearch(String query) {
+    private void requestLogIn() {
+        BottomSheetPromptLogin bottomSheetPromptLogin = BottomSheetPromptLogin.newInstance();
+        bottomSheetPromptLogin.show(getSupportFragmentManager(), BottomSheetPromptLogin.TAG);
 
     }
 
-    private void displayOldSearchList() {
-        getSearchHistory();
-        getSupportFragmentManager().beginTransaction().
-                replace(R.id.container_main, SearchHistoryFragment.getInstance(new ArrayList<>(oldSearches))).
-                addToBackStack(null).commit();
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() != null) {
+            firebaseUser = firebaseAuth.getCurrentUser();
+            if (AppUtilities.isNetworkAvailable(this)) {
+                getSavedRecipesForCurrentUser(firebaseUser);
+            }
+            updateUIWithUserInfo();
+        }
     }
 
+    private void updateUIWithUserInfo() {
+    }
+
+    private void getSavedRecipesForCurrentUser(FirebaseUser firebaseUser) {
+        if (firebaseUser != null) {
+            DocumentReference userRecipesReferences = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
+            userRecipesReferences.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        SavedRecipesDataObject savedRecipesDataObject = document.toObject(SavedRecipesDataObject.class);
+                        if (savedRecipesDataObject != null) {
+                            savedRecipesDataObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
+                            savedRecipes.addAll(savedRecipesDataObject.getSavedRecipes().values());
+                            savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
+                        }
+                    }
+                }
+                dataApiManager.pushRequestRandomRecipes();
+            }).addOnFailureListener(e -> dataApiManager.pushRequestRandomRecipes());
+        }
+    }
+
+
+    @Override
+    public void onBottomSheetItemClicked(int itemId) {
+        if (itemId == R.id.login_with_google_item) {
+            startActivityForResult(AuthenticationService.getInstance().getGoogleSignInIntent(this), 1);
+        }
+        if (itemId == R.id.login_other_options_item) {
+            startWelcomeActivity();
+        }
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == 1) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                firebaseAuthWithGoogle(account);
+            } catch (ApiException e) {
+                // Google Sign In failed, update UI appropriately
+                // ...
+                Snackbar.make(findViewById(R.id.container_main_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        firebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Sign in success, update UI with the signed-in user's information
+                        firebaseUser = firebaseAuth.getCurrentUser();
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Snackbar.make(findViewById(R.id.container_main_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                    }
+
+                    // ...
+                });
+    }
+
+
+    @Override
+    public void refreshErrorState(String error) {
+        if (error.equals(getString(R.string.no_internet_connection))) {
+            if (AppUtilities.isNetworkAvailable(this)) {
+                dataApiManager.pushRequestRandomRecipes();
+                getSavedRecipesForCurrentUser(firebaseUser);
+            }
+        }
+    }
 
 }

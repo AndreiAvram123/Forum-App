@@ -3,25 +3,100 @@ package com.example.bookapp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+import com.google.firebase.database.Exclude;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+@Entity(tableName = "recipes")
 public class Recipe implements Parcelable {
 
+    @PrimaryKey
+    public int id;
+    @ColumnInfo(name = "name")
     private String name;
+    @ColumnInfo(name = "image_url")
     private String imageUrl;
+    @ColumnInfo(name = "health_points")
+    private String healthPoints;
+    @ColumnInfo(name = "cooking_time")
+    private String readyInMinutes;
+    @ColumnInfo(name = "number_of_people")
+    private String servings;
+    @Ignore
+    private HashMap<String,Boolean>features;
+    @ColumnInfo(name = "dish_type")
+    private String dishType;
+    @Ignore
+    private ArrayList<String> ingredients;
+    @Ignore
+    private ArrayList<String> instructions;
+    @Exclude
+    private boolean isSaved;
 
-    public Recipe(String name, String imageUrl) {
+    //empty constructor required by room and firebase
+    public Recipe(){
+
+    }
+
+    @Ignore
+    public Recipe(int id, String name, String imageUrl,String readyInMinutes,String servings) {
+        this.id = id;
         this.name = name;
         this.imageUrl = imageUrl;
+        this.readyInMinutes = readyInMinutes;
+        this.servings = servings;
+    }
+
+    /**
+     * Constructor used to the full details of a recipe
+     * @param id
+     * @param name
+     * @param imageUrl
+     * @param healthPoints
+     * @param readyInMinutes
+     * @param servings
+     * @param features
+     * @param dishType
+     * @param ingredients
+     * @param instructions
+     */
+    public Recipe(@NonNull int id, @NonNull String name, @NonNull String imageUrl, String healthPoints, String readyInMinutes, String servings, HashMap<String, Boolean> features, @NonNull String dishType,
+                  ArrayList<String>ingredients, ArrayList<String>instructions) {
+        this.id = id;
+        this.name = name;
+        this.imageUrl = imageUrl;
+        this.healthPoints = healthPoints;
+        this.readyInMinutes = readyInMinutes;
+        this.servings = servings;
+        this.features = features;
+        this.dishType = dishType;
+        this.ingredients = ingredients;
+        this.instructions = instructions;
     }
 
     protected Recipe(Parcel in) {
+        id= in .readInt();
         name = in.readString();
         imageUrl = in.readString();
+        healthPoints = in.readString();
+        readyInMinutes = in.readString();
+        servings = in.readString();
+        features = in.readHashMap(Boolean.class.getClassLoader());
+        dishType = in.readString();
+        in.readStringList(ingredients);
+        in.readStringList(instructions);
     }
-
+    @Ignore
     public static final Creator<Recipe> CREATOR = new Creator<Recipe>() {
         @Override
         public Recipe createFromParcel(Parcel in) {
-            return new Recipe(in);
+            return new RecipeBuilder().setIn(in).createRecipe();
         }
 
         @Override
@@ -29,6 +104,25 @@ public class Recipe implements Parcelable {
             return new Recipe[size];
         }
     };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(name);
+        dest.writeString(imageUrl);
+        dest.writeString(healthPoints);
+        dest.writeString(readyInMinutes);
+        dest.writeString(servings);
+        dest.writeMap(features);
+        dest.writeString(dishType);
+        dest.writeStringList(ingredients);
+        dest.writeStringList(instructions);
+    }
 
     public String getName() {
         return name;
@@ -38,15 +132,102 @@ public class Recipe implements Parcelable {
         return imageUrl;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getHealthPoints() {
+        return healthPoints;
+    }
+
+    public String getReadyInMinutes() {
+        return readyInMinutes;
+    }
+
+    public String getServings() {
+        return servings;
+    }
+
+    public HashMap<String, Boolean> getFeatures() {
+        return features;
+    }
+
+    public String getDishType() {
+        return dishType;
+    }
+
+    public ArrayList<String> getIngredients() {
+        return ingredients;
+    }
+
+    public ArrayList<String> getInstructions() {
+        return instructions;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setHealthPoints(String healthPoints) {
+        this.healthPoints = healthPoints;
+    }
+
+    public void setReadyInMinutes(String readyInMinutes) {
+        this.readyInMinutes = readyInMinutes;
+    }
+
+    public void setServings(String servings) {
+        this.servings = servings;
+    }
+
+    public void setFeatures(HashMap<String, Boolean> features) {
+        this.features = features;
+    }
+
+    public void setDishType(String dishType) {
+        this.dishType = dishType;
+    }
+
+    public void setIngredients(ArrayList<String> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public void setInstructions(ArrayList<String> instructions) {
+        this.instructions = instructions;
+    }
+
+    public boolean isSaved() {
+        return isSaved;
+    }
+
+    public void setSaved(boolean saved) {
+        isSaved = saved;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeString(imageUrl);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Recipe recipe = (Recipe) o;
+
+        if (id != recipe.id) return false;
+        return name.equals(recipe.name);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + name.hashCode();
+        return result;
     }
 }
 

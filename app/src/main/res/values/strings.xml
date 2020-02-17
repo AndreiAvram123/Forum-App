@@ -2,8 +2,46 @@
     <string name="app_name">BookApp</string>
     <string name="popular_recipes_title">Here are some popular recipes</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
     <string name="preference_file_key">com.example.myapp.PREFERENCE_FILE_KEY</string>
     <string name="search_history_key">SEARCH_HISTORY_KEY</string>
+    <string name="facebook_app_id">2569482526618357</string>
+    <string name="fb_login_protocol_scheme">fb2569482526618357</string>
+    <string name="welcome_activity_shown_key">welcome_activity_shown_key</string>
+
+
+
+    <string name="action_share">Share</string>
+    <string name="action_upload">Upload</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_print">Print</string>
+    <string name="sign_in_google">Sign in with Google</string>
+    <string name="log_in_wanted_text">To use this feature \n please log in first</string>
+    <string name="sort">Sort</string>
+    <string name="results">Results : </string>
+    <string name="no_internet_connection">No internet connection</string>
+    <string name="retry_text">Retry</string>
+    <string name="sign_in_text">SIGN IN</string>
+    <string name="log_in_button_text">Sign in</string>
+    <string name="sign_up_bottom_text">REGISTER</string>
+    <string name="enter_nickname">Nickname</string>
+    <string name="finish">Finish</string>
+    <string name="reenter_password">Confirm password</string>
+    <string name="choose_password">Password</string>
+    <string name="enter_email">Email</string>
+    <string name="create_account_hint">Create account</string>
+    <string name="error_invalid_email">Invalid Email</string>
+    <string name="no_password">No password entered</string>
+    <string name="password_match">The passwords do not match</string>
+    <string name="error_no_nickname">You must enter a nickname</string>
+    <string name="sign_in_facebook">Continue with Facebook</string>
+    <string name="sign_in_email">Continue with Email</string>
+    <string name="other_options_sign_in">See other options</string>
+
+    <string-array name="sort_parameters">
+        <item>Default</item>
+        <item>Quickest</item>
+        <item>Servings</item>
+
+    </string-array>
 </resources>
