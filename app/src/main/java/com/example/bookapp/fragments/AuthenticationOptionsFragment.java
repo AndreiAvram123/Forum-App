@@ -9,16 +9,18 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.bookapp.R;
+import com.facebook.login.widget.LoginButton;
 
 public class AuthenticationOptionsFragment extends Fragment {
 
 
-    private ConstraintLayout loginWithFacebookLayout;
     private ConstraintLayout loginWithGoogleLayout;
     private ConstraintLayout loginWithEmailLayout;
     private AuthenticationOptionsCallback authenticationOptionsCallback;
+    private TextView loginAnonymouslyText;
 
     public static AuthenticationOptionsFragment newInstance() {
         AuthenticationOptionsFragment authenticationOptionsFragment = new AuthenticationOptionsFragment();
@@ -42,30 +44,27 @@ public class AuthenticationOptionsFragment extends Fragment {
     }
 
     private void attachListeners() {
-        loginWithFacebookLayout.setOnClickListener((layout)->{
-        });
-        loginWithGoogleLayout.setOnClickListener((layout)->{
-            authenticationOptionsCallback.loginWithGoogle();
 
-        });
-        loginWithEmailLayout.setOnClickListener((layout)->{
+        loginWithGoogleLayout.setOnClickListener((layout) -> authenticationOptionsCallback.loginWithGoogle());
+        loginWithEmailLayout.setOnClickListener((layout) -> authenticationOptionsCallback.showLoginWithEmailFragment());
+        loginAnonymouslyText.setOnClickListener((layout)->authenticationOptionsCallback.loginAnonymously());
 
-        });
     }
 
     private void initializeViews(View layout) {
-        loginWithFacebookLayout = layout.findViewById(R.id.login_with_facebook_item);
         loginWithGoogleLayout = layout.findViewById(R.id.login_with_google_item);
         loginWithEmailLayout = layout.findViewById(R.id.login_with_email_item);
+        loginAnonymouslyText = layout.findViewById(R.id.sign_in_anonymously_text);
+        LoginButton facebookLoginButton = layout.findViewById(R.id.login_button_facebook);
+        facebookLoginButton.setReadPermissions("email", "public_profile");
+        authenticationOptionsCallback.prepareLoginWithFacebook(facebookLoginButton);
     }
 
 
     public interface AuthenticationOptionsCallback {
-
-        void loginWithFacebook();
-
+        void prepareLoginWithFacebook(LoginButton loginButton);
         void loginWithGoogle();
-
         void showLoginWithEmailFragment();
+        void loginAnonymously();
     }
 }

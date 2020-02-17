@@ -42,6 +42,24 @@ public class RecipeDataFragment extends Fragment {
         return recipeDataFragment;
     }
 
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (getArguments() != null && getArguments().getParcelableArrayList(KEY_DATA).size() != 0) {
+            // Inflate the layout for this fragment
+            this.data = getArguments().getParcelableArrayList(KEY_DATA);
+        }
+    }
+
+    /**
+     * Lifecycle method called when
+     * the view is created
+     * @param inflater
+     * @param container
+     * @param savedInstanceState
+     * @return
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -52,28 +70,28 @@ public class RecipeDataFragment extends Fragment {
             initializeViews(view);
             initializeRecyclerViewAdapter();
             bindDataToViews();
-        } else {
-            //todo
-            //display proper error
-//            view = inflater.inflate(R.layout.layout_fragment_error_message, container, false);
-//            displayErrorMessage(view);
         }
         return view;
     }
 
     private void bindDataToViews() {
         numberResults.setText(Integer.toString(data.size()));
-        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getContext(),R.array.sort_parameters,
+        ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getContext(), R.array.sort_parameters,
                 R.layout.custom_item_spinner);
         sortOptionsSpinner.setAdapter(spinnerAdapter);
-               sortTextView.setOnClickListener(view->sortOptionsSpinner.performClick());
+        sortTextView.setOnClickListener(view -> sortOptionsSpinner.performClick());
+        //make a final boolean array in order to access it from
+        //withing the inner class
+        final boolean[] notFirstCall = {false};
         sortOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //highlight selected item
-                String sortCriteria = parent.getItemAtPosition(position).toString();
-                   adapterRecipesData.sort(sortCriteria);
-
+                 //the onItemSelected method is called the first time when the listener is attached
+                if(notFirstCall[0]) {
+                    String sortCriteria = parent.getItemAtPosition(position).toString();
+                    adapterRecipesData.sort(sortCriteria);
+                }
+                notFirstCall[0] = true;
             }
 
             @Override
@@ -92,22 +110,13 @@ public class RecipeDataFragment extends Fragment {
     }
 
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (getArguments() != null && getArguments().getParcelableArrayList(KEY_DATA).size() != 0) {
-            // Inflate the layout for this fragment
-            this.data = getArguments().getParcelableArrayList(KEY_DATA);
-        }
-    }
-
     /**
      * This method initialises all the the recyclerView
      * with a recyclerView adapter, a layout manager
      * and an item decoration
      */
     private void initializeRecyclerViewAdapter() {
-        adapterRecipesData = new AdapterRecipesData(data,getActivity());
+        adapterRecipesData = new AdapterRecipesData(data, getActivity());
         recyclerView.setAdapter(adapterRecipesData);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));

@@ -5,10 +5,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import com.example.bookapp.activities.WelcomeActivity;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
 import com.example.bookapp.fragments.RecipeDataFragment;
@@ -20,8 +21,6 @@ import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.Recipe;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -62,20 +61,46 @@ public class MainActivity extends AppCompatActivity implements
     private SearchFragment searchFragment;
     private ArrayList<Recipe> savedRecipes = new ArrayList<>();
     private DataApiManager dataApiManager;
+    private ExpandedItemFragment currentExpandedItemFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
         configureDefaultParameters();
-        initializeFragments();
-        configureDatabaseParameters();
-        if (AppUtilities.isNetworkAvailable(this)) {
-            dataApiManager.pushRequestRandomRecipes();
+        if (shouldShowWelcomeActivity()) {
+            startWelcomeActivity();
         } else {
-            displayFragment(ErrorFragment.getInstance(getString(R.string.no_internet_connection), R.drawable.ic_no_wifi));
+            initializeFragments();
+            configureDatabaseParameters();
+            if (AppUtilities.isNetworkAvailable(this)) {
+                dataApiManager.pushRequestRandomRecipes();
+            } else {
+                displayFragment(ErrorFragment.getInstance(getString(R.string.no_internet_connection), R.drawable.ic_no_wifi));
+            }
         }
 
+    }
+
+
+    private boolean shouldShowWelcomeActivity() {
+
+        return !sharedPreferences.getBoolean(getString(R.string.welcome_activity_shown_key), false);
+
+    }
+
+    private void startWelcomeActivity() {
+        markWelcomeActivityAsShown();
+        Intent intent = new Intent(this, WelcomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
+    private void markWelcomeActivityAsShown() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getString(R.string.welcome_activity_shown_key), true);
+        editor.apply();
     }
 
 
@@ -115,11 +140,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onRecipeDetailsReady(Recipe recipe, ArrayList<Recipe> similarRecipes) {
-        if (recipe != null) {
-            displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe, similarRecipes),
-                    ExpandedItemFragment.TAG_EXPANDED_ITEM_FRAGMENT);
-        }
+    public void onRecipeDetailsReady(@NonNull Recipe recipe, ArrayList<Recipe> similarRecipes) {
+        displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe, similarRecipes));
+
     }
 
     @Override
@@ -194,10 +217,13 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void displayFragmentAddToBackStack(Fragment fragment, @Nullable String tag) {
+    private void displayFragmentAddToBackStack(Fragment fragment) {
+        if (fragment instanceof ExpandedItemFragment) {
+            currentExpandedItemFragment = (ExpandedItemFragment) fragment;
+        }
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container_main_activity, fragment)
-                .addToBackStack(tag)
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -222,25 +248,20 @@ public class MainActivity extends AppCompatActivity implements
             savedRecipes.add(recipe);
             updateUserFirebaseDocument();
             //check if we need to update the UI for the expandedItemFragment
-            Fragment backStackFragment = getSupportFragmentManager().findFragmentByTag(ExpandedItemFragment.TAG_EXPANDED_ITEM_FRAGMENT);
-            if (backStackFragment != null) {
-                ((ExpandedItemFragment) backStackFragment).informUserRecipeAddedToFavorited();
+
+            if (currentExpandedItemFragment != null) {
+                currentExpandedItemFragment.informUserRecipeAddedToFavorited();
             }
         }
     }
 
     @Override
     public void deleteSaveRecipe(Recipe recipe) {
-        if (firebaseUser == null) {
-            requestLogIn();
-        } else {
-            savedRecipes.remove(recipe);
-            updateUserFirebaseDocument();
-            //check if we need to update the UI for the expandedItemFragment
-            Fragment backStackFragment = getSupportFragmentManager().findFragmentByTag(ExpandedItemFragment.TAG_EXPANDED_ITEM_FRAGMENT);
-            if (backStackFragment != null) {
-                ((ExpandedItemFragment) backStackFragment).informUserRecipeRemovedFromFavorites();
-            }
+        savedRecipes.remove(recipe);
+        updateUserFirebaseDocument();
+
+        if (currentExpandedItemFragment != null) {
+            currentExpandedItemFragment.informUserRecipeRemovedFromFavorites();
 
         }
     }
@@ -261,6 +282,10 @@ public class MainActivity extends AppCompatActivity implements
         documentReference.set(new SavedRecipesDataObject(savedRecipes), SetOptions.merge());
     }
 
+    /**
+     * Use this method in order to display a bottom
+     * sheet for the user to select a login option
+     */
     private void requestLogIn() {
         BottomSheetPromptLogin bottomSheetPromptLogin = BottomSheetPromptLogin.newInstance();
         bottomSheetPromptLogin.show(getSupportFragmentManager(), BottomSheetPromptLogin.TAG);
@@ -309,6 +334,9 @@ public class MainActivity extends AppCompatActivity implements
     public void onBottomSheetItemClicked(int itemId) {
         if (itemId == R.id.login_with_google_item) {
             startActivityForResult(AuthenticationService.getInstance().getGoogleSignInIntent(this), 1);
+        }
+        if (itemId == R.id.login_other_options_item) {
+            startWelcomeActivity();
         }
 
     }
@@ -359,4 +387,5 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
     }
+
 }

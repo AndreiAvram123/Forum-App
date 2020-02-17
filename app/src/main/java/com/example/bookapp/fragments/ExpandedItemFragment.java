@@ -28,7 +28,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class ExpandedItemFragment extends Fragment  {
+public class ExpandedItemFragment extends Fragment {
     public static final String TAG_EXPANDED_ITEM_FRAGMENT = "TAG_EXPANDED_ITEM_FRAGMENT";
     private static final String KEY_EXPANDED_ITEM = "KEY_EXPANDED_ITEM";
     private static final String KEY_SIMILAR_ITEMS = "KEY_SIMILAR_ITEMS";
@@ -46,17 +46,17 @@ public class ExpandedItemFragment extends Fragment  {
     private ArrayList<Recipe> recipeSuggestions;
     private StringDataFragment fragmentIngredients;
     private StringDataFragment fragmentInstructions;
-    private  ImageView saveButton;
+    private ImageView saveButton;
     private View layout;
 
 
     public static ExpandedItemFragment getInstance(@NonNull Recipe selectedRecipe,
-                                                   @NonNull ArrayList<Recipe> similarRecipes){
+                                                   @NonNull ArrayList<Recipe> similarRecipes) {
 
         ExpandedItemFragment expandedItemFragment = new ExpandedItemFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_EXPANDED_ITEM,selectedRecipe);
-        bundle.putParcelableArrayList(KEY_SIMILAR_ITEMS,similarRecipes);
+        bundle.putParcelable(KEY_EXPANDED_ITEM, selectedRecipe);
+        bundle.putParcelableArrayList(KEY_SIMILAR_ITEMS, similarRecipes);
         expandedItemFragment.setArguments(bundle);
 
         return expandedItemFragment;
@@ -72,17 +72,17 @@ public class ExpandedItemFragment extends Fragment  {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        layout =  inflater.inflate(R.layout.fragment_expanded_item, container, false);
-        recipe =getArguments().getParcelable(KEY_EXPANDED_ITEM);
+        layout = inflater.inflate(R.layout.fragment_expanded_item, container, false);
+        recipe = getArguments().getParcelable(KEY_EXPANDED_ITEM);
         recipeSuggestions = getArguments().getParcelableArrayList(KEY_SIMILAR_ITEMS);
-        if(recipe!=null) {
+        if (recipe != null) {
             initialiseViews();
             bindDataToView(recipe);
             actionsInterface = (ActionsInterface) getActivity();
         }
-        if(recipeSuggestions!=null){
-            listRecipeSuggestions.setAdapter(new AdapterRecipeSuggestion(recipeSuggestions,getActivity()));
-            listRecipeSuggestions.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false));
+        if (recipeSuggestions != null) {
+            listRecipeSuggestions.setAdapter(new AdapterRecipeSuggestion(recipeSuggestions, getActivity()));
+            listRecipeSuggestions.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
             listRecipeSuggestions.setHasFixedSize(true);
         }
         return layout;
@@ -108,34 +108,37 @@ public class ExpandedItemFragment extends Fragment  {
     }
 
     private void configureSaveButton() {
-        if(recipe.isSaved()){
+        if (recipe.isSaved()) {
             saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
         }
-        saveButton.setOnClickListener(view ->{
-             if(recipe.isSaved()){
-                 actionsInterface.deleteSaveRecipe(recipe);
-             }else{
-                 actionsInterface.saveRecipe(recipe);
-             }
+        saveButton.setOnClickListener(view -> {
+            if (recipe.isSaved()) {
+                actionsInterface.deleteSaveRecipe(recipe);
+            } else {
+                actionsInterface.saveRecipe(recipe);
+            }
 
-                });
+        });
     }
 
-    public void informUserRecipeAddedToFavorited(){
+    public void informUserRecipeAddedToFavorited() {
         recipe.setSaved(true);
         saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
-        Snackbar.make(layout,"Recipe added to favorites",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(layout, "Recipe added to favorites", Snackbar.LENGTH_SHORT).show();
     }
-    public void informUserRecipeRemovedFromFavorites(){
+
+    public void informUserRecipeRemovedFromFavorites() {
         recipe.setSaved(false);
         saveButton.setImageResource(R.drawable.ic_favorite_border_black_32dp);
-        Snackbar.make(layout,"Recipe deleted from favorites",Snackbar.LENGTH_SHORT).show();
+        Snackbar.make(layout, "Recipe deleted from favorites", Snackbar.LENGTH_SHORT).show();
     }
+
     private void bindDataToView(Recipe recipe) {
         Glide.with(getContext())
                 .load(recipe.getImageUrl())
                 .centerInside()
                 .into(recipeImage);
+
         recipeName.setText(recipe.getName());
         cookingTime.setText(recipe.getReadyInMinutes());
         healthPoints.setText(recipe.getHealthPoints());
@@ -143,13 +146,13 @@ public class ExpandedItemFragment extends Fragment  {
         dishType.setText(recipe.getDishType());
         fragmentIngredients = StringDataFragment.getInstance(recipe.getIngredients());
         fragmentInstructions = StringDataFragment.getInstance(recipe.getInstructions());
-        viewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager(),FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
+        viewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
             @Override
             public Fragment getItem(int position) {
-                if(position==0){
+                if (position == 0) {
                     return fragmentIngredients;
-                }else{
-                    if(position==1){
+                } else {
+                    if (position == 1) {
                         return fragmentInstructions;
                     }
                 }
@@ -164,25 +167,23 @@ public class ExpandedItemFragment extends Fragment  {
             @Nullable
             @Override
             public CharSequence getPageTitle(int position) {
-                if(position==0){
+                if (position == 0) {
                     return "Ingredients";
-                }else{
+                } else {
                     return "Instructions";
                 }
             }
         });
 
-        for (Map.Entry<String,Boolean> mapElement : recipe.getFeatures().entrySet()) {
+        for (Map.Entry<String, Boolean> mapElement : recipe.getFeatures().entrySet()) {
 
-           if(mapElement.getValue()){
-              TextView featureTextView  = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.text_view,null);
-              features.addView(featureTextView);
-           }
+            if (mapElement.getValue()) {
+                TextView featureTextView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.text_view, null);
+                features.addView(featureTextView);
+            }
         }
 
     }
-
-
 
 
 }

@@ -34,6 +34,7 @@ dependencies {
     def room_version = "2.2.3"
     def nav_version = "2.2.0"
 
+    implementation 'com.facebook.android:facebook-android-sdk:[5,6)'
     // Java language implementation
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
