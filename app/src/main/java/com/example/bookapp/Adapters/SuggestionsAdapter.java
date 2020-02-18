@@ -23,7 +23,7 @@ public class SuggestionsAdapter extends AdapterStrings {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_suggestion_item,parent,false);
+        View layout = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_suggestion_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(layout);
         viewHolder.text = layout.findViewById(R.id.suggestion_item_name);
         return viewHolder;
@@ -32,6 +32,6 @@ public class SuggestionsAdapter extends AdapterStrings {
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        holder.itemView.setOnClickListener(view->searchFragmentInterface.performSearch(data.get(position)));
+        holder.itemView.setOnClickListener(view -> searchFragmentInterface.performSearch(data.get(position)));
     }
 }

@@ -37,7 +37,7 @@ public class Recipe implements Parcelable {
     @Ignore
     private ArrayList<String> instructions;
     @Exclude
-    private boolean isSaved;
+    private boolean isSaved ;
 
     //empty constructor required by room and firebase
     public Recipe(){

@@ -45,7 +45,7 @@ public class AdapterRecipeSuggestion extends RecyclerView.Adapter<AdapterRecipeS
         holder.recipeName.setText(recipes.get(position).getName());
         //when the user clicks on an item
         //display the extended item fragment
-        holder.itemView.setOnClickListener(view -> actionsInterface.expandRecipe(recipes.get(position)));
+       // holder.itemView.setOnClickListener(view -> actionsInterface.expandPost(recipes.get(position)));
     }
 
     @Override

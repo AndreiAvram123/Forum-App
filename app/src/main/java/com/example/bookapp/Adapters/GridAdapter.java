@@ -13,16 +13,16 @@ import androidx.annotation.NonNull;
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
 import com.example.bookapp.interfaces.ActionsInterface;
-import com.example.bookapp.models.Recipe;
+import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 
 public class GridAdapter extends BaseAdapter {
 
-    private ArrayList<Recipe> data;
+    private ArrayList<Post> data;
     private ActionsInterface actionsInterface;
 
-    public GridAdapter(@NonNull ArrayList<Recipe> data, Activity activity) {
+    public GridAdapter(@NonNull ArrayList<Post> data, Activity activity) {
         this.data = data;
         actionsInterface = (ActionsInterface) activity;
     }
@@ -47,13 +47,13 @@ public class GridAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_grid_recipe_item, parent, false);
         }
-        TextView recipeName = convertView.findViewById(R.id.name_recipe_grid_item);
-        recipeName.setText(data.get(position).getName());
+        TextView postName = convertView.findViewById(R.id.name_recipe_grid_item);
+        postName.setText(data.get(position).getPostTitle());
         ImageView recipeImage = convertView.findViewById(R.id.image_recipe_grid_item);
         Glide.with(parent.getContext())
-                .load(data.get(position).getImageUrl())
+                .load(data.get(position).getPostImage())
                 .into(recipeImage);
-         convertView.setOnClickListener(view->actionsInterface.expandRecipe(data.get(position)));
+         convertView.setOnClickListener(view->actionsInterface.expandPost(data.get(position)));
         return convertView;
     }
 }

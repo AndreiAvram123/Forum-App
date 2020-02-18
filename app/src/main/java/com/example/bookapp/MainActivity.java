@@ -18,6 +18,7 @@ import com.example.bookapp.fragments.SavedRecipesDataObject;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.AuthenticationService;
+import com.example.bookapp.models.Post;
 import com.example.bookapp.models.Recipe;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -32,7 +33,6 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements
     private RecipeDataFragment savedRecipesFragment;
     private HomeFragment homeFragment;
     private SearchFragment searchFragment;
-    private ArrayList<Recipe> savedRecipes = new ArrayList<>();
+    private ArrayList<Post> savedPosts = new ArrayList<>();
     private DataApiManager dataApiManager;
     private ExpandedItemFragment currentExpandedItemFragment;
 
@@ -74,7 +74,8 @@ public class MainActivity extends AppCompatActivity implements
             initializeFragments();
             configureDatabaseParameters();
             if (AppUtilities.isNetworkAvailable(this)) {
-                dataApiManager.pushRequestRandomRecipes();
+                //dataApiManager.pushRequestRandomRecipes();
+                 dataApiManager.pushRequestLatestPosts();
             } else {
                 displayFragment(ErrorFragment.getInstance(getString(R.string.no_internet_connection), R.drawable.ic_no_wifi));
             }
@@ -105,12 +106,15 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private void initializeFragments() {
-        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
+        //todo
+        //modify this
+       // savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
         searchFragment = SearchFragment.getInstance(getSearchHistory());
     }
 
     private void configureDatabaseParameters() {
         dataApiManager = new DataApiManager(this);
+        //NukeSSLCerts.nuke();
         firebaseFirestore = FirebaseFirestore.getInstance();
     }
 
@@ -132,21 +136,23 @@ public class MainActivity extends AppCompatActivity implements
 
     //
     @Override
-    public void onRandomRecipesDataReady(ArrayList<Recipe> data) {
-        randomRecipes.addAll(data);
-        checkWhichRandomRecipeIsSaved();
-        homeFragment = HomeFragment.getInstance(data);
+    public void onLatestPostsDataReady(ArrayList<Post> latestPosts) {
+        //todo
+        //modity
+        //randomRecipes.addAll(data);
+        //checkWhichRandomRecipeIsSaved();
+        homeFragment = HomeFragment.getInstance(latestPosts);
         configureNavigationView();
     }
 
     @Override
-    public void onRecipeDetailsReady(@NonNull Recipe recipe, ArrayList<Recipe> similarRecipes) {
-        displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(recipe, similarRecipes));
+    public void onRecipeDetailsReady(@NonNull Post post, ArrayList<Post> similarPosts) {
+        displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(post, null));
 
     }
 
     @Override
-    public void onRecipeSearchReady(ArrayList<Recipe> data) {
+    public void onPostSearchReady(ArrayList<Post> data) {
         searchFragment.displaySearchResults(data);
     }
 
@@ -157,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private void checkWhichRandomRecipeIsSaved() {
         for (Recipe recipe : randomRecipes) {
-            if (savedRecipes.contains(recipe)) {
+            if (savedPosts.contains(recipe)) {
                 recipe.setSaved(true);
             }
         }
@@ -229,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     @Override
-    public void shareRecipe(Recipe recipe) {
+    public void sharePost(Post post) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
@@ -241,45 +247,53 @@ public class MainActivity extends AppCompatActivity implements
 
 
     @Override
-    public void saveRecipe(Recipe recipe) {
+    public void savePost(Post post) {
         if (firebaseUser == null) {
             requestLogIn();
         } else {
-            savedRecipes.add(recipe);
+            savedPosts.add(post);
             updateUserFirebaseDocument();
             //check if we need to update the UI for the expandedItemFragment
 
             if (currentExpandedItemFragment != null) {
-                currentExpandedItemFragment.informUserRecipeAddedToFavorited();
+                currentExpandedItemFragment.informUserPostAddedToFavorited();
             }
         }
     }
 
     @Override
-    public void deleteSaveRecipe(Recipe recipe) {
-        savedRecipes.remove(recipe);
+    public void deleteSavedPost(Post post) {
+        savedPosts.remove(post);
         updateUserFirebaseDocument();
 
         if (currentExpandedItemFragment != null) {
-            currentExpandedItemFragment.informUserRecipeRemovedFromFavorites();
+            currentExpandedItemFragment.informUserPostRemovedFromFavorites();
 
         }
     }
 
     @Override
-    public void expandRecipe(Recipe recipe) {
-        if (recipe.getIngredients() == null) {
-            //get the full data from the api
-            dataApiManager.pushRequestGetRecipeDetails(recipe.getId());
-        } else {
-            dataApiManager.pushRequestSimilarRecipes(recipe);
-        }
+    public void expandPost(Post post) {
+       displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(post,null));
+
+
+        //todo
+//        //maybe optimise??? or not
+//        if (post.getIngredients() == null) {
+//            //get the full data from the api
+//            dataApiManager.pushRequestGetRecipeDetails(post.getId());
+//        } else {
+//            dataApiManager.pushRequestSimilarRecipes(post);
+//        }
     }
 
     private void updateUserFirebaseDocument() {
-        savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
-        DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
-        documentReference.set(new SavedRecipesDataObject(savedRecipes), SetOptions.merge());
+        //todo
+        //modify
+        //        savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
+//        DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
+//        documentReference.set(new SavedRecipesDataObject(savedPosts), SetOptions.merge());
+//    }
     }
 
     /**
@@ -319,13 +333,15 @@ public class MainActivity extends AppCompatActivity implements
                         SavedRecipesDataObject savedRecipesDataObject = document.toObject(SavedRecipesDataObject.class);
                         if (savedRecipesDataObject != null) {
                             savedRecipesDataObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
-                            savedRecipes.addAll(savedRecipesDataObject.getSavedRecipes().values());
-                            savedRecipesFragment = RecipeDataFragment.getInstance(savedRecipes);
+                       //     savedPosts.addAll(savedRecipesDataObject.getSavedRecipes().values());
+                        //    savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
                         }
                     }
                 }
-                dataApiManager.pushRequestRandomRecipes();
-            }).addOnFailureListener(e -> dataApiManager.pushRequestRandomRecipes());
+                //todo
+                //here
+               // dataApiManager.pushRequestRandomRecipes();
+            }).addOnFailureListener(e -> {});//dataApiManager.pushRequestRandomRecipes());
         }
     }
 
@@ -382,8 +398,10 @@ public class MainActivity extends AppCompatActivity implements
     public void refreshErrorState(String error) {
         if (error.equals(getString(R.string.no_internet_connection))) {
             if (AppUtilities.isNetworkAvailable(this)) {
-                dataApiManager.pushRequestRandomRecipes();
-                getSavedRecipesForCurrentUser(firebaseUser);
+
+                dataApiManager.pushRequestLatestPosts();
+                //todo
+                //getSavedRecipesForCurrentUser(firebaseUser);
             }
         }
     }

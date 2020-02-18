@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookapp.Adapters.AdapterRecipesData;
 import com.example.bookapp.R;
+import com.example.bookapp.models.Post;
 import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
@@ -28,13 +29,13 @@ public class RecipeDataFragment extends Fragment {
 
     private static final String KEY_DATA = "KEY_DATA";
     private RecyclerView recyclerView;
-    private ArrayList<Recipe> data;
+    private ArrayList<Post> data;
     private TextView sortTextView;
     private Spinner sortOptionsSpinner;
     private AdapterRecipesData adapterRecipesData;
     private TextView numberResults;
 
-    public static RecipeDataFragment getInstance(@NonNull ArrayList<Recipe> recipes) {
+    public static RecipeDataFragment getInstance(@NonNull ArrayList<Post> recipes) {
         RecipeDataFragment recipeDataFragment = new RecipeDataFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelableArrayList(KEY_DATA, recipes);
@@ -116,7 +117,7 @@ public class RecipeDataFragment extends Fragment {
      * and an item decoration
      */
     private void initializeRecyclerViewAdapter() {
-        adapterRecipesData = new AdapterRecipesData(data, getActivity());
+         adapterRecipesData = new AdapterRecipesData(data, getActivity());
         recyclerView.setAdapter(adapterRecipesData);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));

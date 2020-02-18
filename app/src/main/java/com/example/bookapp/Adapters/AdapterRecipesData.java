@@ -14,18 +14,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
 import com.example.bookapp.interfaces.ActionsInterface;
-import com.example.bookapp.models.Recipe;
+import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 
 public class AdapterRecipesData extends RecyclerView.Adapter<AdapterRecipesData.ViewHolder> {
-    private ArrayList<Recipe> recipes;
+    private ArrayList<Post> posts;
     private Context context;
     private ActionsInterface actionsInterface;
     private String[] allSortCriteria;
 
-    public AdapterRecipesData(@NonNull ArrayList<Recipe> recipes, Activity activity) {
-        this.recipes = recipes;
+    public AdapterRecipesData(@NonNull ArrayList<Post> posts, Activity activity) {
+        this.posts = posts;
         actionsInterface = (ActionsInterface) activity;
         allSortCriteria = activity.getResources().getStringArray(R.array.sort_parameters);
     }
@@ -42,43 +42,43 @@ public class AdapterRecipesData extends RecyclerView.Adapter<AdapterRecipesData.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.recipeName.setText(recipes.get(position).getName());
+        holder.recipeName.setText(posts.get(position).getPostTitle());
         Glide.with(context)
-                .load(recipes.get(position).getImageUrl())
+                .load(posts.get(position).getPostImage())
                 .centerInside()
                 .into(holder.recipeImage);
         //when the user clicks on an item
         //display the extended item fragment
-        holder.itemView.setOnClickListener(view -> actionsInterface.expandRecipe(recipes.get(position)));
+        holder.itemView.setOnClickListener(view -> actionsInterface.expandPost(posts.get(position)));
     }
 
     @Override
     public int getItemCount() {
-        return recipes.size();
+        return posts.size();
     }
 
     public void sort(String sortCriteria) {
 
-        if (sortCriteria.equals(allSortCriteria[1])) {
-            //quickest
-            recipes.sort((r1, r2) -> {
-                int r1CookingTime = Integer.parseInt(r1.getReadyInMinutes());
-                int r2CookingTime = Integer.parseInt(r2.getReadyInMinutes());
-                return Integer.compare(r1CookingTime, r2CookingTime);
-            });
-            notifyDataSetChanged();
-        }
-        if (sortCriteria.equals(allSortCriteria[2])) {
-            //Number of servings
-            recipes.sort((r1, r2) -> {
-                int r1Servings = Integer.parseInt(r1.getServings());
-                int r2Servings = Integer.parseInt(r2.getServings());
-                //the compare method return 1 if the first number is smaller than
-                //the first one
-                return Integer.compare(r2Servings, r1Servings);
-            });
-            notifyDataSetChanged();
-        }
+//        if (sortCriteria.equals(allSortCriteria[1])) {
+//            //quickest
+//            posts.sort((r1, r2) -> {
+//                int r1CookingTime = Integer.parseInt(r1.getReadyInMinutes());
+//                int r2CookingTime = Integer.parseInt(r2.getReadyInMinutes());
+//                return Integer.compare(r1CookingTime, r2CookingTime);
+//            });
+//            notifyDataSetChanged();
+//        }
+//        if (sortCriteria.equals(allSortCriteria[2])) {
+//            //Number of servings
+//            posts.sort((r1, r2) -> {
+//                int r1Servings = Integer.parseInt(r1.getServings());
+//                int r2Servings = Integer.parseInt(r2.getServings());
+//                //the compare method return 1 if the first number is smaller than
+//                //the first one
+//                return Integer.compare(r2Servings, r1Servings);
+//            });
+//            notifyDataSetChanged();
+//        }
 
     }
 
@@ -87,7 +87,7 @@ public class AdapterRecipesData extends RecyclerView.Adapter<AdapterRecipesData.
         private ImageView recipeImage;
         private TextView recipeName;
 
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(@NonNull View itemView) {
             super(itemView);
 
 
