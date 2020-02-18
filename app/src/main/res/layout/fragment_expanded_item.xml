@@ -1,234 +1,221 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <data>
+
+        <variable
+            name="post"
+            type="com.example.bookapp.models.Post" />
+    </data>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#ffffff"
-        tools:context=".fragments.ExpandedItemFragment">
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/list_item_suggested_recipes"
-            android:layout_width="wrap_content"
-            android:layout_height="300dp"
-            android:scrollbars="vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view_pager_expanded" />
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#F3F3F3"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent"
+            android:background="#ffffff"
+            tools:context=".fragments.ExpandedItemFragment">
 
-            <ImageView
-                android:id="@+id/recipe_image_expanded"
-                android:layout_width="300dp"
-                android:layout_height="180dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/round_image"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.495"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/back_button_expanded"
-                tools:src="@tools:sample/avatars" />
-
-            <TextView
-                android:id="@+id/recipe_name_expanded"
-                style="@style/important_text_large"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:autoSizeTextType="uniform"
-                android:text="Pork ribs with cactus"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recipe_image_expanded" />
-
-            <ImageView
-                android:id="@+id/back_button_expanded"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
-                android:src="@drawable/ic_arrow_back_black_32dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/save_button_expanded"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_favorite_border_black_32dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/share_button_expanded"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:layout_marginEnd="16dp"
-                android:src="@drawable/ic_share_black_32dp"
-                app:layout_constraintEnd_toStartOf="@+id/save_button_expanded"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:background="#757575"
-                android:padding="15px"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/recipe_name_expanded">
-
-                <TextView
-                    android:id="@+id/number_likes_post_expanded"
-                    style="@style/important_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:autoSizeTextType="uniform"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/imageView7"
-                    app:layout_constraintStart_toStartOf="@+id/imageView7"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView7"
-                    app:layout_constraintVertical_bias="0.0"
-                    tools:text="4 likes" />
-
-                <TextView
-                    android:id="@+id/author_post_expanded"
-                    style="@style/important_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:autoSizeTextType="uniform"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/imageView5"
-                    app:layout_constraintStart_toStartOf="@+id/imageView5"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView5"
-                    tools:text="Andrei Avram" />
-
-                <ImageView
-                    android:id="@+id/imageView7"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="80dp"
-                    android:layout_marginTop="16dp"
-                    android:src="@drawable/ic_like"
-                    app:layout_constraintStart_toEndOf="@+id/imageView6"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/imageView6"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:src="@drawable/ic_calendar"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.498"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageView
-                    android:id="@+id/imageView5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="80dp"
-                    android:src="@drawable/ic_person_32dp"
-                    app:layout_constraintEnd_toStartOf="@+id/imageView6"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <TextView
-                    android:id="@+id/date_post_expanded"
-                    style="@style/important_text"
-                    android:layout_width="100dp"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:autoSizeTextType="uniform"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/imageView6"
-                    app:layout_constraintStart_toStartOf="@+id/imageView6"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView6"
-                    app:layout_constraintVertical_bias="0.0"
-                    tools:text="2/17/2020" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <LinearLayout
-            android:id="@+id/layout_features_expanded"
-            android:layout_width="409dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
             <TextView
                 android:id="@+id/dish_type"
                 style="@style/important_text"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="4dp"
                 android:layout_weight="1"
                 android:background="@drawable/round_shape"
+                android:text='@{ "#" + post.postCategory}'
                 android:textColor="#ffffff"
+                app:layout_constraintBottom_toTopOf="@+id/list_item_suggested_recipes"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
+                app:layout_constraintVertical_bias="0.39"
                 tools:text="#TextView" />
-        </LinearLayout>
 
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/view_pager_expanded"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layout_features_expanded"
-            app:layout_constraintVertical_bias="0.0">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/list_item_suggested_recipes"
+                android:layout_width="wrap_content"
+                android:layout_height="300dp"
+                android:scrollbars="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
 
-            <com.google.android.material.tabs.TabLayout
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:layout_gravity="top">
+                android:layout_height="wrap_content"
+                android:background="#F3F3F3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <com.google.android.material.tabs.TabItem
+                <ImageView
+                    android:id="@+id/recipe_image_expanded"
+                    android:layout_width="300dp"
+                    android:layout_height="180dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/round_image"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.495"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/back_button_expanded"
+                    tools:src="@tools:sample/avatars" />
+
+                <TextView
+                    android:id="@+id/recipe_name_expanded"
+                    style="@style/important_text_large"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ingredients" />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:autoSizeTextType="uniform"
+                    android:text="@{post.postTitle}"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/recipe_image_expanded"
+                    tools:text="Nela ion" />
 
-                <com.google.android.material.tabs.TabItem
+                <ImageView
+                    android:id="@+id/back_button_expanded"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Instructions" />
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="24dp"
+                    android:src="@drawable/ic_arrow_back_black_32dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
+                <ImageView
+                    android:id="@+id/save_button_expanded"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    android:src='@{post.saved ? "@drawable/ic_favorite_border_black_32dp" : "@drawable/ic_favorite_red_32dp"}'
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-            </com.google.android.material.tabs.TabLayout>
-        </androidx.viewpager.widget.ViewPager>
+                <ImageView
+                    android:id="@+id/share_button_expanded"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_share_black_32dp"
+                    app:layout_constraintEnd_toStartOf="@+id/save_button_expanded"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="#757575"
+                    android:padding="15px"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/recipe_name_expanded">
+
+                    <TextView
+                        android:id="@+id/number_likes_post_expanded"
+                        style="@style/important_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:autoSizeTextType="uniform"
+                        android:text="4 likes"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/imageView7"
+                        app:layout_constraintStart_toStartOf="@+id/imageView7"
+                        app:layout_constraintTop_toBottomOf="@+id/imageView7"
+                        app:layout_constraintVertical_bias="0.0"
+                        tools:text="4 likes" />
+
+                    <TextView
+                        android:id="@+id/author_post_expanded"
+                        style="@style/important_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:autoSizeTextType="uniform"
+                        android:text="@{post.postAuthor}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/imageView5"
+                        app:layout_constraintStart_toStartOf="@+id/imageView5"
+                        app:layout_constraintTop_toBottomOf="@+id/imageView5"
+                        tools:text="Andrei Avram" />
+
+                    <ImageView
+                        android:id="@+id/imageView7"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="80dp"
+                        android:layout_marginTop="16dp"
+                        android:src="@drawable/ic_like"
+                        app:layout_constraintStart_toEndOf="@+id/imageView6"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageView6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:src="@drawable/ic_calendar"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.498"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageView5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="80dp"
+                        android:src="@drawable/ic_person_32dp"
+                        app:layout_constraintEnd_toStartOf="@+id/imageView6"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/date_post_expanded"
+                        style="@style/important_text"
+                        android:layout_width="100dp"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:autoSizeTextType="uniform"
+                        android:text="@{post.postDate}"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/imageView6"
+                        app:layout_constraintStart_toStartOf="@+id/imageView6"
+                        app:layout_constraintTop_toBottomOf="@+id/imageView6"
+                        app:layout_constraintVertical_bias="0.0"
+                        tools:text="2/17/2020" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <FrameLayout
+                android:id="@+id/container_reviews_fragment"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

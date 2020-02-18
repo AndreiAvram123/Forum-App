@@ -10,14 +10,17 @@ public class Post implements Parcelable {
     private String postDate;
     private String postAuthor;
     private String postImage;
+    private String postCategory;
     private boolean isSaved = false;
 
-    Post(int postID, String postTitle, String postDate, String postAuthor, String postImage) {
+
+    Post(int postID, String postTitle, String postDate, String postAuthor, String postCategory, String postImage) {
         this.postID = postID;
         this.postTitle = postTitle;
         this.postDate = postDate;
         this.postAuthor = postAuthor;
         this.postImage = postImage;
+        this.postCategory = postCategory;
 
     }
 
@@ -27,6 +30,7 @@ public class Post implements Parcelable {
         postDate = in.readString();
         postAuthor = in.readString();
         postImage = in.readString();
+        postCategory = in.readString();
     }
 
     public static final Creator<Post> CREATOR = new Creator<Post>() {
@@ -43,6 +47,10 @@ public class Post implements Parcelable {
 
     public int getPostID() {
         return postID;
+    }
+
+    public String getPostCategory() {
+        return postCategory;
     }
 
     public String getPostTitle() {
@@ -73,6 +81,7 @@ public class Post implements Parcelable {
         dest.writeString(postDate);
         dest.writeString(postAuthor);
         dest.writeString(postImage);
+        dest.writeString(postCategory);
     }
 
     public boolean isSaved() {

@@ -6,11 +6,17 @@ public class PostBuilder {
     private String postDate;
     private String postAuthor;
     private String postImage;
+    private String postCategory;
 
     public PostBuilder setPostID(int postID) {
         this.postID = postID;
         return this;
     }
+    public PostBuilder setPostCategory(String postCategory) {
+        this.postCategory = postCategory;
+        return this;
+    }
+
 
     public PostBuilder setPostTitle(String postTitle) {
         this.postTitle = postTitle;
@@ -33,6 +39,6 @@ public class PostBuilder {
     }
 
     public Post createPost() {
-        return new Post(postID, postTitle, postDate, postAuthor, postImage);
+        return new Post(postID, postTitle, postDate, postAuthor,postCategory, postImage);
     }
 }

@@ -1,6 +1,10 @@
 package com.example.bookapp;
 
 import android.app.Activity;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -24,6 +28,7 @@ class DataApiManager {
     private static final String URL_SIMILAR_RECIPES = "https://api.spoonacular.com/recipes/%s/similar?apiKey=8d7003ab81714ae7b9d6e003a61ee0c4&number=5";
     private static final String URL_LATEST_POSTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?recentPosts";
     private static final String URL_POST_AUTOCOMPLETE = "http://sgb967.poseidon.salford.ac.uk/cms/LiveSearchController.php?postsSearchQuery=%s";
+    private static final String URL_POST_COMMENTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?postID=%s&comments";
 
     DataApiManager(Activity activity) {
         this.activity = activity;
@@ -32,17 +37,27 @@ class DataApiManager {
     }
 
 
-
-    void pushRequestLatestPosts(){
+    void pushRequestLatestPosts() {
         StringRequest randomRecipesRequest = new StringRequest(Request.Method.GET, URL_LATEST_POSTS,
                 (response) -> {
-                      ArrayList<Post> latestPosts = PostConverter.getPostsFromJsonArray(response);
-                      dataApiManagerCallback.onLatestPostsDataReady(latestPosts);
+                    ArrayList<Post> latestPosts = PostConverter.getPostsFromJsonArray(response);
+                    dataApiManagerCallback.onLatestPostsDataReady(latestPosts);
                 }, Throwable::printStackTrace);
 
         requestQueue.add(randomRecipesRequest);
 
     }
+
+    void pushRequestGetPostComments(Post post){
+        StringRequest randomRecipesRequest = new StringRequest(Request.Method.GET, String.format(URL_POST_COMMENTS,post.getPostID()),
+                (response) -> {
+                    dataApiManagerCallback.onPostDetailsReady(post,null);
+                    Log.d("Debug",response);
+                }, Throwable::printStackTrace);
+
+        requestQueue.add(randomRecipesRequest);
+    }
+
 
 
     void pushRequestGetRecipeDetails(int id) {
@@ -96,7 +111,7 @@ class DataApiManager {
         {
             ArrayList<Recipe> similarRecipes = RecipeUtil.getSimilarRecipesFromJson(response);
 
-          //  activity.runOnUiThread(() -> dataApiManagerCallback.onRecipeDetailsReady(recipe, similarRecipes));
+            //  activity.runOnUiThread(() -> dataApiManagerCallback.onRecipeDetailsReady(recipe, similarRecipes));
 
         },
                 (error) -> {
@@ -107,10 +122,11 @@ class DataApiManager {
     public interface DataApiManagerCallback {
         void onLatestPostsDataReady(ArrayList<Post> latestPosts);
 
-        void onRecipeDetailsReady(Post post, ArrayList<Post> similarPosts);
+        void onPostDetailsReady(@NonNull Post post, @Nullable ArrayList<Post> similarPosts);
 
         void onPostSearchReady(ArrayList<Post> data);
 
         void onAutocompleteSuggestionsReady(HashMap<Integer, String> data);
+
     }
 }

@@ -2,8 +2,6 @@ package com.example.bookapp.models;
 
 import android.util.Log;
 
-import com.google.gson.JsonArray;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +24,7 @@ public class PostConverter {
                         .setPostTitle(postJson.getString("postTitle"))
                         .setPostDate(postJson.getString("postDate"))
                         .setPostAuthor(postJson.getString("postAuthor"))
+                        .setPostCategory(postJson.getString("postCategory"))
                         .setPostImage(defaultImageURL + postJson.getString("postImage"))
                         .createPost());
             }

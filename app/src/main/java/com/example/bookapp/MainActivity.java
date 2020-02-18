@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onRecipeDetailsReady(@NonNull Post post, ArrayList<Post> similarPosts) {
+    public void onPostDetailsReady(@NonNull Post post, ArrayList<Post> similarPosts) {
         displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(post, null));
 
     }
@@ -274,8 +274,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void expandPost(Post post) {
-       displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(post,null));
-
+        //todo
+        //modify
+        dataApiManager.pushRequestGetPostComments(post);
 
         //todo
 //        //maybe optimise??? or not
