@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.bookapp.activities.WelcomeActivity;
+import com.example.bookapp.customViews.CommentDialog;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
@@ -19,6 +21,7 @@ import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.Comment;
+import com.example.bookapp.models.CommentBuilder;
 import com.example.bookapp.models.Post;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -32,8 +35,11 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.TreeSet;
@@ -47,7 +53,8 @@ public class MainActivity extends AppCompatActivity implements
         ActionsInterface,
         BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface,
         DataApiManager.DataApiManagerCallback
-        , ErrorFragment.ErrorFragmentInterface {
+        , ErrorFragment.ErrorFragmentInterface,
+        CommentDialog.CommentDialogInterface {
 
     private ArrayList<Post> randomRecipes = new ArrayList<>();
     private SharedPreferences sharedPreferences;
@@ -192,24 +199,19 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void insertSearchInDatabase(String search) {
-        Set<String> currentSearchHistory = new TreeSet<>(getSearchHistory());
-        currentSearchHistory.add(search);
-        SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-        sharedPreferencesEditor.putStringSet(getString(R.string.search_history_key), currentSearchHistory);
-        sharedPreferencesEditor.apply();
-
-    }
-
     @Override
     public void performSearch(String query) {
-        insertSearchInDatabase(query);
     }
 
 
     @Override
     public void fetchSuggestions(String query) {
         dataApiManager.pushRequestAutocomplete(query);
+    }
+
+    @Override
+    public void fetchSelectedPostById(int id) {
+        dataApiManager.pushRequestGetPostDetails(id);
     }
 
 
@@ -308,7 +310,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-
     @Override
     public void onBottomSheetItemClicked(int itemId) {
         if (itemId == R.id.login_with_google_item) {
@@ -369,4 +370,14 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    public void submitComment(String comment,int commentPostID) {
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd  H:m:s");
+        String commentDate = simpleDateFormat.format(date);
+        int commentUserID = 2;
+        dataApiManager.uploadNewComment(commentUserID,commentPostID,comment,commentDate);
+
+
+    }
 }

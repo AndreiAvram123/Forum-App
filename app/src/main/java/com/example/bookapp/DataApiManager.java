@@ -8,12 +8,20 @@ import androidx.annotation.Nullable;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.Post;
 import com.example.bookapp.models.PostBuilder;
 import com.example.bookapp.models.PostConverter;
+import com.facebook.login.widget.LoginButton;
+import com.google.gson.JsonObject;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,7 +34,7 @@ class DataApiManager {
     private static final String URL_POST_AUTOCOMPLETE = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?suggestionQuery=%s";
     private static final String URL_POST_COMMENTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?postID=%s&comments";
     private static final String URL_POST_DETAILS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?postID=%s";
-
+    private static final String URL_UPLOAD_COMMENT = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?uploadComment";
 
     DataApiManager(Activity activity) {
         this.activity = activity;
@@ -79,6 +87,29 @@ class DataApiManager {
                 (error) -> {
                 });
         requestQueue.add(stringRequest);
+    }
+
+    void uploadNewComment(int commentUserID, int commentPostID, String comment, String commentDate) {
+        JSONObject postBody = new JSONObject();
+        try {
+            postBody.put("commentUserID", commentUserID);
+            postBody.put("commentDate", commentDate);
+            postBody.put("commentText", comment);
+            postBody.put("commentPostID", commentPostID);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.d("Debug",postBody.toString());
+
+        JsonObjectRequest uploadCommentRequest = new JsonObjectRequest(Request.Method.POST, URL_UPLOAD_COMMENT, postBody, response -> {
+
+        }, error -> {
+
+        });
+
+        requestQueue.add(uploadCommentRequest);
     }
 
 

@@ -130,7 +130,7 @@ public class SearchFragment extends Fragment {
 
     public interface SearchFragmentInterface {
         void performSearch(String query);
-
         void fetchSuggestions(String query);
+        void fetchSelectedPostById(int id);
     }
 }

@@ -39,10 +39,13 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bindData(data.get(position));
+        Post currentPost = data.get(position);
+        holder.bindData(currentPost);
         Glide.with(context)
-                .load(data.get(position).getPostImage())
+                .load(currentPost.getPostImage())
                 .into(holder.layoutSuggestionItemBinding.suggestionImage);
+        holder.layoutSuggestionItemBinding.getRoot().setOnClickListener(view ->
+                searchFragmentInterface.fetchSelectedPostById(currentPost.getPostID()));
     }
 
     @Override

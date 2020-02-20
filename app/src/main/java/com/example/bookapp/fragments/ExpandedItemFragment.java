@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
+import com.example.bookapp.customViews.CommentDialog;
 import com.example.bookapp.databinding.FragmentExpandedItemBinding;
 import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.Comment;
@@ -22,6 +23,7 @@ import com.example.bookapp.models.Post;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
+
 public class ExpandedItemFragment extends Fragment {
     private static final String KEY_EXPANDED_ITEM = "KEY_EXPANDED_ITEM";
     private static final String KEY_SIMILAR_ITEMS = "KEY_SIMILAR_ITEMS";
@@ -32,6 +34,7 @@ public class ExpandedItemFragment extends Fragment {
     private ImageView saveButton;
     private FragmentExpandedItemBinding binding;
     private FragmentActivity activity;
+    private CommentDialog commentDialog;
 
     public static ExpandedItemFragment getInstance(@NonNull Post selectedPost, @Nullable ArrayList<Comment> comments) {
 
@@ -53,12 +56,12 @@ public class ExpandedItemFragment extends Fragment {
                 .inflate(inflater, R.layout.fragment_expanded_item, container, false);
         post = getArguments().getParcelable(KEY_EXPANDED_ITEM);
         comments = getArguments().getParcelableArrayList(KEY_COMMENTS);
-
         if (post != null) {
             binding.setPost(post);
             saveButton = binding.saveButtonExpanded;
             configureViews();
             activity = getActivity();
+            commentDialog = new CommentDialog(activity,post.getPostID());
             actionsInterface = (ActionsInterface) activity;
         }
 
@@ -87,6 +90,9 @@ public class ExpandedItemFragment extends Fragment {
 
         });
         binding.backButtonExpanded.setOnClickListener((view) -> activity.getSupportFragmentManager().popBackStack());
+        binding.writeCommentButton.setOnClickListener((view) -> {
+            commentDialog.show();
+        });
 
         Glide.with(getContext())
                 .load(post.getPostImage())

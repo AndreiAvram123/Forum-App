@@ -21,6 +21,18 @@
             tools:context=".fragments.ExpandedItemFragment">
 
 
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/write_comment_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="24dp"
+                android:layout_marginBottom="32dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:srcCompat="@drawable/ic_edit_blue_24dp" />
+
             <TextView
                 android:id="@+id/dish_type"
                 style="@style/important_text"
@@ -29,27 +41,14 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="4dp"
                 android:layout_weight="1"
                 android:background="@drawable/round_shape"
                 android:text='@{ "#" + post.postCategory}'
                 android:textColor="#ffffff"
-                app:layout_constraintBottom_toTopOf="@+id/list_item_suggested_recipes"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-                app:layout_constraintVertical_bias="0.39"
                 tools:text="#TextView" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/list_item_suggested_recipes"
-                android:layout_width="wrap_content"
-                android:layout_height="300dp"
-                android:scrollbars="vertical"
-                app:layout_constraintBottom_toBottomOf="parent"
-
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout"
@@ -212,7 +211,10 @@
                 android:id="@+id/container_comments_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                app:layout_constraintBottom_toBottomOf="parent">
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dish_type">
 
             </FrameLayout>
 
