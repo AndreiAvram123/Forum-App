@@ -52,8 +52,11 @@ public class PostBuilder {
         if (postImage == null) {
             throw new IllegalStateException("Post image cannot be null");
         }
+        if(postAuthor == null){
+            throw new IllegalStateException("Post author cannot be null");
+        }
         if (postDate == null) {
-            return new Post(postID, postTitle, postImage);
+            return new Post(postID, postTitle, postImage,postAuthor);
         } else {
             return new Post(postID, postTitle, postDate, postAuthor, postCategory, postImage);
         }

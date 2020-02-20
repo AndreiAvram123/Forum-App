@@ -21,6 +21,7 @@ public class PostConverter {
                 dataToReturn.add(new PostBuilder()
                         .setPostID(postJson.getInt("postID"))
                         .setPostTitle(postJson.getString("postTitle"))
+                        .setPostAuthor(postJson.getString("postAuthor"))
                         .setPostImage(String.format(defaultImageURL, postJson.getString("postImage")))
                         .createPost());
 
@@ -31,13 +32,21 @@ public class PostConverter {
         return dataToReturn;
     }
 
-    public static HashMap<Integer, String> getAutocompleteSuggestionFromJson(String response) {
-        HashMap<Integer, String> dataToReturn = new HashMap<>();
+    public static ArrayList<Post> getAutocompleteSuggestionFromJson(@NonNull String response) {
+        ArrayList<Post> dataToReturn = new ArrayList<>();
+        if (response.trim().equals("No results"))
+            return dataToReturn;
         try {
             JSONArray suggestionsJson = new JSONArray(response);
             for (int i = 0; i < suggestionsJson.length(); i++) {
                 JSONObject jsonObject = suggestionsJson.getJSONObject(i);
-                dataToReturn.put(jsonObject.getInt("postID"), jsonObject.getString("postTitle"));
+                PostBuilder postBuilder = new PostBuilder();
+                postBuilder.setPostID(jsonObject.getInt("postID"))
+                        .setPostTitle(jsonObject.getString("postTitle"))
+                        .setPostAuthor(jsonObject.getString("postAuthor"))
+                        .setPostImage(String.format(defaultImageURL, jsonObject.getString("postImage")));
+
+                dataToReturn.add(postBuilder.createPost());
             }
         } catch (JSONException e) {
             e.printStackTrace();

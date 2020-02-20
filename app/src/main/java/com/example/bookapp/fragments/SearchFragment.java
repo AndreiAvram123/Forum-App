@@ -19,7 +19,6 @@ import java.util.HashMap;
 public class SearchFragment extends Fragment {
     private static final String KEY_SEARCH_HISTORY = "KEY_SEARCH_HISTORY";
     private SearchView searchView;
-    private ArrayList<String> searchHistory;
     private SearchFragmentInterface searchFragmentInterface;
     private ArrayList<Post> lastResults;
 
@@ -44,7 +43,6 @@ public class SearchFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        searchHistory = getArguments().getStringArrayList(KEY_SEARCH_HISTORY);
         searchFragmentInterface = (SearchFragmentInterface) getActivity();
     }
 
@@ -54,10 +52,7 @@ public class SearchFragment extends Fragment {
         super.onResume();
         if (lastResults != null) {
             displaySearchResultsFragment();
-        } else {
-            displaySearchSuggestions(searchHistory);
         }
-
     }
 
     public void displaySearchResults(ArrayList<Post> results) {
@@ -73,9 +68,9 @@ public class SearchFragment extends Fragment {
                 .commit();
     }
 
-    private void displaySearchSuggestions(@NonNull ArrayList<String> suggestions) {
+    private void displaySearchSuggestions(@NonNull ArrayList<Post> suggestions) {
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_search_fragment, RecipeSuggestionsFragment.getInstance(suggestions))
+                .replace(R.id.container_search_fragment, PostSuggestionsFragment.getInstance(suggestions))
                 .commit();
 
     }
@@ -88,7 +83,6 @@ public class SearchFragment extends Fragment {
     private void configureSearch() {
         searchView.setOnClickListener(view -> {
             if (searchView.isIconified()) {
-                displaySearchSuggestions(searchHistory);
                 searchView.setBackground(getActivity().getDrawable(R.drawable.search_background_highlighted));
                 searchView.setIconified(false);
             }
@@ -98,8 +92,6 @@ public class SearchFragment extends Fragment {
             searchView.setBackground(getActivity().getDrawable(R.drawable.search_background));
             if (lastResults != null) {
                 displaySearchResultsFragment();
-            } else {
-                displaySearchSuggestions(searchHistory);
             }
             return false;
         });
@@ -109,7 +101,6 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 if (!query.trim().equals("")) {
-                    searchHistory.add(query);
                     searchFragmentInterface.performSearch(query);
                 }
                 return true;
@@ -119,8 +110,6 @@ public class SearchFragment extends Fragment {
             public boolean onQueryTextChange(String newQuery) {
                 if (!newQuery.trim().equals("")) {
                     searchFragmentInterface.fetchSuggestions(newQuery);
-                } else {
-                    displaySearchSuggestions(searchHistory);
                 }
 
                 return false;
@@ -129,14 +118,12 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    public void displayFetchedSuggestions(@NonNull HashMap<Integer, String> suggestions) {
+    public void displayFetchedSuggestions(@NonNull ArrayList<Post> suggestions) {
         //sometimes an async problem may occur when
         //the user deletes the query but the request is still not processed
-        if (searchView.getQuery().toString().trim().equals("")) {
-            displaySearchSuggestions(searchHistory);
-        } else {
+        if (!searchView.getQuery().toString().trim().equals("")) {
             //check current query entered
-            displaySearchSuggestions(new ArrayList<>(suggestions.values()));
+            displaySearchSuggestions(suggestions);
         }
     }
 

@@ -13,9 +13,8 @@ import androidx.fragment.app.Fragment;
 import com.example.bookapp.activities.WelcomeActivity;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
-import com.example.bookapp.fragments.RecipeDataFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
-import com.example.bookapp.fragments.SavedRecipesDataObject;
+import com.example.bookapp.fragments.RecipeDataFragment;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.AuthenticationService;
@@ -31,8 +30,6 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
@@ -158,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onAutocompleteSuggestionsReady(HashMap<Integer, String> data) {
+    public void onAutocompleteSuggestionsReady(ArrayList<Post> data) {
         searchFragment.displayFetchedSuggestions(data);
     }
 
@@ -273,11 +270,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private void updateUserFirebaseDocument() {
         //todo
-        //modify
-        //        savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
-//        DocumentReference documentReference = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
-//        documentReference.set(new SavedRecipesDataObject(savedPosts), SetOptions.merge());
-//    }
+        //modif
+
+
     }
 
     /**
@@ -298,37 +293,20 @@ public class MainActivity extends AppCompatActivity implements
         if (firebaseAuth.getCurrentUser() != null) {
             firebaseUser = firebaseAuth.getCurrentUser();
             if (AppUtilities.isNetworkAvailable(this)) {
-                getSavedRecipesForCurrentUser(firebaseUser);
+                getSavedPostsForCurrentUser(firebaseUser);
             }
             updateUIWithUserInfo();
         }
     }
 
+    private void getSavedPostsForCurrentUser(FirebaseUser firebaseUser) {
+        //todo
+        //needs implementing
+    }
+
     private void updateUIWithUserInfo() {
     }
 
-    private void getSavedRecipesForCurrentUser(FirebaseUser firebaseUser) {
-        if (firebaseUser != null) {
-            DocumentReference userRecipesReferences = firebaseFirestore.collection("users_saved_recipes").document(firebaseUser.getUid());
-            userRecipesReferences.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        SavedRecipesDataObject savedRecipesDataObject = document.toObject(SavedRecipesDataObject.class);
-                        if (savedRecipesDataObject != null) {
-                            savedRecipesDataObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
-                            //     savedPosts.addAll(savedRecipesDataObject.getSavedRecipes().values());
-                            //    savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
-                        }
-                    }
-                }
-                //todo
-                //here
-                // dataApiManager.pushRequestRandomRecipes();
-            }).addOnFailureListener(e -> {
-            });//dataApiManager.pushRequestRandomRecipes());
-        }
-    }
 
 
     @Override
@@ -386,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements
 
                 dataApiManager.pushRequestLatestPosts();
                 //todo
-                //getSavedRecipesForCurrentUser(firebaseUser);
+                //getSavedPostsForCurrentUser(firebaseUser);
             }
         }
     }

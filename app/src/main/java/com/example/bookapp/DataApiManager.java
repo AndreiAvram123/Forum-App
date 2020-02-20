@@ -23,7 +23,7 @@ class DataApiManager {
     private RequestQueue requestQueue;
     private DataApiManagerCallback dataApiManagerCallback;
     private static final String URL_LATEST_POSTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?recentPosts";
-    private static final String URL_POST_AUTOCOMPLETE = "http://sgb967.poseidon.salford.ac.uk/cms/LiveSearchController.php?postsSearchQuery=%s";
+    private static final String URL_POST_AUTOCOMPLETE = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?suggestionQuery=%s";
     private static final String URL_POST_COMMENTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?postID=%s&comments";
     private static final String URL_POST_DETAILS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?postID=%s";
 
@@ -52,7 +52,6 @@ class DataApiManager {
         StringRequest postDetailsRequest = new StringRequest(Request.Method.GET, String.format(URL_POST_DETAILS, postID), (response) -> {
             PostBuilder postBuilder = new PostBuilder();
             PostConverter.getFullPostDetailsFromJson(response, postBuilder);
-            Log.d("Debug", response);
             pushRequestGetPostComments(postBuilder.createPost(), postID);
         }, Throwable::printStackTrace);
 
@@ -74,9 +73,8 @@ class DataApiManager {
         //push request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedAutocompleteURl, (response) ->
         {
-
-            HashMap<Integer, String> searchResults = PostConverter.getAutocompleteSuggestionFromJson(response);
-            activity.runOnUiThread(() -> dataApiManagerCallback.onAutocompleteSuggestionsReady(searchResults));
+            ArrayList<Post> suggestions = PostConverter.getAutocompleteSuggestionFromJson(response);
+            activity.runOnUiThread(() -> dataApiManagerCallback.onAutocompleteSuggestionsReady(suggestions));
         },
                 (error) -> {
                 });
@@ -91,7 +89,7 @@ class DataApiManager {
 
         void onPostSearchReady(ArrayList<Post> data);
 
-        void onAutocompleteSuggestionsReady(HashMap<Integer, String> data);
+        void onAutocompleteSuggestionsReady(ArrayList<Post> data);
 
     }
 }

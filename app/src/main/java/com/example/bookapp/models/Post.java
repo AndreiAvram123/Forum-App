@@ -13,6 +13,9 @@ public class Post implements Parcelable {
     private String postCategory;
     private boolean isSaved = false;
 
+    public Post(){
+
+    }
 
     Post(int postID, String postTitle, String postDate, String postAuthor, String postCategory, String postImage) {
         this.postID = postID;
@@ -23,10 +26,11 @@ public class Post implements Parcelable {
         this.postCategory = postCategory;
 
     }
-    Post(int postID,String postTitle,String postImage){
+    Post(int postID,String postTitle,String postImage,String postAuthor){
         this.postID =postID;
         this.postTitle = postTitle;
         this.postImage = postImage;
+        this.postAuthor = postAuthor;
     }
 
     private Post(Parcel in) {
