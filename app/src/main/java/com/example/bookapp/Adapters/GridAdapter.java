@@ -1,7 +1,6 @@
 package com.example.bookapp.Adapters;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
-import com.example.bookapp.interfaces.ActionsInterface;
+import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
@@ -21,11 +20,11 @@ import java.util.ArrayList;
 public class GridAdapter extends BaseAdapter {
 
     private ArrayList<Post> data;
-    private ActionsInterface actionsInterface;
+    private MainActivityInterface mainActivityInterface;
 
     public GridAdapter(@NonNull ArrayList<Post> data, Activity activity) {
         this.data = data;
-        actionsInterface = (ActionsInterface) activity;
+        mainActivityInterface = (MainActivityInterface) activity;
     }
 
     @Override
@@ -54,7 +53,7 @@ public class GridAdapter extends BaseAdapter {
         Glide.with(parent.getContext())
                 .load(data.get(position).getPostImage())
                 .into(recipeImage);
-        convertView.setOnClickListener(view -> actionsInterface.expandPost(data.get(position).getPostID()));
+        convertView.setOnClickListener(view -> mainActivityInterface.expandPost(data.get(position).getPostID()));
         return convertView;
     }
 }

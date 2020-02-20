@@ -5,6 +5,7 @@ public class CommentBuilder {
     private String commentDate;
     private String commentContent;
     private String commentAuthor;
+    private int postID;
 
     public CommentBuilder setCommentID(int commentID) {
         this.commentID = commentID;
@@ -25,6 +26,10 @@ public class CommentBuilder {
         this.commentAuthor = commentAuthor;
         return this;
     }
+    public CommentBuilder setPostID(int postID) {
+        this.postID = postID;
+        return this;
+    }
 
     public Comment createComment() {
         if (commentID == 0) {
@@ -40,6 +45,6 @@ public class CommentBuilder {
             throw new IllegalStateException("Comment author cannot be null");
         }
 
-        return new Comment(commentID, commentDate, commentContent, commentAuthor);
+        return new Comment(commentID, commentDate, commentContent, commentAuthor,postID);
     }
 }

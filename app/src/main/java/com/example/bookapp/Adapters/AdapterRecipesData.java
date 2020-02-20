@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
-import com.example.bookapp.interfaces.ActionsInterface;
+import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
@@ -21,12 +21,12 @@ import java.util.ArrayList;
 public class AdapterRecipesData extends RecyclerView.Adapter<AdapterRecipesData.ViewHolder> {
     private ArrayList<Post> posts;
     private Context context;
-    private ActionsInterface actionsInterface;
+    private MainActivityInterface mainActivityInterface;
     private String[] allSortCriteria;
 
     public AdapterRecipesData(@NonNull ArrayList<Post> posts, Activity activity) {
         this.posts = posts;
-        actionsInterface = (ActionsInterface) activity;
+        mainActivityInterface = (MainActivityInterface) activity;
         allSortCriteria = activity.getResources().getStringArray(R.array.sort_parameters);
     }
 
@@ -49,7 +49,7 @@ public class AdapterRecipesData extends RecyclerView.Adapter<AdapterRecipesData.
                 .into(holder.recipeImage);
         //when the user clicks on an item
         //display the extended item fragment
-        holder.itemView.setOnClickListener(view -> actionsInterface.expandPost(posts.get(position).getPostID()));
+        holder.itemView.setOnClickListener(view -> mainActivityInterface.expandPost(posts.get(position).getPostID()));
     }
 
     @Override

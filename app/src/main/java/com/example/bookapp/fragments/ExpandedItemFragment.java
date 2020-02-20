@@ -1,7 +1,6 @@
 package com.example.bookapp.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,27 +13,31 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
+import com.example.bookapp.AppUtilities;
 import com.example.bookapp.R;
 import com.example.bookapp.customViews.CommentDialog;
 import com.example.bookapp.databinding.FragmentExpandedItemBinding;
-import com.example.bookapp.interfaces.ActionsInterface;
+import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.Comment;
+import com.example.bookapp.models.CommentBuilder;
 import com.example.bookapp.models.Post;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
-public class ExpandedItemFragment extends Fragment {
+public class ExpandedItemFragment extends Fragment implements CommentDialog.CommentDialogInterface {
     private static final String KEY_EXPANDED_ITEM = "KEY_EXPANDED_ITEM";
     private static final String KEY_SIMILAR_ITEMS = "KEY_SIMILAR_ITEMS";
     private static final String KEY_COMMENTS = "KEY_COMMENTS";
-    private ActionsInterface actionsInterface;
+    private MainActivityInterface mainActivityInterface;
     private Post post;
     private ArrayList<Comment> comments;
     private ImageView saveButton;
     private FragmentExpandedItemBinding binding;
     private FragmentActivity activity;
     private CommentDialog commentDialog;
+    private String username = "Andrei Avram";
+    private CommentsFragment commentsFragment;
 
     public static ExpandedItemFragment getInstance(@NonNull Post selectedPost, @Nullable ArrayList<Comment> comments) {
 
@@ -61,8 +64,8 @@ public class ExpandedItemFragment extends Fragment {
             saveButton = binding.saveButtonExpanded;
             configureViews();
             activity = getActivity();
-            commentDialog = new CommentDialog(activity,post.getPostID());
-            actionsInterface = (ActionsInterface) activity;
+
+            mainActivityInterface = (MainActivityInterface) activity;
         }
 
         if (comments != null) {
@@ -73,9 +76,10 @@ public class ExpandedItemFragment extends Fragment {
     }
 
     private void displayCommentsFragment() {
+        commentsFragment = CommentsFragment.getInstance(comments);
         activity.getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container_comments_fragment, CommentsFragment.getInstance(comments))
+                .replace(R.id.container_comments_fragment, commentsFragment)
                 .commit();
     }
 
@@ -83,21 +87,26 @@ public class ExpandedItemFragment extends Fragment {
 
         saveButton.setOnClickListener(view -> {
             if (post.isSaved()) {
-                actionsInterface.deleteSavedPost(post);
+                mainActivityInterface.deleteSavedPost(post);
             } else {
-                actionsInterface.savePost(post);
+                mainActivityInterface.savePost(post);
             }
 
         });
         binding.backButtonExpanded.setOnClickListener((view) -> activity.getSupportFragmentManager().popBackStack());
         binding.writeCommentButton.setOnClickListener((view) -> {
-            commentDialog.show();
+            showCommentDialog();
         });
 
         Glide.with(getContext())
                 .load(post.getPostImage())
                 .centerInside()
                 .into(binding.recipeImageExpanded);
+    }
+
+    private void showCommentDialog() {
+        commentDialog = new CommentDialog(activity, this, post.getPostID());
+        commentDialog.show();
     }
 
     public void informUserPostAddedToFavorites() {
@@ -113,4 +122,16 @@ public class ExpandedItemFragment extends Fragment {
     }
 
 
+    @Override
+    public void submitComment(String comment, int postID) {
+        CommentBuilder commentBuilder = new CommentBuilder();
+        commentBuilder.setCommentID(1000)
+                .setCommentDate(AppUtilities.getDateString())
+                .setCommentContent(comment)
+                .setPostID(postID)
+                .setCommentAuthor(username);
+        commentsFragment.addComment(commentBuilder.createComment());
+        mainActivityInterface.uploadComment(commentBuilder.createComment());
+
+    }
 }

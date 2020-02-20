@@ -21,6 +21,7 @@ import java.util.ArrayList;
 public class CommentsFragment extends Fragment {
     private static final String KEY_COMMENTS = "KEY_COMMENTS";
     private ArrayList<Comment> comments;
+    private AdapterComments adapterComments;
 
     public static CommentsFragment getInstance(ArrayList<Comment> comments) {
         CommentsFragment commentsFragment = new CommentsFragment();
@@ -38,14 +39,19 @@ public class CommentsFragment extends Fragment {
         View layout = inflater.inflate(R.layout.layout_fragment_comments, container, false);
         comments = getArguments().getParcelableArrayList(KEY_COMMENTS);
 
-        if(comments !=null){
+        if (comments != null) {
             initializeRecyclerView(layout.findViewById(R.id.recycler_comments));
         }
         return layout;
     }
 
+    void addComment(@NonNull Comment comment) {
+        comments.add(comment);
+    }
+
     private void initializeRecyclerView(@NonNull RecyclerView recyclerView) {
-        recyclerView.setAdapter(new AdapterComments(comments));
+        adapterComments = new AdapterComments(comments);
+        recyclerView.setAdapter(adapterComments);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));

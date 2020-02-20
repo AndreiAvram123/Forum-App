@@ -4,6 +4,10 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class AppUtilities {
 
     static boolean isNetworkAvailable(Context context) {
@@ -22,5 +26,10 @@ public class AppUtilities {
      */
     public static boolean isEmailValid(String email) {
         return email.matches("[a-zA-Z0-9]+@[a-z]+\\.[a-z]+");
+    }
+    public static String getDateString(){
+        Date date = Calendar.getInstance().getTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd  H:m:s");
+        return  simpleDateFormat.format(date);
     }
 }

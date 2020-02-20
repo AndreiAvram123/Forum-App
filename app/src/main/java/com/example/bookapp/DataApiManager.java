@@ -35,7 +35,7 @@ class DataApiManager {
     private static final String URL_POST_COMMENTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?postID=%s&comments";
     private static final String URL_POST_DETAILS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?postID=%s";
     private static final String URL_UPLOAD_COMMENT = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?uploadComment";
-
+    private int currentUserID =2;
     DataApiManager(Activity activity) {
         this.activity = activity;
         requestQueue = Volley.newRequestQueue(activity);
@@ -89,19 +89,18 @@ class DataApiManager {
         requestQueue.add(stringRequest);
     }
 
-    void uploadNewComment(int commentUserID, int commentPostID, String comment, String commentDate) {
+    void uploadNewComment(Comment comment) {
         JSONObject postBody = new JSONObject();
         try {
-            postBody.put("commentUserID", commentUserID);
-            postBody.put("commentDate", commentDate);
-            postBody.put("commentText", comment);
-            postBody.put("commentPostID", commentPostID);
+            postBody.put("commentUserID", currentUserID);
+            postBody.put("commentDate", comment.getCommentDate());
+            postBody.put("commentText", comment.getCommentContent());
+            postBody.put("commentPostID", comment.getPostID());
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        Log.d("Debug",postBody.toString());
 
         JsonObjectRequest uploadCommentRequest = new JsonObjectRequest(Request.Method.POST, URL_UPLOAD_COMMENT, postBody, response -> {
 

@@ -9,12 +9,14 @@ public class Comment implements Parcelable {
     private String commentDate;
     private String commentContent;
     private String  commentAuthor;
+    private int postID;
 
-    Comment(int commentID, String commentDate, String commentContent, String commentAuthor) {
+    Comment(int commentID, String commentDate, String commentContent, String commentAuthor,int postID) {
         this.commentID = commentID;
         this.commentDate = commentDate;
         this.commentContent = commentContent;
         this.commentAuthor = commentAuthor;
+        this.postID =postID;
     }
 
     private Comment(Parcel in) {
@@ -22,6 +24,7 @@ public class Comment implements Parcelable {
         commentDate = in.readString();
         commentContent = in.readString();
         commentAuthor = in.readString();
+        postID =in.readInt();
     }
 
     public static final Creator<Comment> CREATOR = new Creator<Comment>() {
@@ -38,6 +41,10 @@ public class Comment implements Parcelable {
 
     public int getCommentID() {
         return commentID;
+    }
+
+    public int getPostID() {
+        return postID;
     }
 
     public String getCommentDate() {
@@ -63,5 +70,6 @@ public class Comment implements Parcelable {
         dest.writeString(commentDate);
         dest.writeString(commentContent);
         dest.writeString(commentAuthor);
+        dest.writeInt(postID);
     }
 }

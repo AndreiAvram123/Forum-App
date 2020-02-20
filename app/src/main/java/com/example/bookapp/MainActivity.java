@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,10 +17,9 @@ import com.example.bookapp.fragments.ErrorFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
 import com.example.bookapp.fragments.RecipeDataFragment;
 import com.example.bookapp.fragments.SearchFragment;
-import com.example.bookapp.interfaces.ActionsInterface;
+import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.Comment;
-import com.example.bookapp.models.CommentBuilder;
 import com.example.bookapp.models.Post;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -35,14 +33,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * The main activity acts as the controller
@@ -50,11 +43,10 @@ import java.util.TreeSet;
  */
 
 public class MainActivity extends AppCompatActivity implements
-        ActionsInterface,
+        MainActivityInterface,
         BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface,
         DataApiManager.DataApiManagerCallback
-        , ErrorFragment.ErrorFragmentInterface,
-        CommentDialog.CommentDialogInterface {
+        , ErrorFragment.ErrorFragmentInterface{
 
     private ArrayList<Post> randomRecipes = new ArrayList<>();
     private SharedPreferences sharedPreferences;
@@ -270,6 +262,12 @@ public class MainActivity extends AppCompatActivity implements
         dataApiManager.pushRequestGetPostDetails(postID);
     }
 
+    @Override
+    public void uploadComment(Comment comment) {
+        dataApiManager.uploadNewComment(comment);
+
+    }
+
     private void updateUserFirebaseDocument() {
         //todo
         //modif
@@ -370,14 +368,5 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void submitComment(String comment,int commentPostID) {
-        Date date = Calendar.getInstance().getTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd  H:m:s");
-        String commentDate = simpleDateFormat.format(date);
-        int commentUserID = 2;
-        dataApiManager.uploadNewComment(commentUserID,commentPostID,comment,commentDate);
 
-
-    }
 }
