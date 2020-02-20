@@ -1,51 +1,44 @@
 package com.example.bookapp.fragments;
 
-
 import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import androidx.fragment.app.FragmentActivity;
 
 import com.bumptech.glide.Glide;
-import com.example.bookapp.Adapters.AdapterRecipeSuggestion;
-import com.example.bookapp.MainActivity;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.FragmentExpandedItemBinding;
 import com.example.bookapp.interfaces.ActionsInterface;
+import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.Post;
-import com.example.bookapp.models.Recipe;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-
 public class ExpandedItemFragment extends Fragment {
     private static final String KEY_EXPANDED_ITEM = "KEY_EXPANDED_ITEM";
     private static final String KEY_SIMILAR_ITEMS = "KEY_SIMILAR_ITEMS";
+    private static final String KEY_COMMENTS = "KEY_COMMENTS";
     private ActionsInterface actionsInterface;
     private Post post;
+    private ArrayList<Comment> comments;
     private ImageView saveButton;
     private FragmentExpandedItemBinding binding;
+    private FragmentActivity activity;
 
-    public static ExpandedItemFragment getInstance(@NonNull Post selectedPost,
-                                                   @Nullable ArrayList<Recipe> similarRecipes) {
+    public static ExpandedItemFragment getInstance(@NonNull Post selectedPost, @Nullable ArrayList<Comment> comments) {
 
         ExpandedItemFragment expandedItemFragment = new ExpandedItemFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(KEY_EXPANDED_ITEM, selectedPost);
-        bundle.putParcelableArrayList(KEY_SIMILAR_ITEMS, similarRecipes);
+        bundle.putParcelableArrayList(KEY_COMMENTS, comments);
         expandedItemFragment.setArguments(bundle);
 
         return expandedItemFragment;
@@ -59,22 +52,28 @@ public class ExpandedItemFragment extends Fragment {
         binding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_expanded_item, container, false);
         post = getArguments().getParcelable(KEY_EXPANDED_ITEM);
-        //recipeSuggestions = getArguments().getParcelableArrayList(KEY_SIMILAR_ITEMS);
+        comments = getArguments().getParcelableArrayList(KEY_COMMENTS);
+
         if (post != null) {
             binding.setPost(post);
             saveButton = binding.saveButtonExpanded;
             configureViews();
-            actionsInterface = (ActionsInterface) getActivity();
-
-
+            activity = getActivity();
+            actionsInterface = (ActionsInterface) activity;
         }
 
-        //  if (recipeSuggestions != null) {
-        // listRecipeSuggestions.setAdapter(new AdapterRecipeSuggestion(recipeSuggestions, getActivity()));
-        // listRecipeSuggestions.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        //listRecipeSuggestions.setHasFixedSize(true);
-        // }
+        if (comments != null) {
+            displayCommentsFragment();
+        }
+
         return binding.getRoot();
+    }
+
+    private void displayCommentsFragment() {
+        activity.getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container_comments_fragment, CommentsFragment.getInstance(comments))
+                .commit();
     }
 
     private void configureViews() {
@@ -87,7 +86,7 @@ public class ExpandedItemFragment extends Fragment {
             }
 
         });
-        binding.backButtonExpanded.setOnClickListener((view) -> getActivity().getSupportFragmentManager().popBackStack());
+        binding.backButtonExpanded.setOnClickListener((view) -> activity.getSupportFragmentManager().popBackStack());
 
         Glide.with(getContext())
                 .load(post.getPostImage())
@@ -95,7 +94,7 @@ public class ExpandedItemFragment extends Fragment {
                 .into(binding.recipeImageExpanded);
     }
 
-    public void informUserPostAddedToFavorited() {
+    public void informUserPostAddedToFavorites() {
         post.setSaved(true);
         saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
         Snackbar.make(binding.getRoot(), "Recipe added to favorites", Snackbar.LENGTH_SHORT).show();
@@ -105,18 +104,6 @@ public class ExpandedItemFragment extends Fragment {
         post.setSaved(false);
         saveButton.setImageResource(R.drawable.ic_favorite_border_black_32dp);
         Snackbar.make(binding.getRoot(), "Recipe deleted from favorites", Snackbar.LENGTH_SHORT).show();
-    }
-
-    private void bindDataToView() {
-
-//        for (Map.Entry<String, Boolean> mapElement : recipe.getFeatures().entrySet()) {
-//
-//            if (mapElement.getValue()) {
-//                TextView featureTextView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.text_view, null);
-//                features.addView(featureTextView);
-//            }
-//        }
-
     }
 
 

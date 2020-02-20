@@ -27,6 +27,19 @@ public class CommentBuilder {
     }
 
     public Comment createComment() {
+        if (commentID == 0) {
+            throw new IllegalStateException("Comment id cannot be null");
+        }
+        if (commentDate == null) {
+            throw new IllegalStateException("Comment date cannot be null");
+        }
+        if (commentContent == null) {
+            throw new IllegalStateException("Comment content cannot be null");
+        }
+        if (commentAuthor == null) {
+            throw new IllegalStateException("Comment author cannot be null");
+        }
+
         return new Comment(commentID, commentDate, commentContent, commentAuthor);
     }
 }

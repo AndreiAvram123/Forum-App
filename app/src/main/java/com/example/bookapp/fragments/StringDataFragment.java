@@ -1,7 +1,6 @@
 package com.example.bookapp.fragments;
 
 
-
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -21,22 +20,17 @@ import java.util.ArrayList;
 
 
 public class StringDataFragment extends Fragment {
-    static final String KEY_SUGGESTIONS_ARRAY ="KEY_SUGGESTIONS_ARRAY";
-ArrayList<String> data;
-RecyclerView recyclerView;
+    static final String KEY_SUGGESTIONS_ARRAY = "KEY_SUGGESTIONS_ARRAY";
+    ArrayList<String> data;
+    RecyclerView recyclerView;
 
 
-    public static StringDataFragment getInstance(ArrayList<String>suggestions){
+    public static StringDataFragment getInstance(ArrayList<String> suggestions) {
         StringDataFragment oldStringDataFragment = new StringDataFragment();
         Bundle bundle = new Bundle();
-        bundle.putStringArrayList(KEY_SUGGESTIONS_ARRAY,suggestions);
+        bundle.putStringArrayList(KEY_SUGGESTIONS_ARRAY, suggestions);
         oldStringDataFragment.setArguments(bundle);
         return oldStringDataFragment;
-    }
-
-    public StringDataFragment() {
-        // Required empty public constructor
-
     }
 
 
@@ -57,10 +51,10 @@ RecyclerView recyclerView;
         recyclerView.setAdapter(adapterStrings);
     }
 
-    public void initializeRecyclerView(){
+    public void initializeRecyclerView() {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
     @Override
@@ -69,7 +63,7 @@ RecyclerView recyclerView;
         if (getArguments() != null) {
             data = getArguments().getStringArrayList(KEY_SUGGESTIONS_ARRAY);
         }
-        if(data == null){
+        if (data == null) {
             data = new ArrayList<>();
         }
 
@@ -78,6 +72,5 @@ RecyclerView recyclerView;
     @Override
     public void onStart() {
         super.onStart();
-        initializeRecyclerView();
     }
 }

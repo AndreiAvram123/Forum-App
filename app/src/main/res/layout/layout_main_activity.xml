@@ -14,7 +14,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/navigation" />
+        app:menu="@menu/navigation"
+        android:background="#324353"
+        app:itemTextColor="#ffffff"
+        />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container_main_activity"

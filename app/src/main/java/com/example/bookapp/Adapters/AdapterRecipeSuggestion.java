@@ -14,17 +14,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
 import com.example.bookapp.interfaces.ActionsInterface;
-import com.example.bookapp.models.Recipe;
+import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 
 public class AdapterRecipeSuggestion extends RecyclerView.Adapter<AdapterRecipeSuggestion.ViewHolder> {
-    private ArrayList<Recipe> recipes;
+    private ArrayList<Post> posts;
     private Context context;
     private ActionsInterface actionsInterface;
 
-    public AdapterRecipeSuggestion(@NonNull ArrayList<Recipe> recipes, Activity activity) {
-        this.recipes = recipes;
+    public AdapterRecipeSuggestion(@NonNull ArrayList<Post> posts, Activity activity) {
+        this.posts = posts;
         actionsInterface = (ActionsInterface) activity;
     }
 
@@ -40,9 +40,9 @@ public class AdapterRecipeSuggestion extends RecyclerView.Adapter<AdapterRecipeS
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Glide.with(context)
-                .load(recipes.get(position).getImageUrl())
+                .load(posts.get(position).getPostImage())
                 .into(holder.recipeImage);
-        holder.recipeName.setText(recipes.get(position).getName());
+        holder.recipeName.setText(posts.get(position).getPostTitle());
         //when the user clicks on an item
         //display the extended item fragment
        // holder.itemView.setOnClickListener(view -> actionsInterface.expandPost(recipes.get(position)));
@@ -50,7 +50,7 @@ public class AdapterRecipeSuggestion extends RecyclerView.Adapter<AdapterRecipeS
 
     @Override
     public int getItemCount() {
-        return recipes.size();
+        return posts.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

@@ -1,6 +1,7 @@
 package com.example.bookapp.Adapters;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +54,7 @@ public class GridAdapter extends BaseAdapter {
         Glide.with(parent.getContext())
                 .load(data.get(position).getPostImage())
                 .into(recipeImage);
-         convertView.setOnClickListener(view->actionsInterface.expandPost(data.get(position)));
+        convertView.setOnClickListener(view -> actionsInterface.expandPost(data.get(position).getPostID()));
         return convertView;
     }
 }

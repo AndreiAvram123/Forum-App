@@ -3,11 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.FragmentIngredients">
+    tools:context=".fragments.CommentsFragment">
+
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_view_recycle_fragment"
+        android:id="@+id/recycler_comments"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:overScrollMode="never" />
+        android:layout_height="match_parent" />
 </FrameLayout>

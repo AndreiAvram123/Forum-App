@@ -6,5 +6,5 @@ public interface ActionsInterface {
     void sharePost(Post post);
     void savePost(Post post);
     void deleteSavedPost(Post post);
-    void expandPost(Post post);
+    void expandPost(int postID);
 }

@@ -1,5 +1,7 @@
 package com.example.bookapp.models;
 
+import java.util.ArrayList;
+
 public class PostBuilder {
     private int postID;
     private String postTitle;
@@ -12,6 +14,7 @@ public class PostBuilder {
         this.postID = postID;
         return this;
     }
+
     public PostBuilder setPostCategory(String postCategory) {
         this.postCategory = postCategory;
         return this;
@@ -38,7 +41,21 @@ public class PostBuilder {
         return this;
     }
 
+
     public Post createPost() {
-        return new Post(postID, postTitle, postDate, postAuthor,postCategory, postImage);
+        if (postID == 0) {
+            throw new IllegalStateException("Post id must not be 0");
+        }
+        if (postTitle == null) {
+            throw new IllegalStateException("Post title must not be null");
+        }
+        if (postImage == null) {
+            throw new IllegalStateException("Post image cannot be null");
+        }
+        if (postDate == null) {
+            return new Post(postID, postTitle, postImage);
+        } else {
+            return new Post(postID, postTitle, postDate, postAuthor, postCategory, postImage);
+        }
     }
 }

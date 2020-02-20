@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bookapp.Adapters.AdapterRecipesData;
 import com.example.bookapp.R;
 import com.example.bookapp.models.Post;
-import com.example.bookapp.models.Recipe;
 
 import java.util.ArrayList;
 

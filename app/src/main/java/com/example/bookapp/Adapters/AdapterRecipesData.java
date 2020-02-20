@@ -49,7 +49,7 @@ public class AdapterRecipesData extends RecyclerView.Adapter<AdapterRecipesData.
                 .into(holder.recipeImage);
         //when the user clicks on an item
         //display the extended item fragment
-        holder.itemView.setOnClickListener(view -> actionsInterface.expandPost(posts.get(position)));
+        holder.itemView.setOnClickListener(view -> actionsInterface.expandPost(posts.get(position).getPostID()));
     }
 
     @Override

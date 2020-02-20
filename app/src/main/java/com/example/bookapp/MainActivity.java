@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -18,8 +19,8 @@ import com.example.bookapp.fragments.SavedRecipesDataObject;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.ActionsInterface;
 import com.example.bookapp.models.AuthenticationService;
+import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.Post;
-import com.example.bookapp.models.Recipe;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements
         DataApiManager.DataApiManagerCallback
         , ErrorFragment.ErrorFragmentInterface {
 
-    private ArrayList<Recipe> randomRecipes = new ArrayList<>();
+    private ArrayList<Post> randomRecipes = new ArrayList<>();
     private SharedPreferences sharedPreferences;
     private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
@@ -75,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements
             configureDatabaseParameters();
             if (AppUtilities.isNetworkAvailable(this)) {
                 //dataApiManager.pushRequestRandomRecipes();
-                 dataApiManager.pushRequestLatestPosts();
+                dataApiManager.pushRequestLatestPosts();
             } else {
                 displayFragment(ErrorFragment.getInstance(getString(R.string.no_internet_connection), R.drawable.ic_no_wifi));
             }
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity implements
     private void initializeFragments() {
         //todo
         //modify this
-       // savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
+        // savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
         searchFragment = SearchFragment.getInstance(getSearchHistory());
     }
 
@@ -146,8 +147,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onPostDetailsReady(@NonNull Post post, ArrayList<Post> similarPosts) {
-        displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(post, null));
+    public void onPostDetailsReady(@NonNull Post post, @Nullable ArrayList<Comment> comments, @Nullable ArrayList<Post> similarPosts) {
+        displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(post, comments));
 
     }
 
@@ -161,13 +162,6 @@ public class MainActivity extends AppCompatActivity implements
         searchFragment.displayFetchedSuggestions(data);
     }
 
-    private void checkWhichRandomRecipeIsSaved() {
-        for (Recipe recipe : randomRecipes) {
-            if (savedPosts.contains(recipe)) {
-                recipe.setSaved(true);
-            }
-        }
-    }
 
     private void configureNavigationView() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -213,7 +207,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void performSearch(String query) {
         insertSearchInDatabase(query);
-        dataApiManager.pushRequestPerformSearch(query);
     }
 
 
@@ -256,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements
             //check if we need to update the UI for the expandedItemFragment
 
             if (currentExpandedItemFragment != null) {
-                currentExpandedItemFragment.informUserPostAddedToFavorited();
+                currentExpandedItemFragment.informUserPostAddedToFavorites();
             }
         }
     }
@@ -273,19 +266,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void expandPost(Post post) {
-        //todo
-        //modify
-        dataApiManager.pushRequestGetPostComments(post);
+    public void expandPost(int postID) {
 
-        //todo
-//        //maybe optimise??? or not
-//        if (post.getIngredients() == null) {
-//            //get the full data from the api
-//            dataApiManager.pushRequestGetRecipeDetails(post.getId());
-//        } else {
-//            dataApiManager.pushRequestSimilarRecipes(post);
-//        }
+        dataApiManager.pushRequestGetPostDetails(postID);
     }
 
     private void updateUserFirebaseDocument() {
@@ -334,15 +317,16 @@ public class MainActivity extends AppCompatActivity implements
                         SavedRecipesDataObject savedRecipesDataObject = document.toObject(SavedRecipesDataObject.class);
                         if (savedRecipesDataObject != null) {
                             savedRecipesDataObject.getSavedRecipes().forEach((s, recipe) -> recipe.setSaved(true));
-                       //     savedPosts.addAll(savedRecipesDataObject.getSavedRecipes().values());
-                        //    savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
+                            //     savedPosts.addAll(savedRecipesDataObject.getSavedRecipes().values());
+                            //    savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
                         }
                     }
                 }
                 //todo
                 //here
-               // dataApiManager.pushRequestRandomRecipes();
-            }).addOnFailureListener(e -> {});//dataApiManager.pushRequestRandomRecipes());
+                // dataApiManager.pushRequestRandomRecipes();
+            }).addOnFailureListener(e -> {
+            });//dataApiManager.pushRequestRandomRecipes());
         }
     }
 

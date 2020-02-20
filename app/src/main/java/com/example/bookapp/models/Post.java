@@ -23,6 +23,11 @@ public class Post implements Parcelable {
         this.postCategory = postCategory;
 
     }
+    Post(int postID,String postTitle,String postImage){
+        this.postID =postID;
+        this.postTitle = postTitle;
+        this.postImage = postImage;
+    }
 
     private Post(Parcel in) {
         postID = in.readInt();
