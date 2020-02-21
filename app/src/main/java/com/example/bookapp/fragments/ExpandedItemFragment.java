@@ -59,6 +59,7 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
                 .inflate(inflater, R.layout.fragment_expanded_item, container, false);
         post = getArguments().getParcelable(KEY_EXPANDED_ITEM);
         comments = getArguments().getParcelableArrayList(KEY_COMMENTS);
+
         if (post != null) {
             binding.setPost(post);
             saveButton = binding.saveButtonExpanded;

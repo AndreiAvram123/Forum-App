@@ -8,6 +8,6 @@ public interface MainActivityInterface {
     void savePost(Post post);
     void deleteSavedPost(Post post);
     void expandPost(int postID);
-
     void uploadComment(Comment comment);
+    void uploadPost(Post post);
 }

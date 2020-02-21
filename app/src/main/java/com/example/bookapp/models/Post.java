@@ -11,26 +11,27 @@ public class Post implements Parcelable {
     private String postAuthor;
     private String postImage;
     private String postCategory;
+    private String postContent;
     private boolean isSaved = false;
 
     public Post(){
 
     }
 
-    Post(int postID, String postTitle, String postDate, String postAuthor, String postCategory, String postImage) {
-        this.postID = postID;
-        this.postTitle = postTitle;
+    Post(int postID, String postTitle, String postDate, String postAuthor, String postCategory, String postImage,String postContent) {
+        this(postID,postTitle,postImage,postAuthor,postContent);
         this.postDate = postDate;
-        this.postAuthor = postAuthor;
-        this.postImage = postImage;
         this.postCategory = postCategory;
 
     }
-    Post(int postID,String postTitle,String postImage,String postAuthor){
+
+
+    Post(int postID,String postTitle,String postImage,String postAuthor,String postContent){
         this.postID =postID;
         this.postTitle = postTitle;
         this.postImage = postImage;
         this.postAuthor = postAuthor;
+        this.postContent = postContent;
     }
 
     private Post(Parcel in) {
@@ -76,6 +77,10 @@ public class Post implements Parcelable {
 
     public String getPostImage() {
         return postImage;
+    }
+
+    public String getPostContent() {
+        return postContent;
     }
 
     @Override

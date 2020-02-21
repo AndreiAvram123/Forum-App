@@ -1,7 +1,5 @@
 package com.example.bookapp.models;
 
-import java.util.ArrayList;
-
 public class PostBuilder {
     private int postID;
     private String postTitle;
@@ -9,34 +7,40 @@ public class PostBuilder {
     private String postAuthor;
     private String postImage;
     private String postCategory;
+    private String postContent;
+
+    public PostBuilder setPostContent(String postContent) {
+        this.postContent = postContent;
+        return this;
+    }
 
     public PostBuilder setPostID(int postID) {
         this.postID = postID;
         return this;
     }
 
-    public PostBuilder setPostCategory(String postCategory) {
+    PostBuilder setPostCategory(String postCategory) {
         this.postCategory = postCategory;
         return this;
     }
 
 
-    public PostBuilder setPostTitle(String postTitle) {
+    PostBuilder setPostTitle(String postTitle) {
         this.postTitle = postTitle;
         return this;
     }
 
-    public PostBuilder setPostDate(String postDate) {
+    PostBuilder setPostDate(String postDate) {
         this.postDate = postDate;
         return this;
     }
 
-    public PostBuilder setPostAuthor(String postAuthor) {
+    PostBuilder setPostAuthor(String postAuthor) {
         this.postAuthor = postAuthor;
         return this;
     }
 
-    public PostBuilder setPostImage(String postImage) {
+    PostBuilder setPostImage(String postImage) {
         this.postImage = postImage;
         return this;
     }
@@ -52,13 +56,14 @@ public class PostBuilder {
         if (postImage == null) {
             throw new IllegalStateException("Post image cannot be null");
         }
-        if(postAuthor == null){
+        if (postAuthor == null) {
             throw new IllegalStateException("Post author cannot be null");
         }
-        if (postDate == null) {
-            return new Post(postID, postTitle, postImage,postAuthor);
+
+        if (postContent == null) {
+            return new Post(postID, postTitle, postImage, postAuthor,postContent);
         } else {
-            return new Post(postID, postTitle, postDate, postAuthor, postCategory, postImage);
+            return new Post(postID, postTitle, postDate, postAuthor, postCategory, postImage,postContent);
         }
     }
 }

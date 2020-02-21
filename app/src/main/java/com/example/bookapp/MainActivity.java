@@ -268,6 +268,11 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
+    @Override
+    public void uploadPost(Post post) {
+     dataApiManager.uploadPost(post);
+    }
+
     private void updateUserFirebaseDocument() {
         //todo
         //modif
