@@ -3,15 +3,13 @@ package com.example.bookapp.Adapters;
 import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.bookapp.R;
-import com.example.bookapp.databinding.LayoutSuggestionItemBinding;
+import com.example.bookapp.databinding.LayoutPostItemBinding;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.models.Post;
 
@@ -32,7 +30,7 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
         LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
-        LayoutSuggestionItemBinding layoutSuggestionItemBinding = LayoutSuggestionItemBinding
+        LayoutPostItemBinding layoutSuggestionItemBinding = LayoutPostItemBinding
                 .inflate(layoutInflater, parent, false);
         return new ViewHolder(layoutSuggestionItemBinding);
     }
@@ -55,9 +53,9 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
 
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        LayoutSuggestionItemBinding layoutSuggestionItemBinding;
+        LayoutPostItemBinding layoutSuggestionItemBinding;
 
-        ViewHolder(@NonNull LayoutSuggestionItemBinding layoutSuggestionItemBinding) {
+        ViewHolder(@NonNull LayoutPostItemBinding layoutSuggestionItemBinding) {
             super(layoutSuggestionItemBinding.getRoot());
             this.layoutSuggestionItemBinding = layoutSuggestionItemBinding;
         }

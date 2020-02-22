@@ -1,5 +1,6 @@
 package com.example.bookapp.Adapters;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,9 +10,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
+import com.example.bookapp.databinding.LayoutGridRecipeItemBinding;
 import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.Post;
 
@@ -44,16 +47,13 @@ public class GridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_grid_recipe_item, parent, false);
-        }
-        TextView postName = convertView.findViewById(R.id.name_recipe_grid_item);
-        postName.setText(data.get(position).getPostTitle());
-        ImageView recipeImage = convertView.findViewById(R.id.image_recipe_grid_item);
+        @SuppressLint("ViewHolder") LayoutGridRecipeItemBinding  binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.layout_grid_recipe_item, parent, false);
+
+        binding.setPost(data.get(position));
         Glide.with(parent.getContext())
                 .load(data.get(position).getPostImage())
-                .into(recipeImage);
-        convertView.setOnClickListener(view -> mainActivityInterface.expandPost(data.get(position).getPostID()));
-        return convertView;
+                .into(binding.imageRecipeGridItem);
+        binding.getRoot().setOnClickListener(view -> mainActivityInterface.expandPost(data.get(position).getPostID()));
+        return binding.getRoot();
     }
 }

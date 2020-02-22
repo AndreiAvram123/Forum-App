@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 public class ExpandedItemFragment extends Fragment implements CommentDialog.CommentDialogInterface {
     private static final String KEY_EXPANDED_ITEM = "KEY_EXPANDED_ITEM";
-    private static final String KEY_SIMILAR_ITEMS = "KEY_SIMILAR_ITEMS";
     private static final String KEY_COMMENTS = "KEY_COMMENTS";
     private MainActivityInterface mainActivityInterface;
     private Post post;
@@ -85,7 +84,9 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
     }
 
     private void configureViews() {
-
+        if (post.isSaved()) {
+            binding.saveButtonExpanded.setImageResource(R.drawable.ic_favorite_red_32dp);
+        }
         saveButton.setOnClickListener(view -> {
             if (post.isSaved()) {
                 mainActivityInterface.deleteSavedPost(post);

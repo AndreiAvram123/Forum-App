@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,7 +15,7 @@ import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
 import com.example.bookapp.fragments.HomeFragment;
-import com.example.bookapp.fragments.RecipeDataFragment;
+import com.example.bookapp.fragments.PostsDataFragment;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.AuthenticationService;
@@ -46,34 +45,33 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity implements
         MainActivityInterface,
         BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface,
-        DataApiManager.DataApiManagerCallback
-        , ErrorFragment.ErrorFragmentInterface{
+        ApiManager.ApiManagerDataCallback
+        , ErrorFragment.ErrorFragmentInterface {
 
-    private ArrayList<Post> randomRecipes = new ArrayList<>();
     private SharedPreferences sharedPreferences;
     private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
-    private RecipeDataFragment savedRecipesFragment;
     private HomeFragment homeFragment;
     private SearchFragment searchFragment;
     private ArrayList<Post> savedPosts = new ArrayList<>();
-    private DataApiManager dataApiManager;
+    private PostsDataFragment savedPostsFragment = PostsDataFragment.getInstance(new ArrayList<>());
+    private ApiManager apiManager;
     private ExpandedItemFragment currentExpandedItemFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
-        Log.d("Debug","Fuck");
         configureDefaultParameters();
         if (shouldShowWelcomeActivity()) {
             startWelcomeActivity();
         } else {
-            initializeFragments();
-            configureDatabaseParameters();
+            searchFragment = SearchFragment.getInstance(getSearchHistory());
             if (AppUtilities.isNetworkAvailable(this)) {
-                //dataApiManager.pushRequestRandomRecipes();
-                dataApiManager.pushRequestLatestPosts();
+                apiManager = ApiManager.getInstance(this);
+                apiManager.setApiManagerDataCallback(this);
+                apiManager.pushRequestLatestPosts();
+                apiManager.pushRequestGetSavedPosts();
             } else {
                 displayFragment(ErrorFragment.getInstance(getString(R.string.no_internet_connection), R.drawable.ic_no_wifi));
             }
@@ -103,18 +101,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    private void initializeFragments() {
-        //todo
-        //modify this
-        // savedRecipesFragment = RecipeDataFragment.getInstance(savedPosts);
-        searchFragment = SearchFragment.getInstance(getSearchHistory());
-    }
-
-    private void configureDatabaseParameters() {
-        dataApiManager = new DataApiManager(this);
-        //NukeSSLCerts.nuke();
-    }
-
     private void configureDefaultParameters() {
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
@@ -134,10 +120,6 @@ public class MainActivity extends AppCompatActivity implements
     //
     @Override
     public void onLatestPostsDataReady(ArrayList<Post> latestPosts) {
-        //todo
-        //modity
-        //randomRecipes.addAll(data);
-        //checkWhichRandomRecipeIsSaved();
         homeFragment = HomeFragment.getInstance(latestPosts);
         configureNavigationView();
     }
@@ -158,6 +140,12 @@ public class MainActivity extends AppCompatActivity implements
         searchFragment.displayFetchedSuggestions(data);
     }
 
+    @Override
+    public void onSavedPostsReady(ArrayList<Post> savedPosts) {
+        savedPostsFragment = PostsDataFragment.getInstance(savedPosts);
+    }
+
+
 
     private void configureNavigationView() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
@@ -175,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements
                     break;
                 }
                 case R.id.saved_items: {
-                    displayFragment(savedRecipesFragment);
+                    displayFragment(savedPostsFragment);
                     break;
                 }
             }
@@ -198,12 +186,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void fetchSuggestions(String query) {
-        dataApiManager.pushRequestAutocomplete(query);
+        apiManager.pushRequestAutocomplete(query);
     }
 
     @Override
     public void fetchSelectedPostById(int id) {
-        dataApiManager.pushRequestGetPostDetails(id);
+        apiManager.pushRequestGetPostDetails(id);
     }
 
 
@@ -235,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements
         if (firebaseUser == null) {
             requestLogIn();
         } else {
-            savedPosts.add(post);
+            addPostToSavedFragment(post);
             updateUserFirebaseDocument();
             //check if we need to update the UI for the expandedItemFragment
 
@@ -245,9 +233,20 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    private void addPostToSavedFragment(Post post) {
+        savedPosts.add(post);
+        if (savedPostsFragment.getData().isEmpty()) {
+            savedPostsFragment = PostsDataFragment.getInstance(savedPosts);
+        } else {
+            savedPostsFragment.addNewSavedPost(post);
+
+        }
+    }
+
     @Override
     public void deleteSavedPost(Post post) {
         savedPosts.remove(post);
+        savedPostsFragment.removePost(post);
         updateUserFirebaseDocument();
 
         if (currentExpandedItemFragment != null) {
@@ -259,18 +258,18 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void expandPost(int postID) {
 
-        dataApiManager.pushRequestGetPostDetails(postID);
+        apiManager.pushRequestGetPostDetails(postID);
     }
 
     @Override
     public void uploadComment(Comment comment) {
-        dataApiManager.uploadNewComment(comment);
+        apiManager.uploadNewComment(comment);
 
     }
 
     @Override
     public void uploadPost(NonUploadedPost nonUploadedPost) {
-           dataApiManager.uploadPost(nonUploadedPost);
+        apiManager.uploadPost(nonUploadedPost);
     }
 
     private void updateUserFirebaseDocument() {
@@ -297,9 +296,7 @@ public class MainActivity extends AppCompatActivity implements
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() != null) {
             firebaseUser = firebaseAuth.getCurrentUser();
-            if (AppUtilities.isNetworkAvailable(this)) {
-                getSavedPostsForCurrentUser(firebaseUser);
-            }
+            //update ui
             updateUIWithUserInfo();
         }
     }
@@ -366,7 +363,7 @@ public class MainActivity extends AppCompatActivity implements
         if (error.equals(getString(R.string.no_internet_connection))) {
             if (AppUtilities.isNetworkAvailable(this)) {
 
-                dataApiManager.pushRequestLatestPosts();
+                apiManager.pushRequestLatestPosts();
                 //todo
                 //getSavedPostsForCurrentUser(firebaseUser);
             }

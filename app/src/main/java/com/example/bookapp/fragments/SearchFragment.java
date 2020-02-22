@@ -14,7 +14,6 @@ import com.example.bookapp.R;
 import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class SearchFragment extends Fragment {
     private static final String KEY_SEARCH_HISTORY = "KEY_SEARCH_HISTORY";
@@ -64,7 +63,7 @@ public class SearchFragment extends Fragment {
 
     private void displaySearchResultsFragment() {
         getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_search_fragment, RecipeDataFragment.getInstance(lastResults))
+                .replace(R.id.container_search_fragment, PostsDataFragment.getInstance(lastResults))
                 .commit();
     }
 
