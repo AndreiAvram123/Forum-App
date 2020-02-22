@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,15 +12,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.example.bookapp.activities.WelcomeActivity;
-import com.example.bookapp.customViews.CommentDialog;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
+import com.example.bookapp.fragments.HomeFragment;
 import com.example.bookapp.fragments.RecipeDataFragment;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.Comment;
+import com.example.bookapp.models.NonUploadedPost;
 import com.example.bookapp.models.Post;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -31,7 +33,6 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements
     private SharedPreferences sharedPreferences;
     private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore firebaseFirestore;
     private RecipeDataFragment savedRecipesFragment;
     private HomeFragment homeFragment;
     private SearchFragment searchFragment;
@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
+        Log.d("Debug","Fuck");
         configureDefaultParameters();
         if (shouldShowWelcomeActivity()) {
             startWelcomeActivity();
@@ -112,7 +113,6 @@ public class MainActivity extends AppCompatActivity implements
     private void configureDatabaseParameters() {
         dataApiManager = new DataApiManager(this);
         //NukeSSLCerts.nuke();
-        firebaseFirestore = FirebaseFirestore.getInstance();
     }
 
     private void configureDefaultParameters() {
@@ -269,8 +269,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void uploadPost(Post post) {
-     dataApiManager.uploadPost(post);
+    public void uploadPost(NonUploadedPost nonUploadedPost) {
+           dataApiManager.uploadPost(nonUploadedPost);
     }
 
     private void updateUserFirebaseDocument() {

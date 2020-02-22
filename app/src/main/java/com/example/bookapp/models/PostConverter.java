@@ -18,7 +18,7 @@ public class PostConverter {
             JSONArray jsonArray = new JSONArray(json);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject postJson = jsonArray.getJSONObject(i);
-                dataToReturn.add(new PostBuilder()
+                dataToReturn.add(new Post.PostBuilder()
                         .setPostID(postJson.getInt("postID"))
                         .setPostTitle(postJson.getString("postTitle"))
                         .setPostAuthor(postJson.getString("postAuthor"))
@@ -40,7 +40,7 @@ public class PostConverter {
             JSONArray suggestionsJson = new JSONArray(response);
             for (int i = 0; i < suggestionsJson.length(); i++) {
                 JSONObject jsonObject = suggestionsJson.getJSONObject(i);
-                PostBuilder postBuilder = new PostBuilder();
+                Post.PostBuilder postBuilder = new Post.PostBuilder();
                 postBuilder.setPostID(jsonObject.getInt("postID"))
                         .setPostTitle(jsonObject.getString("postTitle"))
                         .setPostAuthor(jsonObject.getString("postAuthor"))
@@ -55,7 +55,7 @@ public class PostConverter {
     }
 
 
-    public static void getFullPostDetailsFromJson(@NonNull String response, @NonNull PostBuilder postBuilder) {
+    public static void getFullPostDetailsFromJson(@NonNull String response, @NonNull Post.PostBuilder postBuilder) {
         try {
             JSONObject jsonObject = new JSONObject(response);
             postBuilder.setPostID(jsonObject.getInt("postID"))
@@ -63,7 +63,8 @@ public class PostConverter {
                     .setPostDate(jsonObject.getString("postDate"))
                     .setPostAuthor(jsonObject.getString("postAuthor"))
                     .setPostImage(String.format(defaultImageURL, jsonObject.getString("postImage")))
-                    .setPostCategory(jsonObject.getString("postCategory"));
+                    .setPostCategory(jsonObject.getString("postCategory"))
+                    .setPostContent(jsonObject.getString("postContent"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
