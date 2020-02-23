@@ -22,6 +22,7 @@ import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.NonUploadedPost;
 import com.example.bookapp.models.Post;
+import com.example.bookapp.models.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
@@ -54,15 +55,16 @@ public class MainActivity extends AppCompatActivity implements
     private HomeFragment homeFragment;
     private SearchFragment searchFragment;
     private ArrayList<Post> savedPosts = new ArrayList<>();
-    private PostsDataFragment savedPostsFragment = PostsDataFragment.getInstance(new ArrayList<>());
+    private PostsDataFragment savedPostsFragment;
     private ApiManager apiManager;
     private ExpandedItemFragment currentExpandedItemFragment;
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
-        configureDefaultParameters();
+        configureDefaultVariables();
         if (shouldShowWelcomeActivity()) {
             startWelcomeActivity();
         } else {
@@ -71,12 +73,32 @@ public class MainActivity extends AppCompatActivity implements
                 apiManager = ApiManager.getInstance(this);
                 apiManager.setApiManagerDataCallback(this);
                 apiManager.pushRequestLatestPosts();
-                apiManager.pushRequestGetSavedPosts();
+                getFavoritePosts();
+
             } else {
                 displayFragment(ErrorFragment.getInstance(getString(R.string.no_internet_connection), R.drawable.ic_no_wifi));
             }
         }
 
+    }
+
+
+    private void getFavoritePosts() {
+        if (currentUser != null) {
+            apiManager.pushRequestGetFavoritePosts(currentUser.getUserID());
+        }
+    }
+
+    private User getCurrentUser() {
+        String userID = sharedPreferences.getString(getString(R.string.key_user_id), null);
+        String username = sharedPreferences.getString(getString(R.string.key_username), null);
+        if (userID != null && username != null) {
+            User.Builder builder = new User.Builder();
+            builder.setUserID(userID);
+            builder.setUsername(username);
+            return builder.createUser();
+        }
+        return null;
     }
 
 
@@ -87,22 +109,16 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void startWelcomeActivity() {
-        markWelcomeActivityAsShown();
         Intent intent = new Intent(this, WelcomeActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
     }
 
-    private void markWelcomeActivityAsShown() {
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(getString(R.string.welcome_activity_shown_key), true);
-        editor.apply();
-    }
 
-
-    private void configureDefaultParameters() {
+    private void configureDefaultVariables() {
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        savedPostsFragment = PostsDataFragment.getInstance(new ArrayList<>());
     }
 
 
@@ -144,7 +160,6 @@ public class MainActivity extends AppCompatActivity implements
     public void onSavedPostsReady(ArrayList<Post> savedPosts) {
         savedPostsFragment = PostsDataFragment.getInstance(savedPosts);
     }
-
 
 
     private void configureNavigationView() {
@@ -263,13 +278,13 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void uploadComment(Comment comment) {
-        apiManager.uploadNewComment(comment);
+        apiManager.uploadNewComment(comment, currentUser.getUserID());
 
     }
 
     @Override
     public void uploadPost(NonUploadedPost nonUploadedPost) {
-        apiManager.uploadPost(nonUploadedPost);
+        apiManager.uploadPost(nonUploadedPost, currentUser.getUserID());
     }
 
     private void updateUserFirebaseDocument() {
@@ -293,20 +308,13 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        firebaseAuth = FirebaseAuth.getInstance();
-        if (firebaseAuth.getCurrentUser() != null) {
-            firebaseUser = firebaseAuth.getCurrentUser();
-            //update ui
-            updateUIWithUserInfo();
-        }
+        currentUser = getCurrentUser();
+
     }
 
     private void getSavedPostsForCurrentUser(FirebaseUser firebaseUser) {
         //todo
         //needs implementing
-    }
-
-    private void updateUIWithUserInfo() {
     }
 
 

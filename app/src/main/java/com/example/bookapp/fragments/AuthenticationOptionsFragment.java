@@ -55,14 +55,10 @@ public class AuthenticationOptionsFragment extends Fragment {
         loginWithGoogleLayout = layout.findViewById(R.id.login_with_google_item);
         loginWithEmailLayout = layout.findViewById(R.id.login_with_email_item);
         loginAnonymouslyText = layout.findViewById(R.id.sign_in_anonymously_text);
-        LoginButton facebookLoginButton = layout.findViewById(R.id.login_button_facebook);
-        facebookLoginButton.setReadPermissions("email", "public_profile");
-        authenticationOptionsCallback.prepareLoginWithFacebook(facebookLoginButton);
     }
 
 
     public interface AuthenticationOptionsCallback {
-        void prepareLoginWithFacebook(LoginButton loginButton);
         void loginWithGoogle();
         void showLoginWithEmailFragment();
         void loginAnonymously();

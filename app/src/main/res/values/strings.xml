@@ -46,4 +46,6 @@
 
     <string name="write_comment_text">Write a comment</string>
     <string name="submit_comment">Submit</string>
+    <string name="key_user_id">key_user_id</string>
+    <string name="key_username">key_username</string>
 </resources>

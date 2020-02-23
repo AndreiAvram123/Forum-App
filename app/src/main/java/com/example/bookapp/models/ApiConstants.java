@@ -8,9 +8,11 @@ public class ApiConstants {
     public static final String URL_UPLOAD_COMMENT = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?uploadComment";
     public static final String UPLOAD_IMAGE_URL = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?uploadPost";
     public static final String URL_SAVED_POSTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?savedPosts&userID=%s";
-    public static final String URL_AUTHENTICATE_ACCOUNT_ID = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?authenticateThirdPartyAccount&userID=%s";
+    public static final String URL_AUTHENTICATE_ACCOUNT_ID = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?authenticateThirdPartyAccount&email=%s";
     public static final int RESPONSE_CODE_ACCOUNT_EXISTS = 1;
     public static final int RESPONSE_CODE_ACCOUNT_UNEXISTENT = 0;
-    public static final int RESPONSE_CODE_ACCOUNT_ID_NOT_PROVIDED = -1;
+    public static final int RESPONSE_CODE_ACCOUNT_PARAMERTERS_NOT_PROVIDED = -1;
+    public static final int RESPONSE_CODE_ACCOUNT_CREATED = 2;
 
+    public static final String URL_CREATE_THIRD_PARTY_ACCOUNT = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?createThirdPartyAccount";
 }

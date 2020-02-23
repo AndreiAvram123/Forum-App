@@ -23,6 +23,7 @@ import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.NonUploadedPostBuilder;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Objects;
 
 public class FragmentAddPost extends Fragment {
     private MainActivityInterface mainActivityInterface;
@@ -75,6 +76,7 @@ public class FragmentAddPost extends Fragment {
                 .setImageName(getImageName())
                 .setImageBytes(getImageBytes());
         mainActivityInterface.uploadPost(nonUploadedPostBuilder.createPostUnderUploadModel());
+        Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack();
     }
 
     @Override
