@@ -183,9 +183,11 @@ public class ApiManager {
     void pushRequestGetFavoritePosts(String userID) {
 
         String formattedURLSavedPosts = String.format(ApiConstants.URL_SAVED_POSTS, userID);
+        Log.d("Debug",formattedURLSavedPosts);
         //push request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
         {
+            Log.d("Debug",response);
             ArrayList<Post> savedPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
             apiManagerDataCallback.onSavedPostsReady(savedPosts);
         },
@@ -194,23 +196,16 @@ public class ApiManager {
         requestQueue.add(stringRequest);
     }
 
-    public void pushRequestFacebookDataGraph(AccessToken token) {
+    public void pushRequestAddPostToFavorites(int postID, String userID) {
+        String formattedURLSavedPosts = String.format(ApiConstants.URL_ADD_POST_TO_FAVORITES, postID, userID);
+        //push request
+        StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
+        {
 
-        GraphRequest request = GraphRequest.newMeRequest(
-                token,
-                (object, response) -> {
-                    // Insert your code here
-                    try {
-                        authenticateWithThirdPartyAccount(response.getJSONObject().getString("email"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+        },
+                (error) -> {
                 });
-
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,email");
-        request.setParameters(parameters);
-        request.executeAsync();
+        requestQueue.add(request);
     }
 
 

@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements
         if (shouldShowWelcomeActivity()) {
             startWelcomeActivity();
         } else {
+            currentUser = getCurrentUser();
             searchFragment = SearchFragment.getInstance(getSearchHistory());
             if (AppUtilities.isNetworkAvailable(this)) {
                 apiManager = ApiManager.getInstance(this);
@@ -235,26 +236,23 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void savePost(Post post) {
-        if (firebaseUser == null) {
-            requestLogIn();
-        } else {
-            addPostToSavedFragment(post);
-            updateUserFirebaseDocument();
-            //check if we need to update the UI for the expandedItemFragment
+        addPostToSavedFragment(post);
+        apiManager.pushRequestAddPostToFavorites(post.getPostID(), currentUser.getUserID());
+        //check if we need to
+        // .update the UI for the expandedItemFragment
 
-            if (currentExpandedItemFragment != null) {
-                currentExpandedItemFragment.informUserPostAddedToFavorites();
-            }
+        if (currentExpandedItemFragment != null) {
+            currentExpandedItemFragment.informUserPostAddedToFavorites();
         }
+
     }
 
     private void addPostToSavedFragment(Post post) {
         savedPosts.add(post);
-        if (savedPostsFragment.getData().isEmpty()) {
+        if (savedPosts.size() == 1) {
             savedPostsFragment = PostsDataFragment.getInstance(savedPosts);
         } else {
             savedPostsFragment.addNewSavedPost(post);
-
         }
     }
 
@@ -308,7 +306,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        currentUser = getCurrentUser();
 
     }
 

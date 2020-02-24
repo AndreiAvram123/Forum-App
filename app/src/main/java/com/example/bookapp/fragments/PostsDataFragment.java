@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import androidx.annotation.ArrayRes;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -43,18 +44,17 @@ public class PostsDataFragment extends Fragment {
         adapterRecipesData.notifyDataSetChanged();
     }
 
-    public ArrayList<Post> getData() {
-        return data;
-    }
 
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        if (getArguments().getParcelableArrayList(KEY_DATA).size() != 0) {
-            // Inflate the layout for this fragment
-            this.data = getArguments().getParcelableArrayList(KEY_DATA);
+        // Inflate the layout for this fragment
+        this.data = getArguments().getParcelableArrayList(KEY_DATA);
+        if(data ==null){
+            this.data = new ArrayList<>();
         }
+
     }
 
     @Override
