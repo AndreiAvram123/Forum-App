@@ -17,16 +17,12 @@ import com.example.bookapp.fragments.SignUpFragment;
 import com.example.bookapp.models.ApiConstants;
 import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.User;
-import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,5 +1,6 @@
 package com.example.bookapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,12 +10,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 
 import com.example.bookapp.activities.WelcomeActivity;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
+import com.example.bookapp.fragments.ErrorFragmentDirections;
 import com.example.bookapp.fragments.ExpandedItemFragment;
 import com.example.bookapp.fragments.HomeFragment;
+import com.example.bookapp.fragments.HomeFragmentDirections;
 import com.example.bookapp.fragments.PostsDataFragment;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.MainActivityInterface;
@@ -28,7 +35,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -50,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements
         , ErrorFragment.ErrorFragmentInterface {
 
     private SharedPreferences sharedPreferences;
-    private FirebaseUser firebaseUser;
     private FirebaseAuth firebaseAuth;
     private HomeFragment homeFragment;
     private SearchFragment searchFragment;
@@ -59,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements
     private ApiManager apiManager;
     private ExpandedItemFragment currentExpandedItemFragment;
     private User currentUser;
+    private ArrayList<Post> latestPosts = new ArrayList<>();
+    private NavController navController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,14 +144,16 @@ public class MainActivity extends AppCompatActivity implements
     //
     @Override
     public void onLatestPostsDataReady(ArrayList<Post> latestPosts) {
-        homeFragment = HomeFragment.getInstance(latestPosts);
+        this.latestPosts = latestPosts;
         configureNavigationView();
     }
 
     @Override
     public void onPostDetailsReady(@NonNull Post post, @Nullable ArrayList<Comment> comments, @Nullable ArrayList<Post> similarPosts) {
-        displayFragmentAddToBackStack(ExpandedItemFragment.getInstance(post, comments));
-
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ExpandedItemFragment.KEY_EXPANDED_ITEM,post);
+        bundle.putParcelableArrayList(ExpandedItemFragment.KEY_COMMENTS,comments);
+        navController.navigate(R.id.expandedItemFragment,bundle);
     }
 
     @Override
@@ -167,19 +176,28 @@ public class MainActivity extends AppCompatActivity implements
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         //display home fragment
         bottomNavigationView.setSelectedItemId(R.id.navigation_home);
-        displayFragment(homeFragment);
+         navController = Navigation.findNavController(this, R.id.nav_host_fragment_main);
+
+        Bundle bundleHomeFragment = new Bundle();
+        bundleHomeFragment.putParcelableArrayList(HomeFragment.KEY_DATA, latestPosts);
+        navController.navigate(R.id.homeFragment, bundleHomeFragment);
+
+
         bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.navigation_home: {
-                    displayFragment(homeFragment);
+
+                    navController.navigate(R.id.homeFragment, bundleHomeFragment);
                     break;
                 }
                 case R.id.search_item: {
-                    displayFragment(searchFragment);
+                    navController.navigate(R.id.searchFragment);
                     break;
                 }
                 case R.id.saved_items: {
-                    displayFragment(savedPostsFragment);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelableArrayList(PostsDataFragment.KEY_DATA,savedPosts);
+                    navController.navigate(R.id.favoriteItems,bundle);
                     break;
                 }
             }
@@ -189,9 +207,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void displayFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_main_activity, fragment)
-                .commit();
+//        getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.container_main_activity, fragment)
+//                .commit();
     }
 
 
@@ -215,10 +233,10 @@ public class MainActivity extends AppCompatActivity implements
         if (fragment instanceof ExpandedItemFragment) {
             currentExpandedItemFragment = (ExpandedItemFragment) fragment;
         }
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_main_activity, fragment)
-                .addToBackStack(null)
-                .commit();
+//        getSupportFragmentManager().beginTransaction()
+//                .replace(R.id.container_main_activity, fragment)
+//                .addToBackStack(null)
+//                .commit();
     }
 
 
@@ -340,7 +358,7 @@ public class MainActivity extends AppCompatActivity implements
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 // ...
-                Snackbar.make(findViewById(R.id.container_main_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                //     Snackbar.make(findViewById(R.id.nav_graph_main_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
 
             }
         }
@@ -352,10 +370,9 @@ public class MainActivity extends AppCompatActivity implements
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign in success, update UI with the signed-in user's information
-                        firebaseUser = firebaseAuth.getCurrentUser();
                     } else {
                         // If sign in fails, display a message to the user.
-                        Snackbar.make(findViewById(R.id.container_main_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
+                        // Snackbar.make(findViewById(R.id.container_main_activity), "Authentication Failed.", Snackbar.LENGTH_SHORT).show();
                     }
 
                     // ...

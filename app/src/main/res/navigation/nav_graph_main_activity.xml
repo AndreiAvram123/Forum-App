@@ -1,5 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/nav_graph_main_activity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_main_activity"
+    app:startDestination="@id/errorFragment">
 
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.bookapp.fragments.HomeFragment"
+        android:label="layout_home_fragment"
+        tools:layout="@layout/layout_home_fragment" >
+
+        <action
+            android:id="@+id/action_homeFragment_to_expandedItemFragment"
+            app:destination="@+id/expandedItemFragment"
+            app:enterAnim="@anim/fragment_open_enter" />
+        <action
+            android:id="@+id/action_homeFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+        <argument
+            android:name="latestPosts"
+            app:argType="com.example.bookapp.models.Post[]" />
+        <action
+            android:id="@+id/action_homeFragment_to_fragmentAddPost"
+            app:destination="@id/fragmentAddPost" />
+    </fragment>
+    <fragment
+        android:id="@+id/expandedItemFragment"
+        android:name="com.example.bookapp.fragments.ExpandedItemFragment"
+        android:label="fragment_expanded_item"
+        tools:layout="@layout/fragment_expanded_item" >
+        <argument
+            android:name="post"
+            app:argType="com.example.bookapp.models.Post" />
+    </fragment>
+    <fragment
+        android:id="@+id/favoriteItems"
+        android:name="com.example.bookapp.fragments.PostsDataFragment"
+        android:label="layout_fragment_posts_data"
+        tools:layout="@layout/layout_fragment_posts_data" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.bookapp.fragments.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_postsDataFragment"
+            app:destination="@id/favoriteItems" />
+        <action
+            android:id="@+id/action_searchFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/errorFragment"
+        android:name="com.example.bookapp.fragments.ErrorFragment"
+        android:label="layout_fragment_error"
+        tools:layout="@layout/layout_fragment_error" >
+        <action
+            android:id="@+id/action_errorFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentAddPost"
+        android:name="com.example.bookapp.fragments.FragmentAddPost"
+        android:label="layout_fragment_add_post"
+        tools:layout="@layout/layout_fragment_add_post" />
 </navigation>

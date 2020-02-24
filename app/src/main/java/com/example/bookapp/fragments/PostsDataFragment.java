@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 public class PostsDataFragment extends Fragment {
 
-    private static final String KEY_DATA = "KEY_DATA";
+    public static final String KEY_DATA = "KEY_DATA";
     private ArrayList<Post> data;
     private AdapterRecipesData adapterRecipesData;
     private LayoutFragmentPostsDataBinding binding;
