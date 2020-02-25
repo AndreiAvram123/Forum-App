@@ -15,15 +15,15 @@
             android:id="@+id/action_homeFragment_to_expandedItemFragment"
             app:destination="@+id/expandedItemFragment"
             app:enterAnim="@anim/fragment_open_enter" />
-        <action
-            android:id="@+id/action_homeFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
         <argument
             android:name="latestPosts"
             app:argType="com.example.bookapp.models.Post[]" />
         <action
             android:id="@+id/action_homeFragment_to_fragmentAddPost"
             app:destination="@id/fragmentAddPost" />
+        <action
+            android:id="@+id/action_homeFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
     </fragment>
     <fragment
         android:id="@+id/expandedItemFragment"
@@ -40,18 +40,6 @@
         android:label="layout_fragment_posts_data"
         tools:layout="@layout/layout_fragment_posts_data" />
     <fragment
-        android:id="@+id/searchFragment"
-        android:name="com.example.bookapp.fragments.SearchFragment"
-        android:label="fragment_search"
-        tools:layout="@layout/fragment_search" >
-        <action
-            android:id="@+id/action_searchFragment_to_postsDataFragment"
-            app:destination="@id/favoriteItems" />
-        <action
-            android:id="@+id/action_searchFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/errorFragment"
         android:name="com.example.bookapp.fragments.ErrorFragment"
         android:label="layout_fragment_error"
@@ -65,4 +53,13 @@
         android:name="com.example.bookapp.fragments.FragmentAddPost"
         android:label="layout_fragment_add_post"
         tools:layout="@layout/layout_fragment_add_post" />
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.bookapp.fragments.SearchFragment"
+        android:label="SearchFragment" >
+        <action
+            android:id="@+id/action_searchFragment_to_favoriteItems"
+            app:destination="@id/favoriteItems" />
+    </fragment>
+    <action android:id="@+id/action_global_searchFragment" app:destination="@id/searchFragment" />
 </navigation>

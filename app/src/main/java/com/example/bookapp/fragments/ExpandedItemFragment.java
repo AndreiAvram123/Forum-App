@@ -11,7 +11,6 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
@@ -97,7 +96,7 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
             }
 
         });
-        binding.backButtonExpanded.setOnClickListener((view) -> Navigation.findNavController(activity, R.id.nav_host_fragment_main).popBackStack());
+        binding.backButtonExpanded.setOnClickListener((view) -> Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack());
         binding.writeCommentButton.setOnClickListener((view) -> {
             showCommentDialog();
         });

@@ -94,7 +94,7 @@ public class ApiManager {
         requestQueue.add(postDetailsRequest);
     }
 
-    private void pushRequestGetPostComments(@NonNull Post post, @NonNull int postID) {
+    private void pushRequestGetPostComments(@NonNull Post post, int postID) {
         StringRequest postCommentsRequest = new StringRequest(Request.Method.GET, String.format(URL_POST_COMMENTS, postID),
                 (response) -> {
                     ArrayList<Comment> comments = PostConverter.getCommentsFromJson(response);
@@ -183,11 +183,11 @@ public class ApiManager {
     void pushRequestGetFavoritePosts(String userID) {
 
         String formattedURLSavedPosts = String.format(ApiConstants.URL_SAVED_POSTS, userID);
-        Log.d("Debug",formattedURLSavedPosts);
+        Log.d("Debug", formattedURLSavedPosts);
         //push request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
         {
-            Log.d("Debug",response);
+            Log.d("Debug", response);
             ArrayList<Post> savedPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
             apiManagerDataCallback.onSavedPostsReady(savedPosts);
         },

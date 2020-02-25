@@ -1,17 +1,26 @@
 package com.example.bookapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.bookapp.Adapters.SuggestionsAdapter;
 import com.example.bookapp.R;
+import com.example.bookapp.databinding.FragmentSearchBinding;
 import com.example.bookapp.models.Post;
+import com.example.bookapp.models.ViewModelPost;
 
 import java.util.ArrayList;
 
@@ -19,24 +28,45 @@ public class SearchFragment extends Fragment {
     private static final String KEY_SEARCH_HISTORY = "KEY_SEARCH_HISTORY";
     private SearchView searchView;
     private SearchFragmentInterface searchFragmentInterface;
-    private ArrayList<Post> lastResults;
-
-    public static SearchFragment getInstance(ArrayList<String> searchHistory) {
-        SearchFragment searchFragment = new SearchFragment();
-        Bundle bundle = new Bundle();
-        bundle.putStringArrayList(KEY_SEARCH_HISTORY, searchHistory);
-        searchFragment.setArguments(bundle);
-        return searchFragment;
-    }
+    private LiveData<ArrayList<Post>> autocompleteSuggestions;
+    private LiveData<ArrayList<Post>> previousAutocompleteSuggestion;
+    private FragmentSearchBinding binding;
+    private SuggestionsAdapter suggestionsRecyclerView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View layout = inflater.inflate(R.layout.fragment_search, container, false);
-        searchView = layout.findViewById(R.id.searchView);
+        super.onViewCreated(container,savedInstanceState);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false);
+        searchView = binding.searchView;
+        configureRecyclerView();
         configureSearch();
-        return layout;
+        attachObserverToViewModel();
+        return binding.getRoot();
+    }
+
+    private void configureRecyclerView() {
+        //this should be replaced by search history
+        suggestionsRecyclerView = new SuggestionsAdapter(new ArrayList<>(), getActivity());
+        binding.recyclerViewSearchResults.setAdapter(suggestionsRecyclerView);
+        binding.recyclerViewSearchResults.setHasFixedSize(true);
+        binding.recyclerViewSearchResults.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.recyclerViewSearchResults.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+    }
+
+    private void attachObserverToViewModel() {
+        ViewModelPost viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
+        autocompleteSuggestions = viewModelPost.getAutocompleteResults();
+        previousAutocompleteSuggestion = viewModelPost.getPreviousAutocompleteResults();
+        viewModelPost.getAutocompleteResults().observe(getViewLifecycleOwner(),  item ->{
+                // Update the UI.
+            if (autocompleteSuggestions.getValue().isEmpty()) {
+                suggestionsRecyclerView.setData(previousAutocompleteSuggestion.getValue());
+            } else {
+                suggestionsRecyclerView.setData(autocompleteSuggestions.getValue());
+            }
+        });
     }
 
     @Override
@@ -49,30 +79,8 @@ public class SearchFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (lastResults != null) {
-            displaySearchResultsFragment();
-        }
     }
 
-    public void displaySearchResults(ArrayList<Post> results) {
-        //clear search
-        clearSearch();
-        lastResults = results;
-        displaySearchResultsFragment();
-    }
-
-    private void displaySearchResultsFragment() {
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_search_fragment, PostsDataFragment.getInstance(lastResults))
-                .commit();
-    }
-
-    private void displaySearchSuggestions(@NonNull ArrayList<Post> suggestions) {
-        getActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.container_search_fragment, PostSuggestionsFragment.getInstance(suggestions))
-                .commit();
-
-    }
 
     private void clearSearch() {
         searchView.onActionViewCollapsed();
@@ -86,13 +94,6 @@ public class SearchFragment extends Fragment {
                 searchView.setIconified(false);
             }
 
-        });
-        searchView.setOnCloseListener(() -> {
-            searchView.setBackground(getActivity().getDrawable(R.drawable.search_background));
-            if (lastResults != null) {
-                displaySearchResultsFragment();
-            }
-            return false;
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -108,6 +109,8 @@ public class SearchFragment extends Fragment {
             @Override
             public boolean onQueryTextChange(String newQuery) {
                 if (!newQuery.trim().equals("")) {
+                    previousAutocompleteSuggestion.getValue().clear();
+                    previousAutocompleteSuggestion.getValue().addAll(previousAutocompleteSuggestion.getValue());
                     searchFragmentInterface.fetchSuggestions(newQuery);
                 }
 
@@ -117,19 +120,12 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    public void displayFetchedSuggestions(@NonNull ArrayList<Post> suggestions) {
-        //sometimes an async problem may occur when
-        //the user deletes the query but the request is still not processed
-        if (!searchView.getQuery().toString().trim().equals("")) {
-            //check current query entered
-            displaySearchSuggestions(suggestions);
-        }
-    }
-
 
     public interface SearchFragmentInterface {
         void performSearch(String query);
+
         void fetchSuggestions(String query);
+
         void fetchSelectedPostById(int id);
     }
 }

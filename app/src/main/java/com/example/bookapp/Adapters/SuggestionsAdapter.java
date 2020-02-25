@@ -25,6 +25,15 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
         searchFragmentInterface = (SearchFragment.SearchFragmentInterface) activity;
     }
 
+    public ArrayList<Post> getData() {
+        return data;
+    }
+    public void setData(ArrayList<Post> data){
+        this.data = data;
+        notifyDataSetChanged();
+
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
