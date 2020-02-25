@@ -90,8 +90,10 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
         }
         saveButton.setOnClickListener(view -> {
             if (post.isSaved()) {
+                informUserPostRemovedFromFavorites();
                 mainActivityInterface.deleteSavedPost(post);
             } else {
+                informUserPostAddedToFavorites();
                 mainActivityInterface.savePost(post);
             }
 
@@ -112,13 +114,13 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
         commentDialog.show();
     }
 
-    public void informUserPostAddedToFavorites() {
+    private void informUserPostAddedToFavorites() {
         post.setSaved(true);
         saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
         Snackbar.make(binding.getRoot(), "Recipe added to favorites", Snackbar.LENGTH_SHORT).show();
     }
 
-    public void informUserPostRemovedFromFavorites() {
+    private void informUserPostRemovedFromFavorites() {
         post.setSaved(false);
         saveButton.setImageResource(R.drawable.ic_favorite_border_black_32dp);
         Snackbar.make(binding.getRoot(), "Recipe deleted from favorites", Snackbar.LENGTH_SHORT).show();

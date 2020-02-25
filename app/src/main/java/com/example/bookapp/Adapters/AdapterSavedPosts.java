@@ -18,18 +18,22 @@ import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 
-public class AdapterRecipesData extends RecyclerView.Adapter<AdapterRecipesData.ViewHolder> {
+public class AdapterSavedPosts extends RecyclerView.Adapter<AdapterSavedPosts.ViewHolder> {
     private ArrayList<Post> posts;
     private Context context;
     private MainActivityInterface mainActivityInterface;
     private String[] allSortCriteria;
 
-    public AdapterRecipesData(@NonNull ArrayList<Post> posts, Activity activity) {
+    public AdapterSavedPosts(@NonNull ArrayList<Post> posts, Activity activity) {
         this.posts = posts;
         mainActivityInterface = (MainActivityInterface) activity;
         allSortCriteria = activity.getResources().getStringArray(R.array.sort_parameters);
     }
 
+    public void setData(ArrayList<Post> data){
+        this.posts = data;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override

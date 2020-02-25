@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_main_activity"
-    app:startDestination="@id/errorFragment">
+    app:startDestination="@id/homeFragment">
 
     <fragment
         android:id="@+id/homeFragment"
@@ -36,16 +36,11 @@
     </fragment>
     <fragment
         android:id="@+id/favoriteItems"
-        android:name="com.example.bookapp.fragments.PostsDataFragment"
+        android:name="com.example.bookapp.fragments.FavoritePostsFragment"
         android:label="layout_fragment_posts_data"
-        tools:layout="@layout/layout_fragment_posts_data" />
-    <fragment
-        android:id="@+id/errorFragment"
-        android:name="com.example.bookapp.fragments.ErrorFragment"
-        android:label="layout_fragment_error"
-        tools:layout="@layout/layout_fragment_error" >
+        tools:layout="@layout/layout_fragment_posts_data" >
         <action
-            android:id="@+id/action_errorFragment_to_homeFragment"
+            android:id="@+id/action_favoriteItems_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
     <fragment

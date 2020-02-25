@@ -1,6 +1,6 @@
 package com.example.bookapp.fragments;
 
-import android.content.Context;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,73 +8,50 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
-import androidx.annotation.ArrayRes;
-import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.bookapp.Adapters.AdapterRecipesData;
+import com.example.bookapp.Adapters.AdapterSavedPosts;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.LayoutFragmentPostsDataBinding;
 import com.example.bookapp.models.Post;
+import com.example.bookapp.models.ViewModelPost;
 
 import java.util.ArrayList;
 
-public class PostsDataFragment extends Fragment {
+public class FavoritePostsFragment extends Fragment {
 
-    public static final String KEY_DATA = "KEY_DATA";
-    private ArrayList<Post> data;
-    private AdapterRecipesData adapterRecipesData;
+    private AdapterSavedPosts adapterSavedPosts;
     private LayoutFragmentPostsDataBinding binding;
+    private ViewModelPost viewModelPost;
 
-    public static PostsDataFragment getInstance(@NonNull ArrayList<Post> recipes) {
-        PostsDataFragment postsDataFragment = new PostsDataFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelableArrayList(KEY_DATA, recipes);
-        postsDataFragment.setArguments(bundle);
-        return postsDataFragment;
-    }
-
-
-    public void addNewSavedPost(Post post) {
-        data.add(post);
-        adapterRecipesData.notifyDataSetChanged();
-    }
-
-
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        // Inflate the layout for this fragment
-        this.data = getArguments().getParcelableArrayList(KEY_DATA);
-        if(data ==null){
-            this.data = new ArrayList<>();
-        }
-
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = null;
-
-        if (data != null && data.size() > 0) {
-            binding = DataBindingUtil.inflate(inflater, R.layout.layout_fragment_posts_data, container, false);
-            view = binding.getRoot();
-            initializeRecyclerViewAdapter();
-            bindDataToViews();
-        } else {
-            view = inflater.inflate(R.layout.layout_no_data, container, false);
+        if (viewModelPost == null) {
+            attachObserver();
         }
-        return view;
+        binding = DataBindingUtil.inflate(inflater, R.layout.layout_fragment_posts_data, container, false);
+        initializeRecyclerViewAdapter();
+        bindDataToViews();
+        return binding.getRoot();
     }
 
+    private void attachObserver() {
+        viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
+        viewModelPost.getSavedPosts().observe(getViewLifecycleOwner(), savedPosts -> {
+            adapterSavedPosts.setData(savedPosts);
+        });
+    }
+
+
     private void bindDataToViews() {
-        binding.numberResults.setText(data.size() + "");
+        binding.numberResults.setText(viewModelPost.getSavedPosts().getValue().size() + "");
         ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getContext(), R.array.sort_parameters,
                 R.layout.custom_item_spinner);
         binding.spinnerSortOptions.setAdapter(spinnerAdapter);
@@ -88,7 +65,7 @@ public class PostsDataFragment extends Fragment {
                 //the onItemSelected method is called the first time when the listener is attached
                 if (notFirstCall[0]) {
                     String sortCriteria = parent.getItemAtPosition(position).toString();
-                    adapterRecipesData.sort(sortCriteria);
+                    adapterSavedPosts.sort(sortCriteria);
                 }
                 notFirstCall[0] = true;
             }
@@ -108,15 +85,12 @@ public class PostsDataFragment extends Fragment {
      * and an item decoration
      */
     private void initializeRecyclerViewAdapter() {
-        adapterRecipesData = new AdapterRecipesData(data, getActivity());
+        adapterSavedPosts = new AdapterSavedPosts(viewModelPost.getSavedPosts().getValue(), requireActivity());
         RecyclerView recyclerView = binding.recyclerViewPopularBooks;
-        recyclerView.setAdapter(adapterRecipesData);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        recyclerView.setAdapter(adapterSavedPosts);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setHasFixedSize(true);
     }
 
-    public void removePost(Post post) {
-        data.remove(post);
-    }
 }

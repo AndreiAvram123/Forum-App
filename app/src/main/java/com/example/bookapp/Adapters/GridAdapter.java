@@ -34,6 +34,10 @@ public class GridAdapter extends BaseAdapter {
     public int getCount() {
         return data.size();
     }
+    public void addData(ArrayList<Post> data){
+        this.data.addAll(data);
+        notifyDataSetChanged();
+    }
 
     @Override
     public Object getItem(int position) {

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,13 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.bookapp.activities.WelcomeActivity;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
 import com.example.bookapp.fragments.ExpandedItemFragment;
-import com.example.bookapp.fragments.HomeFragment;
-import com.example.bookapp.fragments.PostsDataFragment;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.AuthenticationService;
@@ -32,11 +30,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -51,11 +47,8 @@ public class MainActivity extends AppCompatActivity implements
         , ErrorFragment.ErrorFragmentInterface {
 
     private SharedPreferences sharedPreferences;
-    private ArrayList<Post> savedPosts = new ArrayList<>();
-    private PostsDataFragment savedPostsFragment;
     private ApiManager apiManager;
     private User currentUser;
-    private ArrayList<Post> latestPosts = new ArrayList<>();
     private ViewModelPost viewModelPost;
 
     @Override
@@ -115,11 +108,8 @@ public class MainActivity extends AppCompatActivity implements
 
     private void configureDefaultVariables() {
         viewModelPost = new ViewModelProvider(this).get(ViewModelPost.class);
-        viewModelPost.setAutocompleteResults(new ArrayList<>());
-        viewModelPost.setLatestPosts(new ArrayList<>());
-        viewModelPost.setPreviousAutocompleteResults(new ArrayList<>());
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        savedPostsFragment = PostsDataFragment.getInstance(new ArrayList<>());
+        configureNavigationView();
 
     }
 
@@ -139,11 +129,13 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLatestPostsDataReady(ArrayList<Post> latestPosts) {
         viewModelPost.setLatestPosts(latestPosts);
-        configureNavigationView();
     }
 
     @Override
     public void onPostDetailsReady(@NonNull Post post, @Nullable ArrayList<Comment> comments, @Nullable ArrayList<Post> similarPosts) {
+        if (viewModelPost.getSavedPosts().getValue().contains(post)) {
+            post.setSaved(true);
+        }
         Bundle bundle = new Bundle();
         bundle.putParcelable(ExpandedItemFragment.KEY_EXPANDED_ITEM, post);
         bundle.putParcelableArrayList(ExpandedItemFragment.KEY_COMMENTS, comments);
@@ -163,29 +155,20 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onSavedPostsReady(ArrayList<Post> savedPosts) {
-        savedPostsFragment = PostsDataFragment.getInstance(savedPosts);
+        viewModelPost.setSavedPosts(savedPosts);
     }
 
 
     private void configureNavigationView() {
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        //display home fragment
-        bottomNavigationView.setSelectedItemId(R.id.navigation_home);
 
-        Bundle bundleHomeFragment = new Bundle();
-        bundleHomeFragment.putParcelableArrayList(HomeFragment.KEY_DATA, latestPosts);
-        NavController navController =
-                Navigation.findNavController(this, R.id.nav_host_fragment);
-        navController.navigate(R.id.homeFragment, bundleHomeFragment);
-
-        Bundle bundleSavedPosts = new Bundle();
-        bundleSavedPosts.putParcelableArrayList(PostsDataFragment.KEY_DATA, savedPosts);
-
-
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.nav_host_fragment);
+        NavController navController = navHostFragment.getNavController();
+        navController.navigate(R.id.homeFragment);
         bottomNavigationView.setOnNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.navigation_home: {
-
                     navController.navigate(R.id.homeFragment);
                     break;
                 }
@@ -194,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements
                     break;
                 }
                 case R.id.saved_items: {
-                    navController.navigate(R.id.favoriteItems, bundleSavedPosts);
+                    navController.navigate(R.id.favoriteItems);
                     break;
                 }
             }
@@ -234,26 +217,14 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void savePost(Post post) {
-        addPostToSavedFragment(post);
         apiManager.pushRequestAddPostToFavorites(post.getPostID(), currentUser.getUserID());
-
+        viewModelPost.addFavoritePost(post);
     }
 
-    private void addPostToSavedFragment(Post post) {
-        savedPosts.add(post);
-        if (savedPosts.size() == 1) {
-            savedPostsFragment = PostsDataFragment.getInstance(savedPosts);
-        } else {
-            savedPostsFragment.addNewSavedPost(post);
-        }
-    }
 
     @Override
     public void deleteSavedPost(Post post) {
-        savedPosts.remove(post);
-        savedPostsFragment.removePost(post);
-        updateUserFirebaseDocument();
-
+        viewModelPost.removeFavoritePost(post);
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.example.bookapp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.Nullable;
+
 public class Post implements Parcelable {
 
     private int postID;
@@ -179,6 +181,28 @@ public class Post implements Parcelable {
 
     public void setSaved(boolean saved) {
         isSaved = saved;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Post post = (Post) o;
+
+        if (postID != post.postID) return false;
+        if (!postTitle.equals(post.postTitle)) return false;
+        if (!postAuthor.equals(post.postAuthor)) return false;
+        return postImage.equals(post.postImage);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = postID;
+        result = 31 * result + postTitle.hashCode();
+        result = 31 * result + postAuthor.hashCode();
+        result = 31 * result + postImage.hashCode();
+        return result;
     }
 }
 
