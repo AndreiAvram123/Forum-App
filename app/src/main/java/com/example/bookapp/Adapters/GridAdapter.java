@@ -6,10 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 
 import com.bumptech.glide.Glide;
@@ -25,7 +23,10 @@ public class GridAdapter extends BaseAdapter {
     private ArrayList<Post> data;
     private MainActivityInterface mainActivityInterface;
 
-    public GridAdapter(@NonNull ArrayList<Post> data, Activity activity) {
+    public GridAdapter(@Nullable ArrayList<Post> data, Activity activity) {
+        if (data == null) {
+            data = new ArrayList<>();
+        }
         this.data = data;
         mainActivityInterface = (MainActivityInterface) activity;
     }
@@ -34,8 +35,9 @@ public class GridAdapter extends BaseAdapter {
     public int getCount() {
         return data.size();
     }
-    public void addData(ArrayList<Post> data){
-        this.data.addAll(data);
+
+    public void setData(ArrayList<Post> data) {
+        this.data = data;
         notifyDataSetChanged();
     }
 

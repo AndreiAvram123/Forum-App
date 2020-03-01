@@ -2,17 +2,15 @@ package com.example.bookapp.fragments;
 
 
 import android.os.Bundle;
-
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+
 import com.example.bookapp.R;
-import com.facebook.login.widget.LoginButton;
 
 public class AuthenticationOptionsFragment extends Fragment {
 
@@ -47,7 +45,7 @@ public class AuthenticationOptionsFragment extends Fragment {
 
         loginWithGoogleLayout.setOnClickListener((layout) -> authenticationOptionsCallback.loginWithGoogle());
         loginWithEmailLayout.setOnClickListener((layout) -> authenticationOptionsCallback.showLoginWithEmailFragment());
-        loginAnonymouslyText.setOnClickListener((layout)->authenticationOptionsCallback.loginAnonymously());
+        // loginAnonymouslyText.setOnClickListener((layout)->authenticationOptionsCallback.loginAnonymously());
 
     }
 

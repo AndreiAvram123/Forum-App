@@ -6,29 +6,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.example.bookapp.AppUtilities;
 import com.example.bookapp.R;
+import com.example.bookapp.activities.AppUtilities;
 import com.example.bookapp.customViews.CommentDialog;
 import com.example.bookapp.databinding.FragmentExpandedItemBinding;
 import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.CommentBuilder;
 import com.example.bookapp.models.Post;
+import com.example.bookapp.models.ViewModelPost;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 
 public class ExpandedItemFragment extends Fragment implements CommentDialog.CommentDialogInterface {
-    public static final String KEY_EXPANDED_ITEM = "KEY_EXPANDED_ITEM";
-    public static final String KEY_COMMENTS = "KEY_COMMENTS";
     private MainActivityInterface mainActivityInterface;
     private Post post;
     private ArrayList<Comment> comments;
@@ -36,19 +34,8 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
     private FragmentExpandedItemBinding binding;
     private FragmentActivity activity;
     private CommentDialog commentDialog;
-    private String username = "Andrei Avram";
     private CommentsFragment commentsFragment;
-
-    public static ExpandedItemFragment getInstance(@NonNull Post selectedPost, @Nullable ArrayList<Comment> comments) {
-
-        ExpandedItemFragment expandedItemFragment = new ExpandedItemFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_EXPANDED_ITEM, selectedPost);
-        bundle.putParcelableArrayList(KEY_COMMENTS, comments);
-        expandedItemFragment.setArguments(bundle);
-
-        return expandedItemFragment;
-    }
+    private ViewModelPost viewModelPost;
 
 
     @Override
@@ -57,8 +44,12 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
         // Inflate the layout for this fragment
         binding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_expanded_item, container, false);
-        post = getArguments().getParcelable(KEY_EXPANDED_ITEM);
-        comments = getArguments().getParcelableArrayList(KEY_COMMENTS);
+
+        if (viewModelPost == null) {
+            viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
+            post = viewModelPost.getCurrentPost().getValue();
+            comments = viewModelPost.getCurrentPostComments().getValue();
+        }
 
         if (post != null) {
             binding.setPost(post);
@@ -130,6 +121,7 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
     @Override
     public void submitComment(String comment, int postID) {
         CommentBuilder commentBuilder = new CommentBuilder();
+        String username = "Andrei Avram";
         commentBuilder.setCommentID(1000)
                 .setCommentDate(AppUtilities.getDateString())
                 .setCommentContent(comment)

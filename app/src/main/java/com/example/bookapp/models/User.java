@@ -2,10 +2,10 @@ package com.example.bookapp.models;
 
 public class User {
 
-    private String userID;
-    private String username;
-    private String email;
-    private String profilePictureURL;
+    protected String userID;
+    protected String username;
+    protected String email;
+    protected String profilePictureURL;
 
     public static class Builder {
         private String userID;
@@ -31,12 +31,12 @@ public class User {
             return this;
         }
 
-        public User createUser(){
+        public User create(){
             if(userID == null){
-                throw new IllegalStateException("User id cannot be 0");
+                throw new IllegalStateException("User id cannot be null");
             }
             if(username == null){
-                throw new IllegalStateException("Usename cannot be null");
+                throw new IllegalStateException("Username cannot be null");
             }
             User user = new User();
             user.userID = userID;

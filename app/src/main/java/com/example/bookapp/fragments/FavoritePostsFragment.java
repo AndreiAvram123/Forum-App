@@ -15,17 +15,14 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.bookapp.Adapters.AdapterSavedPosts;
+import com.example.bookapp.Adapters.RecyclerViewAdapterPosts;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.LayoutFragmentPostsDataBinding;
-import com.example.bookapp.models.Post;
 import com.example.bookapp.models.ViewModelPost;
-
-import java.util.ArrayList;
 
 public class FavoritePostsFragment extends Fragment {
 
-    private AdapterSavedPosts adapterSavedPosts;
+    private RecyclerViewAdapterPosts recyclerViewAdapterPosts;
     private LayoutFragmentPostsDataBinding binding;
     private ViewModelPost viewModelPost;
 
@@ -45,7 +42,7 @@ public class FavoritePostsFragment extends Fragment {
     private void attachObserver() {
         viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
         viewModelPost.getSavedPosts().observe(getViewLifecycleOwner(), savedPosts -> {
-            adapterSavedPosts.setData(savedPosts);
+            recyclerViewAdapterPosts.setData(savedPosts);
         });
     }
 
@@ -65,7 +62,7 @@ public class FavoritePostsFragment extends Fragment {
                 //the onItemSelected method is called the first time when the listener is attached
                 if (notFirstCall[0]) {
                     String sortCriteria = parent.getItemAtPosition(position).toString();
-                    adapterSavedPosts.sort(sortCriteria);
+                    recyclerViewAdapterPosts.sort(sortCriteria);
                 }
                 notFirstCall[0] = true;
             }
@@ -85,9 +82,9 @@ public class FavoritePostsFragment extends Fragment {
      * and an item decoration
      */
     private void initializeRecyclerViewAdapter() {
-        adapterSavedPosts = new AdapterSavedPosts(viewModelPost.getSavedPosts().getValue(), requireActivity());
+        recyclerViewAdapterPosts = new RecyclerViewAdapterPosts(viewModelPost.getSavedPosts().getValue(), requireActivity());
         RecyclerView recyclerView = binding.recyclerViewPopularBooks;
-        recyclerView.setAdapter(adapterSavedPosts);
+        recyclerView.setAdapter(recyclerViewAdapterPosts);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setHasFixedSize(true);

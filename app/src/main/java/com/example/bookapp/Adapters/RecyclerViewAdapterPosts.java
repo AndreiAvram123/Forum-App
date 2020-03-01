@@ -18,13 +18,13 @@ import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 
-public class AdapterSavedPosts extends RecyclerView.Adapter<AdapterSavedPosts.ViewHolder> {
+public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewAdapterPosts.ViewHolder> {
     private ArrayList<Post> posts;
     private Context context;
     private MainActivityInterface mainActivityInterface;
     private String[] allSortCriteria;
 
-    public AdapterSavedPosts(@NonNull ArrayList<Post> posts, Activity activity) {
+    public RecyclerViewAdapterPosts(@NonNull ArrayList<Post> posts, Activity activity) {
         this.posts = posts;
         mainActivityInterface = (MainActivityInterface) activity;
         allSortCriteria = activity.getResources().getStringArray(R.array.sort_parameters);

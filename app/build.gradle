@@ -33,7 +33,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-
 dependencies {
     def room_version = '2.2.4'
     def nav_version = "2.3.0-alpha02"
@@ -45,6 +44,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-database:19.2.1'
     implementation 'com.google.firebase:firebase-auth:19.2.0'
     implementation 'com.google.android.gms:play-services-auth:17.0.0'
+    implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
     annotationProcessor "androidx.room:room-compiler:$room_version"
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     implementation 'com.android.volley:volley:1.1.1'

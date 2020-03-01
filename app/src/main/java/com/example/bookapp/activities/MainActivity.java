@@ -1,22 +1,19 @@
-package com.example.bookapp;
+package com.example.bookapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.bookapp.activities.WelcomeActivity;
+import com.example.bookapp.R;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
-import com.example.bookapp.fragments.ExpandedItemFragment;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.AuthenticationService;
@@ -24,6 +21,7 @@ import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.NonUploadedPost;
 import com.example.bookapp.models.Post;
 import com.example.bookapp.models.User;
+import com.example.bookapp.models.ViewModelFriends;
 import com.example.bookapp.models.ViewModelPost;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -42,14 +40,14 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements
         MainActivityInterface,
-        BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface,
-        ApiManager.ApiManagerDataCallback
+        BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface
         , ErrorFragment.ErrorFragmentInterface {
 
     private SharedPreferences sharedPreferences;
     private ApiManager apiManager;
     private User currentUser;
     private ViewModelPost viewModelPost;
+    private ViewModelFriends viewModelFriends;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,23 +59,29 @@ public class MainActivity extends AppCompatActivity implements
         } else {
             currentUser = getCurrentUser();
             if (AppUtilities.isNetworkAvailable(this)) {
-                apiManager = ApiManager.getInstance(this);
-                apiManager.setApiManagerDataCallback(this);
-                apiManager.pushRequestLatestPosts();
-                getFavoritePosts();
-
+                configureApiManager();
             }
 
         }
 
     }
 
+    private void configureApiManager() {
+        apiManager = ApiManager.getInstance(this);
+        apiManager.setApiManagerDataCallback(viewModelPost);
+        apiManager.setApiMangerFriendsDataCallback(viewModelFriends);
+        pushDefaultRequests();
+    }
 
-    private void getFavoritePosts() {
+    private void pushDefaultRequests() {
+        apiManager.pushRequestLatestPosts();
         if (currentUser != null) {
+            apiManager.pushRequestMyPosts(currentUser.getUserID());
             apiManager.pushRequestGetFavoritePosts(currentUser.getUserID());
+            apiManager.pushRequestFetchFriends(currentUser.getUserID());
         }
     }
+
 
     private User getCurrentUser() {
         String userID = sharedPreferences.getString(getString(R.string.key_user_id), null);
@@ -86,7 +90,7 @@ public class MainActivity extends AppCompatActivity implements
             User.Builder builder = new User.Builder();
             builder.setUserID(userID);
             builder.setUsername(username);
-            return builder.createUser();
+            return builder.create();
         }
         return null;
     }
@@ -107,10 +111,22 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private void configureDefaultVariables() {
-        viewModelPost = new ViewModelProvider(this).get(ViewModelPost.class);
+        configureViewModels();
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         configureNavigationView();
 
+    }
+
+    private void configureViewModels() {
+        viewModelPost = new ViewModelProvider(this).get(ViewModelPost.class);
+        viewModelFriends = new ViewModelProvider(this).get(ViewModelFriends.class);
+
+        viewModelPost.getCurrentPost().observe(this, post -> {
+            if (viewModelPost.getSavedPosts().getValue().contains(post)) {
+                post.setSaved(true);
+            }
+            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.expandedItemFragment);
+        });
     }
 
 
@@ -123,39 +139,6 @@ public class MainActivity extends AppCompatActivity implements
             return searchHistoryArrayList;
         }
         return searchHistoryArrayList;
-    }
-
-    //
-    @Override
-    public void onLatestPostsDataReady(ArrayList<Post> latestPosts) {
-        viewModelPost.setLatestPosts(latestPosts);
-    }
-
-    @Override
-    public void onPostDetailsReady(@NonNull Post post, @Nullable ArrayList<Comment> comments, @Nullable ArrayList<Post> similarPosts) {
-        if (viewModelPost.getSavedPosts().getValue().contains(post)) {
-            post.setSaved(true);
-        }
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(ExpandedItemFragment.KEY_EXPANDED_ITEM, post);
-        bundle.putParcelableArrayList(ExpandedItemFragment.KEY_COMMENTS, comments);
-        Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.expandedItemFragment, bundle);
-    }
-
-    @Override
-    public void onPostSearchReady(ArrayList<Post> data) {
-//         navController.getBackStack().
-//         searchFragment.displaySearchResults(data);
-    }
-
-    @Override
-    public void onAutocompleteSuggestionsReady(ArrayList<Post> suggestions) {
-        viewModelPost.setAutocompleteResults(suggestions);
-    }
-
-    @Override
-    public void onSavedPostsReady(ArrayList<Post> savedPosts) {
-        viewModelPost.setSavedPosts(savedPosts);
     }
 
 
@@ -178,6 +161,14 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 case R.id.saved_items: {
                     navController.navigate(R.id.favoriteItems);
+                    break;
+                }
+                case R.id.my_posts_item: {
+                    navController.navigate(R.id.fragmentMyPosts);
+                    break;
+                }
+                case R.id.friends_item: {
+                    navController.navigate(R.id.friendsFragment);
                     break;
                 }
             }

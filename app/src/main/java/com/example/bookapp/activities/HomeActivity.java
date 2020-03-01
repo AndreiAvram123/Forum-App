@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 
-import com.example.bookapp.MainActivity;
 import com.example.bookapp.R;
 
 public class HomeActivity extends AppCompatActivity {

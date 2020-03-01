@@ -1,7 +1,6 @@
-package com.example.bookapp;
+package com.example.bookapp.activities;
 
 import android.content.Context;
-import android.os.Bundle;
 import android.util.Base64;
 import android.util.Log;
 
@@ -13,16 +12,13 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.bookapp.api.FriendsRepository;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.ApiConstants;
 import com.example.bookapp.models.NonUploadedPost;
 import com.example.bookapp.models.Post;
 import com.example.bookapp.models.PostConverter;
 import com.example.bookapp.models.User;
-import com.facebook.AccessToken;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.HttpMethod;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,29 +37,37 @@ public class ApiManager {
     private ApiManagerDataCallback apiManagerDataCallback;
     private ApiManagerAuthenticationCallback apiManagerAuthenticationCallback;
     private static ApiManager instance;
+    private static final String TAG = ApiManager.class.getSimpleName();
+    private FriendsRepository friendsRepository;
 
     public static synchronized ApiManager getInstance(@NonNull Context context) {
 
         if (instance == null) {
             instance = new ApiManager(context);
         }
+
         return instance;
     }
 
     private ApiManager(@NonNull Context context) {
         requestQueue = Volley.newRequestQueue(context);
+        friendsRepository = FriendsRepository.getInstance(requestQueue);
     }
 
-    public void setApiManagerDataCallback(@NonNull ApiManagerDataCallback callback) {
+    void setApiManagerDataCallback(@NonNull ApiManagerDataCallback callback) {
         this.apiManagerDataCallback = callback;
     }
 
-    public void setApiManagerAuthenticationCallback(@NonNull ApiManagerAuthenticationCallback callback) {
+    void setApiManagerAuthenticationCallback(@NonNull ApiManagerAuthenticationCallback callback) {
         this.apiManagerAuthenticationCallback = callback;
     }
 
+    void setApiMangerFriendsDataCallback(@NonNull FriendsRepository.ApiManagerFriendsDataCallback friendsDataCallback) {
+        this.friendsRepository.setApiManagerFriendsDataCallback(friendsDataCallback);
+    }
 
-    public void authenticateWithThirdPartyAccount(String email) {
+
+    void authenticateWithThirdPartyAccount(String email) {
         String formattedURL = String.format(ApiConstants.URL_AUTHENTICATE_ACCOUNT_ID, email);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 formattedURL, (response) -> apiManagerAuthenticationCallback.onAuthenticationResponse(response)
@@ -77,7 +81,7 @@ public class ApiManager {
                     ArrayList<Post> latestPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
                     apiManagerDataCallback.onLatestPostsDataReady(latestPosts);
                 }, Throwable::printStackTrace);
-
+        Log.d(TAG, "Pushing request " + URL_LATEST_POSTS);
         requestQueue.add(randomRecipesRequest);
 
     }
@@ -160,7 +164,7 @@ public class ApiManager {
         requestQueue.add(uploadCommentRequest);
     }
 
-    public void createThirdPartyUserAccount(User user) {
+    void createThirdPartyUserAccount(User user) {
         JSONObject postBody = new JSONObject();
         try {
             postBody.put("accountID", user.getUserID());
@@ -183,11 +187,9 @@ public class ApiManager {
     void pushRequestGetFavoritePosts(String userID) {
 
         String formattedURLSavedPosts = String.format(ApiConstants.URL_SAVED_POSTS, userID);
-        Log.d("Debug", formattedURLSavedPosts);
         //push request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
         {
-            Log.d("Debug", response);
             ArrayList<Post> savedPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
             apiManagerDataCallback.onSavedPostsReady(savedPosts);
         },
@@ -196,7 +198,7 @@ public class ApiManager {
         requestQueue.add(stringRequest);
     }
 
-    public void pushRequestAddPostToFavorites(int postID, String userID) {
+    void pushRequestAddPostToFavorites(int postID, String userID) {
         String formattedURLSavedPosts = String.format(ApiConstants.URL_ADD_POST_TO_FAVORITES, postID, userID);
         //push request
         StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
@@ -208,17 +210,37 @@ public class ApiManager {
         requestQueue.add(request);
     }
 
+    void pushRequestMyPosts(String userID) {
+        String formattedURLSavedPosts = String.format(ApiConstants.URL_MY_POSTS, userID);
+        //push request
+        StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
+        {
+            ArrayList<Post> myPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
+            apiManagerDataCallback.onMyPostsReady(myPosts);
+        },
+                (error) -> {
+                });
+        requestQueue.add(request);
+    }
+
+    public void pushRequestFetchFriends(String userID) {
+        friendsRepository.pushRequestFetchAllFriends(userID);
+    }
+
 
     public interface ApiManagerDataCallback {
         void onLatestPostsDataReady(ArrayList<Post> latestPosts);
 
         void onPostDetailsReady(@NonNull Post post, @Nullable ArrayList<Comment> comments, @Nullable ArrayList<Post> similarPosts);
 
-        void onPostSearchReady(ArrayList<Post> data);
+        void onPostSearchReady(@NonNull ArrayList<Post> data);
 
-        void onAutocompleteSuggestionsReady(ArrayList<Post> data);
+        void onAutocompleteSuggestionsReady(@NonNull ArrayList<Post> data);
 
-        void onSavedPostsReady(ArrayList<Post> savedPosts);
+        void onSavedPostsReady(@NonNull ArrayList<Post> savedPosts);
+
+        void onMyPostsReady(@NonNull ArrayList<Post> myPosts);
+
 
     }
 
@@ -227,4 +249,6 @@ public class ApiManager {
 
         void onThirdPartyAccountCreated(JSONObject responseCode);
     }
+
+
 }

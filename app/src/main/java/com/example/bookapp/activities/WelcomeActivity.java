@@ -8,8 +8,6 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.bookapp.ApiManager;
-import com.example.bookapp.MainActivity;
 import com.example.bookapp.R;
 import com.example.bookapp.fragments.AuthenticationOptionsFragment;
 import com.example.bookapp.fragments.LoginFragment;
@@ -153,7 +151,7 @@ public class WelcomeActivity extends AppCompatActivity implements LoginFragment.
                 User.Builder builder = new User.Builder();
                 if (googleSignInAccount != null) {
                     buildUserFromGoogleAccount(builder);
-                    apiManager.createThirdPartyUserAccount(builder.createUser());
+                    apiManager.createThirdPartyUserAccount(builder.create());
                 }
             }
 

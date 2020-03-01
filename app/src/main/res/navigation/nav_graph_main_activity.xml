@@ -29,11 +29,7 @@
         android:id="@+id/expandedItemFragment"
         android:name="com.example.bookapp.fragments.ExpandedItemFragment"
         android:label="fragment_expanded_item"
-        tools:layout="@layout/fragment_expanded_item" >
-        <argument
-            android:name="post"
-            app:argType="com.example.bookapp.models.Post" />
-    </fragment>
+        tools:layout="@layout/fragment_expanded_item" />
     <fragment
         android:id="@+id/favoriteItems"
         android:name="com.example.bookapp.fragments.FavoritePostsFragment"
@@ -42,6 +38,9 @@
         <action
             android:id="@+id/action_favoriteItems_to_homeFragment"
             app:destination="@id/homeFragment" />
+        <action
+            android:id="@+id/action_favoriteItems_to_fragmentMyPosts"
+            app:destination="@id/fragmentMyPosts" />
     </fragment>
     <fragment
         android:id="@+id/fragmentAddPost"
@@ -57,4 +56,17 @@
             app:destination="@id/favoriteItems" />
     </fragment>
     <action android:id="@+id/action_global_searchFragment" app:destination="@id/searchFragment" />
+    <fragment
+        android:id="@+id/fragmentMyPosts"
+        android:name="com.example.bookapp.fragments.FragmentMyPosts"
+        android:label="FragmentMyPosts" >
+        <action
+            android:id="@+id/action_fragmentMyPosts_to_friendsFragment"
+            app:destination="@id/friendsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/friendsFragment"
+        android:name="com.example.bookapp.fragments.FriendsFragment"
+        android:label="fragment_friends"
+        tools:layout="@layout/fragment_friends" />
 </navigation>
