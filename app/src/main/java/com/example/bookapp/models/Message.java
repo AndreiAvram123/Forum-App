@@ -2,12 +2,12 @@ package com.example.bookapp.models;
 
 public class Message {
     private String messageContent;
-    private String messageDate;
+    private long messageDate;
     private String senderID;
 
-    public Message(String messageContent, String messageDate, String senderID) {
+    public Message(String messageContent, long messageDateUnix, String senderID) {
         this.messageContent = messageContent;
-        this.messageDate = messageDate;
+        this.messageDate = messageDateUnix;
         this.senderID = senderID;
     }
 
@@ -15,7 +15,7 @@ public class Message {
         return messageContent;
     }
 
-    public String getMessageDate() {
+    public long getMessageDate() {
         return messageDate;
     }
 

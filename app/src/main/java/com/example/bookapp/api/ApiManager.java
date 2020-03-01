@@ -1,4 +1,4 @@
-package com.example.bookapp.activities;
+package com.example.bookapp.api;
 
 import android.content.Context;
 import android.util.Base64;
@@ -12,7 +12,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.bookapp.api.FriendsRepository;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.ApiConstants;
 import com.example.bookapp.models.NonUploadedPost;
@@ -39,6 +38,7 @@ public class ApiManager {
     private static ApiManager instance;
     private static final String TAG = ApiManager.class.getSimpleName();
     private FriendsRepository friendsRepository;
+    private MessageRepository messageRepository;
 
     public static synchronized ApiManager getInstance(@NonNull Context context) {
 
@@ -52,22 +52,23 @@ public class ApiManager {
     private ApiManager(@NonNull Context context) {
         requestQueue = Volley.newRequestQueue(context);
         friendsRepository = FriendsRepository.getInstance(requestQueue);
+        messageRepository = MessageRepository.getInstance(requestQueue);
     }
 
-    void setApiManagerDataCallback(@NonNull ApiManagerDataCallback callback) {
+    public void setPostDataCallback(@NonNull ApiManagerDataCallback callback) {
         this.apiManagerDataCallback = callback;
     }
 
-    void setApiManagerAuthenticationCallback(@NonNull ApiManagerAuthenticationCallback callback) {
+    public void setApiManagerAuthenticationCallback(@NonNull ApiManagerAuthenticationCallback callback) {
         this.apiManagerAuthenticationCallback = callback;
     }
 
-    void setApiMangerFriendsDataCallback(@NonNull FriendsRepository.ApiManagerFriendsDataCallback friendsDataCallback) {
+    public void setFriendsDataCallback(@NonNull FriendsRepository.ApiManagerFriendsDataCallback friendsDataCallback) {
         this.friendsRepository.setApiManagerFriendsDataCallback(friendsDataCallback);
     }
 
 
-    void authenticateWithThirdPartyAccount(String email) {
+    public void authenticateWithThirdPartyAccount(String email) {
         String formattedURL = String.format(ApiConstants.URL_AUTHENTICATE_ACCOUNT_ID, email);
         StringRequest stringRequest = new StringRequest(Request.Method.GET,
                 formattedURL, (response) -> apiManagerAuthenticationCallback.onAuthenticationResponse(response)
@@ -75,7 +76,7 @@ public class ApiManager {
         requestQueue.add(stringRequest);
     }
 
-    void pushRequestLatestPosts() {
+    public void pushRequestLatestPosts() {
         StringRequest randomRecipesRequest = new StringRequest(Request.Method.GET, URL_LATEST_POSTS,
                 (response) -> {
                     ArrayList<Post> latestPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
@@ -87,7 +88,7 @@ public class ApiManager {
     }
 
 
-    void pushRequestGetPostDetails(int postID) {
+    public void pushRequestGetPostDetails(int postID) {
 
         StringRequest postDetailsRequest = new StringRequest(Request.Method.GET, String.format(URL_POST_DETAILS, postID), (response) -> {
             Post.PostBuilder postBuilder = new Post.PostBuilder();
@@ -108,7 +109,7 @@ public class ApiManager {
     }
 
 
-    void pushRequestAutocomplete(String query) {
+    public void pushRequestAutocomplete(String query) {
         String formattedAutocompleteURl = String.format(URL_POST_AUTOCOMPLETE, query);
         //push request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedAutocompleteURl, (response) ->
@@ -121,7 +122,7 @@ public class ApiManager {
         requestQueue.add(stringRequest);
     }
 
-    void uploadNewComment(Comment comment, String userID) {
+    public void uploadNewComment(Comment comment, String userID) {
         JSONObject postBody = new JSONObject();
         try {
             postBody.put("commentUserID", userID);
@@ -141,7 +142,7 @@ public class ApiManager {
         requestQueue.add(uploadCommentRequest);
     }
 
-    void uploadPost(NonUploadedPost post, String userID) {
+    public void uploadPost(NonUploadedPost post, String userID) {
 
         String encodedString = Base64.encodeToString(post.getImageBytes(), 0);
 
@@ -164,7 +165,7 @@ public class ApiManager {
         requestQueue.add(uploadCommentRequest);
     }
 
-    void createThirdPartyUserAccount(User user) {
+    public void createThirdPartyUserAccount(User user) {
         JSONObject postBody = new JSONObject();
         try {
             postBody.put("accountID", user.getUserID());
@@ -184,7 +185,7 @@ public class ApiManager {
     }
 
 
-    void pushRequestGetFavoritePosts(String userID) {
+    public void pushRequestGetFavoritePosts(String userID) {
 
         String formattedURLSavedPosts = String.format(ApiConstants.URL_SAVED_POSTS, userID);
         //push request
@@ -198,7 +199,7 @@ public class ApiManager {
         requestQueue.add(stringRequest);
     }
 
-    void pushRequestAddPostToFavorites(int postID, String userID) {
+    public void pushRequestAddPostToFavorites(int postID, String userID) {
         String formattedURLSavedPosts = String.format(ApiConstants.URL_ADD_POST_TO_FAVORITES, postID, userID);
         //push request
         StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
@@ -210,7 +211,7 @@ public class ApiManager {
         requestQueue.add(request);
     }
 
-    void pushRequestMyPosts(String userID) {
+    public void pushRequestMyPosts(String userID) {
         String formattedURLSavedPosts = String.format(ApiConstants.URL_MY_POSTS, userID);
         //push request
         StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
@@ -225,6 +226,14 @@ public class ApiManager {
 
     public void pushRequestFetchFriends(String userID) {
         friendsRepository.pushRequestFetchAllFriends(userID);
+    }
+
+    public void pushRequestGetMessagesWithUser(String currentUserID,String user2ID,int offset) {
+          messageRepository.pushRequestFetchMessagesWithUser( currentUserID, user2ID, offset);
+    }
+
+    public void setMessagesDataCallback(MessageRepository.MessageRepositoryCallback callback) {
+        messageRepository.setCallback(callback);
     }
 
 
@@ -249,6 +258,7 @@ public class ApiManager {
 
         void onThirdPartyAccountCreated(JSONObject responseCode);
     }
+
 
 
 }

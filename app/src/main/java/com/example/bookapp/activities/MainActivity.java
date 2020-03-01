@@ -5,24 +5,34 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDirections;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.example.bookapp.R;
+import com.example.bookapp.api.ApiManager;
+import com.example.bookapp.api.MessageRepository;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
+import com.example.bookapp.fragments.FriendsFragmentDirections;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.MainActivityInterface;
+import com.example.bookapp.interfaces.MessageInterface;
 import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.Comment;
+import com.example.bookapp.models.Message;
 import com.example.bookapp.models.NonUploadedPost;
 import com.example.bookapp.models.Post;
 import com.example.bookapp.models.User;
-import com.example.bookapp.models.ViewModelFriends;
-import com.example.bookapp.models.ViewModelPost;
+import com.example.bookapp.viewModels.ViewModelFriends;
+import com.example.bookapp.viewModels.ViewModelMessages;
+import com.example.bookapp.viewModels.ViewModelPost;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
@@ -41,13 +51,16 @@ import java.util.Set;
 public class MainActivity extends AppCompatActivity implements
         MainActivityInterface,
         BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface
-        , ErrorFragment.ErrorFragmentInterface {
+        , ErrorFragment.ErrorFragmentInterface, MessageInterface {
 
     private SharedPreferences sharedPreferences;
     private ApiManager apiManager;
     private User currentUser;
     private ViewModelPost viewModelPost;
     private ViewModelFriends viewModelFriends;
+    private ViewModelMessages viewModelMessages;
+    private RequestQueue requestQueue;
+    private MessageRepository messageRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +81,10 @@ public class MainActivity extends AppCompatActivity implements
 
     private void configureApiManager() {
         apiManager = ApiManager.getInstance(this);
-        apiManager.setApiManagerDataCallback(viewModelPost);
-        apiManager.setApiMangerFriendsDataCallback(viewModelFriends);
+        apiManager.setPostDataCallback(viewModelPost);
+        apiManager.setFriendsDataCallback(viewModelFriends);
+        messageRepository = MessageRepository.getInstance(requestQueue);
+        messageRepository.setCallback(viewModelMessages);
         pushDefaultRequests();
     }
 
@@ -111,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     private void configureDefaultVariables() {
+        requestQueue = Volley.newRequestQueue(this);
         configureViewModels();
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         configureNavigationView();
@@ -120,6 +136,7 @@ public class MainActivity extends AppCompatActivity implements
     private void configureViewModels() {
         viewModelPost = new ViewModelProvider(this).get(ViewModelPost.class);
         viewModelFriends = new ViewModelProvider(this).get(ViewModelFriends.class);
+        viewModelMessages = new ViewModelProvider(this).get(ViewModelMessages.class);
 
         viewModelPost.getCurrentPost().observe(this, post -> {
             if (viewModelPost.getSavedPosts().getValue().contains(post)) {
@@ -233,12 +250,13 @@ public class MainActivity extends AppCompatActivity implements
         apiManager.uploadPost(nonUploadedPost, currentUser.getUserID());
     }
 
-    private void updateUserFirebaseDocument() {
-        //todo
-        //modif
-
-
+    @Override
+    public void startChat(String userID) {
+        messageRepository.pushRequestFetchMessagesWithUser(currentUser.getUserID(), userID, 0);
+        NavDirections action = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(currentUser.getUserID(),userID);
+        Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
     }
+
 
     /**
      * Use this method in order to display a bottom
@@ -302,4 +320,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
+    @Override
+    public void sendMessage(@NonNull Message message,@NonNull String user2ID) {
+        messageRepository.sendMessage(message,user2ID);
+    }
 }

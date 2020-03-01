@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bookapp.Adapters.RecyclerViewAdapterPosts;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.LayoutFragmentPostsDataBinding;
-import com.example.bookapp.models.ViewModelPost;
+import com.example.bookapp.viewModels.ViewModelPost;
 
 public class FavoritePostsFragment extends Fragment {
 

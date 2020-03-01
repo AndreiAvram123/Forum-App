@@ -1,12 +1,10 @@
-package com.example.bookapp.models;
-
-import android.util.Log;
+package com.example.bookapp.viewModels;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.bookapp.activities.ApiManager;
 import com.example.bookapp.api.FriendsRepository;
+import com.example.bookapp.models.Friend;
 
 import java.util.ArrayList;
 

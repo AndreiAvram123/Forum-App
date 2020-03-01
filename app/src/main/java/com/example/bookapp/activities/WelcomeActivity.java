@@ -9,6 +9,7 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.bookapp.R;
+import com.example.bookapp.api.ApiManager;
 import com.example.bookapp.fragments.AuthenticationOptionsFragment;
 import com.example.bookapp.fragments.LoginFragment;
 import com.example.bookapp.fragments.SignUpFragment;

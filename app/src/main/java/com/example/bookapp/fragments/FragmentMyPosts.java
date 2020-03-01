@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.bookapp.Adapters.RecyclerViewAdapterPosts;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.FragmentMyPostsBinding;
-import com.example.bookapp.models.ViewModelPost;
+import com.example.bookapp.viewModels.ViewModelPost;
 
 public class FragmentMyPosts extends Fragment {
 

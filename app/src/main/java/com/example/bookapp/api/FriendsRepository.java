@@ -5,10 +5,9 @@ import androidx.annotation.NonNull;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
-import com.example.bookapp.FriendsDataConverter;
+import com.example.bookapp.utilities.FriendsDataConverter;
 import com.example.bookapp.models.ApiConstants;
 import com.example.bookapp.models.Friend;
-import com.example.bookapp.models.User;
 
 import java.util.ArrayList;
 

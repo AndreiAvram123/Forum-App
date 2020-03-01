@@ -21,7 +21,7 @@ import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.CommentBuilder;
 import com.example.bookapp.models.Post;
-import com.example.bookapp.models.ViewModelPost;
+import com.example.bookapp.viewModels.ViewModelPost;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;

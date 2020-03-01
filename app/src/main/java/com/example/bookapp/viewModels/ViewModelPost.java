@@ -1,4 +1,4 @@
-package com.example.bookapp.models;
+package com.example.bookapp.viewModels;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -6,7 +6,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.bookapp.activities.ApiManager;
+import com.example.bookapp.api.ApiManager;
+import com.example.bookapp.models.Comment;
+import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 

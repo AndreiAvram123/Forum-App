@@ -1,7 +1,6 @@
 package com.example.bookapp.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,13 +14,12 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookapp.Adapters.SuggestionsAdapter;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.FragmentSearchBinding;
 import com.example.bookapp.models.Post;
-import com.example.bookapp.models.ViewModelPost;
+import com.example.bookapp.viewModels.ViewModelPost;
 
 import java.util.ArrayList;
 

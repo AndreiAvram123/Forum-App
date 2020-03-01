@@ -1,13 +1,10 @@
-package com.example.bookapp;
+package com.example.bookapp.utilities;
 
 import androidx.annotation.NonNull;
 
 import com.example.bookapp.activities.AppUtilities;
 import com.example.bookapp.models.Friend;
 import com.example.bookapp.models.Message;
-import com.example.bookapp.models.User;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,8 +38,7 @@ public class FriendsDataConverter {
     }
 
     private static Message convertJsonObjectToMessage(@NonNull JSONObject jsonObject) throws JSONException {
-        String messageDate = AppUtilities.convertUnixTimeToStringDate(Long.parseLong(jsonObject.getString("messageDate")));
-        Message message = new Message(jsonObject.getString("messageContent"), messageDate,
+        Message message = new Message(jsonObject.getString("messageContent"), Long.parseLong(jsonObject.getString("messageDate")),
                 jsonObject.getString("senderId"));
         return message;
     }

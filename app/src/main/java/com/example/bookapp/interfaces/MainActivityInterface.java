@@ -16,4 +16,7 @@ public interface MainActivityInterface {
     void uploadComment(Comment comment);
 
     void uploadPost(NonUploadedPost nonUploadedPost);
+
+    void startChat(String userID);
+
 }

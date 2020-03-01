@@ -68,5 +68,20 @@
         android:id="@+id/friendsFragment"
         android:name="com.example.bookapp.fragments.FriendsFragment"
         android:label="fragment_friends"
-        tools:layout="@layout/fragment_friends" />
+        tools:layout="@layout/fragment_friends" >
+        <action
+            android:id="@+id/action_friendsFragment_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/messagesFragment"
+        android:name="com.example.bookapp.fragments.MessagesFragment"
+        android:label="MessagesFragment" >
+        <argument
+            android:name="currentUserID"
+            app:argType="string" />
+        <argument
+            android:name="user2ID"
+            app:argType="string" />
+    </fragment>
 </navigation>
