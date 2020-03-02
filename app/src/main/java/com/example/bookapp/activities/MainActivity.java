@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements
         apiManager = ApiManager.getInstance(this);
         apiManager.setPostDataCallback(viewModelPost);
         apiManager.setFriendsDataCallback(viewModelFriends);
-        messageRepository = MessageRepository.getInstance(requestQueue);
+        messageRepository = MessageRepository.getInstance(requestQueue, currentUser.getUserID());
         messageRepository.setCallback(viewModelMessages);
         pushDefaultRequests();
     }
@@ -251,7 +251,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void startChat(String userID) {
-        messageRepository.pushRequestFetchMessagesWithUser(currentUser.getUserID(), userID, 0);
+        messageRepository.pushRequestFetchOldMessages(userID, 0);
         NavDirections action = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(currentUser.getUserID(),userID);
         Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
     }
@@ -318,9 +318,19 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        messageRepository.shutdownAsyncTasks();
+    }
 
     @Override
     public void sendMessage(@NonNull String messageContent, @NonNull String user2ID, String currentUserID) {
         messageRepository.sendMessage(messageContent, user2ID, currentUserID);
+    }
+
+    @Override
+    public void fetchMoreMessages(@NonNull String user2ID, int offset) {
+        messageRepository.pushRequestFetchOldMessages(user2ID, offset);
     }
 }

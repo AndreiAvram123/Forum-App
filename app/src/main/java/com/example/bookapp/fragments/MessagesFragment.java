@@ -42,12 +42,10 @@ public class MessagesFragment extends Fragment {
     }
 
     private void configureViews() {
-        configureRecyclerView();
         binding.sendMessageButton.setOnClickListener(view -> {
             if (binding.messageTextArea.getText() != null) {
-                String messageContent = binding.messageTextArea.getText().toString();
-                if (!messageContent.equals("")) {
-
+                String messageContent = binding.messageTextArea.getText().toString().trim();
+                if (!messageContent.trim().equals("")) {
                     binding.messageTextArea.getText().clear();
                     messageInterface.sendMessage(messageContent, user2ID, currentUserID);
                 }
@@ -58,23 +56,25 @@ public class MessagesFragment extends Fragment {
 
     private void attachObserver() {
         viewModelMessages = new ViewModelProvider(requireActivity()).get(ViewModelMessages.class);
-        viewModelMessages.getLastMessages().observe(getViewLifecycleOwner(), lastMessages -> {
-            if (lastMessages != null) {
-                adapterMessages.addData(lastMessages);
-                binding.recyclerViewMessages.smoothScrollToPosition(adapterMessages.getItemCount() - 1);
+        viewModelMessages.getLastMessages().observe(getViewLifecycleOwner(), oldMessages -> {
+            if (oldMessages != null) {
+                adapterMessages.addOldMessages(oldMessages);
             }
+            //clean the observer
         });
         viewModelMessages.getLastFetchedMessage().observe(getViewLifecycleOwner(), lastFetchedMessage -> {
             adapterMessages.addMessage(lastFetchedMessage);
-            binding.recyclerViewMessages.smoothScrollToPosition(adapterMessages.getItemCount() - 1);
         });
+
     }
 
 
     private void initializeAdapter() {
         if (adapterMessages == null) {
-            adapterMessages = new AdapterMessages(viewModelMessages.getLastMessages().getValue());
+            adapterMessages = new AdapterMessages(binding.recyclerViewMessages, user2ID);
+            adapterMessages.setCallback((MessageInterface) requireActivity());
         }
+        configureRecyclerView();
     }
 
     private void configureRecyclerView() {

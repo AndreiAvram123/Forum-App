@@ -25,6 +25,10 @@ public class Message {
         return senderID;
     }
 
+    public String getMessageID() {
+        return messageID;
+    }
+
     public static class Builder {
 
         private String messageID;

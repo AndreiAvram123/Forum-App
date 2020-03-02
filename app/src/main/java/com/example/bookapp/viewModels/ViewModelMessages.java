@@ -1,6 +1,7 @@
 package com.example.bookapp.viewModels;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 public class ViewModelMessages extends ViewModel implements MessageRepository.MessageRepositoryCallback {
     private MutableLiveData<ArrayList<Message>> lastMessages = new MutableLiveData<>();
 
+
     public MutableLiveData<ArrayList<Message>> getLastMessages() {
         return lastMessages;
     }
@@ -21,10 +23,14 @@ public class ViewModelMessages extends ViewModel implements MessageRepository.Me
         return currentFetchedMessage;
     }
 
+
+
     @Override
-    public void onLastMessagesReady(@NonNull ArrayList<Message> lastMessages) {
+    public void onLastMessagesFetched(@NonNull ArrayList<Message> lastMessages) {
         this.lastMessages.setValue(lastMessages);
     }
+
+
 
     @Override
     public void onNewMessagesReady(@NonNull ArrayList<Message> messages) {
@@ -39,7 +45,7 @@ public class ViewModelMessages extends ViewModel implements MessageRepository.Me
     }
 
     @Override
-    public void onNewMessageReady(@NonNull Message message) {
+    public void onSendMessageReady(@NonNull Message message) {
      currentFetchedMessage.setValue(message);
     }
 }

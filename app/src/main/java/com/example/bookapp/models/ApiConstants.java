@@ -13,9 +13,9 @@ public class ApiConstants {
     public static final String URL_CREATE_THIRD_PARTY_ACCOUNT = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?createThirdPartyAccount";
     public static final String URL_MY_POSTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?myPosts&userID=%s";
     public static final String URL_MY_FRIENDS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?friends&lastMessage&userID=%s";
-    public static final String URL_LAST_MESSAGES = "http://sgb967.poseidon.salford.ac.uk/cms/ChatController.php?requestName=fetchOldMessages&currentUserId=%s&receiverId=%s&offset=%s";
+    public static final String URL_OLD_MESSAGES = "http://sgb967.poseidon.salford.ac.uk/cms/ChatController.php?requestName=fetchOldMessages&currentUserId=%s&receiverId=%s&offset=%s";
     public static final String URL_SEND_MESSAGE = "http://sgb967.poseidon.salford.ac.uk/cms/ChatController.php?requestName=sendMessage";
-    public static final String URL_FETCH_NEW_MESSAGE = "http://sgb967.poseidon.salford.ac.uk/cms/ChatController.php?requestName=fetchNewMessages&receiverId=%s&lastMessageId=%s&currentUserId=%s";
+    public static final String URL_FETCH_NEW_MESSAGE = "http://sgb967.poseidon.salford.ac.uk/cms/ChatController.php?requestName=fetchNewMessages&currentUserId=%s&receiverId=%s&lastMessageId=%s";
 
 
     public static final int RESPONSE_CODE_ACCOUNT_EXISTS = 1;

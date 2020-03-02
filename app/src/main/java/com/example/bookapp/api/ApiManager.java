@@ -12,8 +12,8 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.ApiConstants;
+import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.NonUploadedPost;
 import com.example.bookapp.models.Post;
 import com.example.bookapp.models.PostConverter;
@@ -52,7 +52,6 @@ public class ApiManager {
     private ApiManager(@NonNull Context context) {
         requestQueue = Volley.newRequestQueue(context);
         friendsRepository = FriendsRepository.getInstance(requestQueue);
-        messageRepository = MessageRepository.getInstance(requestQueue);
     }
 
     public void setPostDataCallback(@NonNull ApiManagerDataCallback callback) {
@@ -226,14 +225,6 @@ public class ApiManager {
 
     public void pushRequestFetchFriends(String userID) {
         friendsRepository.pushRequestFetchAllFriends(userID);
-    }
-
-    public void pushRequestGetMessagesWithUser(String currentUserID,String user2ID,int offset) {
-          messageRepository.pushRequestFetchMessagesWithUser( currentUserID, user2ID, offset);
-    }
-
-    public void setMessagesDataCallback(MessageRepository.MessageRepositoryCallback callback) {
-        messageRepository.setCallback(callback);
     }
 
 

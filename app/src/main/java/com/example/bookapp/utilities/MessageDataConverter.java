@@ -14,9 +14,23 @@ public class MessageDataConverter {
 
     @NonNull
     public static ArrayList<Message> convertJsonArrayToMessages(String response) {
+        JSONArray jsonArray = null;
+        try {
+            jsonArray = new JSONArray(response);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (jsonArray == null) {
+            return new ArrayList<>();
+        } else {
+            return convertJsonArrayToMessages(jsonArray);
+        }
+    }
+
+    @NonNull
+    public static ArrayList<Message> convertJsonArrayToMessages(@NonNull JSONArray jsonArray) {
         ArrayList<Message> dataToReturn = new ArrayList<>();
         try {
-            JSONArray jsonArray = new JSONArray(response);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject messageJson = jsonArray.getJSONObject(i);
                 dataToReturn.add(convertJsonObjectToMessage(messageJson));
@@ -25,7 +39,6 @@ public class MessageDataConverter {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         return dataToReturn;
     }
 

@@ -16,41 +16,71 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static com.example.bookapp.models.ApiConstants.URL_SEND_MESSAGE;
 
-public class MessageRepository {
+public class MessageRepository extends Repository {
 
     private static MessageRepository instance;
-    private RequestQueue requestQueue;
+
     private MessageRepositoryCallback callback;
-    private int messageOffset = 0;
     private String lastMessageID;
     private static final String TAG = Message.class.getSimpleName();
+    private Timer timer;
+    private TimerTask pushRequestNewMessages;
+    private boolean shouldOtherFunctionsWait = false;
+    private boolean lastMessagesFetched = false;
 
-    public static MessageRepository getInstance(RequestQueue requestQueue) {
+    public static MessageRepository getInstance(RequestQueue requestQueue, String currentUserID) {
         if (instance == null) {
-            instance = new MessageRepository(requestQueue);
+            instance = new MessageRepository(requestQueue, currentUserID);
         }
         return instance;
     }
 
-    private MessageRepository(RequestQueue requestQueue) {
-        this.requestQueue = requestQueue;
+    private MessageRepository(RequestQueue requestQueue, String currentUserID) {
+        super(requestQueue, currentUserID);
     }
+
 
     public void setCallback(MessageRepositoryCallback messageRepositoryCallback) {
         this.callback = messageRepositoryCallback;
     }
 
-    public void pushRequestFetchMessagesWithUser(String currentUserID, String user2ID, int offset) {
-        String formattedURLSavedPosts = String.format(ApiConstants.URL_LAST_MESSAGES, currentUserID, user2ID, this.messageOffset);
+    private void initializeAsyncFetchFunctions(String user2ID) {
+        timer = new Timer();
+        pushRequestNewMessages = new TimerTask() {
+            @Override
+            public void run() {
+                if (!shouldOtherFunctionsWait) {
+                    pushRequestFetchNewMessage(currentUserID, user2ID);
+                }
+            }
+        };
+
+        int newMessageCheckInterval = 1500;
+        timer.scheduleAtFixedRate(pushRequestNewMessages, 0, newMessageCheckInterval);
+    }
+
+    /**********************************************Push request functions ********************************/
+
+    public void pushRequestFetchOldMessages(String user2ID, int offset) {
+        String formattedURlOldMessages = String.format(ApiConstants.URL_OLD_MESSAGES, this.currentUserID, user2ID, offset);
         //push request
-        StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
+        StringRequest request = new StringRequest(Request.Method.GET, formattedURlOldMessages, (response) ->
         {
             ArrayList<Message> lastMessages = MessageDataConverter.convertJsonArrayToMessages(response);
-            if (callback != null) {
-                callback.onLastMessagesReady(lastMessages);
+            if (!lastMessages.isEmpty()) {
+                this.lastMessageID = lastMessages.get(lastMessages.size() - 1).getMessageID();
+                Log.d("Debug", lastMessageID);
+                if (timer == null) {
+                    initializeAsyncFetchFunctions(user2ID);
+                }
+                if (callback != null) {
+                    callback.onLastMessagesFetched(lastMessages);
+                }
             }
         },
                 Throwable::printStackTrace);
@@ -58,7 +88,30 @@ public class MessageRepository {
 
     }
 
+    private void pushRequestFetchNewMessage(String currentUserID, String user2ID) {
+        String formattedURLNewMessages = String.format(ApiConstants.URL_FETCH_NEW_MESSAGE, currentUserID, user2ID, lastMessageID);
+        //push request
+        StringRequest request = new StringRequest(Request.Method.GET, formattedURLNewMessages, (response) ->
+        {
+            try {
+                JSONObject jsonObject = new JSONObject(response);
+                if (jsonObject.getInt("responseCode") == ApiConstants.REQUEST_COMPLETED_NO_ERROR) {
+                    ArrayList<Message> newMessages = MessageDataConverter.convertJsonArrayToMessages(jsonObject.getJSONArray("results"));
+                    lastMessageID = newMessages.get(newMessages.size() - 1).getMessageID();
+                    if (!newMessages.isEmpty() && callback != null) {
+                        callback.onNewMessagesReady(newMessages);
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        },
+                Throwable::printStackTrace);
+        requestQueue.add(request);
+    }
+
     public void sendMessage(String messageContent, String user2ID, String currentUserID) {
+        shouldOtherFunctionsWait = true;
         JSONObject postBody = new JSONObject();
         try {
             postBody.put("messageContent", messageContent);
@@ -68,10 +121,10 @@ public class MessageRepository {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.d(TAG, "Pushing send message request with" + postBody.toString());
 
         JsonObjectRequest sendMessageRequest = new JsonObjectRequest(Request.Method.POST, URL_SEND_MESSAGE, postBody,
                 response -> {
+                    shouldOtherFunctionsWait = false;
                     //callback when the message has reached the server
                     try {
                         if (response.getInt("responseCode") == ApiConstants.REQUEST_COMPLETED_NO_ERROR) {
@@ -80,8 +133,9 @@ public class MessageRepository {
                             builder.setMessageID(response.getString("lastMessageID"));
                             builder.setSenderID(currentUserID);
                             builder.setMessageDate(response.getLong("lastMessageDate"));
-                            callback.onNewMessageReady(builder.createMessage());
-                            Log.d("Debug", "Message reached the server " + builder.createMessage());
+                            Message message = builder.createMessage();
+                            callback.onSendMessageReady(message);
+                            lastMessageID = message.getMessageID();
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -89,17 +143,22 @@ public class MessageRepository {
 
                 },
                 error -> {
-
+                    shouldOtherFunctionsWait = false;
                 });
 
         requestQueue.add(sendMessageRequest);
     }
 
+    public void shutdownAsyncTasks() {
+        pushRequestNewMessages.cancel();
+    }
+
     public interface MessageRepositoryCallback {
-        void onLastMessagesReady(@NonNull ArrayList<Message> lastMessages);
+        void onLastMessagesFetched(@NonNull ArrayList<Message> oldMessages);
+
 
         void onNewMessagesReady(@NonNull ArrayList<Message> messages);
 
-        void onNewMessageReady(@NonNull Message message);
+        void onSendMessageReady(@NonNull Message message);
     }
 }
