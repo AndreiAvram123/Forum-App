@@ -13,8 +13,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.example.bookapp.AppUtilities;
 import com.example.bookapp.R;
+import com.example.bookapp.activities.AppUtilities;
 
 public class SignUpFragment extends AuthenticationFragment {
 

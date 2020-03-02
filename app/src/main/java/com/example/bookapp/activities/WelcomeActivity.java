@@ -1,53 +1,54 @@
 package com.example.bookapp.activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
-import com.example.bookapp.MainActivity;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.example.bookapp.R;
 import com.example.bookapp.fragments.AuthenticationOptionsFragment;
 import com.example.bookapp.fragments.LoginFragment;
 import com.example.bookapp.fragments.SignUpFragment;
+import com.example.bookapp.models.ApiConstants;
 import com.example.bookapp.models.AuthenticationService;
-import com.facebook.AccessToken;
+import com.example.bookapp.models.User;
 import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.GoogleAuthProvider;
 
-import java.util.Arrays;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class WelcomeActivity extends AppCompatActivity implements LoginFragment.LoginFragmentCallback, SignUpFragment.SignUpFragmentCallback,
-        AuthenticationOptionsFragment.AuthenticationOptionsCallback {
+        AuthenticationOptionsFragment.AuthenticationOptionsCallback, ApiManager.ApiManagerAuthenticationCallback {
 
     private static final int request_code_google_sign_in = 1;
     private static final String TAG = WelcomeActivity.class.getSimpleName();
-    private FirebaseAuth mFirebaseAuth = FirebaseAuth.getInstance();
     private CallbackManager mCallbackManager = CallbackManager.Factory.create();
+    private GoogleSignInAccount googleSignInAccount = null;
+
+    private ApiManager apiManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_activity_welcome);
         displayAuthenticationOptionsFragment();
+        initializeApiManager();
+        setFlatWelcomeActivityShown();
+    }
+
+    private void setFlatWelcomeActivityShown() {
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putBoolean(getString(R.string.welcome_activity_shown_key), true);
+        editor.apply();
     }
 
     private void displayAuthenticationOptionsFragment() {
@@ -76,8 +77,8 @@ public class WelcomeActivity extends AppCompatActivity implements LoginFragment.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                firebaseAuthWithGoogle(account);
+                googleSignInAccount = task.getResult(ApiException.class);
+                apiManager.authenticateWithThirdPartyAccount(googleSignInAccount.getEmail());
             } catch (ApiException e) {
                 // Google Sign In failed, update UI appropriately
                 // ...
@@ -87,25 +88,14 @@ public class WelcomeActivity extends AppCompatActivity implements LoginFragment.
         }
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
-        mFirebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        startMainActivity();
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Snackbar.make(findViewById(R.id.container_main_activity), "Authentication Failed for firebase.", Snackbar.LENGTH_SHORT).show();
-                    }
-
-                    // ...
-                });
+    private void initializeApiManager() {
+        apiManager = ApiManager.getInstance(this);
+        apiManager.setApiManagerAuthenticationCallback(this);
     }
+
 
     private void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
-     //   intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
 
@@ -115,9 +105,7 @@ public class WelcomeActivity extends AppCompatActivity implements LoginFragment.
     @Override
     protected void onStart() {
         super.onStart();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            startMainActivity();
-        }
+
     }
 
     @Override
@@ -131,51 +119,6 @@ public class WelcomeActivity extends AppCompatActivity implements LoginFragment.
     }
 
 
-    @Override
-    public void prepareLoginWithFacebook(LoginButton loginButton) {
-        loginButton.setReadPermissions(Arrays.asList("email","public_profile"));
-        loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Log.d(TAG, "facebook:onSuccess:" + loginResult);
-                handleFacebookAccessToken(loginResult.getAccessToken());
-            }
-
-            @Override
-            public void onCancel() {
-                Log.d(TAG, "facebook:onCancel");
-                // ...
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-                Log.d(TAG, "facebook:onError", error);
-                // ...
-            }
-        });
-
-    }
-
-    private void handleFacebookAccessToken(AccessToken token) {
-        Log.d(TAG, "handleFacebookAccessToken:" + token);
-
-        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mFirebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, task -> {
-                    if (task.isSuccessful()) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Log.d(TAG, "signInWithCredential:success");
-                        startMainActivity();
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        Log.w(TAG, "signInWithCredential:failure", task.getException());
-                        Toast.makeText(WelcomeActivity.this, "Authentication failed.",
-                                Toast.LENGTH_SHORT).show();
-                    }
-
-                    // ...
-                });
-    }
 
 
     @Override
@@ -190,6 +133,59 @@ public class WelcomeActivity extends AppCompatActivity implements LoginFragment.
 
     @Override
     public void loginAnonymously() {
+        startMainActivity();
+    }
+
+    @Override
+    public void onAuthenticationResponse(String response) {
+        Log.d(TAG, response);
+        int responseCode;
+        JSONObject jsonObject;
+        try {
+            jsonObject = new JSONObject(response);
+            responseCode = jsonObject.getInt("responseCode");
+            if (responseCode == ApiConstants.RESPONSE_CODE_ACCOUNT_EXISTS) {
+                saveUserUserInMemory(jsonObject.getString("userID"), jsonObject.getString("username"));
+            }
+            if (responseCode == ApiConstants.RESPONSE_CODE_ACCOUNT_UNEXISTENT) {
+                User.Builder builder = new User.Builder();
+                if (googleSignInAccount != null) {
+                    buildUserFromGoogleAccount(builder);
+                    apiManager.createThirdPartyUserAccount(builder.create());
+                }
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void onThirdPartyAccountCreated(JSONObject responseJson) {
+        try {
+            if (responseJson.getInt("responseCode") == ApiConstants.RESPONSE_CODE_ACCOUNT_CREATED) {
+                Log.d(TAG, responseJson.toString());
+                saveUserUserInMemory(responseJson.getString("userID"), responseJson.getString("username"));
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void buildUserFromGoogleAccount(User.Builder builder) {
+        builder.setUserID(googleSignInAccount.getId());
+        builder.setUsername(googleSignInAccount.getDisplayName());
+        builder.setEmail(googleSignInAccount.getEmail());
+        builder.setImageURL(googleSignInAccount.getPhotoUrl().toString());
+    }
+
+    private void saveUserUserInMemory(String userID, String username) {
+        SharedPreferences.Editor editor = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE).edit();
+        editor.putString(getString(R.string.key_username), username);
+        editor.putString(getString(R.string.key_user_id), userID);
+        editor.apply();
         startMainActivity();
     }
 }

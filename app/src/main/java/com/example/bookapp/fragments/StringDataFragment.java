@@ -1,9 +1,9 @@
 package com.example.bookapp.fragments;
 
 
-
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.bookapp.Adapters.AdapterStrings;
 import com.example.bookapp.R;
@@ -21,22 +22,17 @@ import java.util.ArrayList;
 
 
 public class StringDataFragment extends Fragment {
-    static final String KEY_SUGGESTIONS_ARRAY ="KEY_SUGGESTIONS_ARRAY";
-ArrayList<String> data;
-RecyclerView recyclerView;
+    static final String KEY_SUGGESTIONS_ARRAY = "KEY_SUGGESTIONS_ARRAY";
+    ArrayList<String> data;
+    RecyclerView recyclerView;
 
 
-    public static StringDataFragment getInstance(ArrayList<String>suggestions){
+    public static StringDataFragment getInstance(@NonNull ArrayList<String> suggestions) {
         StringDataFragment oldStringDataFragment = new StringDataFragment();
         Bundle bundle = new Bundle();
-        bundle.putStringArrayList(KEY_SUGGESTIONS_ARRAY,suggestions);
+        bundle.putStringArrayList(KEY_SUGGESTIONS_ARRAY, suggestions);
         oldStringDataFragment.setArguments(bundle);
         return oldStringDataFragment;
-    }
-
-    public StringDataFragment() {
-        // Required empty public constructor
-
     }
 
 
@@ -44,23 +40,29 @@ RecyclerView recyclerView;
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.layout_fragment_string_data, container, false);
-        recyclerView = view.findViewById(R.id.recycler_view_string_data);
-        setRecyclerViewAdapter();
-        initializeRecyclerView();
+        View view = null;
+        if (data != null && !data.isEmpty()) {
+            view = inflater.inflate(R.layout.layout_recycler_view, container, false);
+            recyclerView = view.findViewById(R.id.recycler_view_string_data);
+            setRecyclerViewAdapter();
+            initializeRecyclerView();
+        } else {
+            view = inflater.inflate(R.layout.layout_no_data, container, false);
+            ((TextView) view.findViewById(R.id.no_data_message)).setText("No results");
+        }
         return view;
     }
 
 
-    public void setRecyclerViewAdapter() {
+    private void setRecyclerViewAdapter() {
         AdapterStrings adapterStrings = new AdapterStrings(data);
         recyclerView.setAdapter(adapterStrings);
     }
 
-    public void initializeRecyclerView(){
+    private void initializeRecyclerView() {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
     @Override
@@ -69,7 +71,7 @@ RecyclerView recyclerView;
         if (getArguments() != null) {
             data = getArguments().getStringArrayList(KEY_SUGGESTIONS_ARRAY);
         }
-        if(data == null){
+        if (data == null) {
             data = new ArrayList<>();
         }
 
@@ -78,6 +80,5 @@ RecyclerView recyclerView;
     @Override
     public void onStart() {
         super.onStart();
-        initializeRecyclerView();
     }
 }

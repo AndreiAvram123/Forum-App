@@ -1,189 +1,134 @@
 package com.example.bookapp.fragments;
 
-
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager.widget.ViewPager;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.example.bookapp.Adapters.AdapterRecipeSuggestion;
 import com.example.bookapp.R;
-import com.example.bookapp.interfaces.ActionsInterface;
-import com.example.bookapp.models.Recipe;
+import com.example.bookapp.activities.AppUtilities;
+import com.example.bookapp.customViews.CommentDialog;
+import com.example.bookapp.databinding.FragmentExpandedItemBinding;
+import com.example.bookapp.interfaces.MainActivityInterface;
+import com.example.bookapp.models.Comment;
+import com.example.bookapp.models.CommentBuilder;
+import com.example.bookapp.models.Post;
+import com.example.bookapp.models.ViewModelPost;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
-import java.util.Map;
 
-public class ExpandedItemFragment extends Fragment {
-    public static final String TAG_EXPANDED_ITEM_FRAGMENT = "TAG_EXPANDED_ITEM_FRAGMENT";
-    private static final String KEY_EXPANDED_ITEM = "KEY_EXPANDED_ITEM";
-    private static final String KEY_SIMILAR_ITEMS = "KEY_SIMILAR_ITEMS";
-    private ImageView recipeImage;
-    private TextView recipeName;
-    private TextView cookingTime;
-    private TextView healthPoints;
-    private TextView numberPeople;
-    private LinearLayout features;
-    private TextView dishType;
-    private ViewPager viewPager;
-    private RecyclerView listRecipeSuggestions;
-    private ActionsInterface actionsInterface;
-    private Recipe recipe;
-    private ArrayList<Recipe> recipeSuggestions;
-    private StringDataFragment fragmentIngredients;
-    private StringDataFragment fragmentInstructions;
+public class ExpandedItemFragment extends Fragment implements CommentDialog.CommentDialogInterface {
+    private MainActivityInterface mainActivityInterface;
+    private Post post;
+    private ArrayList<Comment> comments;
     private ImageView saveButton;
-    private View layout;
-
-
-    public static ExpandedItemFragment getInstance(@NonNull Recipe selectedRecipe,
-                                                   @NonNull ArrayList<Recipe> similarRecipes) {
-
-        ExpandedItemFragment expandedItemFragment = new ExpandedItemFragment();
-        Bundle bundle = new Bundle();
-        bundle.putParcelable(KEY_EXPANDED_ITEM, selectedRecipe);
-        bundle.putParcelableArrayList(KEY_SIMILAR_ITEMS, similarRecipes);
-        expandedItemFragment.setArguments(bundle);
-
-        return expandedItemFragment;
-    }
-
-    public ExpandedItemFragment() {
-        // Required empty public constructor
-
-    }
+    private FragmentExpandedItemBinding binding;
+    private FragmentActivity activity;
+    private CommentDialog commentDialog;
+    private CommentsFragment commentsFragment;
+    private ViewModelPost viewModelPost;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        layout = inflater.inflate(R.layout.fragment_expanded_item, container, false);
-        recipe = getArguments().getParcelable(KEY_EXPANDED_ITEM);
-        recipeSuggestions = getArguments().getParcelableArrayList(KEY_SIMILAR_ITEMS);
-        if (recipe != null) {
-            initialiseViews();
-            bindDataToView(recipe);
-            actionsInterface = (ActionsInterface) getActivity();
+        binding = DataBindingUtil
+                .inflate(inflater, R.layout.fragment_expanded_item, container, false);
+
+        if (viewModelPost == null) {
+            viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
+            post = viewModelPost.getCurrentPost().getValue();
+            comments = viewModelPost.getCurrentPostComments().getValue();
         }
-        if (recipeSuggestions != null) {
-            listRecipeSuggestions.setAdapter(new AdapterRecipeSuggestion(recipeSuggestions, getActivity()));
-            listRecipeSuggestions.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-            listRecipeSuggestions.setHasFixedSize(true);
+
+        if (post != null) {
+            binding.setPost(post);
+            saveButton = binding.saveButtonExpanded;
+            configureViews();
+            activity = getActivity();
+
+            mainActivityInterface = (MainActivityInterface) activity;
         }
-        return layout;
+
+        if (comments != null) {
+            displayCommentsFragment();
+        }
+
+        return binding.getRoot();
     }
 
-    private void initialiseViews() {
-        recipeImage = layout.findViewById(R.id.recipe_image_expanded);
-        recipeName = layout.findViewById(R.id.recipe_name_expanded);
-        cookingTime = layout.findViewById(R.id.cooking_time_expanded);
-        healthPoints = layout.findViewById(R.id.health_points_expanded);
-        numberPeople = layout.findViewById(R.id.number_people_expanded);
-        features = layout.findViewById(R.id.layout_features_expanded);
-        dishType = layout.findViewById(R.id.dish_type);
-        viewPager = layout.findViewById(R.id.view_pager_expanded);
-        listRecipeSuggestions = layout.findViewById(R.id.list_item_suggested_recipes);
-        saveButton = layout.findViewById(R.id.save_button_expanded);
-        ImageView backButton = layout.findViewById(R.id.back_button_expanded);
-        backButton.setOnClickListener((view) -> getActivity().getSupportFragmentManager().popBackStack());
-        ImageView shareButton = layout.findViewById(R.id.share_button_expanded);
-        shareButton.setOnClickListener(view -> actionsInterface.shareRecipe(recipe));
-        configureSaveButton();
-
+    private void displayCommentsFragment() {
+        commentsFragment = CommentsFragment.getInstance(comments);
+        activity.getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container_comments_fragment, commentsFragment)
+                .commit();
     }
 
-    private void configureSaveButton() {
-        if (recipe.isSaved()) {
-            saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
+    private void configureViews() {
+        if (post.isSaved()) {
+            binding.saveButtonExpanded.setImageResource(R.drawable.ic_favorite_red_32dp);
         }
         saveButton.setOnClickListener(view -> {
-            if (recipe.isSaved()) {
-                actionsInterface.deleteSaveRecipe(recipe);
+            if (post.isSaved()) {
+                informUserPostRemovedFromFavorites();
+                mainActivityInterface.deleteSavedPost(post);
             } else {
-                actionsInterface.saveRecipe(recipe);
+                informUserPostAddedToFavorites();
+                mainActivityInterface.savePost(post);
             }
 
         });
-    }
+        binding.backButtonExpanded.setOnClickListener((view) -> Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack());
+        binding.writeCommentButton.setOnClickListener((view) -> {
+            showCommentDialog();
+        });
 
-    public void informUserRecipeAddedToFavorited() {
-        recipe.setSaved(true);
-        saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
-        Snackbar.make(layout, "Recipe added to favorites", Snackbar.LENGTH_SHORT).show();
-    }
-
-    public void informUserRecipeRemovedFromFavorites() {
-        recipe.setSaved(false);
-        saveButton.setImageResource(R.drawable.ic_favorite_border_black_32dp);
-        Snackbar.make(layout, "Recipe deleted from favorites", Snackbar.LENGTH_SHORT).show();
-    }
-
-    private void bindDataToView(Recipe recipe) {
         Glide.with(getContext())
-                .load(recipe.getImageUrl())
+                .load(post.getPostImage())
                 .centerInside()
-                .into(recipeImage);
+                .into(binding.recipeImageExpanded);
+    }
 
-        recipeName.setText(recipe.getName());
-        cookingTime.setText(recipe.getReadyInMinutes());
-        healthPoints.setText(recipe.getHealthPoints());
-        numberPeople.setText(recipe.getServings());
-        dishType.setText(recipe.getDishType());
-        fragmentIngredients = StringDataFragment.getInstance(recipe.getIngredients());
-        fragmentInstructions = StringDataFragment.getInstance(recipe.getInstructions());
-        viewPager.setAdapter(new FragmentPagerAdapter(getChildFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
-            @Override
-            public Fragment getItem(int position) {
-                if (position == 0) {
-                    return fragmentIngredients;
-                } else {
-                    if (position == 1) {
-                        return fragmentInstructions;
-                    }
-                }
-                return fragmentIngredients;
-            }
+    private void showCommentDialog() {
+        commentDialog = new CommentDialog(activity, this, post.getPostID());
+        commentDialog.show();
+    }
 
-            @Override
-            public int getCount() {
-                return 2;
-            }
+    private void informUserPostAddedToFavorites() {
+        post.setSaved(true);
+        saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
+        Snackbar.make(binding.getRoot(), "Recipe added to favorites", Snackbar.LENGTH_SHORT).show();
+    }
 
-            @Nullable
-            @Override
-            public CharSequence getPageTitle(int position) {
-                if (position == 0) {
-                    return "Ingredients";
-                } else {
-                    return "Instructions";
-                }
-            }
-        });
-
-        for (Map.Entry<String, Boolean> mapElement : recipe.getFeatures().entrySet()) {
-
-            if (mapElement.getValue()) {
-                TextView featureTextView = (TextView) LayoutInflater.from(getContext()).inflate(R.layout.text_view, null);
-                features.addView(featureTextView);
-            }
-        }
-
+    private void informUserPostRemovedFromFavorites() {
+        post.setSaved(false);
+        saveButton.setImageResource(R.drawable.ic_favorite_border_black_32dp);
+        Snackbar.make(binding.getRoot(), "Recipe deleted from favorites", Snackbar.LENGTH_SHORT).show();
     }
 
 
+    @Override
+    public void submitComment(String comment, int postID) {
+        CommentBuilder commentBuilder = new CommentBuilder();
+        String username = "Andrei Avram";
+        commentBuilder.setCommentID(1000)
+                .setCommentDate(AppUtilities.getDateString())
+                .setCommentContent(comment)
+                .setPostID(postID)
+                .setCommentAuthor(username);
+        commentsFragment.addComment(commentBuilder.createComment());
+        mainActivityInterface.uploadComment(commentBuilder.createComment());
+
+    }
 }

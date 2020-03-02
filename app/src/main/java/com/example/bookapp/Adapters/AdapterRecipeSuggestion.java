@@ -13,19 +13,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
-import com.example.bookapp.interfaces.ActionsInterface;
-import com.example.bookapp.models.Recipe;
+import com.example.bookapp.interfaces.MainActivityInterface;
+import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 
 public class AdapterRecipeSuggestion extends RecyclerView.Adapter<AdapterRecipeSuggestion.ViewHolder> {
-    private ArrayList<Recipe> recipes;
+    private ArrayList<Post> posts;
     private Context context;
-    private ActionsInterface actionsInterface;
+    private MainActivityInterface mainActivityInterface;
 
-    public AdapterRecipeSuggestion(@NonNull ArrayList<Recipe> recipes, Activity activity) {
-        this.recipes = recipes;
-        actionsInterface = (ActionsInterface) activity;
+    public AdapterRecipeSuggestion(@NonNull ArrayList<Post> posts, Activity activity) {
+        this.posts = posts;
+        mainActivityInterface = (MainActivityInterface) activity;
     }
 
 
@@ -40,17 +40,17 @@ public class AdapterRecipeSuggestion extends RecyclerView.Adapter<AdapterRecipeS
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Glide.with(context)
-                .load(recipes.get(position).getImageUrl())
+                .load(posts.get(position).getPostImage())
                 .into(holder.recipeImage);
-        holder.recipeName.setText(recipes.get(position).getName());
+        holder.recipeName.setText(posts.get(position).getPostTitle());
         //when the user clicks on an item
         //display the extended item fragment
-        holder.itemView.setOnClickListener(view -> actionsInterface.expandRecipe(recipes.get(position)));
+       // holder.itemView.setOnClickListener(view -> mainActivityInterface.expandPost(recipes.get(position)));
     }
 
     @Override
     public int getItemCount() {
-        return recipes.size();
+        return posts.size();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
