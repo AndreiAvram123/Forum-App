@@ -19,9 +19,7 @@ public class MessageDataConverter {
             JSONArray jsonArray = new JSONArray(response);
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject messageJson = jsonArray.getJSONObject(i);
-                Message message = new Message(messageJson.getString("messageContent"),
-                        messageJson.getLong("messageDate"), messageJson.getString("senderId"));
-                dataToReturn.add(message);
+                dataToReturn.add(convertJsonObjectToMessage(messageJson));
             }
 
         } catch (JSONException e) {
@@ -29,5 +27,15 @@ public class MessageDataConverter {
         }
 
         return dataToReturn;
+    }
+
+    @NonNull
+    public static Message convertJsonObjectToMessage(@NonNull JSONObject messageJson) throws JSONException {
+        Message.Builder builder = new Message.Builder();
+        builder.setMessageContent(messageJson.getString("messageContent"));
+        builder.setMessageDate(messageJson.getLong("messageDate"));
+        builder.setMessageID(messageJson.getString("messageId"));
+        builder.setSenderID(messageJson.getString("senderId"));
+        return builder.createMessage();
     }
 }

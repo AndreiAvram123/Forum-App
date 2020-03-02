@@ -4,6 +4,9 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,5 +42,14 @@ public class AppUtilities {
         Date date = new Date(unixTime * 1000);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         return simpleDateFormat.format(date);
+    }
+
+    public static boolean isResponsePositive(JSONObject response) {
+        try {
+           return response.getInt("responseCode") == 200;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -2,9 +2,7 @@ package com.example.bookapp.utilities;
 
 import androidx.annotation.NonNull;
 
-import com.example.bookapp.activities.AppUtilities;
 import com.example.bookapp.models.Friend;
-import com.example.bookapp.models.Message;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,7 +24,7 @@ public class FriendsDataConverter {
                         .setImageURL(friendJson.getString("profilePicture"));
                 if (!friendJson.isNull("lastMessage")) {
                     JSONObject lastMessageJson = friendJson.getJSONObject("lastMessage");
-                    builder.setLastMessage(convertJsonObjectToMessage(lastMessageJson));
+                    builder.setLastMessage(MessageDataConverter.convertJsonObjectToMessage(lastMessageJson));
                 }
                 dataToReturn.add(builder.create());
 
@@ -37,9 +35,4 @@ public class FriendsDataConverter {
         return dataToReturn;
     }
 
-    private static Message convertJsonObjectToMessage(@NonNull JSONObject jsonObject) throws JSONException {
-        Message message = new Message(jsonObject.getString("messageContent"), Long.parseLong(jsonObject.getString("messageDate")),
-                jsonObject.getString("senderId"));
-        return message;
-    }
 }

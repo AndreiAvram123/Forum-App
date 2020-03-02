@@ -26,7 +26,6 @@ import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.interfaces.MessageInterface;
 import com.example.bookapp.models.AuthenticationService;
 import com.example.bookapp.models.Comment;
-import com.example.bookapp.models.Message;
 import com.example.bookapp.models.NonUploadedPost;
 import com.example.bookapp.models.Post;
 import com.example.bookapp.models.User;
@@ -321,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
     @Override
-    public void sendMessage(@NonNull Message message,@NonNull String user2ID) {
-        messageRepository.sendMessage(message,user2ID);
+    public void sendMessage(@NonNull String messageContent, @NonNull String user2ID, String currentUserID) {
+        messageRepository.sendMessage(messageContent, user2ID, currentUserID);
     }
 }

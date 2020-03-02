@@ -17,10 +17,7 @@ import com.example.bookapp.Adapters.AdapterMessages;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.MessagesFragmentBinding;
 import com.example.bookapp.interfaces.MessageInterface;
-import com.example.bookapp.models.Message;
 import com.example.bookapp.viewModels.ViewModelMessages;
-
-import java.util.Calendar;
 
 public class MessagesFragment extends Fragment {
     private MessagesFragmentBinding binding;
@@ -50,8 +47,9 @@ public class MessagesFragment extends Fragment {
             if (binding.messageTextArea.getText() != null) {
                 String messageContent = binding.messageTextArea.getText().toString();
                 if (!messageContent.equals("")) {
-                    Message message = new Message(messageContent, Calendar.getInstance().getTimeInMillis() / 1000L, currentUserID);
-                    messageInterface.sendMessage(message, user2ID);
+
+                    binding.messageTextArea.getText().clear();
+                    messageInterface.sendMessage(messageContent, user2ID, currentUserID);
                 }
             }
         });
@@ -62,8 +60,13 @@ public class MessagesFragment extends Fragment {
         viewModelMessages = new ViewModelProvider(requireActivity()).get(ViewModelMessages.class);
         viewModelMessages.getLastMessages().observe(getViewLifecycleOwner(), lastMessages -> {
             if (lastMessages != null) {
-                adapterMessages.setData(lastMessages);
+                adapterMessages.addData(lastMessages);
+                binding.recyclerViewMessages.smoothScrollToPosition(adapterMessages.getItemCount() - 1);
             }
+        });
+        viewModelMessages.getLastFetchedMessage().observe(getViewLifecycleOwner(), lastFetchedMessage -> {
+            adapterMessages.addMessage(lastFetchedMessage);
+            binding.recyclerViewMessages.smoothScrollToPosition(adapterMessages.getItemCount() - 1);
         });
     }
 

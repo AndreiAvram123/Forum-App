@@ -25,9 +25,13 @@ public class AdapterMessages extends RecyclerView.Adapter<AdapterMessages.ViewHo
         this.messages = messages;
     }
 
-    public void setData(@NonNull ArrayList<Message> data) {
-        this.messages = data;
-        notifyDataSetChanged();
+
+    public void addData(@NonNull ArrayList<Message> lastMessages) {
+        for (Message message : lastMessages) {
+            if (!this.messages.contains(message)) {
+                this.messages.add(message);
+            }
+        }
     }
 
     @NonNull
@@ -46,6 +50,12 @@ public class AdapterMessages extends RecyclerView.Adapter<AdapterMessages.ViewHo
     public int getItemCount() {
         return messages.size();
     }
+
+    public void addMessage(@NonNull Message lastFetchedMessage) {
+        messages.add(lastFetchedMessage);
+        notifyDataSetChanged();
+    }
+
 
     class ViewHolder extends RecyclerView.ViewHolder {
         private ItemMessageBinding itemMessageBinding;

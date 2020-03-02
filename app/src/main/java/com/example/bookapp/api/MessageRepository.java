@@ -18,13 +18,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import static com.example.bookapp.models.ApiConstants.URL_SEND_MESSAGE;
-import static com.example.bookapp.models.ApiConstants.URL_UPLOAD_COMMENT;
 
 public class MessageRepository {
 
     private static MessageRepository instance;
     private RequestQueue requestQueue;
     private MessageRepositoryCallback callback;
+    private int messageOffset = 0;
+    private String lastMessageID;
+    private static final String TAG = Message.class.getSimpleName();
 
     public static MessageRepository getInstance(RequestQueue requestQueue) {
         if (instance == null) {
@@ -42,7 +44,7 @@ public class MessageRepository {
     }
 
     public void pushRequestFetchMessagesWithUser(String currentUserID, String user2ID, int offset) {
-        String formattedURLSavedPosts = String.format(ApiConstants.URL_LAST_MESSAGES, currentUserID, user2ID, offset);
+        String formattedURLSavedPosts = String.format(ApiConstants.URL_LAST_MESSAGES, currentUserID, user2ID, this.messageOffset);
         //push request
         StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
         {
@@ -56,27 +58,48 @@ public class MessageRepository {
 
     }
 
-    public void sendMessage(Message message,String user2ID) {
+    public void sendMessage(String messageContent, String user2ID, String currentUserID) {
         JSONObject postBody = new JSONObject();
         try {
-            postBody.put("messageContent", message.getMessageContent());
-            postBody.put("currentUserId", message.getSenderID());
+            postBody.put("messageContent", messageContent);
+            postBody.put("currentUserId", currentUserID);
             postBody.put("receiverId",user2ID);
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.d("Debug",postBody.toString());
+        Log.d(TAG, "Pushing send message request with" + postBody.toString());
 
+        JsonObjectRequest sendMessageRequest = new JsonObjectRequest(Request.Method.POST, URL_SEND_MESSAGE, postBody,
+                response -> {
+                    //callback when the message has reached the server
+                    try {
+                        if (response.getInt("responseCode") == ApiConstants.REQUEST_COMPLETED_NO_ERROR) {
+                            Message.Builder builder = new Message.Builder();
+                            builder.setMessageContent(postBody.getString("messageContent"));
+                            builder.setMessageID(response.getString("lastMessageID"));
+                            builder.setSenderID(currentUserID);
+                            builder.setMessageDate(response.getLong("lastMessageDate"));
+                            callback.onNewMessageReady(builder.createMessage());
+                            Log.d("Debug", "Message reached the server " + builder.createMessage());
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-        JsonObjectRequest sendMessageRequest = new JsonObjectRequest(Request.Method.POST, URL_SEND_MESSAGE, postBody, response -> Log.d("Debug", response.toString()), error -> {
+                },
+                error -> {
 
-        });
+                });
 
         requestQueue.add(sendMessageRequest);
     }
 
     public interface MessageRepositoryCallback {
         void onLastMessagesReady(@NonNull ArrayList<Message> lastMessages);
+
+        void onNewMessagesReady(@NonNull ArrayList<Message> messages);
+
+        void onNewMessageReady(@NonNull Message message);
     }
 }
