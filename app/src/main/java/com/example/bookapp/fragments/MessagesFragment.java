@@ -56,14 +56,16 @@ public class MessagesFragment extends Fragment {
 
     private void attachObserver() {
         viewModelMessages = new ViewModelProvider(requireActivity()).get(ViewModelMessages.class);
-        viewModelMessages.getLastMessages().observe(getViewLifecycleOwner(), oldMessages -> {
+        viewModelMessages.getMessages().observe(getViewLifecycleOwner(), oldMessages -> {
             if (oldMessages != null) {
                 adapterMessages.addOldMessages(oldMessages);
             }
-            //clean the observer
         });
-        viewModelMessages.getLastFetchedMessage().observe(getViewLifecycleOwner(), lastFetchedMessage -> {
+        viewModelMessages.getCurrentlySentMessage().observe(getViewLifecycleOwner(), lastFetchedMessage -> {
             adapterMessages.addMessage(lastFetchedMessage);
+        });
+        viewModelMessages.getCurrentlyFetchedNewMessages().observe(getViewLifecycleOwner(),newFetchedMessages->{
+            adapterMessages.addNewMessages(newFetchedMessages);
         });
 
     }

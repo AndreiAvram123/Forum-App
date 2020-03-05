@@ -56,9 +56,11 @@ public class AdapterMessages extends RecyclerView.Adapter {
                 if (linearLayoutManager != null && !isLoading && linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
                     isLoading = true;
                     Log.d("Debug", "trying to load more .....");
-                    if (callback != null) {
-                        callback.fetchMoreMessages(user2ID, messages.size());
-                    }
+                    //todo
+
+//                    if (callback != null) {
+//                        callback.fetchMoreMessages(user2ID, messages.size());
+//                    }
                 }
             }
         });
@@ -78,16 +80,22 @@ public class AdapterMessages extends RecyclerView.Adapter {
         isLoading = false;
     }
 
+    public void addMessage(@NonNull Message lastFetchedMessage) {
+        messages.add(lastFetchedMessage);
+        notifyItemInserted(messages.size() - 1);
+    }
+
+    public void addNewMessages(@NonNull ArrayList<Message> newFetchedMessages) {
+        int start = messages.size() - 1;
+        messages.addAll(newFetchedMessages);
+        notifyItemRangeInserted(start, newFetchedMessages.size());
+    }
+
+
     private void scroll(int position) {
         if (recyclerView.getLayoutManager() != null) {
             recyclerView.getLayoutManager().scrollToPosition(position);
         }
-    }
-
-    public void addMessage(@NonNull Message lastFetchedMessage) {
-        messages.add(lastFetchedMessage);
-        notifyItemInserted(messages.size() - 1);
-        recyclerView.scrollToPosition(messages.size() - 1);
     }
 
 

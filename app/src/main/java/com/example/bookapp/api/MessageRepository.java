@@ -1,21 +1,21 @@
 package com.example.bookapp.api;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.example.bookapp.models.ApiConstants;
 import com.example.bookapp.models.Message;
 import com.example.bookapp.utilities.MessageDataConverter;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,12 +26,13 @@ public class MessageRepository extends Repository {
     private static MessageRepository instance;
 
     private MessageRepositoryCallback callback;
-    private String lastMessageID;
+    private int currentMessageOffset;
     private static final String TAG = Message.class.getSimpleName();
     private Timer timer;
     private TimerTask pushRequestNewMessages;
     private boolean shouldOtherFunctionsWait = false;
     private boolean lastMessagesFetched = false;
+    private String lastMessageID;
 
     public static MessageRepository getInstance(RequestQueue requestQueue, String currentUserID) {
         if (instance == null) {
@@ -66,21 +67,32 @@ public class MessageRepository extends Repository {
 
     /**********************************************Push request functions ********************************/
 
+
     public void pushRequestFetchOldMessages(String user2ID, int offset) {
+        shouldOtherFunctionsWait = true;
         String formattedURlOldMessages = String.format(ApiConstants.URL_OLD_MESSAGES, this.currentUserID, user2ID, offset);
         //push request
         StringRequest request = new StringRequest(Request.Method.GET, formattedURlOldMessages, (response) ->
         {
-            ArrayList<Message> lastMessages = MessageDataConverter.convertJsonArrayToMessages(response);
-            if (!lastMessages.isEmpty()) {
-                this.lastMessageID = lastMessages.get(lastMessages.size() - 1).getMessageID();
-                Log.d("Debug", lastMessageID);
+            ArrayList<Message> oldMessages = MessageDataConverter.convertJsonArrayToMessages(response);
+            if (!oldMessages.isEmpty()) {
+                shouldOtherFunctionsWait = false;
+                this.currentMessageOffset += oldMessages.size();
+
+                if (!lastMessagesFetched) {
+                    lastMessagesFetched = true;
+                    this.lastMessageID = oldMessages.get(0).getMessageID();
+                }
+                if (callback != null) {
+                    callback.onOldMessagesFetched(oldMessages);
+                }
                 if (timer == null) {
                     initializeAsyncFetchFunctions(user2ID);
                 }
-                if (callback != null) {
-                    callback.onLastMessagesFetched(lastMessages);
-                }
+            } else {
+                //todo
+                //does it work?
+                this.lastMessageID = "0";
             }
         },
                 Throwable::printStackTrace);
@@ -94,13 +106,11 @@ public class MessageRepository extends Repository {
         StringRequest request = new StringRequest(Request.Method.GET, formattedURLNewMessages, (response) ->
         {
             try {
-                JSONObject jsonObject = new JSONObject(response);
-                if (jsonObject.getInt("responseCode") == ApiConstants.REQUEST_COMPLETED_NO_ERROR) {
-                    ArrayList<Message> newMessages = MessageDataConverter.convertJsonArrayToMessages(jsonObject.getJSONArray("results"));
-                    lastMessageID = newMessages.get(newMessages.size() - 1).getMessageID();
+                JSONArray jsonArray = new JSONArray(response);
+                ArrayList<Message> newMessages = MessageDataConverter.convertJsonArrayToMessages(jsonArray);
                     if (!newMessages.isEmpty() && callback != null) {
+                        this.lastMessageID = newMessages.get(newMessages.size() - 1).getMessageID();
                         callback.onNewMessagesReady(newMessages);
-                    }
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -112,31 +122,21 @@ public class MessageRepository extends Repository {
 
     public void sendMessage(String messageContent, String user2ID, String currentUserID) {
         shouldOtherFunctionsWait = true;
-        JSONObject postBody = new JSONObject();
-        try {
-            postBody.put("messageContent", messageContent);
-            postBody.put("currentUserId", currentUserID);
-            postBody.put("receiverId",user2ID);
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        JsonObjectRequest sendMessageRequest = new JsonObjectRequest(Request.Method.POST, URL_SEND_MESSAGE, postBody,
+        StringRequest sendMessageRequest = new StringRequest(Request.Method.POST, URL_SEND_MESSAGE,
                 response -> {
                     shouldOtherFunctionsWait = false;
                     //callback when the message has reached the server
                     try {
-                        if (response.getInt("responseCode") == ApiConstants.REQUEST_COMPLETED_NO_ERROR) {
+                        JSONObject jsonObject = new JSONObject();
                             Message.Builder builder = new Message.Builder();
-                            builder.setMessageContent(postBody.getString("messageContent"));
-                            builder.setMessageID(response.getString("lastMessageID"));
+                        builder.setMessageContent(messageContent);
+                        builder.setMessageID(jsonObject.getString("lastMessageID"));
                             builder.setSenderID(currentUserID);
-                            builder.setMessageDate(response.getLong("lastMessageDate"));
+                        builder.setMessageDate(jsonObject.getLong("lastMessageDate"));
                             Message message = builder.createMessage();
                             callback.onSendMessageReady(message);
-                            lastMessageID = message.getMessageID();
-                        }
+                        this.lastMessageID = message.getMessageID();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -144,7 +144,16 @@ public class MessageRepository extends Repository {
                 },
                 error -> {
                     shouldOtherFunctionsWait = false;
-                });
+                }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("messageContent", messageContent);
+                params.put("currentUserId", currentUserID);
+                params.put("receiverId", user2ID);
+                return params;
+            }
+        };
 
         requestQueue.add(sendMessageRequest);
     }
@@ -154,11 +163,12 @@ public class MessageRepository extends Repository {
     }
 
     public interface MessageRepositoryCallback {
-        void onLastMessagesFetched(@NonNull ArrayList<Message> oldMessages);
 
+        void onOldMessagesFetched(@NonNull ArrayList<Message> oldMessages);
 
         void onNewMessagesReady(@NonNull ArrayList<Message> messages);
 
         void onSendMessageReady(@NonNull Message message);
+
     }
 }

@@ -1,7 +1,6 @@
 package com.example.bookapp.viewModels;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
@@ -10,42 +9,54 @@ import com.example.bookapp.models.Message;
 
 import java.util.ArrayList;
 
+
 public class ViewModelMessages extends ViewModel implements MessageRepository.MessageRepositoryCallback {
-    private MutableLiveData<ArrayList<Message>> lastMessages = new MutableLiveData<>();
+    //the last messages in the chat
+    private MutableLiveData<ArrayList<Message>> messages = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<Message>> currentlyFetchedNewMessages = new MutableLiveData<>();
+    private MutableLiveData<Message> currentlySentMessage = new MutableLiveData<>();
 
-
-    public MutableLiveData<ArrayList<Message>> getLastMessages() {
-        return lastMessages;
-    }
-    private MutableLiveData<Message> currentFetchedMessage = new MutableLiveData<>();
-
-    public MutableLiveData<Message> getLastFetchedMessage() {
-        return currentFetchedMessage;
+    public MutableLiveData<ArrayList<Message>> getMessages() {
+        return messages;
     }
 
+    public MutableLiveData<Message> getCurrentlySentMessage() {
+        return currentlySentMessage;
+    }
 
+    public MutableLiveData<ArrayList<Message>> getCurrentlyFetchedNewMessages() {
+        return currentlyFetchedNewMessages;
+    }
+
+    /*************************************************INTERFACE METHODS ************************************/
 
     @Override
-    public void onLastMessagesFetched(@NonNull ArrayList<Message> lastMessages) {
-        this.lastMessages.setValue(lastMessages);
-    }
-
-
-
-    @Override
-    public void onNewMessagesReady(@NonNull ArrayList<Message> messages) {
-        //create a new arrayList to trigger the observer
+    public void onOldMessagesFetched(@NonNull ArrayList<Message> oldMessages) {
         ArrayList<Message> newData = new ArrayList<>();
-        if (lastMessages.getValue() != null) {
-            newData.addAll(lastMessages.getValue());
-
+        if (this.messages.getValue() != null) {
+            newData.addAll(this.messages.getValue());
         }
-        newData.addAll(messages);
-        lastMessages.setValue(newData);
+        for (Message message : oldMessages) {
+            newData.add(0, message);
+        }
+
+        this.messages.setValue(newData);
+    }
+
+
+    @Override
+    public void onNewMessagesReady(@NonNull ArrayList<Message> newMessages) {
+        //create a new arrayList to trigger the observer
+        if (this.messages.getValue() != null) {
+            this.messages.getValue().addAll(newMessages);
+        }
+        currentlyFetchedNewMessages.setValue(newMessages);
     }
 
     @Override
     public void onSendMessageReady(@NonNull Message message) {
-     currentFetchedMessage.setValue(message);
+        currentlySentMessage.setValue(message);
     }
+
+
 }
