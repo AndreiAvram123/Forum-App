@@ -36,9 +36,7 @@ public class ViewModelMessages extends ViewModel implements MessageRepository.Me
         if (this.messages.getValue() != null) {
             newData.addAll(this.messages.getValue());
         }
-        for (Message message : oldMessages) {
-            newData.add(0, message);
-        }
+        newData.addAll(oldMessages);
 
         this.messages.setValue(newData);
     }
