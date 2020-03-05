@@ -16,11 +16,10 @@ public class ApiConstants {
     public static final String URL_OLD_MESSAGES = "http://sgb967.poseidon.salford.ac.uk/cms/ChatController.php?requestName=fetchOldMessages&currentUserId=%s&receiverId=%s&offset=%s";
     public static final String URL_SEND_MESSAGE = "http://sgb967.poseidon.salford.ac.uk/cms/ChatController.php?requestName=sendMessage";
     public static final String URL_FETCH_NEW_MESSAGE = "http://sgb967.poseidon.salford.ac.uk/cms/ChatController.php?requestName=fetchNewMessages&currentUserId=%s&receiverId=%s&lastMessageId=%s";
-
+    public static final String URL_MORE_POSTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?recentPosts&lastPostID=%s";
 
     public static final int RESPONSE_CODE_ACCOUNT_EXISTS = 1;
     public static final int RESPONSE_CODE_ACCOUNT_UNEXISTENT = 0;
-    public static final int RESPONSE_CODE_ACCOUNT_PARAMETERS_NOT_PROVIDED = -1;
     public static final int RESPONSE_CODE_ACCOUNT_CREATED = 2;
-    public static final int REQUEST_COMPLETED_NO_ERROR = 200;
+
 }

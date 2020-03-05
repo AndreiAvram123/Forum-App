@@ -14,19 +14,30 @@ import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class HomeAdapter extends RecyclerView.Adapter {
-    private ArrayList<Post> posts = new ArrayList<>();
+    private ArrayList<Post> posts;
     private MainActivityInterface callback;
 
     public HomeAdapter(@NonNull MainActivityInterface callback) {
         this.callback = callback;
+        posts = new ArrayList<>();
     }
 
     public void addPosts(@NonNull ArrayList<Post> newPosts) {
-        int lastPostIndex = posts.size()-1;
-        posts.addAll(newPosts);
-        notifyItemRangeInserted(lastPostIndex+1,newPosts.size());
+
+        int itemsInserted = 0;
+        ArrayList<Post> reversedData = new ArrayList<>(newPosts);
+        Collections.reverse(reversedData);
+
+        for (Post post : reversedData) {
+            if (!posts.contains(post)) {
+                posts.add(0, post);
+                itemsInserted++;
+            }
+        }
+        notifyItemRangeInserted(0, itemsInserted);
     }
 
     @NonNull

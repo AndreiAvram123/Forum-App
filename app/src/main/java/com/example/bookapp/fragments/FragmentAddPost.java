@@ -31,15 +31,6 @@ public class FragmentAddPost extends Fragment {
     private static final int CODE_FILE_EXPLORER = 10;
     private String imageUri;
 
-    public static FragmentAddPost getInstance() {
-        FragmentAddPost fragmentAddPost = new FragmentAddPost();
-        return fragmentAddPost;
-    }
-
-    public FragmentAddPost() {
-        // Required empty public constructor
-    }
-
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -102,9 +93,8 @@ public class FragmentAddPost extends Fragment {
     }
 
     private String getImageName() {
-        String fileNameSegments[] = imageUri.split("/");
-        String fileName = fileNameSegments[fileNameSegments.length - 1] ;
-        return fileName;
+        String[] fileNameSegments = imageUri.split("/");
+        return fileNameSegments[fileNameSegments.length - 1];
     }
 
 

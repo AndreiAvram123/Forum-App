@@ -13,7 +13,7 @@ import com.example.bookapp.models.Post;
 import java.util.ArrayList;
 
 public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDataCallback {
-    private final MutableLiveData<ArrayList<Post>> latestPosts = new MutableLiveData<>();
+    private final MutableLiveData<ArrayList<Post>> currentPosts = new MutableLiveData<>();
     private final MutableLiveData<ArrayList<Post>> autocompleteResults = new MutableLiveData<>();
     private final MutableLiveData<ArrayList<Post>> previousAutocompleteResults = new MutableLiveData<>();
     private final MutableLiveData<ArrayList<Post>> savedPosts = new MutableLiveData<>();
@@ -58,8 +58,8 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
     }
 
 
-    public LiveData<ArrayList<Post>> getLatestPosts() {
-        return latestPosts;
+    public LiveData<ArrayList<Post>> getCurrentPosts() {
+        return currentPosts;
     }
 
     public LiveData<ArrayList<Post>> getAutocompleteResults() {
@@ -79,7 +79,7 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
 
     @Override
     public void onLatestPostsDataReady(ArrayList<Post> latestPosts) {
-        this.latestPosts.setValue(latestPosts);
+        this.currentPosts.setValue(latestPosts);
     }
 
     @Override
@@ -106,5 +106,16 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
     @Override
     public void onMyPostsReady(@NonNull ArrayList<Post> myPosts) {
      this.myPosts.setValue(myPosts);
+    }
+
+    @Override
+    public void onNewPostsReady(@NonNull ArrayList<Post> fetchedPosts) {
+        if (currentPosts.getValue() != null) {
+            ArrayList<Post> newData = new ArrayList<>(currentPosts.getValue());
+            newData.addAll(fetchedPosts);
+            currentPosts.setValue(newData);
+        } else {
+            currentPosts.setValue(fetchedPosts);
+        }
     }
 }

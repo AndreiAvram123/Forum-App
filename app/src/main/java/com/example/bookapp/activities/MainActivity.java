@@ -256,6 +256,11 @@ public class MainActivity extends AppCompatActivity implements
         Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
     }
 
+    @Override
+    public void fetchNewPosts() {
+        apiManager.pushRequestGetMorePosts();
+    }
+
 
     /**
      * Use this method in order to display a bottom
@@ -264,13 +269,6 @@ public class MainActivity extends AppCompatActivity implements
     private void requestLogIn() {
         BottomSheetPromptLogin bottomSheetPromptLogin = BottomSheetPromptLogin.newInstance();
         bottomSheetPromptLogin.show(getSupportFragmentManager(), BottomSheetPromptLogin.TAG);
-
-    }
-
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
     }
 
@@ -312,15 +310,14 @@ public class MainActivity extends AppCompatActivity implements
             if (AppUtilities.isNetworkAvailable(this)) {
 
                 apiManager.pushRequestLatestPosts();
-                //todo
-                //getSavedPostsForCurrentUser(firebaseUser);
             }
         }
     }
 
+
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         messageRepository.shutdownAsyncTasks();
     }
 

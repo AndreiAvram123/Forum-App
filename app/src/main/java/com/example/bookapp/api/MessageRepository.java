@@ -43,6 +43,7 @@ public class MessageRepository extends Repository {
 
     private MessageRepository(RequestQueue requestQueue, String currentUserID) {
         super(requestQueue, currentUserID);
+        timer = new Timer();
     }
 
 
@@ -51,7 +52,6 @@ public class MessageRepository extends Repository {
     }
 
     private void initializeAsyncFetchFunctions(String user2ID) {
-        timer = new Timer();
         pushRequestNewMessages = new TimerTask() {
             @Override
             public void run() {
@@ -60,7 +60,9 @@ public class MessageRepository extends Repository {
                 }
             }
         };
+    }
 
+    private void startAsyncFunctions() {
         int newMessageCheckInterval = 1500;
         timer.scheduleAtFixedRate(pushRequestNewMessages, 0, newMessageCheckInterval);
     }
@@ -88,6 +90,7 @@ public class MessageRepository extends Repository {
                 }
                 if (timer == null) {
                     initializeAsyncFetchFunctions(user2ID);
+                    startAsyncFunctions();
                 }
             } else {
                 //todo

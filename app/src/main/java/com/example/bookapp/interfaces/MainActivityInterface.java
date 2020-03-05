@@ -19,4 +19,5 @@ public interface MainActivityInterface {
 
     void startChat(String userID);
 
+    void fetchNewPosts();
 }

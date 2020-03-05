@@ -1,11 +1,9 @@
 package com.example.bookapp.customViews;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 

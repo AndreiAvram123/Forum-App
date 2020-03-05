@@ -131,4 +131,12 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
         mainActivityInterface.uploadComment(commentBuilder.createComment());
 
     }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (commentDialog != null) {
+            commentDialog.hide();
+        }
+    }
 }

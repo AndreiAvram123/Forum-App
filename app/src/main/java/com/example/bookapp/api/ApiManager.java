@@ -38,7 +38,7 @@ public class ApiManager {
     private static ApiManager instance;
     private static final String TAG = ApiManager.class.getSimpleName();
     private FriendsRepository friendsRepository;
-    private MessageRepository messageRepository;
+    private int lastPostID;
 
     public static synchronized ApiManager getInstance(@NonNull Context context) {
 
@@ -79,12 +79,33 @@ public class ApiManager {
         StringRequest randomRecipesRequest = new StringRequest(Request.Method.GET, URL_LATEST_POSTS,
                 (response) -> {
                     ArrayList<Post> latestPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
+                    //this case only applies when there is no data in the system
+
+                    if (!latestPosts.isEmpty()) {
+                        lastPostID = latestPosts.get(0).getPostID();
+                    }
                     apiManagerDataCallback.onLatestPostsDataReady(latestPosts);
+
                 }, Throwable::printStackTrace);
-        Log.d(TAG, "Pushing request " + URL_LATEST_POSTS);
         requestQueue.add(randomRecipesRequest);
 
     }
+
+    public void pushRequestGetMorePosts() {
+        String formattedURL = String.format(ApiConstants.URL_MORE_POSTS, lastPostID);
+        StringRequest morePostsRequest = new StringRequest(Request.Method.GET, formattedURL, (response -> {
+            ArrayList<Post> fetchedPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
+            if (!fetchedPosts.isEmpty()) {
+                lastPostID = fetchedPosts.get(fetchedPosts.size() - 1).getPostID();
+            }
+            if (apiManagerDataCallback != null) {
+                apiManagerDataCallback.onNewPostsReady(fetchedPosts);
+            }
+        }), Throwable::printStackTrace);
+        requestQueue.add(morePostsRequest);
+    }
+
+
 
 
     public void pushRequestGetPostDetails(int postID) {
@@ -92,14 +113,14 @@ public class ApiManager {
         StringRequest postDetailsRequest = new StringRequest(Request.Method.GET, String.format(URL_POST_DETAILS, postID), (response) -> {
             Post.PostBuilder postBuilder = new Post.PostBuilder();
             PostConverter.getFullPostDetailsFromJson(response, postBuilder);
-            pushRequestGetPostComments(postBuilder.createPost(), postID);
+            pushRequestGetPostComments(postBuilder.createPost());
         }, Throwable::printStackTrace);
 
         requestQueue.add(postDetailsRequest);
     }
 
-    private void pushRequestGetPostComments(@NonNull Post post, int postID) {
-        StringRequest postCommentsRequest = new StringRequest(Request.Method.GET, String.format(URL_POST_COMMENTS, postID),
+    private void pushRequestGetPostComments(@NonNull Post post) {
+        StringRequest postCommentsRequest = new StringRequest(Request.Method.GET, String.format(URL_POST_COMMENTS, post.getPostID()),
                 (response) -> {
                     ArrayList<Comment> comments = PostConverter.getCommentsFromJson(response);
                     apiManagerDataCallback.onPostDetailsReady(post, comments, null);
@@ -242,6 +263,7 @@ public class ApiManager {
         void onMyPostsReady(@NonNull ArrayList<Post> myPosts);
 
 
+        void onNewPostsReady(@NonNull ArrayList<Post> fetchedPosts);
     }
 
     public interface ApiManagerAuthenticationCallback {
