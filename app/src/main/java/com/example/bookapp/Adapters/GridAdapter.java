@@ -23,7 +23,7 @@ public class GridAdapter extends BaseAdapter {
     private ArrayList<Post> data;
     private MainActivityInterface mainActivityInterface;
 
-    public GridAdapter(@Nullable ArrayList<Post> data, Activity activity) {
+    public GridAdapter(Activity activity) {
         if (data == null) {
             data = new ArrayList<>();
         }
