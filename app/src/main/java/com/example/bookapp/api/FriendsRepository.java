@@ -1,49 +1,55 @@
 package com.example.bookapp.api;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.example.bookapp.utilities.FriendsDataConverter;
-import com.example.bookapp.models.ApiConstants;
+import com.example.bookapp.interfaces.FriendsRepositoryInterface;
 import com.example.bookapp.models.Friend;
+import com.example.bookapp.utilities.FriendsDataConverter;
 
 import java.util.ArrayList;
 
-public class FriendsRepository {
-    private RequestQueue requestQueue;
-    private static FriendsRepository instance;
-    private ApiManagerFriendsDataCallback apiManagerFriendsDataCallback;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
-    public static FriendsRepository getInstance(RequestQueue requestQueue) {
+public class FriendsRepository {
+    private static FriendsRepository instance;
+    private MutableLiveData<ArrayList<Friend>> friends;
+    private FriendsRepositoryInterface repositoryInterface;
+
+    public static FriendsRepository getInstance(@NonNull Retrofit retrofit) {
         if (instance == null) {
-            instance = new FriendsRepository(requestQueue);
+            instance = new FriendsRepository(retrofit);
         }
         return instance;
     }
 
-    private FriendsRepository(@NonNull RequestQueue requestQueue) {
-        this.requestQueue = requestQueue;
+    private FriendsRepository(@NonNull Retrofit retrofit) {
+        repositoryInterface = retrofit.create(FriendsRepositoryInterface.class);
     }
 
-    public void pushRequestFetchAllFriends(String userID) {
-        String formattedURLSavedPosts = String.format(ApiConstants.URL_MY_FRIENDS, userID);
-        //push request
-        StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
-        {
-            ArrayList<Friend> friends = FriendsDataConverter.convertJsonArrayToFriendsObjects(response);
-            apiManagerFriendsDataCallback.onFriendsDataReady(friends);
-        },
-                Throwable::printStackTrace);
-        requestQueue.add(request);
+
+    public MutableLiveData<ArrayList<Friend>> fetchAllFriends(String userID) {
+        //initialize the data
+        friends = new MutableLiveData<>();
+        repositoryInterface.getFriends(userID, true, true).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                if (response.body() != null) {
+                    friends.setValue(FriendsDataConverter.convertJsonArrayToFriendsObjects(response.body()));
+                }
+            }
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+
+            }
+        });
+        //
+        return friends;
+
     }
 
-    public void setApiManagerFriendsDataCallback(@NonNull ApiManagerFriendsDataCallback apiManagerFriendsDataCallback) {
-        this.apiManagerFriendsDataCallback = apiManagerFriendsDataCallback;
-    }
-
-    public interface ApiManagerFriendsDataCallback {
-        void onFriendsDataReady(ArrayList<Friend> friends);
-    }
 }

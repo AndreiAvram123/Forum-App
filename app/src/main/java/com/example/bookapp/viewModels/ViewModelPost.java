@@ -6,22 +6,26 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.bookapp.activities.AppUtilities;
 import com.example.bookapp.api.ApiManager;
+import com.example.bookapp.dataLayer.repositories.PostRepository;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 
 public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDataCallback {
-    private final MutableLiveData<ArrayList<Post>> currentPosts = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<Post>> currentPosts;
     private final MutableLiveData<ArrayList<Post>> autocompleteResults = new MutableLiveData<>();
     private final MutableLiveData<ArrayList<Post>> previousAutocompleteResults = new MutableLiveData<>();
     private final MutableLiveData<ArrayList<Post>> savedPosts = new MutableLiveData<>();
-    private final MutableLiveData<Post> currentPost = new MutableLiveData<>();
-    private final MutableLiveData<ArrayList<Comment>> currentPostComments = new MutableLiveData<>();
+
     private final MutableLiveData<ArrayList<Post>> myPosts = new MutableLiveData<>();
+    private PostRepository postRepository;
+
     public ViewModelPost() {
         super();
+        postRepository = PostRepository.getInstance(AppUtilities.getRetrofit());
         initializeFields();
     }
 
@@ -32,16 +36,17 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
         this.myPosts.setValue(new ArrayList<>());
     }
 
+
     public MutableLiveData<ArrayList<Post>> getMyPosts() {
         return myPosts;
     }
 
-    public MutableLiveData<Post> getCurrentPost() {
-        return currentPost;
+    public MutableLiveData<Post> getPost(int id) {
+        return postRepository.fetchPost(id);
     }
 
-    public MutableLiveData<ArrayList<Comment>> getCurrentPostComments() {
-        return currentPostComments;
+    public MutableLiveData<ArrayList<Comment>> getPostComments(int postID) {
+        return postRepository.fetchPostComments(postID);
     }
 
     public void addFavoritePost(Post savedPost) {
@@ -59,6 +64,11 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
 
 
     public LiveData<ArrayList<Post>> getCurrentPosts() {
+        if (currentPosts == null) {
+            //fetch the current posts if the current posts are not yet set
+            currentPosts = postRepository.fetchCurrentPosts();
+
+        }
         return currentPosts;
     }
 
@@ -84,8 +94,7 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
 
     @Override
     public void onPostDetailsReady(@NonNull Post post, @Nullable ArrayList<Comment> comments, @Nullable ArrayList<Post> similarPosts) {
-        this.currentPost.setValue(post);
-        this.currentPostComments.setValue(comments);
+
     }
 
     @Override

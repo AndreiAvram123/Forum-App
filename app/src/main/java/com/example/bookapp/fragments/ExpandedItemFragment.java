@@ -46,25 +46,42 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
                 .inflate(inflater, R.layout.fragment_expanded_item, container, false);
 
         if (viewModelPost == null) {
-            viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
-            post = viewModelPost.getCurrentPost().getValue();
-            comments = viewModelPost.getCurrentPostComments().getValue();
-        }
+            attachObserver();
 
-        if (post != null) {
-            binding.setPost(post);
-            saveButton = binding.saveButtonExpanded;
-            configureViews();
-            activity = getActivity();
-
-            mainActivityInterface = (MainActivityInterface) activity;
         }
-
-        if (comments != null) {
-            displayCommentsFragment();
-        }
+//        if (post != null) {
+//            binding.setPost(post);
+//            saveButton = binding.saveButtonExpanded;
+//            configureViews();
+//            activity = getActivity();
+//
+//            mainActivityInterface = (MainActivityInterface) activity;
+//        }
+//
+//        if (comments != null) {
+//            displayCommentsFragment();
+//        }
 
         return binding.getRoot();
+    }
+
+    private void attachObserver() {
+        viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
+        int postID = ExpandedItemFragmentArgs.fromBundle(getArguments()).getPostID();
+        viewModelPost.getPost(postID).observe(getViewLifecycleOwner(), fetchedPost -> {
+            if (fetchedPost != null) {
+                post = fetchedPost;
+                configureViews();
+                activity = getActivity();
+                mainActivityInterface = (MainActivityInterface) activity;
+            }
+        });
+        viewModelPost.getPostComments(postID).observe(getViewLifecycleOwner(), fetchedComments -> {
+            if (fetchedComments != null) {
+                comments = fetchedComments;
+                displayCommentsFragment();
+            }
+        });
     }
 
     private void displayCommentsFragment() {
@@ -76,6 +93,9 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
     }
 
     private void configureViews() {
+        binding.setPost(post);
+        saveButton = binding.saveButtonExpanded;
+
         if (post.isSaved()) {
             binding.saveButtonExpanded.setImageResource(R.drawable.ic_favorite_red_32dp);
         }

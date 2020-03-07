@@ -1,22 +1,33 @@
 package com.example.bookapp.viewModels;
 
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
+import com.example.bookapp.activities.AppUtilities;
 import com.example.bookapp.api.FriendsRepository;
 import com.example.bookapp.models.Friend;
 
 import java.util.ArrayList;
 
-public class ViewModelFriends extends ViewModel implements FriendsRepository.ApiManagerFriendsDataCallback {
-    private final MutableLiveData<ArrayList<Friend>> friends = new MutableLiveData<>();
+public class ViewModelFriends extends ViewModel {
 
-    public MutableLiveData<ArrayList<Friend>> getFriends() {
+    private MutableLiveData<ArrayList<Friend>> friends;
+    private FriendsRepository friendsRepository;
+
+    public ViewModelFriends() {
+        super();
+        friendsRepository = FriendsRepository.getInstance(AppUtilities.getRetrofit());
+    }
+
+    public MutableLiveData<ArrayList<Friend>> getFriends(String userID) {
+        if (friends == null) {
+            //push the request
+            friends = friendsRepository.fetchAllFriends(userID);
+
+        }
         return friends;
     }
 
-    @Override
-    public void onFriendsDataReady(ArrayList<Friend> friends) {
-        this.friends.setValue(friends);
-    }
+
 }

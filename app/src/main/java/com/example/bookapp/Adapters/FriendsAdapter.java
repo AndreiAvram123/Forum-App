@@ -4,7 +4,6 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,11 +19,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
     private ArrayList<Friend> friends;
     private MainActivityInterface mainActivityInterface;
 
-    public FriendsAdapter(@Nullable ArrayList<Friend> friends, @NonNull MainActivityInterface activityInterface) {
-        if (friends == null) {
+    public FriendsAdapter(@NonNull MainActivityInterface activityInterface) {
             friends = new ArrayList<>();
-        }
-        this.friends = friends;
         this.mainActivityInterface = activityInterface;
     }
 

@@ -11,10 +11,6 @@
         android:label="layout_home_fragment"
         tools:layout="@layout/layout_home_fragment" >
 
-        <action
-            android:id="@+id/action_homeFragment_to_expandedItemFragment"
-            app:destination="@+id/expandedItemFragment"
-            app:enterAnim="@anim/fragment_open_enter" />
         <argument
             android:name="latestPosts"
             app:argType="com.example.bookapp.models.Post[]" />
@@ -29,7 +25,11 @@
         android:id="@+id/expandedItemFragment"
         android:name="com.example.bookapp.fragments.ExpandedItemFragment"
         android:label="fragment_expanded_item"
-        tools:layout="@layout/fragment_expanded_item" />
+        tools:layout="@layout/fragment_expanded_item" >
+        <argument
+            android:name="postID"
+            app:argType="integer" />
+    </fragment>
     <fragment
         android:id="@+id/favoriteItems"
         android:name="com.example.bookapp.fragments.FavoritePostsFragment"
@@ -84,4 +84,5 @@
             android:name="user2ID"
             app:argType="string" />
     </fragment>
+    <action android:id="@+id/action_global_expandedItemFragment" app:destination="@id/expandedItemFragment" />
 </navigation>

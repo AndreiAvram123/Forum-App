@@ -131,7 +131,7 @@ public class MessageRepository extends Repository {
                     shouldOtherFunctionsWait = false;
                     //callback when the message has reached the server
                     try {
-                        JSONObject jsonObject = new JSONObject();
+                        JSONObject jsonObject = new JSONObject(response);
                             Message.Builder builder = new Message.Builder();
                         builder.setMessageContent(messageContent);
                         builder.setMessageID(jsonObject.getString("lastMessageID"));

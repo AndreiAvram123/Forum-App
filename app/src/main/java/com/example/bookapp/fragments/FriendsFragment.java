@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -17,7 +16,9 @@ import com.example.bookapp.Adapters.FriendsAdapter;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.FragmentFriendsBinding;
 import com.example.bookapp.interfaces.MainActivityInterface;
+import com.example.bookapp.models.User;
 import com.example.bookapp.viewModels.ViewModelFriends;
+import com.example.bookapp.viewModels.ViewModelUser;
 
 public class FriendsFragment extends Fragment {
 
@@ -28,18 +29,23 @@ public class FriendsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        if (viewModelFriends == null) {
-            attachObserver();
-        }
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_friends, container, false);
-
         //set the adapter
         configureRecyclerView();
+
+        // Inflate the layout for this fragment
+        if (viewModelFriends == null) {
+            attachObservers();
+        }
+
+
         return binding.getRoot();
     }
 
     private void configureRecyclerView() {
+        if (friendsAdapter == null) {
+            friendsAdapter = new FriendsAdapter((MainActivityInterface) requireActivity());
+        }
         binding.recyclerViewFriends.setAdapter(friendsAdapter);
         binding.recyclerViewFriends.setHasFixedSize(true);
         binding.recyclerViewFriends.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.HORIZONTAL));
@@ -47,10 +53,15 @@ public class FriendsFragment extends Fragment {
 
     }
 
-    private void attachObserver() {
+    private void attachObservers() {
         viewModelFriends = new ViewModelProvider(requireActivity()).get(ViewModelFriends.class);
-        friendsAdapter = new FriendsAdapter(viewModelFriends.getFriends().getValue(), (MainActivityInterface) requireContext());
-        viewModelFriends.getFriends().observe(getViewLifecycleOwner(), friends -> friendsAdapter.setData(friends));
+        ViewModelUser viewModelUser = new ViewModelProvider(requireActivity()).get(ViewModelUser.class);
+
+        User currentUser = viewModelUser.getUser().getValue();
+        if (currentUser != null) {
+            viewModelFriends.getFriends(currentUser.getUserID()).observe(getViewLifecycleOwner(), friends -> friendsAdapter.setData(friends));
+        }
+
     }
 
 

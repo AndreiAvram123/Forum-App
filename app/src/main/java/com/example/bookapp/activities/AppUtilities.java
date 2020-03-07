@@ -11,7 +11,21 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import retrofit2.Retrofit;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
+
 public class AppUtilities {
+    private static Retrofit retrofit;
+
+    public static Retrofit getRetrofit(){
+        if(retrofit == null){
+            retrofit = new Retrofit.Builder().baseUrl("http://sgb967.poseidon.salford.ac.uk/cms/")
+                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .build();
+        }
+        return retrofit;
+    }
+
 
     static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager

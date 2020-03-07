@@ -20,6 +20,7 @@ import com.example.bookapp.api.ApiManager;
 import com.example.bookapp.api.MessageRepository;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
+import com.example.bookapp.fragments.ExpandedItemFragmentDirections;
 import com.example.bookapp.fragments.FriendsFragmentDirections;
 import com.example.bookapp.fragments.SearchFragment;
 import com.example.bookapp.interfaces.MainActivityInterface;
@@ -32,6 +33,7 @@ import com.example.bookapp.models.User;
 import com.example.bookapp.viewModels.ViewModelFriends;
 import com.example.bookapp.viewModels.ViewModelMessages;
 import com.example.bookapp.viewModels.ViewModelPost;
+import com.example.bookapp.viewModels.ViewModelUser;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.common.api.ApiException;
@@ -54,9 +56,9 @@ public class MainActivity extends AppCompatActivity implements
 
     private SharedPreferences sharedPreferences;
     private ApiManager apiManager;
-    private User currentUser;
     private ViewModelPost viewModelPost;
     private ViewModelFriends viewModelFriends;
+    private ViewModelUser viewModelUser;
     private ViewModelMessages viewModelMessages;
     private RequestQueue requestQueue;
     private MessageRepository messageRepository;
@@ -66,10 +68,10 @@ public class MainActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main_activity);
         configureDefaultVariables();
+        getCurrentUser();
         if (shouldShowWelcomeActivity()) {
             startWelcomeActivity();
         } else {
-            currentUser = getCurrentUser();
             if (AppUtilities.isNetworkAvailable(this)) {
                 configureApiManager();
             }
@@ -81,32 +83,32 @@ public class MainActivity extends AppCompatActivity implements
     private void configureApiManager() {
         apiManager = ApiManager.getInstance(this);
         apiManager.setPostDataCallback(viewModelPost);
-        apiManager.setFriendsDataCallback(viewModelFriends);
-        messageRepository = MessageRepository.getInstance(requestQueue, currentUser.getUserID());
+        messageRepository = MessageRepository.getInstance(requestQueue, viewModelUser.getUser().getValue().getUserID());
         messageRepository.setCallback(viewModelMessages);
         pushDefaultRequests();
     }
 
     private void pushDefaultRequests() {
-        apiManager.pushRequestLatestPosts();
-        if (currentUser != null) {
-            apiManager.pushRequestMyPosts(currentUser.getUserID());
-            apiManager.pushRequestGetFavoritePosts(currentUser.getUserID());
-            apiManager.pushRequestFetchFriends(currentUser.getUserID());
+        // apiManager.pushRequestLatestPosts();
+        if (viewModelUser.getUser().getValue() != null) {
+            apiManager.pushRequestMyPosts(viewModelUser.getUser().getValue().getUserID());
+            apiManager.pushRequestGetFavoritePosts(viewModelUser.getUser().getValue().getUserID());
+            viewModelFriends.getFriends(viewModelUser.getUser().getValue().getUserID());
         }
     }
 
 
-    private User getCurrentUser() {
+    private void getCurrentUser() {
         String userID = sharedPreferences.getString(getString(R.string.key_user_id), null);
         String username = sharedPreferences.getString(getString(R.string.key_username), null);
         if (userID != null && username != null) {
             User.Builder builder = new User.Builder();
             builder.setUserID(userID);
             builder.setUsername(username);
-            return builder.create();
+            viewModelUser.setUser(builder.create());
+        } else {
+            startWelcomeActivity();
         }
-        return null;
     }
 
 
@@ -136,13 +138,14 @@ public class MainActivity extends AppCompatActivity implements
         viewModelPost = new ViewModelProvider(this).get(ViewModelPost.class);
         viewModelFriends = new ViewModelProvider(this).get(ViewModelFriends.class);
         viewModelMessages = new ViewModelProvider(this).get(ViewModelMessages.class);
+        viewModelUser = new ViewModelProvider(this).get(ViewModelUser.class);
 
-        viewModelPost.getCurrentPost().observe(this, post -> {
-            if (viewModelPost.getSavedPosts().getValue().contains(post)) {
-                post.setSaved(true);
-            }
-            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.expandedItemFragment);
-        });
+//        viewModelPost.getCurrentPost().observe(this, post -> {
+//            if (viewModelPost.getSavedPosts().getValue().contains(post)) {
+//                post.setSaved(true);
+//            }
+//            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.expandedItemFragment);
+//        });
     }
 
 
@@ -224,7 +227,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void savePost(Post post) {
-        apiManager.pushRequestAddPostToFavorites(post.getPostID(), currentUser.getUserID());
+        apiManager.pushRequestAddPostToFavorites(post.getPostID(), viewModelUser.getUser().getValue().getUserID());
         viewModelPost.addFavoritePost(post);
     }
 
@@ -236,23 +239,25 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void expandPost(int postID) {
-        apiManager.pushRequestGetPostDetails(postID);
+        NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(postID);
+        Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
+
     }
 
     @Override
     public void uploadComment(Comment comment) {
-        apiManager.uploadNewComment(comment, currentUser.getUserID());
+        apiManager.uploadNewComment(comment, viewModelUser.getUser().getValue().getUserID());
     }
 
     @Override
     public void uploadPost(NonUploadedPost nonUploadedPost) {
-        apiManager.uploadPost(nonUploadedPost, currentUser.getUserID());
+        apiManager.uploadPost(nonUploadedPost, viewModelUser.getUser().getValue().getUserID());
     }
 
     @Override
     public void startChat(String userID) {
         messageRepository.pushRequestFetchOldMessages(userID, 0);
-        NavDirections action = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(currentUser.getUserID(),userID);
+        NavDirections action = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(viewModelUser.getUser().getValue().getUserID(), userID);
         Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action);
     }
 
@@ -309,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements
         if (error.equals(getString(R.string.no_internet_connection))) {
             if (AppUtilities.isNetworkAvailable(this)) {
 
-                apiManager.pushRequestLatestPosts();
+                //   apiManager.pushRequestLatestPosts();
             }
         }
     }

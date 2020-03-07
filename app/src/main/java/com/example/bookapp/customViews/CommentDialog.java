@@ -18,6 +18,7 @@ public class CommentDialog extends Dialog {
         super(context);
         this.commentDialogInterface = commentDialogInterface;
         this.postID = postID;
+        
     }
 
     @Override

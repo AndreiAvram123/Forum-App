@@ -51,7 +51,6 @@ public class ApiManager {
 
     private ApiManager(@NonNull Context context) {
         requestQueue = Volley.newRequestQueue(context);
-        friendsRepository = FriendsRepository.getInstance(requestQueue);
     }
 
     public void setPostDataCallback(@NonNull ApiManagerDataCallback callback) {
@@ -60,10 +59,6 @@ public class ApiManager {
 
     public void setApiManagerAuthenticationCallback(@NonNull ApiManagerAuthenticationCallback callback) {
         this.apiManagerAuthenticationCallback = callback;
-    }
-
-    public void setFriendsDataCallback(@NonNull FriendsRepository.ApiManagerFriendsDataCallback friendsDataCallback) {
-        this.friendsRepository.setApiManagerFriendsDataCallback(friendsDataCallback);
     }
 
 
@@ -78,7 +73,7 @@ public class ApiManager {
     public void pushRequestLatestPosts() {
         StringRequest randomRecipesRequest = new StringRequest(Request.Method.GET, URL_LATEST_POSTS,
                 (response) -> {
-                    ArrayList<Post> latestPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
+                    ArrayList<Post> latestPosts = PostConverter.getPostsFromJsonArray(response);
                     //this case only applies when there is no data in the system
 
                     if (!latestPosts.isEmpty()) {
@@ -94,7 +89,7 @@ public class ApiManager {
     public void pushRequestGetMorePosts() {
         String formattedURL = String.format(ApiConstants.URL_MORE_POSTS, lastPostID);
         StringRequest morePostsRequest = new StringRequest(Request.Method.GET, formattedURL, (response -> {
-            ArrayList<Post> fetchedPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
+            ArrayList<Post> fetchedPosts = PostConverter.getPostsFromJsonArray(response);
             if (!fetchedPosts.isEmpty()) {
                 lastPostID = fetchedPosts.get(fetchedPosts.size() - 1).getPostID();
             }
@@ -211,7 +206,7 @@ public class ApiManager {
         //push request
         StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
         {
-            ArrayList<Post> savedPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
+            ArrayList<Post> savedPosts = PostConverter.getPostsFromJsonArray(response);
             apiManagerDataCallback.onSavedPostsReady(savedPosts);
         },
                 (error) -> {
@@ -236,7 +231,7 @@ public class ApiManager {
         //push request
         StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
         {
-            ArrayList<Post> myPosts = PostConverter.getSmallDataPostsFromJsonArray(response);
+            ArrayList<Post> myPosts = PostConverter.getPostsFromJsonArray(response);
             apiManagerDataCallback.onMyPostsReady(myPosts);
         },
                 (error) -> {
@@ -245,7 +240,7 @@ public class ApiManager {
     }
 
     public void pushRequestFetchFriends(String userID) {
-        friendsRepository.pushRequestFetchAllFriends(userID);
+
     }
 
 

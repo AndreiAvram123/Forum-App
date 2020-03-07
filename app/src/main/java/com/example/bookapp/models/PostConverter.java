@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class PostConverter {
     private static final String defaultImageURL = "http://sgb967.poseidon.salford.ac.uk/cms/%s";
 
-    public static ArrayList<Post> getSmallDataPostsFromJsonArray(String json) {
+    public static ArrayList<Post> getPostsFromJsonArray(String json) {
         ArrayList<Post> dataToReturn = new ArrayList<>();
         try {
             JSONArray jsonArray = new JSONArray(json);
