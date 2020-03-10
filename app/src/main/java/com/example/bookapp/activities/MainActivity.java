@@ -85,16 +85,6 @@ public class MainActivity extends AppCompatActivity implements
         apiManager.setPostDataCallback(viewModelPost);
         messageRepository = MessageRepository.getInstance(requestQueue, viewModelUser.getUser().getValue().getUserID());
         messageRepository.setCallback(viewModelMessages);
-        pushDefaultRequests();
-    }
-
-    private void pushDefaultRequests() {
-        // apiManager.pushRequestLatestPosts();
-        if (viewModelUser.getUser().getValue() != null) {
-            apiManager.pushRequestMyPosts(viewModelUser.getUser().getValue().getUserID());
-            apiManager.pushRequestGetFavoritePosts(viewModelUser.getUser().getValue().getUserID());
-            viewModelFriends.getFriends(viewModelUser.getUser().getValue().getUserID());
-        }
     }
 
 
@@ -139,13 +129,6 @@ public class MainActivity extends AppCompatActivity implements
         viewModelFriends = new ViewModelProvider(this).get(ViewModelFriends.class);
         viewModelMessages = new ViewModelProvider(this).get(ViewModelMessages.class);
         viewModelUser = new ViewModelProvider(this).get(ViewModelUser.class);
-
-//        viewModelPost.getCurrentPost().observe(this, post -> {
-//            if (viewModelPost.getSavedPosts().getValue().contains(post)) {
-//                post.setSaved(true);
-//            }
-//            Navigation.findNavController(this, R.id.nav_host_fragment).navigate(R.id.expandedItemFragment);
-//        });
     }
 
 
@@ -227,8 +210,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void savePost(Post post) {
-        apiManager.pushRequestAddPostToFavorites(post.getPostID(), viewModelUser.getUser().getValue().getUserID());
-        viewModelPost.addFavoritePost(post);
+  //      apiManager.pushRequestAddPostToFavorites(post.getPostID(), viewModelUser.getUser().getValue().getUserID());
+//        viewModelPost.addFavoritePost(post);
     }
 
 

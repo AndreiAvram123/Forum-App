@@ -1,33 +1,30 @@
 package com.example.bookapp.Adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
-import com.example.bookapp.interfaces.MainActivityInterface;
+import com.example.bookapp.databinding.LayoutItemPostBinding;
+import com.example.bookapp.fragments.ExpandedItemFragmentDirections;
 import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 
 public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewAdapterPosts.ViewHolder> {
-    private ArrayList<Post> posts;
+    private ArrayList<Post> posts = new ArrayList<>();
     private Context context;
-    private MainActivityInterface mainActivityInterface;
     private String[] allSortCriteria;
 
-    public RecyclerViewAdapterPosts(@NonNull ArrayList<Post> posts, Activity activity) {
-        this.posts = posts;
-        mainActivityInterface = (MainActivityInterface) activity;
-        allSortCriteria = activity.getResources().getStringArray(R.array.sort_parameters);
+    public RecyclerViewAdapterPosts(@NonNull String[] allSortCriteria) {
+        this.allSortCriteria = allSortCriteria;
     }
 
     public void setData(ArrayList<Post> data){
@@ -39,21 +36,24 @@ public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewA
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         context = parent.getContext();
-        View itemLayout = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_item_post, parent, false);
+        LayoutItemPostBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.layout_item_post, parent, false);
 
-        return new ViewHolder(itemLayout);
+        return new ViewHolder(binding);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.recipeName.setText(posts.get(position).getPostTitle());
+        holder.binding.setPost(posts.get(position));
         Glide.with(context)
                 .load(posts.get(position).getPostImage())
                 .centerInside()
-                .into(holder.recipeImage);
+                .into(holder.binding.postImage);
         //when the user clicks on an item
         //display the extended item fragment
-        holder.itemView.setOnClickListener(view -> mainActivityInterface.expandPost(posts.get(position).getPostID()));
+        holder.itemView.setOnClickListener(view -> {
+            NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(posts.get(position).getPostID());
+            Navigation.findNavController(holder.binding.getRoot()).navigate(action);
+        });
     }
 
     @Override
@@ -87,20 +87,12 @@ public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewA
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        //declare the views to bind
-        private ImageView recipeImage;
-        private TextView recipeName;
+        private LayoutItemPostBinding binding;
 
-        ViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-
-            bindValuesToViews(itemView);
+        ViewHolder(@NonNull LayoutItemPostBinding binding) {
+            super(binding.getRoot());
+            this.binding= binding;
         }
 
-        private void bindValuesToViews(View itemLayout) {
-            recipeImage = itemLayout.findViewById(R.id.recipe_image_list_item);
-            recipeName = itemLayout.findViewById(R.id.recipe_name_list_item);
-        }
     }
 }

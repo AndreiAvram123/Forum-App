@@ -1,11 +1,12 @@
 package com.example.bookapp.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import android.view.View;
+import android.widget.ImageView;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.databinding.BindingAdapter;
 
-public class Post implements Parcelable {
+public class Post {
 
     private int postID;
     private String postTitle;
@@ -14,7 +15,8 @@ public class Post implements Parcelable {
     private String postImage;
     private String postCategory;
     private String postContent;
-    private boolean isSaved = false;
+    private boolean isFavorite = false;
+
 
     public static class PostBuilder {
         private int postID;
@@ -24,6 +26,7 @@ public class Post implements Parcelable {
         private String postImage;
         private String postCategory;
         private String postContent;
+
 
         public PostBuilder setPostContent(String postContent) {
             this.postContent = postContent;
@@ -93,44 +96,6 @@ public class Post implements Parcelable {
 
     }
 
-    //    Post(int postID, String postTitle, String postDate, String postAuthor, String postCategory, String postImage, String postContent) {
-//        this(postID, postTitle, postImage, postAuthor);
-//        this.postDate = postDate;
-//        this.postCategory = postCategory;
-//        this.postContent = postContent;
-//
-//    }
-//
-//
-//    Post(int postID, String postTitle, String postImage, String postAuthor) {
-//        this.postID = postID;
-//        this.postTitle = postTitle;
-//        this.postImage = postImage;
-//        this.postAuthor = postAuthor;
-//    }
-//
-    private Post(Parcel in) {
-        postID = in.readInt();
-        postTitle = in.readString();
-        postDate = in.readString();
-        postAuthor = in.readString();
-        postImage = in.readString();
-        postCategory = in.readString();
-        postContent = in.readString();
-    }
-
-    public static final Creator<Post> CREATOR = new Creator<Post>() {
-        @Override
-        public Post createFromParcel(Parcel in) {
-            return new Post(in);
-        }
-
-        @Override
-        public Post[] newArray(int size) {
-            return new Post[size];
-        }
-    };
-
     public int getPostID() {
         return postID;
     }
@@ -159,28 +124,13 @@ public class Post implements Parcelable {
         return postContent;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+
+    public boolean isFavorite() {
+        return isFavorite;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(postID);
-        dest.writeString(postTitle);
-        dest.writeString(postDate);
-        dest.writeString(postAuthor);
-        dest.writeString(postImage);
-        dest.writeString(postCategory);
-        dest.writeString(postContent);
-    }
-
-    public boolean isSaved() {
-        return isSaved;
-    }
-
-    public void setSaved(boolean saved) {
-        isSaved = saved;
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
     }
 
     @Override

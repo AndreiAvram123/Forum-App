@@ -49,8 +49,7 @@
     <string name="key_user_id">key_user_id</string>
     <string name="key_username">key_username</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="number_saved_posts">Saved posts : %1$d </string>
     <string name="my_posts_label">My posts</string>
     <string name="friend_fragment_label">Friends</string>
 </resources>

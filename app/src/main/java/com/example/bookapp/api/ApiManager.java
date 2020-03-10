@@ -12,6 +12,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.bookapp.dataLayer.repositories.FriendsRepository;
 import com.example.bookapp.models.ApiConstants;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.NonUploadedPost;
@@ -70,21 +71,7 @@ public class ApiManager {
         requestQueue.add(stringRequest);
     }
 
-    public void pushRequestLatestPosts() {
-        StringRequest randomRecipesRequest = new StringRequest(Request.Method.GET, URL_LATEST_POSTS,
-                (response) -> {
-                    ArrayList<Post> latestPosts = PostConverter.getPostsFromJsonArray(response);
-                    //this case only applies when there is no data in the system
 
-                    if (!latestPosts.isEmpty()) {
-                        lastPostID = latestPosts.get(0).getPostID();
-                    }
-                    apiManagerDataCallback.onLatestPostsDataReady(latestPosts);
-
-                }, Throwable::printStackTrace);
-        requestQueue.add(randomRecipesRequest);
-
-    }
 
     public void pushRequestGetMorePosts() {
         String formattedURL = String.format(ApiConstants.URL_MORE_POSTS, lastPostID);
@@ -200,48 +187,7 @@ public class ApiManager {
     }
 
 
-    public void pushRequestGetFavoritePosts(String userID) {
 
-        String formattedURLSavedPosts = String.format(ApiConstants.URL_SAVED_POSTS, userID);
-        //push request
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
-        {
-            ArrayList<Post> savedPosts = PostConverter.getPostsFromJsonArray(response);
-            apiManagerDataCallback.onSavedPostsReady(savedPosts);
-        },
-                (error) -> {
-                });
-        requestQueue.add(stringRequest);
-    }
-
-    public void pushRequestAddPostToFavorites(int postID, String userID) {
-        String formattedURLSavedPosts = String.format(ApiConstants.URL_ADD_POST_TO_FAVORITES, postID, userID);
-        //push request
-        StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
-        {
-
-        },
-                (error) -> {
-                });
-        requestQueue.add(request);
-    }
-
-    public void pushRequestMyPosts(String userID) {
-        String formattedURLSavedPosts = String.format(ApiConstants.URL_MY_POSTS, userID);
-        //push request
-        StringRequest request = new StringRequest(Request.Method.GET, formattedURLSavedPosts, (response) ->
-        {
-            ArrayList<Post> myPosts = PostConverter.getPostsFromJsonArray(response);
-            apiManagerDataCallback.onMyPostsReady(myPosts);
-        },
-                (error) -> {
-                });
-        requestQueue.add(request);
-    }
-
-    public void pushRequestFetchFriends(String userID) {
-
-    }
 
 
     public interface ApiManagerDataCallback {

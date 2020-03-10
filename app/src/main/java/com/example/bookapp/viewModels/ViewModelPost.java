@@ -16,11 +16,13 @@ import java.util.ArrayList;
 
 public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDataCallback {
     private MutableLiveData<ArrayList<Post>> currentPosts;
+    private MutableLiveData<ArrayList<Post>> favoritePosts;
+
+
     private final MutableLiveData<ArrayList<Post>> autocompleteResults = new MutableLiveData<>();
     private final MutableLiveData<ArrayList<Post>> previousAutocompleteResults = new MutableLiveData<>();
-    private final MutableLiveData<ArrayList<Post>> savedPosts = new MutableLiveData<>();
 
-    private final MutableLiveData<ArrayList<Post>> myPosts = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<Post>> myPosts;
     private PostRepository postRepository;
 
     public ViewModelPost() {
@@ -32,12 +34,14 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
     private void initializeFields() {
         this.autocompleteResults.setValue(new ArrayList<>());
         this.previousAutocompleteResults.setValue(new ArrayList<>());
-        this.savedPosts.setValue(new ArrayList<>());
-        this.myPosts.setValue(new ArrayList<>());
     }
 
 
-    public MutableLiveData<ArrayList<Post>> getMyPosts() {
+    public MutableLiveData<ArrayList<Post>> getMyPosts(String userID) {
+        if (myPosts == null) {
+            //should fetch posts
+            return postRepository.fetchMyPosts(userID);
+        }
         return myPosts;
     }
 
@@ -49,21 +53,16 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
         return postRepository.fetchPostComments(postID);
     }
 
-    public void addFavoritePost(Post savedPost) {
-        ArrayList<Post> newSavedPosts = new ArrayList<>(savedPosts.getValue());
-        newSavedPosts.add(savedPost);
-        savedPosts.setValue(newSavedPosts);
-
-    }
 
     public void removeFavoritePost(Post postToRemove) {
-        ArrayList<Post> newSavedPosts = new ArrayList<>(savedPosts.getValue());
+        ArrayList<Post> newSavedPosts = new ArrayList<>(favoritePosts.getValue());
         newSavedPosts.remove(postToRemove);
-        savedPosts.setValue(newSavedPosts);
+        favoritePosts.setValue(newSavedPosts);
     }
 
 
     public LiveData<ArrayList<Post>> getCurrentPosts() {
+        //no need to fetch the data again if the current posts is not null
         if (currentPosts == null) {
             //fetch the current posts if the current posts are not yet set
             currentPosts = postRepository.fetchCurrentPosts();
@@ -82,9 +81,36 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
         return previousAutocompleteResults;
     }
 
-    public MutableLiveData<ArrayList<Post>> getSavedPosts() {
-        return savedPosts;
+    public MutableLiveData<ArrayList<Post>> getFavoritePosts(String userID) {
+        if (favoritePosts == null) {
+            favoritePosts = postRepository.fetchFavoritePosts(userID);
+        }
+        return favoritePosts;
     }
+
+
+    public void addPostToFavorites(Post post, String userID) {
+        postRepository.addPostToFavorites(post.getPostID(), userID);
+        //if the favoritePosts data has been fetched you need to update the ui
+        if (favoritePosts != null && favoritePosts.getValue() != null) {
+            ArrayList<Post> newData = new ArrayList<>(favoritePosts.getValue());
+            post.setFavorite(true);
+            newData.add(post);
+            favoritePosts.setValue(newData);
+        }
+    }
+
+    public void deletePostFromFavorites(Post post, String userID) {
+        postRepository.deletePostFromFavorites(post.getPostID(), userID);
+        if (favoritePosts != null && favoritePosts.getValue() != null) {
+            ArrayList<Post> newData = new ArrayList<>(favoritePosts.getValue());
+            newData.remove(post);
+            //notify the observers
+            favoritePosts.setValue(newData);
+        }
+    }
+
+
 
 
     @Override
@@ -109,7 +135,7 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
 
     @Override
     public void onSavedPostsReady(ArrayList<Post> savedPosts) {
-        this.savedPosts.setValue(savedPosts);
+        this.favoritePosts.setValue(savedPosts);
     }
 
     @Override
@@ -127,4 +153,6 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
             currentPosts.setValue(fetchedPosts);
         }
     }
+
+
 }

@@ -19,6 +19,8 @@ public class PostRepository {
     private static PostRepository instance;
     private MutableLiveData<ArrayList<Post>> currentPosts;
     private MutableLiveData<Post> currentFetchedPost;
+    private MutableLiveData<ArrayList<Post>> favoritePosts;
+    private MutableLiveData<ArrayList<Post>> myPosts;
     private MutableLiveData<ArrayList<Comment>> currentFetchedComments;
     private PostRepositoryInterface repositoryInterface;
 
@@ -45,7 +47,7 @@ public class PostRepository {
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-
+                t.printStackTrace();
             }
         });
         return currentPosts;
@@ -65,7 +67,7 @@ public class PostRepository {
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-
+                t.printStackTrace();
             }
         });
         return currentFetchedPost;
@@ -84,9 +86,74 @@ public class PostRepository {
 
             @Override
             public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-
+                t.printStackTrace();
             }
         });
         return currentFetchedComments;
+    }
+
+    /**
+     * This method should be called when the favorite posts
+     * data is requested
+     * The method decided weather it should fetch the data from
+     * cache or from the source
+     *
+     * @param userID
+     * @return
+     */
+    public MutableLiveData<ArrayList<Post>> fetchFavoritePosts(String userID) {
+        //prepare data to be returned on the main thread
+        favoritePosts = new MutableLiveData<>();
+        //start fetching the other data on the other thread
+        repositoryInterface.fetchFavoritePostsByUserID(userID, true).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                ArrayList<Post> fetchedPosts = PostConverter.getPostsFromJsonArray(response.body());
+                fetchedPosts.forEach(post -> post.setFavorite(true));
+                favoritePosts.setValue(fetchedPosts);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                t.printStackTrace();
+            }
+        });
+        return favoritePosts;
+    }
+
+    public MutableLiveData<ArrayList<Post>> fetchMyPosts(String userID) {
+        myPosts = new MutableLiveData<>();
+        repositoryInterface.fetchMyPosts(userID, true).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                ArrayList<Post> fetchedPosts = PostConverter.getPostsFromJsonArray(response.body());
+                myPosts.setValue(fetchedPosts);
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                t.printStackTrace();
+            }
+        });
+        return myPosts;
+    }
+
+
+    public void addPostToFavorites(int postID, String userID) {
+        repositoryInterface.addPostToFavorites(true, postID, userID).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+
+            }
+        });
+    }
+
+    public void deletePostFromFavorites(int postID, String userID) {
+        //  repositoryInterface.deletePostFromFavorites(postID,userID);
     }
 }

@@ -11,9 +11,6 @@
         android:label="layout_home_fragment"
         tools:layout="@layout/layout_home_fragment" >
 
-        <argument
-            android:name="latestPosts"
-            app:argType="com.example.bookapp.models.Post[]" />
         <action
             android:id="@+id/action_homeFragment_to_fragmentAddPost"
             app:destination="@id/fragmentAddPost" />

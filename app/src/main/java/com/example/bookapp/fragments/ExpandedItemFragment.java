@@ -21,7 +21,9 @@ import com.example.bookapp.interfaces.MainActivityInterface;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.CommentBuilder;
 import com.example.bookapp.models.Post;
+import com.example.bookapp.models.User;
 import com.example.bookapp.viewModels.ViewModelPost;
+import com.example.bookapp.viewModels.ViewModelUser;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -30,13 +32,14 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
     private MainActivityInterface mainActivityInterface;
     private Post post;
     private ArrayList<Comment> comments;
-    private ImageView saveButton;
+    private ImageView favoriteButton;
     private FragmentExpandedItemBinding binding;
     private FragmentActivity activity;
     private CommentDialog commentDialog;
     private CommentsFragment commentsFragment;
     private ViewModelPost viewModelPost;
-
+    private ViewModelUser viewModelUser;
+    private User user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,34 +49,33 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
                 .inflate(inflater, R.layout.fragment_expanded_item, container, false);
 
         if (viewModelPost == null) {
-            attachObserver();
-
+            attachObservers();
         }
-//        if (post != null) {
-//            binding.setPost(post);
-//            saveButton = binding.saveButtonExpanded;
-//            configureViews();
-//            activity = getActivity();
-//
-//            mainActivityInterface = (MainActivityInterface) activity;
-//        }
-//
-//        if (comments != null) {
-//            displayCommentsFragment();
-//        }
+        activity = requireActivity();
+        mainActivityInterface = (MainActivityInterface) activity;
 
         return binding.getRoot();
     }
 
-    private void attachObserver() {
+    private void attachObservers() {
         viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
+        viewModelUser = new ViewModelProvider(requireActivity()).get(ViewModelUser.class);
+        user = viewModelUser.getUser().getValue();
+        //start observing if the user is not logged in to see
+        //weather he will log in
+
+        if (user == null) {
+            viewModelUser.getUser().observe(getViewLifecycleOwner(), newUser -> {
+                this.user = newUser;
+            });
+        }
+
+
         int postID = ExpandedItemFragmentArgs.fromBundle(getArguments()).getPostID();
         viewModelPost.getPost(postID).observe(getViewLifecycleOwner(), fetchedPost -> {
             if (fetchedPost != null) {
                 post = fetchedPost;
                 configureViews();
-                activity = getActivity();
-                mainActivityInterface = (MainActivityInterface) activity;
             }
         });
         viewModelPost.getPostComments(postID).observe(getViewLifecycleOwner(), fetchedComments -> {
@@ -94,27 +96,31 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
 
     private void configureViews() {
         binding.setPost(post);
-        saveButton = binding.saveButtonExpanded;
+        favoriteButton = binding.saveButtonExpanded;
 
-        if (post.isSaved()) {
-            binding.saveButtonExpanded.setImageResource(R.drawable.ic_favorite_red_32dp);
+        if (user != null) {
+            favoriteButton.setOnClickListener(view -> {
+                if (post.isFavorite()) {
+                    post.setFavorite(false);
+                    informUserPostRemovedFromFavorites();
+                    viewModelPost.deletePostFromFavorites(post,user.getUserID());
+                } else {
+                    post.setFavorite(true);
+                    informUserPostAddedToFavorites();
+                    viewModelPost.addPostToFavorites(post, user.getUserID());
+                }
+
+            });
+        } else {
+            //todo
+            //prompt user to log in
         }
-        saveButton.setOnClickListener(view -> {
-            if (post.isSaved()) {
-                informUserPostRemovedFromFavorites();
-                mainActivityInterface.deleteSavedPost(post);
-            } else {
-                informUserPostAddedToFavorites();
-                mainActivityInterface.savePost(post);
-            }
-
-        });
         binding.backButtonExpanded.setOnClickListener((view) -> Navigation.findNavController(activity, R.id.nav_host_fragment).popBackStack());
         binding.writeCommentButton.setOnClickListener((view) -> {
             showCommentDialog();
         });
 
-        Glide.with(getContext())
+        Glide.with(requireContext())
                 .load(post.getPostImage())
                 .centerInside()
                 .into(binding.recipeImageExpanded);
@@ -126,30 +132,28 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
     }
 
     private void informUserPostAddedToFavorites() {
-        post.setSaved(true);
-        saveButton.setImageResource(R.drawable.ic_favorite_red_32dp);
+        post.setFavorite(true);
         Snackbar.make(binding.getRoot(), "Recipe added to favorites", Snackbar.LENGTH_SHORT).show();
     }
 
     private void informUserPostRemovedFromFavorites() {
-        post.setSaved(false);
-        saveButton.setImageResource(R.drawable.ic_favorite_border_black_32dp);
+        post.setFavorite(false);
         Snackbar.make(binding.getRoot(), "Recipe deleted from favorites", Snackbar.LENGTH_SHORT).show();
     }
 
 
     @Override
     public void submitComment(String comment, int postID) {
-        CommentBuilder commentBuilder = new CommentBuilder();
-        String username = "Andrei Avram";
-        commentBuilder.setCommentID(1000)
-                .setCommentDate(AppUtilities.getDateString())
-                .setCommentContent(comment)
-                .setPostID(postID)
-                .setCommentAuthor(username);
-        commentsFragment.addComment(commentBuilder.createComment());
-        mainActivityInterface.uploadComment(commentBuilder.createComment());
-
+        if (user != null) {
+            CommentBuilder commentBuilder = new CommentBuilder();
+            commentBuilder.setCommentID(1000)
+                    .setCommentDate(AppUtilities.getDateString())
+                    .setCommentContent(comment)
+                    .setPostID(postID)
+                    .setCommentAuthor(viewModelUser.getUser().getValue().getUsername());
+            commentsFragment.addComment(commentBuilder.createComment());
+            mainActivityInterface.uploadComment(commentBuilder.createComment());
+        }
     }
 
     @Override
