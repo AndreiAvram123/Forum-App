@@ -1,12 +1,12 @@
-package com.example.bookapp.dataLayer.repositories;
+package com.example.dataLayer.repositories;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.bookapp.dataLayer.interfaces.PostRepositoryInterface;
-import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.Post;
 import com.example.bookapp.models.PostConverter;
+import com.example.dataLayer.dataObjectsToSerialize.SerializePost;
+import com.example.dataLayer.interfaces.PostRepositoryInterface;
 
 import java.util.ArrayList;
 
@@ -16,13 +16,15 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class PostRepository {
+
     private static PostRepository instance;
     private MutableLiveData<ArrayList<Post>> currentPosts;
     private MutableLiveData<Post> currentFetchedPost;
     private MutableLiveData<ArrayList<Post>> favoritePosts;
     private MutableLiveData<ArrayList<Post>> myPosts;
-    private MutableLiveData<ArrayList<Comment>> currentFetchedComments;
     private PostRepositoryInterface repositoryInterface;
+    private int lastPostID;
+
 
     private PostRepository(@NonNull Retrofit retrofit) {
         repositoryInterface = retrofit.create(PostRepositoryInterface.class);
@@ -41,8 +43,9 @@ public class PostRepository {
         repositoryInterface.fetchCurrentPosts(true).enqueue(new Callback<String>() {
             @Override
             public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                ArrayList<Post> recentPosts = PostConverter.getPostsFromJsonArray(response.body());
-                currentPosts.setValue(recentPosts);
+                ArrayList<Post> fetchedPosts = PostConverter.getPostsFromJsonArray(response.body());
+                lastPostID = fetchedPosts.get(fetchedPosts.size() - 1).getPostID();
+                currentPosts.setValue(fetchedPosts);
             }
 
             @Override
@@ -71,25 +74,6 @@ public class PostRepository {
             }
         });
         return currentFetchedPost;
-    }
-
-    public MutableLiveData<ArrayList<Comment>> fetchPostComments(int id) {
-        currentFetchedComments = new MutableLiveData<>();
-        repositoryInterface.fetchCommentsByPostID(id, true).enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                if (response.body() != null) {
-                    ArrayList<Comment> fetchedComments = PostConverter.getCommentsFromJson(response.body());
-                    currentFetchedComments.setValue(fetchedComments);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
-                t.printStackTrace();
-            }
-        });
-        return currentFetchedComments;
     }
 
     /**
@@ -153,7 +137,41 @@ public class PostRepository {
         });
     }
 
+    public void insertPost(@NonNull SerializePost serializePost) {
+        repositoryInterface.uploadPost(true, serializePost).enqueue(new Callback<Post>() {
+            @Override
+            public void onResponse(@NonNull Call<Post> call, @NonNull Response<Post> response) {
+                addNewDataAndNotify(currentPosts, response.body());
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Post> call, @NonNull Throwable t) {
+                t.printStackTrace();
+            }
+        });
+    }
+
+
+    private void addNewDataAndNotify(MutableLiveData<ArrayList<Post>> data, Post post) {
+        if (data != null && data.getValue() != null) {
+            ArrayList<Post> newData = new ArrayList<Post>(data.getValue());
+            newData.add(post);
+            data.setValue(newData);
+        }
+    }
+
+
     public void deletePostFromFavorites(int postID, String userID) {
         //  repositoryInterface.deletePostFromFavorites(postID,userID);
+    }
+
+
+    public MutableLiveData<ArrayList<Post>> fetchNewPosts() {
+        if (currentPosts == null) {
+            currentPosts = new MutableLiveData<>();
+        }
+         // repositoryInterface.fetchNewPosts(true,lastPostID).enqueue(new Call);
+
+        return currentPosts;
     }
 }

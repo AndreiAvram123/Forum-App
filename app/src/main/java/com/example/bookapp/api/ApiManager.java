@@ -12,7 +12,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.bookapp.dataLayer.repositories.FriendsRepository;
+import com.example.dataLayer.repositories.FriendsRepository;
 import com.example.bookapp.models.ApiConstants;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.NonUploadedPost;
@@ -26,10 +26,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import static com.example.bookapp.models.ApiConstants.UPLOAD_IMAGE_URL;
-import static com.example.bookapp.models.ApiConstants.URL_LATEST_POSTS;
 import static com.example.bookapp.models.ApiConstants.URL_POST_AUTOCOMPLETE;
-import static com.example.bookapp.models.ApiConstants.URL_POST_COMMENTS;
-import static com.example.bookapp.models.ApiConstants.URL_POST_DETAILS;
 import static com.example.bookapp.models.ApiConstants.URL_UPLOAD_COMMENT;
 
 public class ApiManager {
@@ -88,27 +85,6 @@ public class ApiManager {
     }
 
 
-
-
-    public void pushRequestGetPostDetails(int postID) {
-
-        StringRequest postDetailsRequest = new StringRequest(Request.Method.GET, String.format(URL_POST_DETAILS, postID), (response) -> {
-            Post.PostBuilder postBuilder = new Post.PostBuilder();
-            PostConverter.getFullPostDetailsFromJson(response, postBuilder);
-            pushRequestGetPostComments(postBuilder.createPost());
-        }, Throwable::printStackTrace);
-
-        requestQueue.add(postDetailsRequest);
-    }
-
-    private void pushRequestGetPostComments(@NonNull Post post) {
-        StringRequest postCommentsRequest = new StringRequest(Request.Method.GET, String.format(URL_POST_COMMENTS, post.getPostID()),
-                (response) -> {
-                    ArrayList<Comment> comments = PostConverter.getCommentsFromJson(response);
-                    apiManagerDataCallback.onPostDetailsReady(post, comments, null);
-                }, Throwable::printStackTrace);
-        requestQueue.add(postCommentsRequest);
-    }
 
 
     public void pushRequestAutocomplete(String query) {

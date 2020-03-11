@@ -1,4 +1,4 @@
-package com.example.bookapp.dataLayer.repositories;
+package com.example.dataLayer.repositories;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;

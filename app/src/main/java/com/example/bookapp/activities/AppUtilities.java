@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import androidx.annotation.Nullable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,18 +13,21 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class AppUtilities {
     private static Retrofit retrofit;
 
-    public static Retrofit getRetrofit(){
-        if(retrofit == null){
-            retrofit = new Retrofit.Builder().baseUrl("http://sgb967.poseidon.salford.ac.uk/cms/")
-                    .addConverterFactory(ScalarsConverterFactory.create())
-                    .build();
+    public static Retrofit getRetrofit(@Nullable Converter.Factory converterFactory) {
+        Retrofit.Builder builder = new Retrofit.Builder().baseUrl("http://sgb967.poseidon.salford.ac.uk/cms/");
+        if (converterFactory == null) {
+            builder.addConverterFactory(ScalarsConverterFactory.create());
+        } else {
+            builder.addConverterFactory(converterFactory);
         }
+        retrofit = builder.build();
         return retrofit;
     }
 

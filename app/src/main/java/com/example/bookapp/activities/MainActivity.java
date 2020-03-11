@@ -17,7 +17,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.example.bookapp.R;
 import com.example.bookapp.api.ApiManager;
-import com.example.bookapp.api.MessageRepository;
+import com.example.dataLayer.repositories.MessageRepository;
 import com.example.bookapp.fragments.BottomSheetPromptLogin;
 import com.example.bookapp.fragments.ErrorFragment;
 import com.example.bookapp.fragments.ExpandedItemFragmentDirections;
@@ -192,7 +192,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void fetchSelectedPostById(int id) {
-        apiManager.pushRequestGetPostDetails(id);
     }
 
 

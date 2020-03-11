@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.bookapp.api.MessageRepository;
+import com.example.dataLayer.repositories.MessageRepository;
 import com.example.bookapp.models.Message;
 
 import java.util.ArrayList;

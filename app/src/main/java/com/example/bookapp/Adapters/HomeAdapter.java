@@ -25,7 +25,7 @@ public class HomeAdapter extends RecyclerView.Adapter {
         posts = new ArrayList<>();
     }
 
-    public void addPosts(@NonNull ArrayList<Post> newPosts) {
+    public void addNewPosts(@NonNull ArrayList<Post> newPosts) {
         int itemsInserted = 0;
         ArrayList<Post> reversedData = new ArrayList<>(newPosts);
         Collections.reverse(reversedData);

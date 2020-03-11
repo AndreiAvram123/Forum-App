@@ -1,11 +1,5 @@
 package com.example.bookapp.models;
 
-import android.view.View;
-import android.widget.ImageView;
-
-import androidx.annotation.NonNull;
-import androidx.databinding.BindingAdapter;
-
 public class Post {
 
     private int postID;

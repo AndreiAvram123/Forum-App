@@ -1,6 +1,7 @@
 package com.example.bookapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,24 +20,25 @@ import com.example.bookapp.Adapters.SuggestionsAdapter;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.FragmentSearchBinding;
 import com.example.bookapp.models.Post;
-import com.example.bookapp.viewModels.ViewModelPost;
+import com.example.bookapp.viewModels.ViewModelSearch;
 
 import java.util.ArrayList;
 
 public class SearchFragment extends Fragment {
-    private static final String KEY_SEARCH_HISTORY = "KEY_SEARCH_HISTORY";
     private SearchView searchView;
-    private SearchFragmentInterface searchFragmentInterface;
     private LiveData<ArrayList<Post>> autocompleteSuggestions;
-    private LiveData<ArrayList<Post>> previousAutocompleteSuggestion;
     private FragmentSearchBinding binding;
-    private SuggestionsAdapter suggestionsRecyclerView;
+    private SuggestionsAdapter suggestionsAdapter;
+    private ViewModelSearch viewModelSearch;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         super.onViewCreated(container,savedInstanceState);
+        if (viewModelSearch == null) {
+            attachObserverToViewModel();
+        }
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false);
         searchView = binding.searchView;
         configureRecyclerView();
@@ -47,31 +49,25 @@ public class SearchFragment extends Fragment {
 
     private void configureRecyclerView() {
         //this should be replaced by search history
-        suggestionsRecyclerView = new SuggestionsAdapter(new ArrayList<>(), getActivity());
-        binding.recyclerViewSearchResults.setAdapter(suggestionsRecyclerView);
+        suggestionsAdapter = new SuggestionsAdapter(new ArrayList<>());
+        binding.recyclerViewSearchResults.setAdapter(suggestionsAdapter);
         binding.recyclerViewSearchResults.setHasFixedSize(true);
         binding.recyclerViewSearchResults.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.recyclerViewSearchResults.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     }
 
     private void attachObserverToViewModel() {
-        ViewModelPost viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
-        autocompleteSuggestions = viewModelPost.getAutocompleteResults();
-        previousAutocompleteSuggestion = viewModelPost.getPreviousAutocompleteResults();
-        viewModelPost.getAutocompleteResults().observe(getViewLifecycleOwner(),  item ->{
-                // Update the UI.
-            if (autocompleteSuggestions.getValue().isEmpty()) {
-                suggestionsRecyclerView.setData(previousAutocompleteSuggestion.getValue());
-            } else {
-                suggestionsRecyclerView.setData(autocompleteSuggestions.getValue());
-            }
+        viewModelSearch = new ViewModelProvider(requireActivity()).get(ViewModelSearch.class);
+        viewModelSearch.getObservableSearchSuggestions().observe(getViewLifecycleOwner(), suggestions -> {
+
+            suggestionsAdapter.setData(suggestions);
         });
+
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        searchFragmentInterface = (SearchFragmentInterface) getActivity();
     }
 
 
@@ -99,18 +95,18 @@ public class SearchFragment extends Fragment {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-                if (!query.trim().equals("")) {
-                    searchFragmentInterface.performSearch(query);
-                }
+
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newQuery) {
                 if (!newQuery.trim().equals("")) {
-                    previousAutocompleteSuggestion.getValue().clear();
-                    previousAutocompleteSuggestion.getValue().addAll(previousAutocompleteSuggestion.getValue());
-                    searchFragmentInterface.fetchSuggestions(newQuery);
+                    if (!newQuery.trim().equals("") && newQuery.length() > 1) {
+                        viewModelSearch.requestSuggestions(newQuery);
+                    }
+                } else {
+                    suggestionsAdapter.setData(new ArrayList<>());
                 }
 
                 return false;

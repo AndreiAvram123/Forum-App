@@ -1,23 +1,20 @@
 package com.example.bookapp.viewModels;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.bookapp.activities.AppUtilities;
-import com.example.bookapp.api.ApiManager;
-import com.example.bookapp.dataLayer.repositories.PostRepository;
-import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.Post;
+import com.example.dataLayer.dataObjectsToSerialize.SerializePost;
+import com.example.dataLayer.repositories.PostRepository;
 
 import java.util.ArrayList;
 
-public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDataCallback {
-    private MutableLiveData<ArrayList<Post>> currentPosts;
+public class ViewModelPost extends ViewModel {
+    private MutableLiveData<ArrayList<Post>> currentDisplayedPosts;
     private MutableLiveData<ArrayList<Post>> favoritePosts;
-
 
     private final MutableLiveData<ArrayList<Post>> autocompleteResults = new MutableLiveData<>();
     private final MutableLiveData<ArrayList<Post>> previousAutocompleteResults = new MutableLiveData<>();
@@ -25,22 +22,17 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
     private MutableLiveData<ArrayList<Post>> myPosts;
     private PostRepository postRepository;
 
+
     public ViewModelPost() {
         super();
-        postRepository = PostRepository.getInstance(AppUtilities.getRetrofit());
-        initializeFields();
-    }
-
-    private void initializeFields() {
-        this.autocompleteResults.setValue(new ArrayList<>());
-        this.previousAutocompleteResults.setValue(new ArrayList<>());
+        postRepository = PostRepository.getInstance(AppUtilities.getRetrofit(null));
     }
 
 
     public MutableLiveData<ArrayList<Post>> getMyPosts(String userID) {
         if (myPosts == null) {
             //should fetch posts
-            return postRepository.fetchMyPosts(userID);
+            myPosts = postRepository.fetchMyPosts(userID);
         }
         return myPosts;
     }
@@ -49,9 +41,7 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
         return postRepository.fetchPost(id);
     }
 
-    public MutableLiveData<ArrayList<Comment>> getPostComments(int postID) {
-        return postRepository.fetchPostComments(postID);
-    }
+
 
 
     public void removeFavoritePost(Post postToRemove) {
@@ -61,25 +51,16 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
     }
 
 
-    public LiveData<ArrayList<Post>> getCurrentPosts() {
+    public LiveData<ArrayList<Post>> getCurrentDisplayedPosts() {
         //no need to fetch the data again if the current posts is not null
-        if (currentPosts == null) {
+        if (currentDisplayedPosts == null) {
             //fetch the current posts if the current posts are not yet set
-            currentPosts = postRepository.fetchCurrentPosts();
+            currentDisplayedPosts = postRepository.fetchCurrentPosts();
 
         }
-        return currentPosts;
+        return currentDisplayedPosts;
     }
 
-    public LiveData<ArrayList<Post>> getAutocompleteResults() {
-
-        return autocompleteResults;
-    }
-
-    public LiveData<ArrayList<Post>> getPreviousAutocompleteResults() {
-
-        return previousAutocompleteResults;
-    }
 
     public MutableLiveData<ArrayList<Post>> getFavoritePosts(String userID) {
         if (favoritePosts == null) {
@@ -110,49 +91,56 @@ public class ViewModelPost extends ViewModel implements ApiManager.ApiManagerDat
         }
     }
 
-
-
-
-    @Override
-    public void onLatestPostsDataReady(ArrayList<Post> latestPosts) {
-        this.currentPosts.setValue(latestPosts);
+    public void addPost(@NonNull SerializePost serializePost) {
+        postRepository.insertPost(serializePost);
     }
 
-    @Override
-    public void onPostDetailsReady(@NonNull Post post, @Nullable ArrayList<Comment> comments, @Nullable ArrayList<Post> similarPosts) {
-
+    public void fetchNewPosts() {
+        currentDisplayedPosts = postRepository.fetchNewPosts();
     }
 
-    @Override
-    public void onPostSearchReady(ArrayList<Post> data) {
+//
+//    @Override
+//    public void onLatestPostsDataReady(ArrayList<Post> latestPosts) {
+//        this.currentDisplayedPosts.setValue(latestPosts);
+//    }
+//
+//    @Override
+//    public void onPostDetailsReady(@NonNull Post post, @Nullable ArrayList<Comment> comments, @Nullable ArrayList<Post> similarPosts) {
+//
+//    }
+//
+//    @Override
+//    public void onPostSearchReady(ArrayList<Post> data) {
+//
+//    }
+//
+//    @Override
+//    public void onAutocompleteSuggestionsReady(ArrayList<Post> data) {
+//        this.autocompleteResults.setValue(data);
+//    }
+//
+//    @Override
+//    public void onSavedPostsReady(ArrayList<Post> savedPosts) {
+//        this.favoritePosts.setValue(savedPosts);
+//    }
+//
+//    @Override
+//    public void onMyPostsReady(@NonNull ArrayList<Post> myPosts) {
+//     this.myPosts.setValue(myPosts);
+//    }
+//
+//    @Override
+//    public void onNewPostsReady(@NonNull ArrayList<Post> fetchedPosts) {
+//        if (currentDisplayedPosts.getValue() != null) {
+//            ArrayList<Post> newData = new ArrayList<>(currentDisplayedPosts.getValue());
+//            newData.addAll(fetchedPosts);
+//            currentDisplayedPosts.setValue(newData);
+//        } else {
+//            currentDisplayedPosts.setValue(fetchedPosts);
+//        }
+//    }
 
-    }
-
-    @Override
-    public void onAutocompleteSuggestionsReady(ArrayList<Post> data) {
-        this.autocompleteResults.setValue(data);
-    }
-
-    @Override
-    public void onSavedPostsReady(ArrayList<Post> savedPosts) {
-        this.favoritePosts.setValue(savedPosts);
-    }
-
-    @Override
-    public void onMyPostsReady(@NonNull ArrayList<Post> myPosts) {
-     this.myPosts.setValue(myPosts);
-    }
-
-    @Override
-    public void onNewPostsReady(@NonNull ArrayList<Post> fetchedPosts) {
-        if (currentPosts.getValue() != null) {
-            ArrayList<Post> newData = new ArrayList<>(currentPosts.getValue());
-            newData.addAll(fetchedPosts);
-            currentPosts.setValue(newData);
-        } else {
-            currentPosts.setValue(fetchedPosts);
-        }
-    }
 
 
 }
