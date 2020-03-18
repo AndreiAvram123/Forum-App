@@ -16,7 +16,7 @@ public class ViewModelFriends extends ViewModel {
 
     public ViewModelFriends() {
         super();
-        friendsRepository = FriendsRepository.getInstance(AppUtilities.getRetrofit(null));
+        friendsRepository = FriendsRepository.getInstance(AppUtilities.getRetrofit());
     }
 
     public MutableLiveData<ArrayList<Friend>> getFriends(String userID) {

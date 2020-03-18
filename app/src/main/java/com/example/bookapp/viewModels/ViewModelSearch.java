@@ -15,7 +15,7 @@ public class ViewModelSearch extends ViewModel {
 
     public ViewModelSearch() {
         super();
-        searchRepository = SearchRepository.getInstance(AppUtilities.getRetrofit(null));
+        searchRepository = SearchRepository.getInstance(AppUtilities.getRetrofit());
     }
 
     public void requestSuggestions(String query) {

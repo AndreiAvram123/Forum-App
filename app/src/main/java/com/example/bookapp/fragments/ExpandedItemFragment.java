@@ -76,7 +76,7 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
         }
 
 
-        int postID = ExpandedItemFragmentArgs.fromBundle(getArguments()).getPostID();
+        long postID = ExpandedItemFragmentArgs.fromBundle(getArguments()).getPostID();
         viewModelPost.getPost(postID).observe(getViewLifecycleOwner(), fetchedPost -> {
             if (fetchedPost != null) {
                 post = fetchedPost;
@@ -147,7 +147,7 @@ public class ExpandedItemFragment extends Fragment implements CommentDialog.Comm
 
 
     @Override
-    public void submitComment(String comment, int postID) {
+    public void submitComment(String comment, long postID) {
         if (user != null) {
             SerializeComment serializeComment = new SerializeComment(postID, comment, user.getUserID());
             viewModelComments.uploadComment(serializeComment);

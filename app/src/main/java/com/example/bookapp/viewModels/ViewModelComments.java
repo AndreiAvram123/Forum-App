@@ -17,14 +17,14 @@ public class ViewModelComments extends ViewModel {
     private MutableLiveData<ArrayList<Comment>> currentPostComments;
     public ViewModelComments() {
         super();
-        commentsRepository = CommentsRepository.getInstance(AppUtilities.getRetrofit(GsonConverterFactory.create()));
+        commentsRepository = CommentsRepository.getInstance(AppUtilities.getRetrofit());
     }
 
     public void uploadComment(@NonNull SerializeComment serializeComment) {
         commentsRepository.uploadComment(serializeComment);
     }
 
-    public MutableLiveData<ArrayList<Comment>> getCommentsForPost(int postID) {
+    public MutableLiveData<ArrayList<Comment>> getCommentsForPost(long postID) {
         currentPostComments = commentsRepository.fetchCommentsForPost(postID);
 
         return currentPostComments;

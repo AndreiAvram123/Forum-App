@@ -1,11 +1,12 @@
 package com.example.dataLayer.repositories;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.dataLayer.interfaces.SearchInterface;
 import com.example.bookapp.models.Post;
-import com.example.bookapp.models.PostConverter;
+import com.example.dataLayer.interfaces.SearchInterface;
 
 import java.util.ArrayList;
 
@@ -36,15 +37,16 @@ public class SearchRepository {
     }
 
     public MutableLiveData<ArrayList<Post>> fetchSearchSuggestions(String query) {
-        searchInterface.fetchSearchSuggestions(query).enqueue(new Callback<String>() {
+        searchInterface.fetchSearchSuggestions(query).enqueue(new Callback<ArrayList<Post>>() {
             @Override
-            public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
-                ArrayList<Post> fetchedData = PostConverter.getPostsFromJsonArray(response.body());
+            public void onResponse(@NonNull Call<ArrayList<Post>> call, @NonNull Response<ArrayList<Post>> response) {
+                Log.d("haha",response.body().toString());
+                ArrayList<Post> fetchedData = response.body();
                 searchSuggestions.setValue(fetchedData);
             }
 
             @Override
-            public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<ArrayList<Post>> call, @NonNull Throwable t) {
 
             }
         });

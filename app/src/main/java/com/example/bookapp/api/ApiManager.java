@@ -17,7 +17,6 @@ import com.example.bookapp.models.ApiConstants;
 import com.example.bookapp.models.Comment;
 import com.example.bookapp.models.NonUploadedPost;
 import com.example.bookapp.models.Post;
-import com.example.bookapp.models.PostConverter;
 import com.example.bookapp.models.User;
 
 import org.json.JSONException;
@@ -70,35 +69,6 @@ public class ApiManager {
 
 
 
-    public void pushRequestGetMorePosts() {
-        String formattedURL = String.format(ApiConstants.URL_MORE_POSTS, lastPostID);
-        StringRequest morePostsRequest = new StringRequest(Request.Method.GET, formattedURL, (response -> {
-            ArrayList<Post> fetchedPosts = PostConverter.getPostsFromJsonArray(response);
-            if (!fetchedPosts.isEmpty()) {
-                lastPostID = fetchedPosts.get(fetchedPosts.size() - 1).getPostID();
-            }
-            if (apiManagerDataCallback != null) {
-                apiManagerDataCallback.onNewPostsReady(fetchedPosts);
-            }
-        }), Throwable::printStackTrace);
-        requestQueue.add(morePostsRequest);
-    }
-
-
-
-
-    public void pushRequestAutocomplete(String query) {
-        String formattedAutocompleteURl = String.format(URL_POST_AUTOCOMPLETE, query);
-        //push request
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, formattedAutocompleteURl, (response) ->
-        {
-            ArrayList<Post> suggestions = PostConverter.getAutocompleteSuggestionFromJson(response);
-            apiManagerDataCallback.onAutocompleteSuggestionsReady(suggestions);
-        },
-                (error) -> {
-                });
-        requestQueue.add(stringRequest);
-    }
 
     public void uploadNewComment(Comment comment, String userID) {
         JSONObject postBody = new JSONObject();

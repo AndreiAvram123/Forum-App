@@ -5,12 +5,14 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.PostItemHomePageBinding;
-import com.example.bookapp.interfaces.MainActivityInterface;
+import com.example.bookapp.fragments.ExpandedItemFragmentDirections;
 import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
@@ -18,10 +20,8 @@ import java.util.Collections;
 
 public class HomeAdapter extends RecyclerView.Adapter {
     private ArrayList<Post> posts;
-    private MainActivityInterface callback;
 
-    public HomeAdapter(@NonNull MainActivityInterface callback) {
-        this.callback = callback;
+    public HomeAdapter() {
         posts = new ArrayList<>();
     }
 
@@ -72,7 +72,10 @@ public class HomeAdapter extends RecyclerView.Adapter {
 
         void bind(@NonNull Post post) {
             binding.setPost(post);
-            binding.getRoot().setOnClickListener(view -> callback.expandPost(post.getPostID()));
+            binding.getRoot().setOnClickListener(view -> {
+                NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(post.getPostID());
+                Navigation.findNavController(binding.getRoot()).navigate(action);
+            });
             Glide.with(binding.getRoot().getContext())
                     .load(post.getPostImage())
                     .into(binding.postItemHomeImage);

@@ -51,7 +51,7 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements
         MainActivityInterface,
-        BottomSheetPromptLogin.BottomSheetInterface, SearchFragment.SearchFragmentInterface
+        BottomSheetPromptLogin.BottomSheetInterface
         , ErrorFragment.ErrorFragmentInterface, MessageInterface {
 
     private SharedPreferences sharedPreferences;
@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements
 
     private void configureApiManager() {
         apiManager = ApiManager.getInstance(this);
-        apiManager.setPostDataCallback(viewModelPost);
         messageRepository = MessageRepository.getInstance(requestQueue, viewModelUser.getUser().getValue().getUserID());
         messageRepository.setCallback(viewModelMessages);
     }
@@ -180,19 +179,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    @Override
-    public void performSearch(String query) {
-    }
-
-
-    @Override
-    public void fetchSuggestions(String query) {
-        apiManager.pushRequestAutocomplete(query);
-    }
-
-    @Override
-    public void fetchSelectedPostById(int id) {
-    }
 
 
     @Override
@@ -216,7 +202,6 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void deleteSavedPost(Post post) {
-        viewModelPost.removeFavoritePost(post);
     }
 
     @Override
@@ -245,7 +230,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void fetchNewPosts() {
-        apiManager.pushRequestGetMorePosts();
+
     }
 
 

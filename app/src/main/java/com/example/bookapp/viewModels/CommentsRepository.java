@@ -55,7 +55,7 @@ class CommentsRepository {
     }
 
     @NonNull
-    MutableLiveData<ArrayList<Comment>> fetchCommentsForPost(int postID) {
+    MutableLiveData<ArrayList<Comment>> fetchCommentsForPost(long postID) {
         postComments = new MutableLiveData<>();
 
         commentsInterface.fetchCommentsByPostID(postID, true).enqueue(new Callback<ArrayList<Comment>>() {

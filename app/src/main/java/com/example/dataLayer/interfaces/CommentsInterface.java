@@ -17,7 +17,7 @@ import retrofit2.http.Query;
 public interface CommentsInterface {
 
     @GET("RestfulRequestHandler.php")
-    Call<ArrayList<Comment>> fetchCommentsByPostID(@Query("postID") int postID, @Query("comments") boolean fetchComments);
+    Call<ArrayList<Comment>> fetchCommentsByPostID(@Query("postID") long postID, @Query("comments") boolean fetchComments);
 
     @POST("RestfulRequestHandler.php")
     Call<Comment> uploadComment(@Query("uploadComment") boolean uploadComment, @Body SerializeComment comment);

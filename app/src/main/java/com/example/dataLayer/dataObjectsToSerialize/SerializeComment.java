@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName;
 public class SerializeComment {
     @SerializedName("commentPostID")
     @Expose
-    private int commentPostID;
+    private long commentPostID;
 
     @SerializedName("commentContent")
     @Expose
@@ -17,7 +17,7 @@ public class SerializeComment {
     private String commentUserID;
 
 
-    public SerializeComment(int commentPostID, String commentContent, String commentUserID) {
+    public SerializeComment(long commentPostID, String commentContent, String commentUserID) {
         this.commentPostID = commentPostID;
         this.commentContent = commentContent;
         this.commentUserID = commentUserID;
