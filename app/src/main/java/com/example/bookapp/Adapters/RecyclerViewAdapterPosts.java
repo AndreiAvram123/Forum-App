@@ -63,26 +63,6 @@ public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewA
 
     public void sort(String sortCriteria) {
 
-//        if (sortCriteria.equals(allSortCriteria[1])) {
-//            //quickest
-//            posts.sort((r1, r2) -> {
-//                int r1CookingTime = Integer.parseInt(r1.getReadyInMinutes());
-//                int r2CookingTime = Integer.parseInt(r2.getReadyInMinutes());
-//                return Integer.compare(r1CookingTime, r2CookingTime);
-//            });
-//            notifyDataSetChanged();
-//        }
-//        if (sortCriteria.equals(allSortCriteria[2])) {
-//            //Number of servings
-//            posts.sort((r1, r2) -> {
-//                int r1Servings = Integer.parseInt(r1.getServings());
-//                int r2Servings = Integer.parseInt(r2.getServings());
-//                //the compare method return 1 if the first number is smaller than
-//                //the first one
-//                return Integer.compare(r2Servings, r1Servings);
-//            });
-//            notifyDataSetChanged();
-//        }
 
     }
 

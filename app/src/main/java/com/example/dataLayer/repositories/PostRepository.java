@@ -1,6 +1,9 @@
 package com.example.dataLayer.repositories;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.bookapp.models.Post;
@@ -24,11 +27,17 @@ public class PostRepository {
     private MutableLiveData<ArrayList<Post>> favoritePosts;
     private MutableLiveData<ArrayList<Post>> myPosts;
     private PostRepositoryInterface repositoryInterface;
-    private long lastPostID;
+    private MutableLiveData<Post> currentlyUploadedPost = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<Post>> newFetchedPosts  = new MutableLiveData<>();
 
 
     private PostRepository(@NonNull Retrofit retrofit) {
         repositoryInterface = retrofit.create(PostRepositoryInterface.class);
+    }
+
+
+    public MutableLiveData<Post> getCurrentlyUploadedPost() {
+        return currentlyUploadedPost;
     }
 
     public static PostRepository getInstance(@NonNull Retrofit retrofit) {
@@ -39,13 +48,13 @@ public class PostRepository {
 
     }
 
-    public void fetchMorePostsByPageNumber(@NonNull MutableLiveData<ArrayList<Post>> posts, int page) {
+    public MutableLiveData<ArrayList<Post>> fetchFirstPagePosts() {
+        posts = new MutableLiveData<>();
         repositoryInterface.fetchPosts(true).enqueue(new Callback<ArrayList<Post>>() {
             @Override
             public void onResponse(@NonNull Call<ArrayList<Post>> call, @NonNull Response<ArrayList<Post>> response) {
                 ArrayList<Post> fetchedPosts = response.body();
                 assert fetchedPosts != null;
-                lastPostID = fetchedPosts.get(fetchedPosts.size() - 1).getPostID();
                 if (posts.getValue() != null) {
                     //clear some data if necessary
                     clearData(posts);
@@ -60,12 +69,10 @@ public class PostRepository {
 
             }
         });
+        return posts;
     }
 
     private void clearData(@NonNull MutableLiveData<ArrayList<Post>> posts) {
-        if (posts.getValue().size() > 20) {
-
-        }
     }
 
     public MutableLiveData<Post> fetchPostByID(long id) {
@@ -74,6 +81,7 @@ public class PostRepository {
             @Override
             public void onResponse(Call<Post> call, Response<Post> response) {
                 currentFetchedPost.setValue(response.body());
+                Log.d("test", "callback with uploaded data");
             }
 
             @Override
@@ -145,10 +153,11 @@ public class PostRepository {
     }
 
     public void insertPost(@NonNull SerializePost serializePost) {
+
         repositoryInterface.uploadPost(true, serializePost).enqueue(new Callback<Post>() {
             @Override
             public void onResponse(@NonNull Call<Post> call, @NonNull Response<Post> response) {
-                addNewDataAndNotify(posts, response.body());
+                currentlyUploadedPost.setValue(response.body());
             }
 
             @Override
@@ -159,13 +168,6 @@ public class PostRepository {
     }
 
 
-    private void addNewDataAndNotify(MutableLiveData<ArrayList<Post>> data, Post post) {
-        if (data != null && data.getValue() != null) {
-            ArrayList<Post> newData = new ArrayList<Post>(data.getValue());
-            newData.add(post);
-            data.setValue(newData);
-        }
-    }
 
 
     public void deletePostFromFavorites(long postID, String userID) {
@@ -173,22 +175,23 @@ public class PostRepository {
     }
 
 
-    public MutableLiveData<ArrayList<Post>> fetchNewPosts() {
-        if (posts == null) {
-            posts = new MutableLiveData<>();
-        }
-        repositoryInterface.fetchNewPosts(true, lastPostID).enqueue(new Callback<ArrayList<Post>>() {
+    public void fetchNewPosts() {
+        Log.d("HomeFragment","fetching new posts");
+        repositoryInterface.fetchPosts(true).enqueue(new Callback<ArrayList<Post>>() {
             @Override
-            public void onResponse(Call<ArrayList<Post>> call, Response<ArrayList<Post>> response) {
-
+            public void onResponse(@NonNull Call<ArrayList<Post>> call, @NonNull Response<ArrayList<Post>> response) {
+                newFetchedPosts.setValue(response.body());
             }
 
             @Override
-            public void onFailure(Call<ArrayList<Post>> call, Throwable t) {
+            public void onFailure(@NonNull Call<ArrayList<Post>> call, Throwable t) {
 
             }
         });
 
-        return posts;
+    }
+
+    public MutableLiveData<ArrayList<Post>> getNewFetchedPosts() {
+        return newFetchedPosts;
     }
 }

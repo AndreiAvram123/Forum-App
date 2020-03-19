@@ -31,7 +31,7 @@ public class SerializePost {
         private String postCategory;
         private String imageName;
         private String imageBase64;
-
+        private String postAuthorID;
         public Builder setPostTitle(String postTitle) {
             this.postTitle = postTitle;
             return this;
@@ -54,6 +54,10 @@ public class SerializePost {
 
         public Builder setImageBase64(String imageBase64) {
             this.imageBase64 = imageBase64;
+            return this;
+        }
+        public Builder setPostAuthorID(String postAuthorID){
+            this.postAuthorID = postAuthorID;
             return this;
         }
 

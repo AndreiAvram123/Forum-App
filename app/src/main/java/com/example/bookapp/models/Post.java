@@ -3,6 +3,8 @@ package com.example.bookapp.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Objects;
+
 public class Post {
 
     @SerializedName("postID")
@@ -64,7 +66,29 @@ public class Post {
         isFavorite = favorite;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Post)) return false;
 
+        Post post = (Post) o;
+
+        if (postID != post.postID) return false;
+        if (!Objects.equals(postTitle, post.postTitle))
+            return false;
+        if (!Objects.equals(postDate, post.postDate))
+            return false;
+        return Objects.equals(postImage, post.postImage);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (postID ^ (postID >>> 32));
+        result = 31 * result + (postTitle != null ? postTitle.hashCode() : 0);
+        result = 31 * result + (postDate != null ? postDate.hashCode() : 0);
+        result = 31 * result + (postImage != null ? postImage.hashCode() : 0);
+        return result;
+    }
 }
 
 

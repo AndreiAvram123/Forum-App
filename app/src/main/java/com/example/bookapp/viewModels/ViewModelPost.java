@@ -3,6 +3,7 @@ package com.example.bookapp.viewModels;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 
 import com.example.bookapp.activities.AppUtilities;
@@ -12,16 +13,13 @@ import com.example.dataLayer.repositories.PostRepository;
 
 import java.util.ArrayList;
 
-import retrofit2.converter.gson.GsonConverterFactory;
-
 public class ViewModelPost extends ViewModel {
     private MutableLiveData<ArrayList<Post>> currentFetchedPosts;
     private MutableLiveData<ArrayList<Post>> currentlyDisplayedPosts;
 
-    private final MutableLiveData<ArrayList<Post>> autocompleteResults = new MutableLiveData<>();
-    private final MutableLiveData<ArrayList<Post>> previousAutocompleteResults = new MutableLiveData<>();
-
     private MutableLiveData<ArrayList<Post>> myPosts;
+    private MutableLiveData<ArrayList<Post>> newFetchedPosts ;
+
     private PostRepository postRepository;
 
 
@@ -47,11 +45,11 @@ public class ViewModelPost extends ViewModel {
 
 
 
-    public LiveData<ArrayList<Post>> getPostsFromPage(int page) {
+    public LiveData<ArrayList<Post>> getFirstPagePosts(int page) {
+
         if (currentFetchedPosts == null) {
-            currentFetchedPosts = new MutableLiveData<>();
+            currentFetchedPosts = postRepository.fetchFirstPagePosts();
         }
-        postRepository.fetchMorePostsByPageNumber(currentFetchedPosts, page);
         return currentFetchedPosts;
     }
 
@@ -91,8 +89,11 @@ public class ViewModelPost extends ViewModel {
     }
 
     public void fetchNewPosts() {
-        currentFetchedPosts = postRepository.fetchNewPosts();
+        postRepository.fetchNewPosts();
     }
 
 
+    public MutableLiveData<ArrayList<Post>> getNewFetchedPosts() {
+        return postRepository.getNewFetchedPosts();
+    }
 }

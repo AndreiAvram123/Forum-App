@@ -60,7 +60,7 @@ public class FragmentAddPost extends Fragment {
         builder.setImageName(getImageName());
         builder.setPostTitle(binding.postTitleAdd.getText().toString());
         builder.setPostContent(binding.postContentAdd.getEditText().getText().toString());
-
+        builder.setPostAuthorID("sdf");
         ViewModelPost viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
         viewModelPost.addPost(builder.build());
         Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack();

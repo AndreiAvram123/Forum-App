@@ -38,6 +38,10 @@ public class HomeAdapter extends RecyclerView.Adapter {
         }
         notifyItemRangeInserted(0, itemsInserted);
     }
+    public void addNewPost(Post post) {
+      posts.add(0,post);
+      notifyItemInserted(0);
+    }
 
     @NonNull
     @Override
@@ -60,6 +64,12 @@ public class HomeAdapter extends RecyclerView.Adapter {
     public int getItemCount() {
         return posts.size();
     }
+
+    public void setData(ArrayList<Post> posts) {
+        this.posts = posts;
+        notifyDataSetChanged();
+    }
+
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
