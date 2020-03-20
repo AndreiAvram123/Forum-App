@@ -79,9 +79,8 @@ public class PostRepository {
         currentFetchedPost = new MutableLiveData<>();
         repositoryInterface.fetchPostByID(id).enqueue(new Callback<Post>() {
             @Override
-            public void onResponse(Call<Post> call, Response<Post> response) {
+            public void onResponse(@NonNull Call<Post> call, @NonNull Response<Post> response) {
                 currentFetchedPost.setValue(response.body());
-                Log.d("test", "callback with uploaded data");
             }
 
             @Override
