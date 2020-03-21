@@ -1,31 +1,33 @@
 package com.example.bookapp.models
 
-import com.google.gson.annotations.SerializedName
-
-data class Post(@SerializedName("postID")
-
-                val postID: Long,
-                @SerializedName("postTitle")
-                var postTitle: String,
-                @SerializedName("postImage")
-
-                var postImage: String,
-                @SerializedName("postDate")
-
-                var postDate: String?,
-                @SerializedName("postAuthor")
-
-                var postAuthor: String?,
-                @SerializedName("postCategory")
-
-                var postCategory: String? = null,
-                @SerializedName("postContent")
-
-                var postContent: String? = null
-
-
+data class Post(
+        var postID: Long,
+        var postTitle: String,
+        var postImage: String,
+        var postDate: String? = null,
+        var postAuthor: String? = null,
+        var postCategory: String? = null,
+        var postContent: String? = null
 ) {
+    var isFavorite = false;
 
-    var isFavorite = false
+    class Builder {
+        var postID: Long? = null
+        var postTitle: String? = null
+        var postImage: String? = null
+        var postDate: String? = null
+        var postAuthor: String? = null
+        var postCategory: String? = null
+        var postContent: String? = null
+        fun build() = Post(postID!!, postTitle!!, postImage!!, postDate, postAuthor, postCategory, postContent);
+    }
+
+    companion object Empty {
+
+        fun buildNullSafeObject(): Post {
+
+            return Post(0, "Unknown", "","Unknown","Unknown","Unknown","Unknown");
+        }
+    }
 
 }

@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="post"
             type="com.example.bookapp.models.Post" />
@@ -25,7 +24,7 @@
                 android:id="@+id/write_comment_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="24dp"
+                android:layout_marginEnd="24dp"
                 android:layout_marginBottom="32dp"
                 android:clickable="true"
                 android:focusable="true"

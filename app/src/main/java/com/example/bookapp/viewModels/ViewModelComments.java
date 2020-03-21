@@ -4,13 +4,11 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.bookapp.activities.AppUtilities;
+import com.example.bookapp.AppUtilities;
 import com.example.bookapp.models.Comment;
 import com.example.dataLayer.dataObjectsToSerialize.SerializeComment;
 
 import java.util.ArrayList;
-
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ViewModelComments extends ViewModel {
     private CommentsRepository commentsRepository;

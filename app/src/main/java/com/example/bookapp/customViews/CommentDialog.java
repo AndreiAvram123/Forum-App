@@ -14,7 +14,7 @@ public class CommentDialog extends Dialog {
 
     private CommentDialogInterface commentDialogInterface;
     private long postID;
-    public CommentDialog(@NonNull Context context,@NonNull CommentDialogInterface commentDialogInterface, long postID) {
+    public CommentDialog(@NonNull Context context,@NonNull CommentDialogInterface commentDialogInterface, Long postID) {
         super(context);
         this.commentDialogInterface = commentDialogInterface;
         this.postID = postID;

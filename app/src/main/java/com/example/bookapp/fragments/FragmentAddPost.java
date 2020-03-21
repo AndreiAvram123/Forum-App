@@ -20,16 +20,13 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.LayoutFragmentAddPostBinding;
 import com.example.bookapp.viewModels.ViewModelPost;
-import com.example.dataLayer.dataObjectsToSerialize.SerializePost;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Objects;
 
 public class FragmentAddPost extends Fragment {
     private LayoutFragmentAddPostBinding binding;
     private static final int CODE_FILE_EXPLORER = 10;
     private String imageUri;
-    private SerializePost.Builder builder = new SerializePost.Builder();
 
 
     @Override
@@ -55,15 +52,7 @@ public class FragmentAddPost extends Fragment {
     }
 
     private void startUploadPost() {
-        builder.setImageBase64(Base64.encodeToString(getImageBytes(), 0));
-        builder.setPostCategory("Missions");
-        builder.setImageName(getImageName());
-        builder.setPostTitle(binding.postTitleAdd.getText().toString());
-        builder.setPostContent(binding.postContentAdd.getEditText().getText().toString());
-        builder.setPostAuthorID("sdf");
-        ViewModelPost viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
-        viewModelPost.addPost(builder.build());
-        Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack();
+
     }
 
     @Override

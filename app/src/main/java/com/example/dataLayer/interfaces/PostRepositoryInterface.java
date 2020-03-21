@@ -1,7 +1,6 @@
 package com.example.dataLayer.interfaces;
 
-import com.example.bookapp.models.Post;
-import com.example.dataLayer.dataObjectsToSerialize.SerializePost;
+import com.example.dataLayer.models.PostDTO;
 
 import java.util.ArrayList;
 
@@ -15,24 +14,24 @@ import retrofit2.http.Query;
 
 public interface PostRepositoryInterface {
     @GET("RestfulRequestHandler.php")
-    Call<ArrayList<Post>> fetchPosts(@Query("recentPosts") boolean recentPosts);
+    Call<ArrayList<PostDTO>> fetchPosts(@Query("recentPosts") boolean recentPosts);
 
 
     @GET("RestfulRequestHandler.php")
-    Call<ArrayList<Post>> fetchNewPosts(@Query("recentPosts") boolean recentPosts, @Query("lastPostID") long lastPostID);
+    Call<ArrayList<PostDTO>> fetchNewPosts(@Query("recentPosts") boolean recentPosts, @Query("lastPostID") long lastPostID);
 
     @GET("RestfulRequestHandler.php")
-    Call<Post> fetchPostByID(@Query("postID") long postID);
+    Call<PostDTO> fetchPostByID(@Query("postID") long postID);
 
     @GET("RestfulRequestHandler.php")
-    Call<ArrayList<Post>> fetchFavoritePostsByUserID(@Query("userID") String userID, @Query("savedPosts") boolean favoritePosts);
+    Call<ArrayList<PostDTO>> fetchFavoritePostsByUserID(@Query("userID") String userID, @Query("savedPosts") boolean favoritePosts);
 
     @GET("RestfulRequestHandler.php")
-    Call<ArrayList<Post>> fetchMyPosts(@Query("userID") String userID, @Query("myPosts") boolean favoritePosts);
+    Call<ArrayList<PostDTO>> fetchMyPosts(@Query("userID") String userID, @Query("myPosts") boolean favoritePosts);
 
 
     @POST("RestfulRequestHandler.php")
-    Call<Post> uploadPost(@Query("uploadPost") boolean uploadPost, @Body SerializePost serializePost);
+    Call<PostDTO> uploadPost(@Query("uploadPost") boolean uploadPost, @Body PostDTO serializePost);
 
 
     @FormUrlEncoded
@@ -41,7 +40,7 @@ public interface PostRepositoryInterface {
 
     @FormUrlEncoded
     @POST("RestfulRequestHandler.php")
-    Call<String> removePostsFromFavorites(@Query("addPostToFavorite") boolean addToFavorites, @Field("postID") int postID, @Field("userID") String userID);
+    Call<PostDTO> removePostsFromFavorites(@Query("addPostToFavorite") boolean addToFavorites, @Field("postID") int postID, @Field("userID") String userID);
 
 
 }

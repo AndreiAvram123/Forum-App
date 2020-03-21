@@ -1,16 +1,15 @@
 package com.example.bookapp.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
 import com.example.bookapp.R
@@ -43,6 +42,7 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
         binding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_expanded_item, container, false)
         attachObservers()
+
         return binding.root
     }
 
@@ -54,11 +54,12 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
             viewModelUser.user.observe(viewLifecycleOwner, Observer { newUser: User? -> user = newUser })
         }
         val postID = ExpandedItemFragmentArgs.fromBundle(requireArguments()).postID
-        viewModelPost.getPost(postID).observe(viewLifecycleOwner, Observer { fetchedPost: Post? ->
+
+        viewModelPost.getPost(postID).observe(viewLifecycleOwner, Observer { fetchedPost: Post ->
                 post = fetchedPost
                 configureViews()
         })
-        viewModelComments!!.getCommentsForPost(postID).observe(viewLifecycleOwner, Observer { fetchedComments: ArrayList<Comment>? ->
+        viewModelComments.getCommentsForPost(postID).observe(viewLifecycleOwner, Observer { fetchedComments: ArrayList<Comment>? ->
             comments = fetchedComments
             displayCommentsFragment()
         })
@@ -99,7 +100,7 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
     }
 
     private fun showCommentDialog() {
-        commentDialog = CommentDialog(requireActivity(), this, post!!.postID)
+        commentDialog = CommentDialog(requireActivity(), this, post?.postID)
         commentDialog!!.show()
     }
 

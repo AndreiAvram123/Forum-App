@@ -3,6 +3,7 @@ package com.example.dataLayer.repositories;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
+import com.example.bookapp.AppUtilities;
 import com.example.bookapp.interfaces.FriendsRepositoryInterface;
 import com.example.bookapp.models.Friend;
 import com.example.bookapp.utilities.FriendsDataConverter;
@@ -12,22 +13,21 @@ import java.util.ArrayList;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 
 public class FriendsRepository {
     private static FriendsRepository instance;
     private MutableLiveData<ArrayList<Friend>> friends;
     private FriendsRepositoryInterface repositoryInterface;
 
-    public static FriendsRepository getInstance(@NonNull Retrofit retrofit) {
+    public static synchronized FriendsRepository getInstance() {
         if (instance == null) {
-            instance = new FriendsRepository(retrofit);
+            instance = new FriendsRepository();
         }
         return instance;
     }
 
-    private FriendsRepository(@NonNull Retrofit retrofit) {
-        repositoryInterface = retrofit.create(FriendsRepositoryInterface.class);
+    private FriendsRepository() {
+        repositoryInterface = AppUtilities.getRetrofit().create(FriendsRepositoryInterface.class);
     }
 
 
@@ -37,6 +37,8 @@ public class FriendsRepository {
         repositoryInterface.getFriends(userID, true, true).enqueue(new Callback<String>() {
             @Override
             public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                //todo
+                //use GSON mapper
                 if (response.body() != null) {
                     friends.setValue(FriendsDataConverter.convertJsonArrayToFriendsObjects(response.body()));
                 }

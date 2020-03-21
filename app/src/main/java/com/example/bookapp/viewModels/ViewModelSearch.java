@@ -3,7 +3,7 @@ package com.example.bookapp.viewModels;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.bookapp.activities.AppUtilities;
+import com.example.bookapp.AppUtilities;
 import com.example.dataLayer.repositories.SearchRepository;
 import com.example.bookapp.models.Post;
 
