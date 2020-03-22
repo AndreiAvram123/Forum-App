@@ -11,6 +11,12 @@ import retrofit2.Callback
 import retrofit2.Response
 
 object PostRepository {
+    private var currentPage: Int = 0
+    private val postsPerPage: Int = 10
+
+    private val nextPagePosts: MutableLiveData<ArrayList<Post>> by lazy {
+        MutableLiveData<ArrayList<Post>>()
+    }
     private val posts: MutableLiveData<ArrayList<Post>> by lazy {
         MutableLiveData<ArrayList<Post>>()
     }
@@ -32,14 +38,14 @@ object PostRepository {
 
 
     fun fetchFirstPagePosts(): MutableLiveData<ArrayList<Post>> {
-        repositoryInterface.fetchPosts(true).enqueue(object : Callback<ArrayList<PostDTO>> {
+        repositoryInterface.fetchPostByPage().enqueue(object : Callback<ArrayList<PostDTO>> {
             override fun onResponse(call: Call<ArrayList<PostDTO>?>, response: Response<ArrayList<PostDTO>?>) {
                 response.body()?.let {
                     posts.value = PostMapper.convertDTONetworkToDomainObjects(it)
+                    currentPage = 1
                 }
 
             }
-
             override fun onFailure(call: Call<ArrayList<PostDTO>?>, t: Throwable) {}
         })
         return posts
@@ -49,8 +55,6 @@ object PostRepository {
         repositoryInterface.fetchPostByID(id).enqueue(object : Callback<PostDTO> {
             override fun onResponse(call: Call<PostDTO>, response: Response<PostDTO>) {
                 currentFetchedPost.value = PostMapper.convertDtoObjectToDomainObject(response.body())
-
-
             }
 
             override fun onFailure(call: Call<PostDTO>, t: Throwable) {}
@@ -71,8 +75,8 @@ object PostRepository {
         //start fetching the other data on the other thread
         repositoryInterface.fetchFavoritePostsByUserID(userID, true).enqueue(object : Callback<ArrayList<PostDTO>> {
             override fun onResponse(call: Call<ArrayList<PostDTO>>, response: Response<ArrayList<PostDTO>>) {
-                response.body()?.let {
-                    favoritePosts.value = PostMapper.convertDTONetworkToDomainObjects(it)
+                favoritePosts.value = response.body()?.let {
+                    PostMapper.convertDTONetworkToDomainObjects(it)
                 }
             }
 
@@ -105,14 +109,28 @@ object PostRepository {
     }
 
     fun fetchNewPosts() {
-        repositoryInterface.fetchPosts(true).enqueue(object : Callback<ArrayList<PostDTO>> {
-            override fun onResponse(call: Call<ArrayList<PostDTO>>, response: Response<ArrayList<PostDTO>>) {
-                newFetchedPosts.value = response.body()?.let { PostMapper.convertDTONetworkToDomainObjects(it) }
-            }
+        //todo
+        //implement
 
-            override fun onFailure(call: Call<ArrayList<PostDTO>>, t: Throwable) {}
-        })
     }
 
+    fun fetchNextPagePosts(): MutableLiveData<java.util.ArrayList<Post>> {
+        repositoryInterface.fetchPostByPage(currentPage + 1).enqueue(object : Callback<ArrayList<PostDTO>> {
+            override fun onResponse(call: Call<ArrayList<PostDTO>>, response: Response<ArrayList<PostDTO>>) {
+                response.body()?.let {
+                    currentPage++
+                    nextPagePosts.value = PostMapper.convertDTONetworkToDomainObjects(it)
+                    posts.value?.addAll(nextPagePosts.value!!)
+                }
 
-}
+            }
+
+            override fun onFailure(call: Call<ArrayList<PostDTO>>, t: Throwable) {
+
+            }
+        })
+
+        return nextPagePosts
+    }
+    }
+

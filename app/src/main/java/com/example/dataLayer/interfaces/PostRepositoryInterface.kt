@@ -4,10 +4,17 @@ import com.example.dataLayer.models.PostDTO
 import retrofit2.Call
 import retrofit2.http.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 interface PostRepositoryInterface {
-    @GET("RestfulRequestHandler.php")
-    fun fetchPosts(@Query("recentPosts") recentPosts: Boolean): Call<ArrayList<PostDTO>>
+//todo
+    //refactor parameters
+
+
+    @GET("RestfulRequestHandler.php?recentPosts")
+    fun fetchPostByPage(@Query("page") page:Int = 1): Call<ArrayList<PostDTO>>
+
+
 
     @GET("RestfulRequestHandler.php")
     fun fetchNewPosts(@Query("recentPosts") recentPosts: Boolean, @Query("lastPostID") lastPostID: Long): Call<ArrayList<PostDTO>>

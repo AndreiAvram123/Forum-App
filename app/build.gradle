@@ -39,12 +39,14 @@ android {
     }
 }
 dependencies {
+    def paging_version = "2.1.2"
+    implementation "androidx.paging:paging-runtime-ktx:$paging_version" // For Kotlin use paging-runtime-ktx
     implementation "androidx.fragment:fragment-ktx:1.2.3"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
     implementation 'com.squareup.retrofit2:retrofit:2.7.2'
     implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
-    def room_version = '2.2.4'
-    def nav_version = "2.3.0-alpha02"
+    def room_version = '2.2.5'
+    def nav_version = "2.3.0-alpha04"
     // Java language implementation
     implementation "androidx.navigation:navigation-fragment:$nav_version"
     implementation "androidx.navigation:navigation-ui:$nav_version"
