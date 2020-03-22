@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.example.bookapp.R;
-import com.example.bookapp.activities.AppUtilities;
+import com.example.bookapp.AppUtilities;
 
 public class SignUpFragment extends AuthenticationFragment {
 

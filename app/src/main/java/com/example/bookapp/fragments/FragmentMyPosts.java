@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
@@ -14,37 +15,60 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.example.bookapp.Adapters.RecyclerViewAdapterPosts;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.FragmentMyPostsBinding;
-import com.example.bookapp.models.ViewModelPost;
+import com.example.bookapp.models.Post;
+import com.example.bookapp.models.User;
+import com.example.bookapp.viewModels.ViewModelPost;
+import com.example.bookapp.viewModels.ViewModelUser;
+
+import java.util.ArrayList;
 
 public class FragmentMyPosts extends Fragment {
 
     private FragmentMyPostsBinding binding;
     private RecyclerViewAdapterPosts recyclerViewAdapterPosts;
     private ViewModelPost viewModelPost;
+    private ViewModelUser viewModelUser;
+    private ArrayList<Post> myPosts;
+
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        initializeViews(inflater, container);
+
         // Inflate the layout for this fragment
-        if (viewModelPost == null) {
+        if (viewModelUser == null) {
             attachObserver();
         }
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_posts, container, false);
-        initializeRecyclerViewAdapter();
-        initializeRecyclerView();
+
         return binding.getRoot();
     }
 
+    private void initializeViews(@NonNull LayoutInflater inflater, ViewGroup container) {
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_posts, container, false);
+        initializeRecyclerView();
+        initializeRecyclerViewAdapter();
+    }
+
     private void initializeRecyclerViewAdapter() {
-        if (viewModelPost.getSavedPosts().getValue() != null) {
-            recyclerViewAdapterPosts = new RecyclerViewAdapterPosts(viewModelPost.getSavedPosts().getValue(), requireActivity());
-            binding.recyclerViewMyPosts.setAdapter(recyclerViewAdapterPosts);
+        if (recyclerViewAdapterPosts == null) {
+            recyclerViewAdapterPosts = new RecyclerViewAdapterPosts(getResources().getStringArray(R.array.sort_parameters));
         }
+        binding.recyclerViewMyPosts.setAdapter(recyclerViewAdapterPosts);
     }
 
     private void attachObserver() {
         viewModelPost = new ViewModelProvider(requireActivity()).get(ViewModelPost.class);
-        viewModelPost.getMyPosts().observe(getViewLifecycleOwner(), myPosts -> recyclerViewAdapterPosts.setData(myPosts));
+        viewModelUser = new ViewModelProvider(requireActivity()).get(ViewModelUser.class);
+        User user = viewModelUser.getUser().getValue();
+        if (user != null) {
+            viewModelPost.getMyPosts(user.getUserID()).observe(getViewLifecycleOwner(),
+                    myPosts -> {
+                        this.myPosts = myPosts;
+                        recyclerViewAdapterPosts.setData(myPosts);
+
+                    });
+        }
     }
 
     private void initializeRecyclerView() {

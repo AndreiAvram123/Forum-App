@@ -5,15 +5,7 @@ import com.example.bookapp.models.NonUploadedPost;
 import com.example.bookapp.models.Post;
 
 public interface MainActivityInterface {
-    void sharePost(Post post);
 
-    void savePost(Post post);
+    void startChat(String userID);
 
-    void deleteSavedPost(Post post);
-
-    void expandPost(int postID);
-
-    void uploadComment(Comment comment);
-
-    void uploadPost(NonUploadedPost nonUploadedPost);
 }

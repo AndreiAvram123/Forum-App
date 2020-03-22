@@ -6,41 +6,25 @@
     app:startDestination="@id/homeFragment">
 
     <fragment
-        android:id="@+id/homeFragment"
-        android:name="com.example.bookapp.fragments.HomeFragment"
-        android:label="layout_home_fragment"
-        tools:layout="@layout/layout_home_fragment" >
-
-        <action
-            android:id="@+id/action_homeFragment_to_expandedItemFragment"
-            app:destination="@+id/expandedItemFragment"
-            app:enterAnim="@anim/fragment_open_enter" />
-        <argument
-            android:name="latestPosts"
-            app:argType="com.example.bookapp.models.Post[]" />
-        <action
-            android:id="@+id/action_homeFragment_to_fragmentAddPost"
-            app:destination="@id/fragmentAddPost" />
-        <action
-            android:id="@+id/action_homeFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-    </fragment>
-    <fragment
         android:id="@+id/expandedItemFragment"
         android:name="com.example.bookapp.fragments.ExpandedItemFragment"
         android:label="fragment_expanded_item"
-        tools:layout="@layout/fragment_expanded_item" />
+        tools:layout="@layout/fragment_expanded_item" >
+        <argument
+            android:name="postID"
+            app:argType="long" />
+    </fragment>
     <fragment
         android:id="@+id/favoriteItems"
         android:name="com.example.bookapp.fragments.FavoritePostsFragment"
         android:label="layout_fragment_posts_data"
         tools:layout="@layout/layout_fragment_posts_data" >
         <action
-            android:id="@+id/action_favoriteItems_to_homeFragment"
-            app:destination="@id/homeFragment" />
-        <action
             android:id="@+id/action_favoriteItems_to_fragmentMyPosts"
             app:destination="@id/fragmentMyPosts" />
+        <action
+            android:id="@+id/action_favoriteItems_to_homeFragment2"
+            app:destination="@id/homeFragment" />
     </fragment>
     <fragment
         android:id="@+id/fragmentAddPost"
@@ -68,5 +52,32 @@
         android:id="@+id/friendsFragment"
         android:name="com.example.bookapp.fragments.FriendsFragment"
         android:label="fragment_friends"
-        tools:layout="@layout/fragment_friends" />
+        tools:layout="@layout/fragment_friends" >
+        <action
+            android:id="@+id/action_friendsFragment_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/messagesFragment"
+        android:name="com.example.bookapp.fragments.MessagesFragment"
+        android:label="MessagesFragment" >
+        <argument
+            android:name="currentUserID"
+            app:argType="string" />
+        <argument
+            android:name="user2ID"
+            app:argType="string" />
+    </fragment>
+    <action android:id="@+id/action_global_expandedItemFragment" app:destination="@id/expandedItemFragment" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="HomeFragment"
+        android:label="HomeFragment" >
+        <action
+            android:id="@+id/action_homeFragment2_to_searchFragment"
+            app:destination="@id/searchFragment" />
+        <action
+            android:id="@+id/action_homeFragment2_to_fragmentAddPost"
+            app:destination="@id/fragmentAddPost" />
+    </fragment>
 </navigation>

@@ -1,28 +1,27 @@
 package com.example.bookapp.Adapters;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.navigation.NavDirections;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.bookapp.databinding.LayoutPostItemBinding;
-import com.example.bookapp.fragments.SearchFragment;
+import com.example.bookapp.fragments.ExpandedItemFragmentDirections;
 import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
 
 public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.ViewHolder> {
-    private SearchFragment.SearchFragmentInterface searchFragmentInterface;
     private ArrayList<Post> data;
     private Context context;
 
-    public SuggestionsAdapter(ArrayList<Post> data, Activity activity) {
+    public SuggestionsAdapter(ArrayList<Post> data) {
         this.data = data;
-        searchFragmentInterface = (SearchFragment.SearchFragmentInterface) activity;
     }
 
     public ArrayList<Post> getData() {
@@ -50,9 +49,11 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
         holder.bindData(currentPost);
         Glide.with(context)
                 .load(currentPost.getPostImage())
-                .into(holder.layoutSuggestionItemBinding.suggestionImage);
-        holder.layoutSuggestionItemBinding.getRoot().setOnClickListener(view ->
-                searchFragmentInterface.fetchSelectedPostById(currentPost.getPostID()));
+                .into(holder.binding.suggestionImage);
+        holder.binding.getRoot().setOnClickListener(view -> {
+            NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(currentPost.getPostID());
+            Navigation.findNavController(holder.binding.getRoot()).navigate(action);
+        });
     }
 
     @Override
@@ -62,15 +63,15 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
 
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        LayoutPostItemBinding layoutSuggestionItemBinding;
+        LayoutPostItemBinding binding;
 
-        ViewHolder(@NonNull LayoutPostItemBinding layoutSuggestionItemBinding) {
-            super(layoutSuggestionItemBinding.getRoot());
-            this.layoutSuggestionItemBinding = layoutSuggestionItemBinding;
+        ViewHolder(@NonNull LayoutPostItemBinding binding) {
+            super(binding.getRoot());
+            this.binding = binding;
         }
 
         void bindData(Post post) {
-            layoutSuggestionItemBinding.setSuggestionPost(post);
+            binding.setSuggestionPost(post);
         }
     }
 }

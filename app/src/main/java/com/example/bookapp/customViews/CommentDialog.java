@@ -1,11 +1,9 @@
 package com.example.bookapp.customViews;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 
@@ -15,11 +13,12 @@ import com.google.android.material.textfield.TextInputLayout;
 public class CommentDialog extends Dialog {
 
     private CommentDialogInterface commentDialogInterface;
-    private int postID;
-    public CommentDialog(@NonNull Context context,@NonNull CommentDialogInterface commentDialogInterface, int postID) {
+    private long postID;
+    public CommentDialog(@NonNull Context context,@NonNull CommentDialogInterface commentDialogInterface, Long postID) {
         super(context);
         this.commentDialogInterface = commentDialogInterface;
         this.postID = postID;
+        
     }
 
     @Override
@@ -36,6 +35,6 @@ public class CommentDialog extends Dialog {
     }
 
     public interface CommentDialogInterface {
-        void submitComment(String comment,int postID);
+        void submitComment(String comment,long postID);
     }
 }

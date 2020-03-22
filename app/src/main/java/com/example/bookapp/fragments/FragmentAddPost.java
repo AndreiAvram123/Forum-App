@@ -6,9 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -16,29 +15,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.LayoutFragmentAddPostBinding;
-import com.example.bookapp.interfaces.MainActivityInterface;
-import com.example.bookapp.models.NonUploadedPostBuilder;
+import com.example.bookapp.viewModels.ViewModelPost;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Objects;
 
 public class FragmentAddPost extends Fragment {
-    private MainActivityInterface mainActivityInterface;
     private LayoutFragmentAddPostBinding binding;
     private static final int CODE_FILE_EXPLORER = 10;
     private String imageUri;
-
-    public static FragmentAddPost getInstance() {
-        FragmentAddPost fragmentAddPost = new FragmentAddPost();
-        return fragmentAddPost;
-    }
-
-    public FragmentAddPost() {
-        // Required empty public constructor
-    }
 
 
     @Override
@@ -50,11 +38,6 @@ public class FragmentAddPost extends Fragment {
         return binding.getRoot();
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        mainActivityInterface = (MainActivityInterface) getActivity();
-    }
 
     private void configureViews() {
         binding.postImageAdd.setOnClickListener(view -> {
@@ -69,14 +52,7 @@ public class FragmentAddPost extends Fragment {
     }
 
     private void startUploadPost() {
-        NonUploadedPostBuilder nonUploadedPostBuilder = new NonUploadedPostBuilder();
-        nonUploadedPostBuilder.setPostTitle(binding.postTitleAdd.getText().toString())
-                .setPostCategory("Missions")
-                .setPostContent(binding.postContentAdd.getEditText().getText().toString())
-                .setImageName(getImageName())
-                .setImageBytes(getImageBytes());
-        mainActivityInterface.uploadPost(nonUploadedPostBuilder.createPostUnderUploadModel());
-        Objects.requireNonNull(getActivity()).getSupportFragmentManager().popBackStack();
+
     }
 
     @Override
@@ -102,15 +78,8 @@ public class FragmentAddPost extends Fragment {
     }
 
     private String getImageName() {
-        String fileNameSegments[] = imageUri.split("/");
-        String fileName = fileNameSegments[fileNameSegments.length - 1] ;
-        return fileName;
+        String[] fileNameSegments = imageUri.split("/");
+        return fileNameSegments[fileNameSegments.length - 1];
     }
 
-
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        mainActivityInterface = (MainActivityInterface) getActivity();
-    }
 }

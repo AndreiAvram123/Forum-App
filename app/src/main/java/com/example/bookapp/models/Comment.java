@@ -3,20 +3,36 @@ package com.example.bookapp.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 public class Comment implements Parcelable {
 
+    @SerializedName("commentID")
+    @Expose
     private int commentID;
+    @SerializedName("commentDate")
+    @Expose
     private String commentDate;
+    @SerializedName("commentContent")
+    @Expose
     private String commentContent;
+    @SerializedName("commentAuthor")
+    @Expose
     private String  commentAuthor;
+    @SerializedName("commentUserID")
+    private String commentUserID;
+
+
     private int postID;
 
-    Comment(int commentID, String commentDate, String commentContent, String commentAuthor,int postID) {
+    Comment(int commentID, String commentDate, String commentContent, String commentAuthor, int postID, String commentUserID) {
         this.commentID = commentID;
         this.commentDate = commentDate;
         this.commentContent = commentContent;
         this.commentAuthor = commentAuthor;
         this.postID =postID;
+        this.commentUserID = commentUserID;
     }
 
     private Comment(Parcel in) {
@@ -39,9 +55,6 @@ public class Comment implements Parcelable {
         }
     };
 
-    public int getCommentID() {
-        return commentID;
-    }
 
     public int getPostID() {
         return postID;
@@ -57,6 +70,10 @@ public class Comment implements Parcelable {
 
     public String getCommentAuthor() {
         return commentAuthor;
+    }
+
+    public int getCommentID() {
+        return commentID;
     }
 
     @Override
