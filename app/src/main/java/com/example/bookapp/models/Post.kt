@@ -1,6 +1,6 @@
 package com.example.bookapp.models
 
-data class Post(
+data class Post (
         var postID: Long,
         var postTitle: String,
         var postImage: String,

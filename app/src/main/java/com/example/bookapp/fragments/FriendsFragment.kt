@@ -45,7 +45,6 @@ class FriendsFragment : Fragment() {
     private fun attachObservers() {
         val currentUser = viewModelUser.user.value
         viewModelUser.user.value?.userID?.let {
-
             viewModelFriends.getFriends(currentUser?.userID).observe(viewLifecycleOwner, Observer {
                 it?.let { friendsAdapter.setData(it) }
             })

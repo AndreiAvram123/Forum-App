@@ -16,7 +16,9 @@ class ViewModelPost : ViewModel() {
     }
 
     fun getMyPosts(userID: String?): MutableLiveData<ArrayList<Post>>? {
-        myPosts = postRepository.fetchMyPosts(userID)
+        if (!this::myPosts.isInitialized) {
+            myPosts = postRepository.fetchMyPosts(userID)
+        }
         return myPosts
     }
 
@@ -25,33 +27,39 @@ class ViewModelPost : ViewModel() {
     }
 
     fun getFirstPagePosts(): LiveData<ArrayList<Post>>? {
+        if (!this::currentFetchedPosts.isInitialized) {
             currentFetchedPosts = postRepository.fetchFirstPagePosts()
+        }
         return currentFetchedPosts
     }
 
     fun getFavoritePosts(userID: String?): MutableLiveData<ArrayList<Post>>? {
-        currentlyDisplayedPosts = postRepository.fetchFavoritePosts(userID)
+        if (!this::currentlyDisplayedPosts.isInitialized) {
+            currentlyDisplayedPosts = postRepository.fetchFavoritePosts(userID)
+        }
         return currentlyDisplayedPosts
     }
 
     fun addPostToFavorites(post: Post, userID: String?) {
         postRepository.addPostToFavorites(post.postID, userID)
         //if the favoritePosts data has been fetched you need to update the ui
-        if (currentlyDisplayedPosts!!.value != null) {
-            val newData = ArrayList(currentlyDisplayedPosts!!.value!!)
-            post.isFavorite = true
-            newData.add(post)
-            currentlyDisplayedPosts!!.value = newData
+        if (this::currentlyDisplayedPosts.isInitialized) {
+            currentlyDisplayedPosts.value?.let {
+                val newData = ArrayList(currentlyDisplayedPosts.value!!)
+                post.isFavorite = true;
+                newData.add(post)
+                currentlyDisplayedPosts.value = newData
+            }
         }
     }
 
     fun deletePostFromFavorites(post: Post, userID: String?) {
         postRepository.deletePostFromFavorites(post.postID, userID)
-        if (currentlyDisplayedPosts != null && currentlyDisplayedPosts!!.value != null) {
+        currentlyDisplayedPosts.value?.let {
             val newData = ArrayList(currentlyDisplayedPosts!!.value!!)
             newData.remove(post)
             //notify the observers
-            currentlyDisplayedPosts!!.value = newData
+            currentlyDisplayedPosts.value = newData
         }
     }
 

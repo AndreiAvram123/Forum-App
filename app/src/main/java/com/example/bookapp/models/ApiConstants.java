@@ -7,7 +7,7 @@ public class ApiConstants {
     public static final String URL_POST_DETAILS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?postID=%s";
     public static final String URL_UPLOAD_COMMENT = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?uploadComment";
     public static final String UPLOAD_IMAGE_URL = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?uploadPost";
-    public static final String URL_AUTHENTICATE_ACCOUNT_ID = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?authenticateThirdPartyAccount&email=%s";
+    public static final String URL_AUTHENTICATE_THIRD_PARTY_EMAIL = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?authenticateThirdPartyAccount&email=%s";
     public static final String URL_CREATE_THIRD_PARTY_ACCOUNT = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?createThirdPartyAccount";
     public static final String URL_MY_POSTS = "http://sgb967.poseidon.salford.ac.uk/cms/RestfulRequestHandler.php?myPosts&userID=%s";
     public static final String URL_OLD_MESSAGES = "http://sgb967.poseidon.salford.ac.uk/cms/ChatController.php?requestName=fetchOldMessages&currentUserId=%s&receiverId=%s&offset=%s";

@@ -10,19 +10,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.Volley
 import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
-import com.example.bookapp.api.ApiManager
 import com.example.bookapp.fragments.BottomSheetPromptLogin
 import com.example.bookapp.fragments.BottomSheetPromptLogin.BottomSheetInterface
 import com.example.bookapp.fragments.ErrorFragment.ErrorFragmentInterface
-import com.example.bookapp.fragments.ExpandedItemFragmentDirections
 import com.example.bookapp.fragments.FriendsFragmentDirections
 import com.example.bookapp.interfaces.MainActivityInterface
 import com.example.bookapp.interfaces.MessageInterface
-import com.example.bookapp.models.*
+import com.example.bookapp.models.AuthenticationService
+import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelFriends
 import com.example.bookapp.viewModels.ViewModelMessages
 import com.example.bookapp.viewModels.ViewModelPost
@@ -37,17 +34,12 @@ import java.util.*
  * The main activity acts as the controller
  * for the main screen
  */
-class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface, ErrorFragmentInterface, MessageInterface {
+class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface, ErrorFragmentInterface {
     private var sharedPreferences: SharedPreferences? = null
-    private var apiManager: ApiManager? = null
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelFriends: ViewModelFriends by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
     private val viewModelMessages: ViewModelMessages by viewModels()
-    private var requestQueue: RequestQueue? = null
-    private val messageRepository: MessageRepository by lazy {
-        MessageRepository.getInstance(requestQueue, viewModelUser.user.value!!.userID)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,25 +50,16 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
             startWelcomeActivity()
         } else {
             if (AppUtilities.isNetworkAvailable(this)) {
-                configureApiManager()
             }
         }
     }
 
-    private fun configureApiManager() {
-        apiManager = ApiManager.getInstance(this)
-        messageRepository.setCallback(viewModelMessages)
-    }
-
     private val currentUser: Unit
-        private get() {
+        get() {
             val userID = sharedPreferences!!.getString(getString(R.string.key_user_id), null)
             val username = sharedPreferences!!.getString(getString(R.string.key_username), null)
             if (userID != null && username != null) {
-                val builder = User.Builder()
-                builder.setUserID(userID)
-                builder.setUsername(username)
-                viewModelUser!!.setUser(builder.create())
+                viewModelUser.setUser(User(userID = userID, username = username, email = null, profilePictureURL = null))
             } else {
                 startWelcomeActivity()
             }
@@ -94,7 +77,6 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
     }
 
     private fun configureDefaultVariables() {
-        requestQueue = Volley.newRequestQueue(this)
         sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         configureNavigationView()
     }
@@ -106,7 +88,7 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
             val searchHistoryArrayList = ArrayList<String?>()
             if (searchHistorySet != null) {
                 searchHistoryArrayList.addAll(searchHistorySet)
-                Collections.reverse(searchHistoryArrayList)
+                searchHistoryArrayList.reverse()
                 return searchHistoryArrayList
             }
             return searchHistoryArrayList
@@ -140,40 +122,12 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
         }
     }
 
-    override fun sharePost(post: Post) {
-        val sendIntent = Intent()
-        sendIntent.action = Intent.ACTION_SEND
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.")
-        sendIntent.type = "text/plain"
-        val shareIntent = Intent.createChooser(sendIntent, null)
-        startActivity(shareIntent)
-    }
-
-    override fun savePost(post: Post) { //      apiManager.pushRequestAddPostToFavorites(post.getPostID(), viewModelUser.getUser().getValue().getUserID());
-//        viewModelPost.addFavoritePost(post);
-    }
-
-    override fun deleteSavedPost(post: Post) {}
-    override fun expandPost(postID: Int) {
-        val action: NavDirections = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(postID.toLong())
-        Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action)
-    }
-
-    override fun uploadComment(comment: Comment) {
-        apiManager!!.uploadNewComment(comment, viewModelUser!!.user.value!!.userID)
-    }
-
-    override fun uploadPost(nonUploadedPost: NonUploadedPost) {
-        apiManager!!.uploadPost(nonUploadedPost, viewModelUser!!.user.value!!.userID)
-    }
 
     override fun startChat(userID: String) {
-        messageRepository!!.pushRequestFetchOldMessages(userID, 0)
-        val action: NavDirections = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(viewModelUser!!.user.value!!.userID, userID)
+        val action: NavDirections = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(viewModelUser.user.value!!.userID, userID)
         Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action)
     }
-
-    override fun fetchNewPosts() {}
+    
     /**
      * Use this method in order to display a bottom
      * sheet for the user to select a login option
@@ -213,16 +167,6 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        messageRepository!!.shutdownAsyncTasks()
-    }
 
-    override fun sendMessage(messageContent: String, user2ID: String, currentUserID: String) {
-        messageRepository!!.sendMessage(messageContent, user2ID, currentUserID)
-    }
 
-    override fun fetchMoreMessages(user2ID: String, offset: Int) {
-        messageRepository!!.pushRequestFetchOldMessages(user2ID, offset)
-    }
 }

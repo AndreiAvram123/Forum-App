@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewAdapterPosts.ViewHolder> {
     private ArrayList<Post> posts = new ArrayList<>();
-    private Context context;
     private String[] allSortCriteria;
 
     public RecyclerViewAdapterPosts(@NonNull String[] allSortCriteria) {
@@ -35,7 +34,6 @@ public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewA
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        context = parent.getContext();
         LayoutItemPostBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.layout_item_post, parent, false);
 
         return new ViewHolder(binding);
@@ -44,12 +42,6 @@ public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewA
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.binding.setPost(posts.get(position));
-        Glide.with(context)
-                .load(posts.get(position).getPostImage())
-                .centerInside()
-                .into(holder.binding.postImage);
-        //when the user clicks on an item
-        //display the extended item fragment
         holder.itemView.setOnClickListener(view -> {
             NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(posts.get(position).getPostID());
             Navigation.findNavController(holder.binding.getRoot()).navigate(action);

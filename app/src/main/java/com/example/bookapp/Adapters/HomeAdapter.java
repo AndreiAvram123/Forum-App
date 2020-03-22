@@ -86,9 +86,7 @@ public class HomeAdapter extends RecyclerView.Adapter {
                 NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(post.getPostID());
                 Navigation.findNavController(binding.getRoot()).navigate(action);
             });
-            Glide.with(binding.getRoot().getContext())
-                    .load(post.getPostImage())
-                    .into(binding.postItemHomeImage);
+
         }
     }
 }

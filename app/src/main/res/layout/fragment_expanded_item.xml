@@ -68,6 +68,7 @@
                     app:layout_constraintHorizontal_bias="0.495"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/back_button_expanded"
+                    app:imageFromURL="@{post.postImage}"
                     tools:src="@tools:sample/avatars" />
 
                 <TextView
@@ -101,7 +102,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:layout_marginEnd="16dp"
-                    
                     android:src= '@{post.favorite ? @drawable/ic_favorite_red_32dp : @drawable/ic_favorite_border_black_32dp }'
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
