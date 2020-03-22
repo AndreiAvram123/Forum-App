@@ -7,7 +7,7 @@ import com.example.bookapp.models.Post
 import com.example.dataLayer.repositories.PostRepository
 
 class ViewModelPost : ViewModel() {
-    private lateinit var currentFetchedPosts: MutableLiveData<ArrayList<Post>>;
+    private lateinit var currentFetchedPosts: MutableLiveData<ArrayList<Post>>
     private lateinit var currentlyDisplayedPosts: MutableLiveData<ArrayList<Post>>
     private lateinit var myPosts: MutableLiveData<ArrayList<Post>>
 
@@ -65,6 +65,10 @@ class ViewModelPost : ViewModel() {
 
     fun fetchNewPosts() {
         postRepository.fetchNewPosts()
+    }
+
+    fun fetchNextPagePosts(): MutableLiveData<ArrayList<Post>> {
+        return postRepository.fetchNextPagePosts()
     }
 
 }
