@@ -1,19 +1,23 @@
 package com.example.bookapp.viewModels
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.bookapp.models.Post
 import com.example.dataLayer.repositories.PostRepository
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 
-class ViewModelPost : ViewModel() {
+@InternalCoroutinesApi
+class ViewModelPost(application: Application) : AndroidViewModel(application) {
     private lateinit var currentFetchedPosts: MutableLiveData<ArrayList<Post>>
     private lateinit var currentlyDisplayedPosts: MutableLiveData<ArrayList<Post>>
     private lateinit var myPosts: MutableLiveData<ArrayList<Post>>
 
-    private val postRepository: PostRepository by lazy {
-        PostRepository
-    }
+    @InternalCoroutinesApi
+    private val postRepository: PostRepository = PostRepository(application,viewModelScope)
 
     fun getMyPosts(userID: String?): MutableLiveData<ArrayList<Post>>? {
         if (!this::myPosts.isInitialized) {
@@ -22,13 +26,13 @@ class ViewModelPost : ViewModel() {
         return myPosts
     }
 
-    fun getPost(id: Long): MutableLiveData<Post> {
+    fun getPostByID(id: Long): MutableLiveData<Post> {
         return postRepository.fetchPostByID(id)
     }
 
     fun getFirstPagePosts(): LiveData<ArrayList<Post>>? {
         if (!this::currentFetchedPosts.isInitialized) {
-            currentFetchedPosts = postRepository.fetchFirstPagePosts()
+            currentFetchedPosts = postRepository.fetchAllCachedPosts()
         }
         return currentFetchedPosts
     }
@@ -56,15 +60,11 @@ class ViewModelPost : ViewModel() {
     fun deletePostFromFavorites(post: Post, userID: String?) {
         postRepository.deletePostFromFavorites(post.postID, userID)
         currentlyDisplayedPosts.value?.let {
-            val newData = ArrayList(currentlyDisplayedPosts!!.value!!)
+            val newData = ArrayList(currentlyDisplayedPosts.value!!)
             newData.remove(post)
             //notify the observers
             currentlyDisplayedPosts.value = newData
         }
-    }
-
-    fun fetchNewPosts() {
-        postRepository.fetchNewPosts()
     }
 
     fun fetchNextPagePosts() {

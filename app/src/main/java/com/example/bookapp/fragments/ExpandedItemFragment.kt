@@ -22,8 +22,10 @@ import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.dataObjectsToSerialize.SerializeComment
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
 
+@InternalCoroutinesApi
 class ExpandedItemFragment : Fragment(), CommentDialogInterface {
     private lateinit var post: Post;
     private var comments: ArrayList<Comment>? = null
@@ -52,7 +54,7 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
 
         val postID = ExpandedItemFragmentArgs.fromBundle(requireArguments()).postID
 
-        viewModelPost.getPost(postID).observe(viewLifecycleOwner, Observer { fetchedPost: Post ->
+        viewModelPost.getPostByID(postID).observe(viewLifecycleOwner, Observer { fetchedPost: Post ->
                 post = fetchedPost
                 configureViews()
         })

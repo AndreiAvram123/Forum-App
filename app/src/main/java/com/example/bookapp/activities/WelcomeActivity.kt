@@ -16,7 +16,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.InternalCoroutinesApi
 
+@InternalCoroutinesApi
 class WelcomeActivity : AppCompatActivity() {
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()

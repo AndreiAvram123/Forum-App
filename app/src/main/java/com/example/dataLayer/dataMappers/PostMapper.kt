@@ -2,6 +2,7 @@ package com.example.dataLayer.dataMappers
 
 import com.example.bookapp.models.Post
 import com.example.dataLayer.models.PostDTO
+import com.example.dataLayer.models.RoomPostDTO
 
 object PostMapper {
 
@@ -31,5 +32,40 @@ object PostMapper {
           }
         return Post.buildNullSafeObject()
 
+    }
+
+    fun mapRoomDTOToDomainObject(roomPostDTO: RoomPostDTO?): Post {
+        roomPostDTO?.let {
+            val builder: Post.Builder = Post.Builder();
+            builder.postID = roomPostDTO.postID;
+            builder.postTitle = roomPostDTO.postTitle
+            builder.postImage = roomPostDTO.postImage
+            builder.postDate = roomPostDTO.postDate
+            builder.postAuthor = roomPostDTO.postAuthor
+            builder.postCategory = roomPostDTO.postCategory
+            builder.postContent = roomPostDTO.postContent
+            return builder.build()
+        }
+        return Post.buildNullSafeObject()
+    }
+
+    fun mapRoomDTOToDomainObjects(posts: List<RoomPostDTO>): ArrayList<Post> {
+        val toReturn: ArrayList<Post> = ArrayList()
+        posts.forEach {
+            toReturn.add(mapRoomDTOToDomainObject(it))
+
+        }
+        return toReturn
+
+    }
+
+    fun mapDomainToRoomDTO(fetchedPost: Post): RoomPostDTO {
+        return RoomPostDTO(postID = fetchedPost.postID,
+                postTitle = fetchedPost.postTitle,
+                postImage = fetchedPost.postImage,
+                postDate = fetchedPost.postDate,
+                postAuthor = fetchedPost.postAuthor,
+                postCategory = fetchedPost.postCategory,
+                postContent = fetchedPost.postContent)
     }
 }

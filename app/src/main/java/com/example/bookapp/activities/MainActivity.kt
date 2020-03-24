@@ -28,12 +28,14 @@ import com.example.dataLayer.repositories.MessageRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
 
 /**
  * The main activity acts as the controller
  * for the main screen
  */
+@InternalCoroutinesApi
 class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface, ErrorFragmentInterface {
     private var sharedPreferences: SharedPreferences? = null
     private val viewModelPost: ViewModelPost by viewModels()

@@ -39,7 +39,6 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
     }
 
     override fun getItemViewType(position: Int): Int {
-        Log.d("test", position.toString())
         return if (posts[position] == loadingObject) {
             ItemTypes.LOADING_ITEM.id
         } else {
@@ -113,5 +112,4 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
     interface Callback {
         fun requestMoreData()
     }
-
 }
