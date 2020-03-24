@@ -12,9 +12,8 @@ import retrofit2.Response
 
 object PostRepository {
     private var currentPage: Int = 0
-    private val postsPerPage: Int = 10
 
-    private val nextPagePosts: MutableLiveData<ArrayList<Post>> by lazy {
+    val nextPagePosts: MutableLiveData<ArrayList<Post>> by lazy {
         MutableLiveData<ArrayList<Post>>()
     }
     private val posts: MutableLiveData<ArrayList<Post>> by lazy {

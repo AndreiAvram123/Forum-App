@@ -67,8 +67,12 @@ class ViewModelPost : ViewModel() {
         postRepository.fetchNewPosts()
     }
 
-    fun fetchNextPagePosts(): MutableLiveData<ArrayList<Post>> {
-        return postRepository.fetchNextPagePosts()
+    fun fetchNextPagePosts() {
+        postRepository.fetchNextPagePosts()
+    }
+
+    fun getObservableNextPagePosts(): MutableLiveData<ArrayList<Post>> {
+        return postRepository.nextPagePosts
     }
 
 }
