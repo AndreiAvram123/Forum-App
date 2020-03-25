@@ -12,7 +12,7 @@ interface RoomPostDao {
      fun getPostByID(postID: Long): LiveData<Post>
 
     @Query("SELECT * FROM posts")
-     fun getAllPosts():List<Post>
+     fun getAllPosts():LiveData<List<Post>>
 
     @Insert
     suspend fun insertPost(post: Post)
