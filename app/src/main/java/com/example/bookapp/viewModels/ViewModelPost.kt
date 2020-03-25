@@ -12,12 +12,11 @@ import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
 class ViewModelPost(application: Application) : AndroidViewModel(application) {
-    private lateinit var currentFetchedPosts: MutableLiveData<ArrayList<Post>>
+
     private lateinit var currentlyDisplayedPosts: MutableLiveData<ArrayList<Post>>
     private lateinit var myPosts: MutableLiveData<ArrayList<Post>>
-
     @InternalCoroutinesApi
-    private val postRepository: PostRepository = PostRepository(application,viewModelScope)
+    private val postRepository: PostRepository = PostRepository(application)
 
     fun getMyPosts(userID: String?): MutableLiveData<ArrayList<Post>>? {
         if (!this::myPosts.isInitialized) {
@@ -26,18 +25,21 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         return myPosts
     }
 
-    fun getPostByID(id: Long): MutableLiveData<Post> {
-        return postRepository.fetchPostByID(id)
-    }
-
-    fun getFirstPagePosts(): LiveData<ArrayList<Post>>? {
-        if (!this::currentFetchedPosts.isInitialized) {
-            currentFetchedPosts = postRepository.fetchAllCachedPosts()
+    fun getPostByID(id: Long): LiveData<Post> {
+        viewModelScope.launch {
+            postRepository.fetchPostByID(id)
         }
-        return currentFetchedPosts
+        return postRepository.currentFetchedPost
     }
 
-    fun getFavoritePosts(userID: String?): MutableLiveData<ArrayList<Post>>? {
+    fun getFirstPagePosts(): LiveData<List<Post>>? {
+        viewModelScope.launch {
+            postRepository.fetchFirstPagePosts()
+        }
+        return postRepository.posts
+    }
+
+    fun getFavoritePosts(userID: String?): LiveData<ArrayList<Post>>? {
         if (!this::currentlyDisplayedPosts.isInitialized) {
             currentlyDisplayedPosts = postRepository.fetchFavoritePosts(userID)
         }
@@ -68,7 +70,9 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
     }
 
     fun fetchNextPagePosts() {
-        postRepository.fetchNextPagePosts()
+        viewModelScope.launch {
+            postRepository.fetchNextPagePosts()
+        }
     }
 
     fun getObservableNextPagePosts(): MutableLiveData<ArrayList<Post>> {

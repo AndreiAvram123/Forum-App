@@ -10,7 +10,7 @@ object PostMapper {
      * This method is used to convert the dto network objects to
      * domain specific objects
      */
-    fun convertDTONetworkToDomainObjects(dboPosts: ArrayList<PostDTO>): ArrayList<Post> {
+    fun mapDTONetworkToDomainObjects(dboPosts: ArrayList<PostDTO>): ArrayList<Post> {
         val toReturn: ArrayList<Post> = ArrayList();
         dboPosts.forEach {
             toReturn.add(convertDtoObjectToDomainObject(it));
@@ -67,5 +67,18 @@ object PostMapper {
                 postAuthor = fetchedPost.postAuthor,
                 postCategory = fetchedPost.postCategory,
                 postContent = fetchedPost.postContent)
+    }
+
+     fun mapNetworkDTOToRoomDTO(post: PostDTO): RoomPostDTO = RoomPostDTO(postID = post.postID, postTitle = post.postTitle,
+            postImage = post.postImage, postDate = post.postDate, postAuthor = post.postAuthor, postCategory = post.postCategory, postContent = post.postContent)
+
+    fun mapNetworkDTOToRoomDTOS(posts: ArrayList<PostDTO>): ArrayList<RoomPostDTO> {
+        val toReturn: ArrayList<RoomPostDTO> = ArrayList()
+        posts.forEach {
+            toReturn.add(mapNetworkDTOToRoomDTO(it))
+        }
+        return toReturn
+
+
     }
 }

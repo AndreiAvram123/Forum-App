@@ -12,9 +12,7 @@ interface PostRepositoryInterface {
 
 
     @GET("RestfulRequestHandler.php?recentPosts")
-    fun fetchPostByPage(@Query("page") page:Int = 1): Call<ArrayList<PostDTO>>
-
-
+    suspend fun fetchPostByPage(@Query("page") page:Int = 1): Call<ArrayList<PostDTO>>
 
     @GET("RestfulRequestHandler.php")
     fun fetchNewPosts(@Query("recentPosts") recentPosts: Boolean, @Query("lastPostID") lastPostID: Long): Call<ArrayList<PostDTO>>

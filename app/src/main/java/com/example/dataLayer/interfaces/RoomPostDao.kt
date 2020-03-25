@@ -1,20 +1,22 @@
 package com.example.dataLayer.interfaces
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.example.dataLayer.models.RoomPostDTO
+import com.example.bookapp.models.Post
 
 @Dao
 interface RoomPostDao {
-    @Query("SELECT * FROM posts WHERE postID = :postID")
-    suspend fun getPostByID(postID: Long): RoomPostDTO
+    @Query("SELECT * FROM posts WHERE postID = :postID LIMIT 1")
+     fun getPostByID(postID: Long): LiveData<Post>
 
     @Query("SELECT * FROM posts")
-    suspend fun getAllPosts():List<RoomPostDTO>
+     fun getAllPosts():List<Post>
 
     @Insert
-    suspend fun addPost(post: RoomPostDTO)
+    suspend fun insertPost(post: Post)
+
+    @Insert
+    suspend fun insertPosts(posts:List<Post>)
 }
