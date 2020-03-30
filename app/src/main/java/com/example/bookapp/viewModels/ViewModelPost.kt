@@ -36,7 +36,7 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             postRepository.fetchFirstPagePosts()
         }
-        return postRepository.posts
+        return postRepository.recentPosts;
     }
 
     fun getFavoritePosts(userID: String?): LiveData<ArrayList<Post>>? {
@@ -75,8 +75,5 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun getObservableNextPagePosts(): MutableLiveData<ArrayList<Post>> {
-        return postRepository.nextPagePosts
-    }
 
 }

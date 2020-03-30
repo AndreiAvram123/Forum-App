@@ -13,16 +13,19 @@ object PostMapper {
     fun mapDTONetworkToDomainObjects(dboPosts: ArrayList<PostDTO>): ArrayList<Post> {
         val toReturn: ArrayList<Post> = ArrayList();
         dboPosts.forEach {
-            toReturn.add(convertDtoObjectToDomainObject(it));
+            toReturn.add(mapDtoObjectToDomainObject(it));
         }
         return toReturn
     }
 
-    fun convertDtoObjectToDomainObject(postDTO: PostDTO?): Post {
+    fun mapDtoObjectToDomainObject(postDTO: PostDTO?): Post {
           postDTO?.let{
               val builder: Post.Builder = Post.Builder();
               builder.postID = postDTO.postID;
               builder.postTitle = postDTO.postTitle
+              if (!postDTO.postImage.contains("https://i.picsum.photos/")) {
+                  postDTO.postImage = "http://sgb967.poseidon.salford.ac.uk/cms/" + postDTO.postImage
+              }
               builder.postImage = postDTO.postImage
               builder.postDate = postDTO.postDate
               builder.postAuthor = postDTO.postAuthor

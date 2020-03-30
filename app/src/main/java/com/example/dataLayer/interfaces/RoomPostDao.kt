@@ -9,14 +9,17 @@ import com.example.bookapp.models.Post
 @Dao
 interface RoomPostDao {
     @Query("SELECT * FROM posts WHERE postID = :postID LIMIT 1")
-     fun getPostByID(postID: Long): LiveData<Post>
+    suspend fun getPostByID(postID: Long): Post
 
     @Query("SELECT * FROM posts")
-     fun getAllPosts():LiveData<List<Post>>
+    fun getRecentPosts(): LiveData<List<Post>>
 
     @Insert
     suspend fun insertPost(post: Post)
 
     @Insert
     suspend fun insertPosts(posts:List<Post>)
+
+    @Query("DELETE FROM posts ")
+    suspend fun removeOldFetchedData()
 }

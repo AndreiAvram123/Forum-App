@@ -1,6 +1,5 @@
 package com.example.bookapp.Adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,13 +8,19 @@ import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.databinding.LoadingItemListBinding
 import com.example.bookapp.databinding.PostItemHomePageBinding
 import com.example.bookapp.fragments.ExpandedItemFragmentDirections
 import com.example.bookapp.models.Post
+import com.google.android.material.snackbar.Snackbar
+import java.util.*
+import kotlin.collections.ArrayList
 
 class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private var timeout: Timer = Timer();
 
     enum class State {
         LOADING, LOADED
@@ -26,16 +31,29 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
     }
 
     private var posts: ArrayList<Post> = ArrayList()
-    var currentState: State = State.LOADED
-    val loadingObject: Post = Post.buildNullSafeObject()
+    var currentState: State = State.LOADING
+    private val loadingObject: Post = Post.buildNullSafeObject()
 
 
     fun addData(newPosts: ArrayList<Post>) {
         val oldIndex: Int = posts.size
         posts.addAll(newPosts)
         notifyItemRangeInserted(oldIndex, posts.size)
-        currentState = State.LOADED
-        posts.remove(loadingObject)
+        toggleLoading()
+        timeout.cancel()
+        timeout = Timer()
+    }
+
+    private fun toggleLoading() {
+        if (currentState == State.LOADING) {
+            currentState = State.LOADED
+            posts.remove(loadingObject)
+            notifyItemRemoved(posts.size);
+        } else {
+            currentState = State.LOADING;
+            posts.add(loadingObject)
+            notifyItemInserted(posts.size-1)
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -52,17 +70,19 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val linearLayoutManager: LinearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
-                if (linearLayoutManager.findLastCompletelyVisibleItemPosition() == posts.size - 2) {
-                    loadMore()
+                if (linearLayoutManager.findLastCompletelyVisibleItemPosition() > posts.size - 2 && currentState == State.LOADED) {
+                    loadMore(recyclerView)
                 }
             }
 
-            private fun loadMore() {
-                if (currentState == State.LOADED) {
-                    currentState = State.LOADING
-                    posts.add(loadingObject)
-                    callback.requestMoreData()
-                }
+            private fun loadMore(recyclerView: RecyclerView) {
+                toggleLoading()
+                callback.requestMoreData()
+                timeout.schedule(object : TimerTask() {
+                    override fun run() {
+                        recyclerView.post { toggleLoading() }
+                    }
+                }, 3000)
             }
         })
     }
@@ -91,17 +111,17 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
         return posts.size
     }
 
-    fun setData(posts: ArrayList<Post>) {
-        this.posts = posts
-        notifyDataSetChanged()
-    }
-
     inner class ViewHolder(val binding: PostItemHomePageBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(post: Post) {
             binding.post = post
             binding.root.setOnClickListener {
-                val action: NavDirections = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(post.postID)
-                Navigation.findNavController(binding.root).navigate(action)
+                if (AppUtilities.isNetworkAvailable(binding.root.context)) {
+                    val action: NavDirections = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(post.postID)
+                    Navigation.findNavController(binding.root).navigate(action)
+                } else {
+                    Snackbar.make(binding.root, binding.root.context.getString(R.string.no_internet_connection), Snackbar.LENGTH_SHORT)
+                            .show();
+                }
             }
         }
     }

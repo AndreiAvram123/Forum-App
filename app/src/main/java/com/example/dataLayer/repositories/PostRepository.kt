@@ -1,7 +1,6 @@
 package com.example.dataLayer.repositories
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bookapp.AppUtilities
@@ -11,9 +10,7 @@ import com.example.dataLayer.dataMappers.PostMapper
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.RoomPostDao
 import com.example.dataLayer.models.PostDTO
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.withContext
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,16 +18,10 @@ import retrofit2.Response
 @InternalCoroutinesApi
 class PostRepository(private val application: Application) {
 
-    private var currentPage: Int = 0
+    private var currentPage: Int = 0;
 
-    val nextPagePosts: MutableLiveData<ArrayList<Post>>
-            by lazy {
-        MutableLiveData<ArrayList<Post>>()
-    }
 
-    var posts: LiveData<List<Post>>;
-
-    var currentFetchedPost: LiveData<Post> = MutableLiveData()
+    var currentFetchedPost: MutableLiveData<Post> = MutableLiveData()
 
     private val favoritePosts: MutableLiveData<ArrayList<Post>> by lazy {
         MutableLiveData<ArrayList<Post>>()
@@ -45,63 +36,33 @@ class PostRepository(private val application: Application) {
 
     val newFetchedPosts = MutableLiveData<ArrayList<Post>>()
     private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()
-
-
-    init {
-        posts = postDao.getAllPosts()
+    val recentPosts: LiveData<List<Post>> by lazy {
+        postDao.getRecentPosts();
     }
 
-    suspend fun fetchFirstPagePosts(): LiveData<List<Post>> {
 
-        //check weather we have the latest posts
-        fetchFirstsPageByNetwork()
-        val data = repositoryInterface.fetchPostByPage();
-        Log.d("test",data.toString())
-        return posts;
-    }
-
-      private suspend fun fetchFirstsPageByNetwork() = repositoryInterface.fetchPostByPage()
-
-//        withContext(Dispatchers.IO) {
-//            repositoryInterface.fetchPostByPage().enqueue(object : Callback<ArrayList<PostDTO>> {
-//                override fun onResponse(call: Call<ArrayList<PostDTO>?>, response: Response<ArrayList<PostDTO>?>) {
-//                    response.body()?.let {
-//                        currentPage = 1
-//                       // fetchedPosts = PostMapper.mapDTONetworkToDomainObjects(it)
-//                    }
-//
-//                }
-//
-//                override fun onFailure(call: Call<ArrayList<PostDTO>?>, t: Throwable) {}
-//            })
-//        }
-//        withContext(Dispatchers.IO) {
-//          //  Log.d("test",fetchedPosts.toString())
-//          //  fetchedPosts?.let { postDao.insertPosts(it) }
-//        }
-//    }
-
-
-    suspend fun fetchPostByID(id: Long): LiveData<Post> {
-        withContext(Dispatchers.IO) {
-            currentFetchedPost = postDao.getPostByID(id)
+    suspend fun fetchFirstPagePosts() {
+        if (AppUtilities.isNetworkAvailable(application.applicationContext)) {
+            val dataFetched: ArrayList<Post> = PostMapper.mapDTONetworkToDomainObjects(fetchFirstsPageByNetwork())
+            postDao.removeOldFetchedData()
+            postDao.insertPosts(dataFetched)
+            currentPage = 1;
         }
 
-        if (currentFetchedPost.value == null) {
-            withContext(Dispatchers.IO) {
-                repositoryInterface.fetchPostByID(id).enqueue(object : Callback<PostDTO> {
-                    override fun onResponse(call: Call<PostDTO>, response: Response<PostDTO>) {
-                        PostMapper.convertDtoObjectToDomainObject(response.body())
-                    }
-
-                    override fun onFailure(call: Call<PostDTO>, t: Throwable) {}
-                })
-            }
-        }
-
-        return currentFetchedPost;
     }
 
+    private suspend fun fetchFirstsPageByNetwork() = repositoryInterface.fetchPostByPage()
+
+    suspend fun fetchPostByID(id: Long) {
+
+        try {
+            currentFetchedPost.value = PostMapper.mapDtoObjectToDomainObject(repositoryInterface.fetchPostByID(id))
+        } catch (e: java.lang.Exception) {
+            currentFetchedPost.value = Post.buildNullSafeObject();
+            e.printStackTrace()
+
+        }
+    }
 
     /**
      * This method should be called when the favorite posts
@@ -150,24 +111,15 @@ class PostRepository(private val application: Application) {
     }
 
 
-    suspend fun fetchNextPagePosts(): MutableLiveData<java.util.ArrayList<Post>> {
-//        withContext(Dispatchers.IO) {
-//            repositoryInterface.fetchPostByPage(currentPage + 1).enqueue(object : Callback<ArrayList<PostDTO>> {
-//                override fun onResponse(call: Call<ArrayList<PostDTO>>, response: Response<ArrayList<PostDTO>>) {
-//                    response.body()?.let {
-//                        currentPage++
-//                        nextPagePosts.value = PostMapper.mapDTONetworkToDomainObjects(it)
-//                        // posts.value?.addAll(nextPagePosts.value!!)
-//                    }
-//
-//                }
-//
-//                override fun onFailure(call: Call<ArrayList<PostDTO>>, t: Throwable) {
-//
-//                }
-//            })
-//        }
-        return nextPagePosts
+    suspend fun fetchNextPagePosts() {
+        try {
+            val fetchedData: ArrayList<PostDTO> = repositoryInterface.fetchPostByPage(currentPage + 1);
+            currentPage++
+            postDao.insertPosts(PostMapper.mapDTONetworkToDomainObjects(fetchedData));
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
-    }
+}
 
