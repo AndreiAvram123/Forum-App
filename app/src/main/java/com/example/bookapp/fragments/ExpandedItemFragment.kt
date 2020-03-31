@@ -78,15 +78,14 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
         favoriteButton = binding.saveButtonExpanded
         if (user != null)
             favoriteButton!!.setOnClickListener {
-                post.isFavorite = !post.isFavorite
-                binding.notifyChange()
                 if (post.isFavorite) {
                     informUserPostRemovedFromFavorites()
                     viewModelPost.deletePostFromFavorites(post, user?.userID)
                 } else {
                     informUserPostAddedToFavorites()
-                    viewModelPost.addPostToFavorites(post, user?.userID)
+                    user?.userID?.let { it1 -> viewModelPost.addPostToFavorites(post, it1) }
                 }
+                binding.notifyChange()
             }
         binding.backButtonExpanded.setOnClickListener { Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).popBackStack() }
         binding.writeCommentButton.setOnClickListener { showCommentDialog() }

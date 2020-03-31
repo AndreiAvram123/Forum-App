@@ -32,9 +32,10 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         return postRepository.currentFetchedPost
     }
 
-    fun getFirstPagePosts(): LiveData<List<Post>>? {
+    fun getFirstPagePosts(): LiveData<List<Post>> {
+
         viewModelScope.launch {
-            postRepository.fetchFirstPagePosts()
+            postRepository.fetchPostFirstPage()
         }
         return postRepository.recentPosts;
     }
@@ -46,15 +47,14 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         return currentlyDisplayedPosts
     }
 
-    fun addPostToFavorites(post: Post, userID: String?) {
-        postRepository.addPostToFavorites(post.postID, userID)
-        //if the favoritePosts data has been fetched you need to update the ui
-        if (this::currentlyDisplayedPosts.isInitialized) {
+    fun addPostToFavorites(post: Post, userID: String) {
+        viewModelScope.launch {
+            postRepository.addPostToFavorites(post.postID, userID)
+            //if the favoritePosts data has been fetched you need to update the ui
             currentlyDisplayedPosts.value?.let {
                 val newData = ArrayList(currentlyDisplayedPosts.value!!)
-                post.isFavorite = true;
                 newData.add(post)
-                currentlyDisplayedPosts.value = newData
+                currentlyDisplayedPosts.postValue(newData)
             }
         }
     }

@@ -2,6 +2,7 @@ package com.example.bookapp.fragments;
 
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,10 +41,7 @@ public class FavoritePostsFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         initializeViews(inflater, container);
-
-        if (viewModelPost == null) {
             attachObserver();
-        }
 
         bindDataToViews();
         return binding.getRoot();

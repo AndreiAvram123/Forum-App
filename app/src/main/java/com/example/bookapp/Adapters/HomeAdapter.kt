@@ -37,8 +37,14 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
 
     fun addData(newPosts: ArrayList<Post>) {
         val oldIndex: Int = posts.size
-        posts.addAll(newPosts)
-        notifyItemRangeInserted(oldIndex, posts.size)
+        newPosts.forEach {
+            if(!posts.contains(it)){
+                posts.add(it)
+            }
+        }
+        if(posts.size > oldIndex){
+            notifyItemRangeInserted(oldIndex, posts.size)
+        }
         toggleLoading()
         timeout.cancel()
         timeout = Timer()
@@ -82,7 +88,7 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
                     override fun run() {
                         recyclerView.post { toggleLoading() }
                     }
-                }, 3000)
+                }, 7000)
             }
         })
     }

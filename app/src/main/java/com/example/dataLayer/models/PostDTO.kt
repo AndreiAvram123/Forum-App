@@ -16,6 +16,7 @@ data class PostDTO(
         @SerializedName("postCategory")
         var postCategory: String? = null,
         @SerializedName("postContent")
-        var postContent: String? = null
-) {
-}
+        var postContent: String? = null,
+        @SerializedName("isFavorite")
+        var isFavorite:Boolean = false
+)

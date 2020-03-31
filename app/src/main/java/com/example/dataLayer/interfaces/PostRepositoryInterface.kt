@@ -16,7 +16,7 @@ interface PostRepositoryInterface {
 
 
     @GET("RestfulRequestHandler.php")
-    suspend fun fetchPostByID(@Query("postID") postID: Long): PostDTO
+    suspend fun fetchPostByID(@Query("postID") postID: Long,@Query("userID") userID: String = ""): PostDTO
 
     @GET("RestfulRequestHandler.php")
     fun fetchFavoritePostsByUserID(@Query("userID") userID: String?, @Query("savedPosts") favoritePosts: Boolean): Call<ArrayList<PostDTO>>
@@ -24,12 +24,10 @@ interface PostRepositoryInterface {
     @GET("RestfulRequestHandler.php")
     fun fetchMyPosts(@Query("userID") userID: String?, @Query("myPosts") favoritePosts: Boolean): Call<ArrayList<PostDTO>>
 
-    @POST("RestfulRequestHandler.php")
-    fun uploadPost(@Query("uploadPost") uploadPost: Boolean, @Body serializePost: PostDTO?): Call<PostDTO>
 
     @FormUrlEncoded
-    @POST("RestfulRequestHandler.php")
-    fun addPostToFavorites(@Query("addPostToFavorite") addToFavorites: Boolean, @Field("postID") postID: Long, @Field("userID") userID: String?): Call<String>
+    @POST("RestfulRequestHandler.php?addPostToFavorite")
+    suspend fun addPostToFavorites(@Field("postID") postID: Long, @Field("userID") userID: String)
 
     @FormUrlEncoded
     @POST("RestfulRequestHandler.php")

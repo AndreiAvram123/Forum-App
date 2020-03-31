@@ -18,7 +18,7 @@ import retrofit2.Response
 @InternalCoroutinesApi
 class PostRepository(private val application: Application) {
 
-    private var currentPage: Int = 0;
+    private var nextPageToFetch: Int = 1;
 
 
     var currentFetchedPost: MutableLiveData<Post> = MutableLiveData()
@@ -40,23 +40,9 @@ class PostRepository(private val application: Application) {
         postDao.getRecentPosts();
     }
 
-
-    suspend fun fetchFirstPagePosts() {
-        if (AppUtilities.isNetworkAvailable(application.applicationContext)) {
-            val dataFetched: ArrayList<Post> = PostMapper.mapDTONetworkToDomainObjects(fetchFirstsPageByNetwork())
-            postDao.removeOldFetchedData()
-            postDao.insertPosts(dataFetched)
-            currentPage = 1;
-        }
-
-    }
-
-    private suspend fun fetchFirstsPageByNetwork() = repositoryInterface.fetchPostByPage()
-
-    suspend fun fetchPostByID(id: Long) {
-
+    suspend fun fetchPostByID(id: Long, userID: String = "") {
         try {
-            currentFetchedPost.value = PostMapper.mapDtoObjectToDomainObject(repositoryInterface.fetchPostByID(id))
+            currentFetchedPost.value = PostMapper.mapDtoObjectToDomainObject(repositoryInterface.fetchPostByID(id, userID))
         } catch (e: java.lang.Exception) {
             currentFetchedPost.value = Post.buildNullSafeObject();
             e.printStackTrace()
@@ -98,12 +84,7 @@ class PostRepository(private val application: Application) {
         return myPosts
     }
 
-    fun addPostToFavorites(postID: Long, userID: String?) {
-        repositoryInterface.addPostToFavorites(true, postID, userID).enqueue(object : Callback<String?> {
-            override fun onResponse(call: Call<String?>, response: Response<String?>) {}
-            override fun onFailure(call: Call<String?>, t: Throwable) {}
-        })
-    }
+    suspend fun addPostToFavorites(postID: Long, userID: String) = repositoryInterface.addPostToFavorites(postID, userID)
 
 
     fun deletePostFromFavorites(postID: Long, userID: String?) {
@@ -113,11 +94,19 @@ class PostRepository(private val application: Application) {
 
     suspend fun fetchNextPagePosts() {
         try {
-            val fetchedData: ArrayList<PostDTO> = repositoryInterface.fetchPostByPage(currentPage + 1);
-            currentPage++
+            val fetchedData: ArrayList<PostDTO> = repositoryInterface.fetchPostByPage(nextPageToFetch);
+            nextPageToFetch++
             postDao.insertPosts(PostMapper.mapDTONetworkToDomainObjects(fetchedData));
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+
+    }
+
+    suspend fun fetchPostFirstPage() {
+        if (nextPageToFetch == 1) {
+            postDao.removeOldFetchedData()
+            fetchNextPagePosts()
         }
 
     }
