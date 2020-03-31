@@ -10,39 +10,59 @@ import com.example.dataLayer.dataMappers.PostMapper
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.RoomPostDao
 import com.example.dataLayer.models.PostDTO
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.InternalCoroutinesApi
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
-class PostRepository(private val application: Application) {
+class PostRepository(application: Application, coroutineScope: CoroutineScope, val userID: String) {
 
     private var nextPageToFetch: Int = 1;
-
-
     var currentFetchedPost: MutableLiveData<Post> = MutableLiveData()
 
-    private val favoritePosts: MutableLiveData<ArrayList<Post>> by lazy {
-        MutableLiveData<ArrayList<Post>>()
-    }
-
-    private val myPosts: MutableLiveData<ArrayList<Post>> by lazy {
-        MutableLiveData<ArrayList<Post>>()
-    }
     private val repositoryInterface: PostRepositoryInterface by lazy {
         AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
     }
 
-    val newFetchedPosts = MutableLiveData<ArrayList<Post>>()
     private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()
+
     val recentPosts: LiveData<List<Post>> by lazy {
-        postDao.getRecentPosts();
+        postDao.getRecentPosts()
+    }.also {
+        if (AppUtilities.isNetworkAvailable(application)) {
+            coroutineScope.launch { fetchPostFirstPage() }
+        }
     }
+
+    val favoritePosts: LiveData<List<Post>> by lazy {
+        postDao.getFavoritePosts()
+    }.also {
+        if (AppUtilities.isNetworkAvailable(application)) {
+            coroutineScope.launch { fetchFavoritePosts(userID) }
+        }
+    }
+    val myPosts: LiveData<List<Post>> by lazy {
+        postDao.getUserPosts(userID)
+    }.also {
+        if (AppUtilities.isNetworkAvailable(application)) {
+            coroutineScope.launch {
+                fetchMyPosts()
+            }
+        }
+    }
+
+
+
+
 
     suspend fun fetchPostByID(id: Long, userID: String = "") {
         try {
-            currentFetchedPost.value = PostMapper.mapDtoObjectToDomainObject(repositoryInterface.fetchPostByID(id, userID))
+            currentFetchedPost.value = postDao.getPostByID(id);
+            if (currentFetchedPost.value == null) {
+                val fetchedPost = PostMapper.mapDtoObjectToDomainObject(repositoryInterface.fetchPostByID(id, userID))
+                currentFetchedPost.value = fetchedPost;
+                postDao.insertPost(fetchedPost)
+            }
         } catch (e: java.lang.Exception) {
             currentFetchedPost.value = Post.buildNullSafeObject();
             e.printStackTrace()
@@ -50,45 +70,29 @@ class PostRepository(private val application: Application) {
         }
     }
 
-    /**
-     * This method should be called when the favorite posts
-     * data is requested
-     * The method decided weather it should fetch the data from
-     * cache or from the source
-     *
-     * @param userID
-     * @return
-     */
-    fun fetchFavoritePosts(userID: String?): MutableLiveData<ArrayList<Post>> {
-        //start fetching the other data on the other thread
-        repositoryInterface.fetchFavoritePostsByUserID(userID, true).enqueue(object : Callback<ArrayList<PostDTO>> {
-            override fun onResponse(call: Call<ArrayList<PostDTO>>, response: Response<ArrayList<PostDTO>>) {
-                favoritePosts.value = response.body()?.let {
-                    PostMapper.mapDTONetworkToDomainObjects(it)
-                }
-            }
-
-            override fun onFailure(call: Call<ArrayList<PostDTO>>, t: Throwable) {}
-        })
-        return favoritePosts;
+    private suspend fun fetchFavoritePosts(userID: String) {
+        val data = repositoryInterface.fetchFavoritePostsByUserID(userID)
+        postDao.insertPosts(PostMapper.mapDTONetworkToDomainObjects(data))
     }
 
-    fun fetchMyPosts(userID: String?): MutableLiveData<ArrayList<Post>> {
-        repositoryInterface.fetchMyPosts(userID, true).enqueue(object : Callback<ArrayList<PostDTO>> {
-            override fun onResponse(call: Call<ArrayList<PostDTO>>, response: Response<ArrayList<PostDTO>>) {
-                myPosts.value = response.body()?.let { PostMapper.mapDTONetworkToDomainObjects(it) }
-            }
-
-            override fun onFailure(call: Call<ArrayList<PostDTO>>, t: Throwable) {}
-        })
-        return myPosts
+    private suspend fun fetchMyPosts() {
+        try {
+            val fetchedPosts = PostMapper.mapDTONetworkToDomainObjects(repositoryInterface.fetchMyPosts(userID))
+            postDao.insertPosts(fetchedPosts)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace();
+    }
     }
 
-    suspend fun addPostToFavorites(postID: Long, userID: String) = repositoryInterface.addPostToFavorites(postID, userID)
+    suspend fun addPostToFavorites(post: Post, userID: String) {
+        postDao.addPostToFavorites(post)
+        repositoryInterface.addPostToFavorites(post.postID, userID)
+    }
 
 
-    fun deletePostFromFavorites(postID: Long, userID: String?) {
-        //  repositoryInterface.deletePostFromFavorites(postID,userID);
+    suspend fun deletePostFromFavorites(post: Post, userID: String) {
+        repositoryInterface.deletePostFromFavorites(post.postID, userID);
+        postDao.deletePostFromFavorites(post)
     }
 
 
@@ -103,11 +107,9 @@ class PostRepository(private val application: Application) {
 
     }
 
-    suspend fun fetchPostFirstPage() {
-        if (nextPageToFetch == 1) {
+    private suspend fun fetchPostFirstPage() {
             postDao.removeOldFetchedData()
             fetchNextPagePosts()
-        }
 
     }
 }

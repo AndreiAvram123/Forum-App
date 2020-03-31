@@ -4,18 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.MenuItem
+import android.os.PersistableBundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.fragments.BottomSheetPromptLogin
 import com.example.bookapp.fragments.BottomSheetPromptLogin.BottomSheetInterface
-import com.example.bookapp.fragments.ErrorFragment.ErrorFragmentInterface
 import com.example.bookapp.fragments.FriendsFragmentDirections
 import com.example.bookapp.interfaces.MainActivityInterface
 import com.example.bookapp.models.AuthenticationService
@@ -35,7 +33,7 @@ import java.util.*
  * for the main screen
  */
 @InternalCoroutinesApi
-class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface, ErrorFragmentInterface {
+class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface {
     private var sharedPreferences: SharedPreferences? = null
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelFriends: ViewModelFriends by viewModels()
@@ -46,14 +44,15 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_main_activity)
         configureDefaultVariables()
-        currentUser
+
         if (shouldShowWelcomeActivity()) {
             startWelcomeActivity()
         } else {
-            if (AppUtilities.isNetworkAvailable(this)) {
-            }
+            currentUser
         }
+
     }
+
 
     private val currentUser: Unit
         get() {
@@ -61,6 +60,7 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
             val username = sharedPreferences!!.getString(getString(R.string.key_username), null)
             if (userID != null && username != null) {
                 viewModelUser.setUser(User(userID = userID, username = username, email = null, profilePictureURL = null))
+                viewModelPost.userID = userID;
             } else {
                 startWelcomeActivity()
             }
@@ -143,14 +143,6 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
             }
         }
     }
-
-    override fun refreshErrorState(error: String) {
-        if (error == getString(R.string.no_internet_connection)) {
-            if (AppUtilities.isNetworkAvailable(this)) { //   apiManager.pushRequestLatestPosts();
-            }
-        }
-    }
-
 
 
 }

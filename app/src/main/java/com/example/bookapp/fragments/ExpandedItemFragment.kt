@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -29,7 +28,6 @@ import java.util.*
 class ExpandedItemFragment : Fragment(), CommentDialogInterface {
     private lateinit var post: Post;
     private var comments: ArrayList<Comment>? = null
-    private var favoriteButton: ImageView? = null
     lateinit var binding: FragmentExpandedItemBinding
     private var commentDialog: CommentDialog? = null
     private val viewModelPost: ViewModelPost by activityViewModels()
@@ -75,16 +73,17 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
 
     private fun configureViews() {
         binding.post = post
-        favoriteButton = binding.saveButtonExpanded
         if (user != null)
-            favoriteButton!!.setOnClickListener {
+            binding.saveButtonExpanded.setOnClickListener {
                 if (post.isFavorite) {
                     informUserPostRemovedFromFavorites()
-                    viewModelPost.deletePostFromFavorites(post, user?.userID)
+                    user?.let { viewModelPost.deletePostFromFavorites(post, it.userID) }
                 } else {
                     informUserPostAddedToFavorites()
-                    user?.userID?.let { it1 -> viewModelPost.addPostToFavorites(post, it1) }
+                    user?.let { viewModelPost.addPostToFavorites(post, it.userID) }
                 }
+                post.isFavorite = !post.isFavorite
+                binding.post = post;
                 binding.notifyChange()
             }
         binding.backButtonExpanded.setOnClickListener { Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).popBackStack() }

@@ -2,7 +2,6 @@ package com.example.bookapp.fragments;
 
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,9 +58,8 @@ public class FavoritePostsFragment extends Fragment {
 
         User user = viewModelUser.getUser().getValue();
         if (user != null) {
-            viewModelPost.getFavoritePosts(user.getUserID()).observe(getViewLifecycleOwner(), favoritePosts -> {
-                this.favoritePosts = favoritePosts;
-                recyclerViewAdapterPosts.setData(favoritePosts);
+            viewModelPost.getFavoritePosts().observe(getViewLifecycleOwner(), favoritePosts -> {
+                recyclerViewAdapterPosts.addData(new ArrayList<>(favoritePosts));
                 bindDataToViews();
             });
         }
