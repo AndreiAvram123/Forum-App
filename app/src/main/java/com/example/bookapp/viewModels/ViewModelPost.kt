@@ -1,74 +1,55 @@
 package com.example.bookapp.viewModels
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.bookapp.models.Post
 import com.example.dataLayer.repositories.PostRepository
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 
-class ViewModelPost : ViewModel() {
-    private lateinit var currentFetchedPosts: MutableLiveData<ArrayList<Post>>
-    private lateinit var currentlyDisplayedPosts: MutableLiveData<ArrayList<Post>>
-    private lateinit var myPosts: MutableLiveData<ArrayList<Post>>
+@InternalCoroutinesApi
+class ViewModelPost(application: Application) : AndroidViewModel(application) {
+
+    var lastSeenPostPosition: Int = 0;
+    lateinit var userID: String;
 
     private val postRepository: PostRepository by lazy {
-        PostRepository
+        PostRepository(application, coroutineScope = viewModelScope, userID = this.userID)
     }
 
-    fun getMyPosts(userID: String?): MutableLiveData<ArrayList<Post>>? {
-        if (!this::myPosts.isInitialized) {
-            myPosts = postRepository.fetchMyPosts(userID)
+
+    fun getMyPosts(): LiveData<List<Post>> {
+        return postRepository.myPosts
+    }
+
+    fun getPostByID(id: Long): LiveData<Post> {
+        viewModelScope.launch {
+            postRepository.fetchPostByID(id)
         }
-        return myPosts
+        return postRepository.currentFetchedPost
     }
 
-    fun getPost(id: Long): MutableLiveData<Post> {
-        return postRepository.fetchPostByID(id)
+    fun getFirstPagePosts(): LiveData<List<Post>> {
+
+        return postRepository.recentPosts;
     }
 
-    fun getFirstPagePosts(): LiveData<ArrayList<Post>>? {
-        if (!this::currentFetchedPosts.isInitialized) {
-            currentFetchedPosts = postRepository.fetchFirstPagePosts()
-        }
-        return currentFetchedPosts
+    fun getFavoritePosts(): LiveData<List<Post>> {
+        return postRepository.favoritePosts
     }
 
-    fun getFavoritePosts(userID: String?): MutableLiveData<ArrayList<Post>>? {
-        if (!this::currentlyDisplayedPosts.isInitialized) {
-            currentlyDisplayedPosts = postRepository.fetchFavoritePosts(userID)
-        }
-        return currentlyDisplayedPosts
-    }
-
-    fun addPostToFavorites(post: Post, userID: String?) {
-        postRepository.addPostToFavorites(post.postID, userID)
-        //if the favoritePosts data has been fetched you need to update the ui
-        if (this::currentlyDisplayedPosts.isInitialized) {
-            currentlyDisplayedPosts.value?.let {
-                val newData = ArrayList(currentlyDisplayedPosts.value!!)
-                post.isFavorite = true;
-                newData.add(post)
-                currentlyDisplayedPosts.value = newData
-            }
+    fun addPostToFavorites(post: Post, userID: String) {
+        viewModelScope.launch {
+            postRepository.addPostToFavorites(post, userID)
         }
     }
 
-    fun deletePostFromFavorites(post: Post, userID: String?) {
-        postRepository.deletePostFromFavorites(post.postID, userID)
-        currentlyDisplayedPosts.value?.let {
-            val newData = ArrayList(currentlyDisplayedPosts!!.value!!)
-            newData.remove(post)
-            //notify the observers
-            currentlyDisplayedPosts.value = newData
-        }
-    }
+    fun deletePostFromFavorites(post: Post, userID: String) = viewModelScope.launch { postRepository.deletePostFromFavorites(post, userID) }
 
-    fun fetchNewPosts() {
-        postRepository.fetchNewPosts()
-    }
 
-    fun fetchNextPagePosts(): MutableLiveData<ArrayList<Post>> {
-        return postRepository.fetchNextPagePosts()
-    }
+    fun fetchNextPagePosts() = viewModelScope.launch { postRepository.fetchNextPagePosts() }
+
 
 }

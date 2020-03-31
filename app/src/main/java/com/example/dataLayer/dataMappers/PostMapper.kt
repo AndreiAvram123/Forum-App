@@ -9,27 +9,31 @@ object PostMapper {
      * This method is used to convert the dto network objects to
      * domain specific objects
      */
-    fun convertDTONetworkToDomainObjects(dboPosts: ArrayList<PostDTO>): ArrayList<Post> {
+    fun mapDTONetworkToDomainObjects(dboPosts: ArrayList<PostDTO>): ArrayList<Post> {
         val toReturn: ArrayList<Post> = ArrayList();
         dboPosts.forEach {
-            toReturn.add(convertDtoObjectToDomainObject(it));
+            toReturn.add(mapDtoObjectToDomainObject(it));
         }
         return toReturn
     }
 
-    fun convertDtoObjectToDomainObject(postDTO: PostDTO?): Post {
+    fun mapDtoObjectToDomainObject(postDTO: PostDTO?): Post {
           postDTO?.let{
-              val builder: Post.Builder = Post.Builder();
-              builder.postID = postDTO.postID;
-              builder.postTitle = postDTO.postTitle
-              builder.postImage = postDTO.postImage
-              builder.postDate = postDTO.postDate
-              builder.postAuthor = postDTO.postAuthor
-              builder.postCategory = postDTO.postCategory
-              builder.postContent = postDTO.postContent
-              return builder.build()
+              if (!postDTO.postImage.contains("https://i.picsum.photos/")) {
+                  postDTO.postImage = "http://sgb967.poseidon.salford.ac.uk/cms/" + postDTO.postImage
+              }
+              val post: Post = Post(postDTO.postID, postDTO.postTitle, postImage = postDTO.postImage);
+              post.postDate = postDTO.postDate;
+              post.postAuthor = postDTO.postAuthor;
+              post.postCategory = postDTO.postCategory
+              post.postContent = postDTO.postContent
+              post.isFavorite = postDTO.isFavorite
+              post.postAuthorID = postDTO.postAuthorID;
+              return post;
           }
+
         return Post.buildNullSafeObject()
 
     }
+
 }

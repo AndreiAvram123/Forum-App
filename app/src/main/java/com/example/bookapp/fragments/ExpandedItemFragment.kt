@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -22,12 +21,13 @@ import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.dataObjectsToSerialize.SerializeComment
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
 
+@InternalCoroutinesApi
 class ExpandedItemFragment : Fragment(), CommentDialogInterface {
     private lateinit var post: Post;
     private var comments: ArrayList<Comment>? = null
-    private var favoriteButton: ImageView? = null
     lateinit var binding: FragmentExpandedItemBinding
     private var commentDialog: CommentDialog? = null
     private val viewModelPost: ViewModelPost by activityViewModels()
@@ -52,7 +52,7 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
 
         val postID = ExpandedItemFragmentArgs.fromBundle(requireArguments()).postID
 
-        viewModelPost.getPost(postID).observe(viewLifecycleOwner, Observer { fetchedPost: Post ->
+        viewModelPost.getPostByID(postID).observe(viewLifecycleOwner, Observer { fetchedPost: Post ->
                 post = fetchedPost
                 configureViews()
         })
@@ -73,18 +73,18 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
 
     private fun configureViews() {
         binding.post = post
-        favoriteButton = binding.saveButtonExpanded
         if (user != null)
-            favoriteButton!!.setOnClickListener {
-                post.isFavorite = !post.isFavorite
-                binding.notifyChange()
+            binding.saveButtonExpanded.setOnClickListener {
                 if (post.isFavorite) {
                     informUserPostRemovedFromFavorites()
-                    viewModelPost.deletePostFromFavorites(post, user?.userID)
+                    user?.let { viewModelPost.deletePostFromFavorites(post, it.userID) }
                 } else {
                     informUserPostAddedToFavorites()
-                    viewModelPost.addPostToFavorites(post, user?.userID)
+                    user?.let { viewModelPost.addPostToFavorites(post, it.userID) }
                 }
+                post.isFavorite = !post.isFavorite
+                binding.post = post;
+                binding.notifyChange()
             }
         binding.backButtonExpanded.setOnClickListener { Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).popBackStack() }
         binding.writeCommentButton.setOnClickListener { showCommentDialog() }

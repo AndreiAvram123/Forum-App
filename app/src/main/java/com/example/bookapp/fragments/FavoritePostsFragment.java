@@ -40,10 +40,7 @@ public class FavoritePostsFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         initializeViews(inflater, container);
-
-        if (viewModelPost == null) {
             attachObserver();
-        }
 
         bindDataToViews();
         return binding.getRoot();
@@ -61,9 +58,8 @@ public class FavoritePostsFragment extends Fragment {
 
         User user = viewModelUser.getUser().getValue();
         if (user != null) {
-            viewModelPost.getFavoritePosts(user.getUserID()).observe(getViewLifecycleOwner(), favoritePosts -> {
-                this.favoritePosts = favoritePosts;
-                recyclerViewAdapterPosts.setData(favoritePosts);
+            viewModelPost.getFavoritePosts().observe(getViewLifecycleOwner(), favoritePosts -> {
+                recyclerViewAdapterPosts.addData(new ArrayList<>(favoritePosts));
                 bindDataToViews();
             });
         }

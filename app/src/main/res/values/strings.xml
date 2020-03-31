@@ -52,6 +52,7 @@
     <string name="number_saved_posts">Saved posts : %1$d </string>
     <string name="my_posts_label">My posts</string>
     <string name="friend_fragment_label">Friends</string>
-    <string name="added_to_favorites">Post added to ffavorites</string>
+    <string name="added_to_favorites">Post added to favorites</string>
     <string name="removed_from_favorites">Post removed from favorites</string>
+    <string name="please_connect_to_internet">Please connect to the internet to use this feature</string>
 </resources>

@@ -4,37 +4,36 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.view.MenuItem
+import android.os.PersistableBundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
-import com.example.bookapp.AppUtilities
+import androidx.navigation.ui.NavigationUI
 import com.example.bookapp.R
 import com.example.bookapp.fragments.BottomSheetPromptLogin
 import com.example.bookapp.fragments.BottomSheetPromptLogin.BottomSheetInterface
-import com.example.bookapp.fragments.ErrorFragment.ErrorFragmentInterface
 import com.example.bookapp.fragments.FriendsFragmentDirections
 import com.example.bookapp.interfaces.MainActivityInterface
-import com.example.bookapp.interfaces.MessageInterface
 import com.example.bookapp.models.AuthenticationService
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelFriends
 import com.example.bookapp.viewModels.ViewModelMessages
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
-import com.example.dataLayer.repositories.MessageRepository
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
 
 /**
  * The main activity acts as the controller
  * for the main screen
  */
-class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface, ErrorFragmentInterface {
+@InternalCoroutinesApi
+class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface {
     private var sharedPreferences: SharedPreferences? = null
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelFriends: ViewModelFriends by viewModels()
@@ -45,14 +44,15 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_main_activity)
         configureDefaultVariables()
-        currentUser
+
         if (shouldShowWelcomeActivity()) {
             startWelcomeActivity()
         } else {
-            if (AppUtilities.isNetworkAvailable(this)) {
-            }
+            currentUser
         }
+
     }
+
 
     private val currentUser: Unit
         get() {
@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
             val username = sharedPreferences!!.getString(getString(R.string.key_username), null)
             if (userID != null && username != null) {
                 viewModelUser.setUser(User(userID = userID, username = username, email = null, profilePictureURL = null))
+                viewModelPost.userID = userID;
             } else {
                 startWelcomeActivity()
             }
@@ -99,27 +100,10 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
         val navHostFragment = supportFragmentManager
                 .findFragmentById(R.id.nav_host_fragment) as NavHostFragment?
         val navController = navHostFragment!!.navController
-        navController.navigate(R.id.homeFragment)
-        bottomNavigationView.setOnNavigationItemSelectedListener { menuItem: MenuItem ->
-            when (menuItem.itemId) {
-                R.id.navigation_home -> {
-                    navController.navigate(R.id.homeFragment)
-                }
-                R.id.search_item -> {
-                    navController.navigate(R.id.searchFragment)
-                }
-                R.id.saved_items -> {
-                    navController.navigate(R.id.favoriteItems)
-                }
-                R.id.my_posts_item -> {
-                    navController.navigate(R.id.fragmentMyPosts)
-                }
-                R.id.friends_item -> {
-                    navController.navigate(R.id.friendsFragment)
-                }
-            }
-            true
-        }
+
+        NavigationUI.setupWithNavController(bottomNavigationView,
+               navController)
+
     }
 
 
@@ -159,14 +143,6 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
             }
         }
     }
-
-    override fun refreshErrorState(error: String) {
-        if (error == getString(R.string.no_internet_connection)) {
-            if (AppUtilities.isNetworkAvailable(this)) { //   apiManager.pushRequestLatestPosts();
-            }
-        }
-    }
-
 
 
 }
