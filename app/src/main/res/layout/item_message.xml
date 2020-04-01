@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <variable
             name="message"
-            type="com.example.bookapp.models.Message" />
+            type="com.example.bookapp.models.UserMessage" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -1,20 +1,25 @@
 package com.example.bookapp.Adapters
 
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookapp.R
 import com.example.bookapp.databinding.ItemMessageBinding
 import com.example.bookapp.databinding.LoadingItemListBinding
-import com.example.bookapp.models.Message
+import com.example.bookapp.models.UserMessage
 import java.util.*
 
-class AdapterMessages : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val messages: ArrayList<Message> = ArrayList()
+class AdapterMessages : PagedListAdapter<UserMessage, RecyclerView.ViewHolder>(object : DiffUtil.ItemCallback<UserMessage>() {
+    override fun areItemsTheSame(oldItem: UserMessage, newItem: UserMessage): Boolean = oldItem.messageID == newItem.messageID
+
+    override fun areContentsTheSame(oldItem: UserMessage, newItem: UserMessage): Boolean = oldItem.messageID == newItem.messageID
+}) {
+    private val userMessages: ArrayList<UserMessage> = ArrayList()
     private var isLoading = false
 
     enum class ItemType(val id: Int) {
@@ -35,10 +40,10 @@ class AdapterMessages : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
 
-    fun addOldMessages(oldMessages: List<Message>) {
-        oldMessages.forEach{
-            if(!messages.contains(it)){
-                messages.add(it)
+    fun addOldMessages(oldUserMessages: List<UserMessage>) {
+        oldUserMessages.forEach{
+            if(!userMessages.contains(it)){
+                userMessages.add(it)
             }
         }
         isLoading = false
@@ -57,12 +62,13 @@ class AdapterMessages : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is MessageViewHolder) {
-            holder.bind(messages[position])
+            holder.bind(userMessages[position])
         }
+
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (messages[position] == Message.getNullSafeObject()) {
+        return if (userMessages[position] == UserMessage.getNullSafeObject()) {
 
             ItemType.LOADING.id
         } else {
@@ -72,12 +78,12 @@ class AdapterMessages : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return messages.size
+        return userMessages.size
     }
 
     internal inner class MessageViewHolder(private val itemMessageBinding: ItemMessageBinding) : RecyclerView.ViewHolder(itemMessageBinding.root) {
-        fun bind(message: Message?) {
-            itemMessageBinding.message = message
+        fun bind(userMessage: UserMessage?) {
+            itemMessageBinding.message = userMessage
         }
 
     }

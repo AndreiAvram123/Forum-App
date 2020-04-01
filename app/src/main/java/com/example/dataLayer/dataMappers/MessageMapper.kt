@@ -1,16 +1,16 @@
 package com.example.dataLayer.dataMappers
 
-import com.example.bookapp.models.Message
+import com.example.bookapp.models.UserMessage
 import com.example.dataLayer.models.MessageDTO
 
 object MessageMapper {
 
-    fun mapNetworkToDomainObject(messageDTO: MessageDTO): Message {
+    fun mapNetworkToDomainObject(messageDTO: MessageDTO): UserMessage {
         var messageImage:String? = null
         if(messageDTO.messageImage !=null) {
            messageImage = ("http://sgb967.poseidon.salford.ac.uk/cms/" + messageDTO.messageImage)
         }
-        return Message(
+        return UserMessage(
                 messageID = messageDTO.messageID,
                 messageContent = messageDTO.messageContent,
                 senderID = messageDTO.senderID,
@@ -20,8 +20,8 @@ object MessageMapper {
         )
     }
 
-    fun mapNetworkToDomainObjects(messages: ArrayList<MessageDTO>): ArrayList<Message> {
-        val toReturn = ArrayList<Message>()
+    fun mapNetworkToDomainObjects(messages: ArrayList<MessageDTO>): ArrayList<UserMessage> {
+        val toReturn = ArrayList<UserMessage>()
         messages.forEach {
             toReturn.add(mapNetworkToDomainObject(it))
         }

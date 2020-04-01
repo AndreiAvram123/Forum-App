@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "messages")
-data class Message(
+data class UserMessage(
         @PrimaryKey
         @ColumnInfo(name = "messageID")
         val messageID: String,
@@ -21,8 +21,8 @@ data class Message(
         val messageImage: String?
 ) {
     companion object {
-        fun getNullSafeObject():Message{
-            return Message("0","Unknown","0","0",0L,"Unknown");
+        fun getNullSafeObject():UserMessage{
+            return UserMessage("0","Unknown","0","0",0L,"Unknown");
         }
     }
 }
