@@ -18,7 +18,6 @@ object FriendsMapper {
                 lastMessage = MessageMapper.mapNetworkToDomainObject(friendDTO.lastMessage)
                 , userID = friendDTO.userID
                 , username = friendDTO.username
-                , profilePictureURl = friendDTO.profilePicture
                 , email = null)
     }
 }

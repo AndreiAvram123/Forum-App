@@ -12,7 +12,7 @@ interface MessageDao {
     @Query("SELECT * FROM messages WHERE (senderID = :currentUserID AND receiverId = :user2ID )  OR (senderID = :user2ID AND receiverId=:currentUserID) ORDER BY messageID  LIMIT 15")
     fun getRecentMessages(currentUserID: String, user2ID: String): LiveData<List<Message>>
 
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessages(messages: List<Message>)
 
 }

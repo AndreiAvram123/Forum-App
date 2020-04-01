@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <data>
+
+        <import type="android.view.View" />
         <variable
             name="message"
             type="com.example.bookapp.models.Message" />
@@ -23,11 +25,29 @@
             android:layout_marginBottom="32dp"
             android:autoSizeTextType="uniform"
             android:text="@{message.messageContent}"
+            android:visibility="@{message.messageImage != null ? View.GONE : View.VISIBLE }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Hey, what are you doing?" />
+
+        <ImageView
+            android:id="@+id/message_image"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="8dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:visibility="@{message.messageImage == null ? View.GONE : View.VISIBLE }"
+            app:imageFromURL="@{message.messageImage}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/placeholder" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

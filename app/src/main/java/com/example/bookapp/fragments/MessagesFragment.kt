@@ -1,6 +1,7 @@
 package com.example.bookapp.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.AdapterMessages
 import com.example.bookapp.R
 import com.example.bookapp.databinding.MessagesFragmentBinding
-import com.example.bookapp.interfaces.MessageInterface
 import com.example.bookapp.viewModels.ViewModelMessages
 import kotlinx.coroutines.InternalCoroutinesApi
 
@@ -22,7 +22,7 @@ class MessagesFragment : Fragment() {
     private lateinit var binding: MessagesFragmentBinding;
     private val viewModelMessages: ViewModelMessages by activityViewModels()
     private val adapterMessages: AdapterMessages by lazy {
-        AdapterMessages(binding.recyclerViewMessages, user2ID)
+        AdapterMessages()
     }
     private lateinit var currentUserID: String
     private lateinit var user2ID: String

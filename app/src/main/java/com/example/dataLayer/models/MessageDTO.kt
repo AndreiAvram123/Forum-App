@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class MessageDTO(
         @SerializedName("messageId")
         val messageID: String,
-        @SerializedName("messsageContent")
+        @SerializedName("messageContent")
         val messageContent: String,
         @SerializedName("messageDate")
         val messageDate: Long,
@@ -14,6 +14,6 @@ data class MessageDTO(
         @SerializedName("receiverId")
         val receiverID: String,
         @SerializedName("messageImage")
-        val messageImage: String
+        val messageImage: String?
 ) {
 }

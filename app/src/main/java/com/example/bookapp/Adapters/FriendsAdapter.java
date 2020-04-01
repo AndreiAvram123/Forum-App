@@ -57,9 +57,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
 
         void bindData(Friend friend) {
             binding.setFriend(friend);
-            Glide.with(binding.getRoot())
-                    .load(friend.getProfilePictureURL())
-                    .into(binding.imageView2);
             binding.getRoot().setOnClickListener(view->mainActivityInterface.startChat(friend.getUserID()));
         }
     }

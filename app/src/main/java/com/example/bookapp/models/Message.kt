@@ -19,4 +19,10 @@ data class Message(
         val messageDate: Long = 0L,
         @ColumnInfo(name = "messageImage")
         val messageImage: String?
-)
+) {
+    companion object {
+        fun getNullSafeObject():Message{
+            return Message("0","Unknown","0","0",0L,"Unknown");
+        }
+    }
+}

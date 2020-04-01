@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
             val userID = sharedPreferences!!.getString(getString(R.string.key_user_id), null)
             val username = sharedPreferences!!.getString(getString(R.string.key_username), null)
             if (userID != null && username != null) {
-                viewModelUser.setUser(User(userID = userID, username = username, email = null, profilePictureURL = null))
+                viewModelUser.setUser(User(userID = userID, username = username, email = null))
                 viewModelPost.userID = userID;
             } else {
                 startWelcomeActivity()
