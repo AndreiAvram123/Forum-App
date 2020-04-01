@@ -3,7 +3,7 @@ package com.example.bookapp.viewModels;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.dataLayer.interfaces.CommentsInterface;
+import com.example.dataLayer.interfaces.CommentsRepositoryInterface;
 import com.example.bookapp.models.Comment;
 import com.example.dataLayer.dataObjectsToSerialize.SerializeComment;
 
@@ -15,7 +15,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 
 class CommentsRepository {
-    private CommentsInterface commentsInterface;
+    private CommentsRepositoryInterface commentsInterface;
     private static CommentsRepository instance;
     private MutableLiveData<ArrayList<Comment>> postComments;
 
@@ -27,7 +27,7 @@ class CommentsRepository {
     }
 
     private CommentsRepository(@NonNull Retrofit retrofit) {
-        commentsInterface = retrofit.create(CommentsInterface.class);
+        commentsInterface = retrofit.create(CommentsRepositoryInterface.class);
     }
 
     void uploadComment(@NonNull SerializeComment comment) {

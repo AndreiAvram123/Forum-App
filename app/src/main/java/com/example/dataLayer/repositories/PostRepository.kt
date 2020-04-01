@@ -7,8 +7,8 @@ import com.example.bookapp.AppUtilities
 import com.example.bookapp.models.Post
 import com.example.dataLayer.PostDatabase
 import com.example.dataLayer.dataMappers.PostMapper
-import com.example.dataLayer.interfaces.PostRepositoryInterface
-import com.example.dataLayer.interfaces.RoomPostDao
+import com.example.dataLayer.interfaces.PostsRepositoryInterface
+import com.example.dataLayer.RoomDao.RoomPostDao
 import com.example.dataLayer.models.PostDTO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -20,8 +20,8 @@ class PostRepository(application: Application, coroutineScope: CoroutineScope, v
     private var nextPageToFetch: Int = 1;
     var currentFetchedPost: MutableLiveData<Post> = MutableLiveData()
 
-    private val repositoryInterface: PostRepositoryInterface by lazy {
-        AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
+    private val repositoryInterface: PostsRepositoryInterface by lazy {
+        AppUtilities.getRetrofit().create(PostsRepositoryInterface::class.java)
     }
 
     private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()

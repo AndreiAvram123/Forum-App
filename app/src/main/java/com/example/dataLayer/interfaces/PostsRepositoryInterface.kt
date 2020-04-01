@@ -6,7 +6,7 @@ import retrofit2.http.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-interface PostRepositoryInterface {
+interface PostsRepositoryInterface {
 
     @GET("RestfulRequestHandler.php?recentPosts")
     suspend fun fetchPostByPage(@Query("page") page:Int = 1): ArrayList<PostDTO>

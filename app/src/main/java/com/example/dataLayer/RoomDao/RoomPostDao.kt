@@ -1,4 +1,4 @@
-package com.example.dataLayer.interfaces
+package com.example.dataLayer.RoomDao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*

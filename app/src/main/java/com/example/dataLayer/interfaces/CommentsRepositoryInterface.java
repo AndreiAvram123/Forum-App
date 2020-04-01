@@ -14,7 +14,7 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
-public interface CommentsInterface {
+public interface CommentsRepositoryInterface {
 
     @GET("RestfulRequestHandler.php")
     Call<ArrayList<Comment>> fetchCommentsByPostID(@Query("postID") long postID, @Query("comments") boolean fetchComments);

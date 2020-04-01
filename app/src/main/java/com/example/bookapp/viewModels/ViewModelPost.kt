@@ -20,6 +20,7 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
     }
 
 
+
     fun getMyPosts(): LiveData<List<Post>> {
         return postRepository.myPosts
     }

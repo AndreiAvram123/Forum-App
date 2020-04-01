@@ -8,7 +8,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface SearchInterface {
+public interface SearchRepositoryInterface {
 
     @GET("RestfulRequestHandler.php")
     Call<ArrayList<Post>> fetchSearchSuggestions(@Query("suggestionQuery") String query);

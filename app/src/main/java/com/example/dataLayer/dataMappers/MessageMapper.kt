@@ -5,14 +5,23 @@ import com.example.dataLayer.models.MessageDTO
 
 object MessageMapper {
 
-    fun mapNetworkToDomainObject(message: MessageDTO): Message {
-        val builder: Message.Builder = Message.Builder()
-        builder.setMessageID(message.messageID)
-        builder.setMessageContent(message.messageContent)
-        builder.setSenderID(message.senderID)
-        builder.setMessageDate(message.messageDate)
-        return builder.createMessage()
+    fun mapNetworkToDomainObject(messageDTO: MessageDTO): Message {
+        return Message(
+                messageID = messageDTO.messageID,
+                messageContent = messageDTO.messageContent,
+                senderID = messageDTO.senderID,
+                receiverID = messageDTO.receiverID,
+                messageDate = messageDTO.messageDate,
+                messageImage = messageDTO.messageImage
+        )
 
+    }
 
+    fun mapNetworkToDomainObjects(messages: ArrayList<MessageDTO>): ArrayList<Message> {
+        val toReturn = ArrayList<Message>()
+        messages.forEach {
+            toReturn.add(mapNetworkToDomainObject(it))
+        }
+        return toReturn;
     }
 }

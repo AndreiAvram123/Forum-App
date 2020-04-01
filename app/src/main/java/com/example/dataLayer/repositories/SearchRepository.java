@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.bookapp.models.Post;
-import com.example.dataLayer.interfaces.SearchInterface;
+import com.example.dataLayer.interfaces.SearchRepositoryInterface;
 
 import java.util.ArrayList;
 
@@ -17,11 +17,11 @@ import retrofit2.Retrofit;
 
 public class SearchRepository {
     private static SearchRepository instance;
-    private SearchInterface searchInterface;
+    private SearchRepositoryInterface searchRepositoryInterface;
     private MutableLiveData<ArrayList<Post>> searchSuggestions = new MutableLiveData<>();
 
     private SearchRepository(Retrofit retrofit) {
-        searchInterface = retrofit.create(SearchInterface.class);
+        searchRepositoryInterface = retrofit.create(SearchRepositoryInterface.class);
     }
 
     public static synchronized SearchRepository getInstance(@NonNull Retrofit retrofit) {
@@ -37,7 +37,7 @@ public class SearchRepository {
     }
 
     public MutableLiveData<ArrayList<Post>> fetchSearchSuggestions(String query) {
-        searchInterface.fetchSearchSuggestions(query).enqueue(new Callback<ArrayList<Post>>() {
+        searchRepositoryInterface.fetchSearchSuggestions(query).enqueue(new Callback<ArrayList<Post>>() {
             @Override
             public void onResponse(@NonNull Call<ArrayList<Post>> call, @NonNull Response<ArrayList<Post>> response) {
                 Log.d("haha",response.body().toString());

@@ -18,6 +18,7 @@ import com.example.bookapp.models.Message;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class AdapterMessages extends RecyclerView.Adapter {
 
@@ -68,17 +69,10 @@ public class AdapterMessages extends RecyclerView.Adapter {
     }
 
 
-    public void addOldMessages(@NonNull ArrayList<Message> oldMessages) {
-        isLoading = true;
-        for (Message message : oldMessages) {
-            if (!this.messages.contains(message))
-                this.messages.add(0, message);
-        }
-
-        notifyItemRangeChanged(0, oldMessages.size());
-        //maintain current position
-        scroll(oldMessages.size() - 1);
+    public void addOldMessages(@NonNull List<Message> oldMessages) {
+       messages.addAll(oldMessages);
         isLoading = false;
+        notifyDataSetChanged();
     }
 
     public void addMessage(@NonNull Message lastFetchedMessage) {
