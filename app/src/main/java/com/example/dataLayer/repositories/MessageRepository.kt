@@ -12,7 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
-class MessageRepository(coroutineScope: CoroutineScope, application: Application) {
+class MessageRepository(coroutineScope: CoroutineScope, val application: Application) {
 
     private val repositoryInterface: MessagesRepositoryInterface by lazy {
         AppUtilities.getRetrofit().create(MessagesRepositoryInterface::class.java)
@@ -22,12 +22,13 @@ class MessageRepository(coroutineScope: CoroutineScope, application: Application
     private val messages: HashMap<String, LiveData<List<UserMessage>>> = HashMap()
     val requests: HashMap<String, Boolean> = HashMap()
 
+
     fun getMessages(currentUserID: String, user2ID: String): LiveData<List<UserMessage>> {
         val temp = messages[user2ID]
         return if (temp != null) {
             temp;
         } else {
-            val toReturn = messageDao.getRecentMessages(currentUserID, user2ID)
+            val toReturn = messageDao.getMessages(currentUserID, user2ID)
             messages[user2ID] = toReturn
             toReturn
         }
@@ -36,13 +37,27 @@ class MessageRepository(coroutineScope: CoroutineScope, application: Application
 
 
     suspend fun fetchRecentMessages(currentUserID: String, receiverID: String) {
+        if (AppUtilities.isNetworkAvailable(application)) {
+            try {
+                val fetchedData = MessageMapper.mapNetworkToDomainObjects(
+                        repositoryInterface.fetchOldMessages(currentUserID = currentUserID, receiverID = receiverID, offset = 0)
+                )
+                requests[receiverID] = true
+                messageDao.deleteOldData(currentUserID,receiverID)
+                messageDao.insertMessages(fetchedData)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    suspend fun fetchMoreMessages(currentUserID: String, receiverID: String, currentOffset: Int) {
         try {
             val fetchedData = MessageMapper.mapNetworkToDomainObjects(
-                    repositoryInterface.fetchOldMessages(currentUserID = currentUserID, receiverID = receiverID, offset = 0)
-            )
-            requests[receiverID] = true
+                    repositoryInterface.fetchOldMessages(currentUserID = currentUserID, receiverID = receiverID, offset = currentOffset))
             messageDao.insertMessages(fetchedData)
-        } catch (e: Exception) {
+
+        } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
     }

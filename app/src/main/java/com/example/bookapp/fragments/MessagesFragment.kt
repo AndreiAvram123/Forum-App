@@ -11,6 +11,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.bookapp.Adapters.AdapterInterface
 import com.example.bookapp.Adapters.AdapterMessages
 import com.example.bookapp.R
 import com.example.bookapp.databinding.MessagesFragmentBinding
@@ -18,12 +19,10 @@ import com.example.bookapp.viewModels.ViewModelMessages
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
-class MessagesFragment : Fragment() {
+class MessagesFragment : Fragment(), AdapterInterface {
     private lateinit var binding: MessagesFragmentBinding;
     private val viewModelMessages: ViewModelMessages by activityViewModels()
-    private val adapterMessages: AdapterMessages by lazy {
-        AdapterMessages()
-    }
+    private val adapterMessages: AdapterMessages = AdapterMessages(this)
     private lateinit var currentUserID: String
     private lateinit var user2ID: String
 
@@ -39,9 +38,9 @@ class MessagesFragment : Fragment() {
     }
 
     private fun configureViews() {
-        binding.sendMessageButton.setOnClickListener { view: View? ->
+        binding.sendMessageButton.setOnClickListener {
             if (binding.messageTextArea.text != null) {
-                val messageContent = binding.messageTextArea.text.toString().trim { it <= ' ' }
+                val messageContent = binding.messageTextArea.text.toString()
                 if (messageContent.trim { it <= ' ' } != "") {
                     binding.messageTextArea.text!!.clear()
 
@@ -53,7 +52,8 @@ class MessagesFragment : Fragment() {
     private fun attachObserver() {
         viewModelMessages.getRecentMessages(currentUserID, user2ID).observe(viewLifecycleOwner,
                 Observer {
-                    adapterMessages.addOldMessages(it)
+                    adapterMessages.addMessages(it)
+                    Log.d("test","newData")
                 })
     }
 
@@ -65,5 +65,9 @@ class MessagesFragment : Fragment() {
         binding.recyclerViewMessages.adapter = adapterMessages
         binding.recyclerViewMessages.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.HORIZONTAL))
         binding.recyclerViewMessages.layoutManager = LinearLayoutManager(requireContext())
+    }
+
+    override fun requestMoreData(offset: Int) {
+        viewModelMessages.requestMoreMessages(currentUserID, user2ID, offset)
     }
 }

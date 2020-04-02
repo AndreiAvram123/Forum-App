@@ -1,6 +1,7 @@
 package com.example.bookapp.Adapters
 
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -12,37 +13,94 @@ import com.example.bookapp.databinding.LoadingItemListBinding
 import com.example.bookapp.models.UserMessage
 import java.util.*
 
-class AdapterMessages : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class AdapterMessages(private val adapterInterface: AdapterInterface? = null) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val messages: ArrayList<UserMessage> = ArrayList()
-    private var isLoading = false
-
+    private var recyclerView: RecyclerView? = null
+    private var currentState: State = State.LOADING
+    private val loadingObject: UserMessage = UserMessage.getNullSafeObject()
+    private var timeout: Timer = Timer()
     enum class ItemType(val id: Int) {
         TEXT(1), LOADING(0)
     }
 
+    enum class State {
+        LOADING, LOADED
+    }
+
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
+        this.recyclerView = recyclerView
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val linearLayoutManager = recyclerView.layoutManager as LinearLayoutManager?
-                if (linearLayoutManager != null && !isLoading && linearLayoutManager.findFirstCompletelyVisibleItemPosition() == 0) {
-                    isLoading = true
+                if (linearLayoutManager != null && linearLayoutManager.findFirstCompletelyVisibleItemPosition() <= 2
+                        && currentState == State.LOADED) {
+                    loadMore()
                 }
             }
         })
     }
 
+    private fun loadMore() {
+        adapterInterface?.let {
+            it.requestMoreData(messages.size)
+            enableLoading()
 
-    fun addOldMessages(oldMessages: List<UserMessage>) {
+            timeout.schedule(object : TimerTask() {
+                override fun run() {
+                    recyclerView?.post { disableLoadingItem() }
+                }
+            }, 3000)
+        }
+
+    }
+
+    private fun enableLoading() {
+        currentState = State.LOADING
+        messages.add(0, loadingObject)
+        notifyItemRangeChanged(0, 1)
+    }
+
+
+
+    fun addMessages(oldMessages: List<UserMessage>) {
         oldMessages.forEach {
+            if (!messages.contains(it)) {
+                messages.add(0, it)
+            }
+        }
+        notifyDataSetChanged()
+        disableLoadingItem()
+
+
+        //this means that we fetched the recent messages
+        if (oldMessages.size == messages.size) {
+            recyclerView?.scrollToPosition(oldMessages.size)
+        }
+    }
+
+    private fun disableLoadingItem() {
+        currentState = State.LOADED
+        if (messages.contains(loadingObject)) {
+            messages.remove(loadingObject)
+            notifyItemRemoved(0)
+        }
+        timeout.cancel()
+        timeout = Timer()
+    }
+
+    fun addNewMessages(newMessages: List<UserMessage>) {
+        val oldIndex = messages.size
+        newMessages.forEach {
             if (!messages.contains(it)) {
                 messages.add(it)
             }
         }
-        isLoading = false
-        notifyDataSetChanged()
+        notifyItemRangeInserted(oldIndex, newMessages.size)
+        recyclerView?.smoothScrollToPosition(newMessages.size - 1)
     }
+
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -62,7 +120,6 @@ class AdapterMessages : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         return if (messages[position] == UserMessage.getNullSafeObject()) {
-
             ItemType.LOADING.id
         } else {
             ItemType.TEXT.id

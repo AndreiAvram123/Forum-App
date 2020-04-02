@@ -23,4 +23,11 @@ class ViewModelMessages(application: Application) : AndroidViewModel(application
         }
         return messageRepository.getMessages(currentUserID, user2ID)
     }
+
+    fun requestMoreMessages(currentUserID: String, user2ID: String,currentOffset:Int) {
+        viewModelScope.launch {
+            messageRepository.fetchMoreMessages(currentUserID, user2ID,currentOffset)
+        }
+    }
+
 }
