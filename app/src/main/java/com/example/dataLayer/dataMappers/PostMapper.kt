@@ -22,7 +22,7 @@ object PostMapper {
               if (!postDTO.postImage.contains("https://i.picsum.photos/")) {
                   postDTO.postImage = "http://sgb967.poseidon.salford.ac.uk/cms/" + postDTO.postImage
               }
-              val post: Post = Post(postDTO.postID, postDTO.postTitle, postImage = postDTO.postImage);
+              val post = Post(postDTO.postID, postDTO.postTitle, postImage = postDTO.postImage);
               post.postDate = postDTO.postDate;
               post.postAuthor = postDTO.postAuthor;
               post.postCategory = postDTO.postCategory

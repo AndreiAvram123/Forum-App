@@ -26,7 +26,7 @@ import java.util.*
 
 @InternalCoroutinesApi
 class ExpandedItemFragment : Fragment(), CommentDialogInterface {
-    private lateinit var post: Post;
+    private lateinit var post: Post
     private var comments: ArrayList<Comment>? = null
     lateinit var binding: FragmentExpandedItemBinding
     private var commentDialog: CommentDialog? = null
@@ -36,7 +36,7 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
     private var user: User? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? { // Inflate the layout for this fragment
+                              savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil
                 .inflate(inflater, R.layout.fragment_expanded_item, container, false)
         attachObservers()
@@ -73,21 +73,23 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
 
     private fun configureViews() {
         binding.post = post
-        if (user != null)
+        user?.let { user ->
+            binding.currentUserID = user.userID
             binding.saveButtonExpanded.setOnClickListener {
                 if (post.isFavorite) {
                     informUserPostRemovedFromFavorites()
-                    user?.let { viewModelPost.deletePostFromFavorites(post, it.userID) }
+                    viewModelPost.deletePostFromFavorites(post, user.userID)
                 } else {
                     informUserPostAddedToFavorites()
-                    user?.let { viewModelPost.addPostToFavorites(post, it.userID) }
+                    viewModelPost.addPostToFavorites(post, user.userID)
                 }
                 post.isFavorite = !post.isFavorite
                 binding.post = post;
                 binding.notifyChange()
             }
+            binding.writeCommentButton.setOnClickListener { showCommentDialog() }
+        }
         binding.backButtonExpanded.setOnClickListener { Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).popBackStack() }
-        binding.writeCommentButton.setOnClickListener { showCommentDialog() }
     }
 
     private fun showCommentDialog() {

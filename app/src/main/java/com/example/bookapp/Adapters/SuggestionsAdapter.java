@@ -17,12 +17,10 @@ import com.example.bookapp.models.Post;
 import java.util.ArrayList;
 
 public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.ViewHolder> {
-    private ArrayList<Post> data;
+    private ArrayList<Post> data = new ArrayList<Post>();
     private Context context;
 
-    public SuggestionsAdapter(ArrayList<Post> data) {
-        this.data = data;
-    }
+
 
     public ArrayList<Post> getData() {
         return data;

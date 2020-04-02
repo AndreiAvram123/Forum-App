@@ -1,6 +1,7 @@
 package com.example.dataLayer.repositories
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.bookapp.AppUtilities
@@ -18,7 +19,7 @@ import kotlinx.coroutines.launch
 class PostRepository(application: Application, coroutineScope: CoroutineScope, val userID: String) {
 
     private var nextPageToFetch: Int = 1;
-    var currentFetchedPost: MutableLiveData<Post> = MutableLiveData()
+    val currentFetchedPost: MutableLiveData<Post> = MutableLiveData()
 
     private val repositoryInterface: PostsRepositoryInterface by lazy {
         AppUtilities.getRetrofit().create(PostsRepositoryInterface::class.java)
@@ -57,14 +58,17 @@ class PostRepository(application: Application, coroutineScope: CoroutineScope, v
 
     suspend fun fetchPostByID(id: Long, userID: String = "") {
         try {
-            currentFetchedPost.value = postDao.getPostByID(id);
-            if (currentFetchedPost.value == null) {
+            val temp:Post? = postDao.getPostByID(id);
+            if(temp != null){
+                currentFetchedPost.postValue(temp);
+            }else{
                 val fetchedPost = PostMapper.mapDtoObjectToDomainObject(repositoryInterface.fetchPostByID(id, userID))
-                currentFetchedPost.value = fetchedPost;
+                currentFetchedPost.postValue(fetchedPost)
                 postDao.insertPost(fetchedPost)
             }
+
         } catch (e: java.lang.Exception) {
-            currentFetchedPost.value = Post.buildNullSafeObject();
+            currentFetchedPost.postValue(Post.buildNullSafeObject())
             e.printStackTrace()
 
         }

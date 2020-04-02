@@ -82,7 +82,7 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
             }
 
             private fun loadMore(recyclerView: RecyclerView) {
-                toggleLoading()
+                recyclerView.post{toggleLoading()}
                 callback.requestMoreData()
                 timeout.schedule(object : TimerTask() {
                     override fun run() {

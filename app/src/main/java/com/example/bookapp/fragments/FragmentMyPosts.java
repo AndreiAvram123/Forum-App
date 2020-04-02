@@ -52,7 +52,7 @@ public class FragmentMyPosts extends Fragment {
 
     private void initializeRecyclerViewAdapter() {
         if (recyclerViewAdapterPosts == null) {
-            recyclerViewAdapterPosts = new RecyclerViewAdapterPosts(getResources().getStringArray(R.array.sort_parameters));
+            recyclerViewAdapterPosts = new RecyclerViewAdapterPosts();
         }
         binding.recyclerViewMyPosts.setAdapter(recyclerViewAdapterPosts);
     }
