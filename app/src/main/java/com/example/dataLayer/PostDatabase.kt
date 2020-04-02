@@ -4,14 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.bookapp.models.UserMessage
 import com.example.bookapp.models.Post
+import com.example.bookapp.models.UserMessage
 import com.example.dataLayer.RoomDao.MessageDao
 import com.example.dataLayer.RoomDao.RoomPostDao
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 
-@Database(entities = [Post::class, UserMessage::class], version = 7, exportSchema = false)
+@Database(entities = [Post::class, UserMessage::class], version = 8, exportSchema = false)
 abstract class PostDatabase : RoomDatabase() {
     abstract fun postDao(): RoomPostDao
     abstract fun messageDao(): MessageDao

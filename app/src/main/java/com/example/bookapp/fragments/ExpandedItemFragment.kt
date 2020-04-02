@@ -19,7 +19,7 @@ import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelComments
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
-import com.example.dataLayer.dataObjectsToSerialize.SerializeComment
+import com.example.dataLayer.models.CommentDTO
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
@@ -105,7 +105,7 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
 
     override fun submitComment(comment: String, postID: Long) {
         user?.let {
-            val serializeComment = SerializeComment(postID, comment, it.userID)
+            val serializeComment = CommentDTO(postID, comment, it.userID)
             viewModelComments.uploadComment(serializeComment)
         }
     }

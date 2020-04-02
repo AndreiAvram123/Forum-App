@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.dataLayer.interfaces.CommentsRepositoryInterface;
 import com.example.bookapp.models.Comment;
-import com.example.dataLayer.dataObjectsToSerialize.SerializeComment;
+import com.example.dataLayer.models.CommentDTO;
 
 import java.util.ArrayList;
 
@@ -30,7 +30,7 @@ class CommentsRepository {
         commentsInterface = retrofit.create(CommentsRepositoryInterface.class);
     }
 
-    void uploadComment(@NonNull SerializeComment comment) {
+    void uploadComment(@NonNull CommentDTO comment) {
         commentsInterface.uploadComment(true, comment).enqueue(new Callback<Comment>() {
             @Override
             public void onResponse(@NonNull Call<Comment> call, @NonNull Response<Comment> response) {

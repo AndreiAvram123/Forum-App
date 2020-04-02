@@ -15,7 +15,7 @@ object FriendsMapper {
 
     private fun mapNetworkToDomainObject(friendDTO: FriendDTO): Friend {
         return Friend(
-                lastUserMessage = MessageMapper.mapNetworkToDomainObject(friendDTO.lastMessage)
+                lastMessage = MessageMapper.mapNetworkToDomainObject(friendDTO.lastMessage)
                 , userID = friendDTO.userID
                 , username = friendDTO.username
                 , email = null)

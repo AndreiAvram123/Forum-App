@@ -1,7 +1,7 @@
 package com.example.dataLayer.interfaces;
 
 import com.example.bookapp.models.Comment;
-import com.example.dataLayer.dataObjectsToSerialize.SerializeComment;
+import com.example.dataLayer.models.CommentDTO;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ public interface CommentsRepositoryInterface {
     Call<ArrayList<Comment>> fetchCommentsByPostID(@Query("postID") long postID, @Query("comments") boolean fetchComments);
 
     @POST("RestfulRequestHandler.php")
-    Call<Comment> uploadComment(@Query("uploadComment") boolean uploadComment, @Body SerializeComment comment);
+    Call<Comment> uploadComment(@Query("uploadComment") boolean uploadComment, @Body CommentDTO comment);
 
 
 }

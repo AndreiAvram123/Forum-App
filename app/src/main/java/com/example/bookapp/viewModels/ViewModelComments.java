@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.bookapp.AppUtilities;
 import com.example.bookapp.models.Comment;
-import com.example.dataLayer.dataObjectsToSerialize.SerializeComment;
+import com.example.dataLayer.models.CommentDTO;
 
 import java.util.ArrayList;
 
@@ -18,7 +18,7 @@ public class ViewModelComments extends ViewModel {
         commentsRepository = CommentsRepository.getInstance(AppUtilities.getRetrofit());
     }
 
-    public void uploadComment(@NonNull SerializeComment serializeComment) {
+    public void uploadComment(@NonNull CommentDTO serializeComment) {
         commentsRepository.uploadComment(serializeComment);
     }
 
