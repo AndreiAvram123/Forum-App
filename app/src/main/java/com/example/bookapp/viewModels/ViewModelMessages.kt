@@ -3,6 +3,7 @@ package com.example.bookapp.viewModels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.bookapp.models.UserMessage
 import com.example.dataLayer.repositories.MessageRepository
@@ -28,6 +29,14 @@ class ViewModelMessages(application: Application) : AndroidViewModel(application
         viewModelScope.launch {
             messageRepository.fetchMoreMessages(currentUserID, user2ID,currentOffset)
         }
+    }
+    fun uploadTextMessage(currentUserID: String,user2ID: String,messageContent:String){
+        viewModelScope.launch {
+            messageRepository.uploadTextMessage(currentUserID,user2ID,messageContent)
+        }
+    }
+    fun getCurrentlySentMessage():MutableLiveData<UserMessage>{
+        return messageRepository.currentlySentMessage;
     }
 
 }

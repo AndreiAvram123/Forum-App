@@ -2,6 +2,7 @@ package com.example.dataLayer.repositories
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.bookapp.AppUtilities
 import com.example.bookapp.models.UserMessage
 import com.example.dataLayer.PostDatabase
@@ -13,6 +14,8 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
 class MessageRepository(coroutineScope: CoroutineScope, val application: Application) {
+
+    val currentlySentMessage: MutableLiveData<UserMessage> = MutableLiveData()
 
     private val repositoryInterface: MessagesRepositoryInterface by lazy {
         AppUtilities.getRetrofit().create(MessagesRepositoryInterface::class.java)
@@ -58,6 +61,17 @@ class MessageRepository(coroutineScope: CoroutineScope, val application: Applica
             messageDao.insertMessages(fetchedData)
 
         } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    suspend fun uploadTextMessage(currentUserID: String, user2ID: String, messageContent: String) {
+        try {
+            val uploadedMessage = MessageMapper.mapNetworkToDomainObject(
+                    repositoryInterface.uploadTextMessage(currentUserID, user2ID, messageContent))
+            messageDao.insertMessage(uploadedMessage)
+            currentlySentMessage.postValue(uploadedMessage)
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }

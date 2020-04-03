@@ -1,7 +1,6 @@
 package com.example.bookapp.Adapters
 
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -45,7 +44,7 @@ class AdapterMessages(private val adapterInterface: AdapterInterface? = null) : 
     private fun loadMore() {
         adapterInterface?.let {
             it.requestMoreData(messages.size)
-            enableLoading()
+            recyclerView?.post { enableLoading() }
 
             timeout.schedule(object : TimerTask() {
                 override fun run() {
@@ -70,13 +69,21 @@ class AdapterMessages(private val adapterInterface: AdapterInterface? = null) : 
                 messages.add(0, it)
             }
         }
-        notifyDataSetChanged()
+
+        notifyItemRangeChanged(0, oldMessages.size)
         disableLoadingItem()
 
 
         //this means that we fetched the recent messages
         if (oldMessages.size == messages.size) {
-            recyclerView?.scrollToPosition(oldMessages.size)
+            recyclerView?.smoothScrollToPosition(messages.size - 1)
+        }
+    }
+
+    fun addNewMessage(newMessage: UserMessage) {
+        if (!messages.contains(newMessage)) {
+            messages.add(newMessage)
+            notifyItemInserted(messages.size - 1)
         }
     }
 

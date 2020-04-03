@@ -9,10 +9,10 @@ import retrofit2.http.Query
 
 interface UserRepositoryInterface {
 
-    @GET("RestfulRequestHandler.php")
-    fun authenticationWithThirdPartyEmail(@Query("authenticateThirdPartyAccount") thirdPartyAccount: Boolean,@Query("email") email:String): Call<UserDTO>
+    @GET("RestfulRequestHandler.php?authenticateWithGoogle")
+    suspend fun authenticationWithThirdPartyEmail(@Query("email") email:String): UserDTO
 
-    @POST("RestfulRequestHandler.php")
-    fun createThirdPartyAccount(@Query("createThirdPartyAccount") createAccount:Boolean,@Body userDTO: UserDTO):Call<UserDTO>
+    @POST("RestfulRequestHandler.php?createThirdPartyAccount")
+    suspend fun createThirdPartyAccount(@Body userDTO: UserDTO):UserDTO
 
 }

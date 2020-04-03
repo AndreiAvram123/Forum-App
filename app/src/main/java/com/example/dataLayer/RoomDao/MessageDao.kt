@@ -18,4 +18,7 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessages(messages: List<UserMessage>)
 
+    @Insert
+    suspend fun insertMessage(message:UserMessage)
+
 }

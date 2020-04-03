@@ -6,7 +6,7 @@ data class MessageDTO(
         @SerializedName("messageId")
         val messageID: String,
         @SerializedName("messageContent")
-        val messageContent: String,
+        val messageContent: String?,
         @SerializedName("messageDate")
         val messageDate: Long,
         @SerializedName("senderId")

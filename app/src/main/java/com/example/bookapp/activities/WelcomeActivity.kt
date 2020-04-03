@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.bookapp.R
 import com.example.bookapp.fragments.AuthenticationOptionsFragment
-import com.example.bookapp.models.ApiConstants
+import com.example.bookapp.models.AuthenticationService
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.UserDTO
@@ -19,36 +19,17 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
-class WelcomeActivity : AppCompatActivity() {
+class WelcomeActivity : AppCompatActivity(), AuthenticationOptionsFragment.AuthenticationOptionsCallback {
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()
-    private  val requestCodeGoogleSignIn = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
         displayAuthenticationOptionsFragment()
         setFlatWelcomeActivityShown()
-        viewModelUser.errorResponseCode.observe(this, Observer {
-            if (it == ApiConstants.RESPONSE_CODE_ACCOUNT_UNEXISTENT) {
-                createAccount()
-            }
-        })
-        viewModelUser.user.observe(this, Observer {
-            it?.let {
-                saveUserUserInMemory(it)
-            }
-        })
 
     }
-
-    private fun createAccount() {
-        googleSignInAccount?.let {
-            val userDTO: UserDTO = UserDTO(userID = it.id!!, username = it.displayName!!, email = it.email, profilePicture = it.photoUrl.toString())
-            viewModelUser.createThirdPartyAccount(userDTO)
-        }
-    }
-
     private fun setFlatWelcomeActivityShown() {
         val sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -73,8 +54,11 @@ class WelcomeActivity : AppCompatActivity() {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                 googleSignInAccount = task.getResult(ApiException::class.java)
-                googleSignInAccount?.email?.let {
-                    viewModelUser.getUserFromThirdPartyEmailAccount(it)
+                googleSignInAccount?.let {
+                    val temp = UserDTO(userID = it.id!!, username = it.displayName!!, email = it.email!!)
+                    viewModelUser.getUserFromThirdPartyEmailAccount(temp).observe(this, Observer { user ->
+                        saveUserUserInMemory(user)
+                    })
                 }
 
             } catch (e: ApiException) {
@@ -99,6 +83,18 @@ class WelcomeActivity : AppCompatActivity() {
         editor.putString(getString(R.string.key_user_id), userDTO.userID)
         editor.apply()
         startMainActivity()
+    }
+
+    override fun showLoginWithEmailFragment() {
+        TODO("Not yet implemented")
+    }
+
+    override fun loginAnonymously() {
+        TODO("Not yet implemented")
+    }
+
+    override fun loginWithGoogle() {
+        startActivityForResult(AuthenticationService.getInstance().getGoogleSignInIntent(this), 1)
     }
 
 }

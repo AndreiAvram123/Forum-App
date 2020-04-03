@@ -1,7 +1,6 @@
 package com.example.bookapp.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,8 +33,10 @@ class MessagesFragment : Fragment(), AdapterInterface {
         attachObserver()
         initializeAdapter()
         configureViews()
+
         return binding.root
     }
+
 
     private fun configureViews() {
         binding.sendMessageButton.setOnClickListener {
@@ -43,7 +44,7 @@ class MessagesFragment : Fragment(), AdapterInterface {
                 val messageContent = binding.messageTextArea.text.toString()
                 if (messageContent.trim { it <= ' ' } != "") {
                     binding.messageTextArea.text!!.clear()
-
+                    viewModelMessages.uploadTextMessage(currentUserID, user2ID, messageContent)
                 }
             }
         }
@@ -53,8 +54,11 @@ class MessagesFragment : Fragment(), AdapterInterface {
         viewModelMessages.getRecentMessages(currentUserID, user2ID).observe(viewLifecycleOwner,
                 Observer {
                     adapterMessages.addMessages(it)
-                    Log.d("test","newData")
                 })
+        viewModelMessages.getCurrentlySentMessage().observe(viewLifecycleOwner,
+        Observer {
+            adapterMessages.addNewMessage(it)
+        })
     }
 
     private fun initializeAdapter() {
