@@ -20,7 +20,6 @@ public class AuthenticationService {
 
     public Intent getGoogleSignInIntent(Activity activity){
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(activity.getString(R.string.default_web_client_id))
                 .requestEmail()
                 .build();
         GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(activity, gso);

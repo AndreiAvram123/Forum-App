@@ -21,7 +21,7 @@ public class AppUtilities {
 
     public static Retrofit getRetrofit() {
         if (retrofit == null) {
-            Retrofit.Builder builder = new Retrofit.Builder().baseUrl("http://sgb967.poseidon.salford.ac.uk/cms/");
+            Retrofit.Builder builder = new Retrofit.Builder().baseUrl("http://andreiram.co.uk/recentPosts");
             builder.addConverterFactory(GsonConverterFactory.create());
             retrofit = builder.build();
         }

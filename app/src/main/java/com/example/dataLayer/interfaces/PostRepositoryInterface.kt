@@ -8,10 +8,10 @@ import kotlin.collections.ArrayList
 
 interface PostRepositoryInterface {
 
-    @GET("RestfulRequestHandler.php?recentPosts")
+    @GET("/recentPosts")
     suspend fun fetchPostByPage(@Query("page") page:Int = 1): ArrayList<PostDTO>
 
-    @GET("RestfulRequestHandler.php")
+    @GET("/post")
     suspend fun fetchPostByID(@Query("postID") postID: Long,@Query("userID") userID: String = ""): PostDTO
 
     @GET("RestfulRequestHandler.php?favoritePosts")
