@@ -32,22 +32,6 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:srcCompat="@drawable/ic_edit_blue_24dp" />
 
-            <TextView
-                android:id="@+id/dish_type"
-                style="@style/important_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="16dp"
-                android:layout_weight="1"
-                android:background="@drawable/round_shape"
-                android:text='@{ "#" + post.postCategory}'
-                android:textColor="#ffffff"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
-                tools:text="#TextView" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/constraintLayout"
@@ -151,7 +135,6 @@
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="16dp"
                         android:autoSizeTextType="uniform"
-                        android:text="@{post.postAuthor}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@+id/imageView5"
                         app:layout_constraintStart_toStartOf="@+id/imageView5"
@@ -197,7 +180,7 @@
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="16dp"
                         android:autoSizeTextType="uniform"
-                        android:text="@{post.postDate}"
+                        android:text="@{}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@+id/imageView6"
                         app:layout_constraintStart_toStartOf="@+id/imageView6"
@@ -213,8 +196,7 @@
                 android:layout_height="300dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/dish_type">
+                app:layout_constraintBottom_toBottomOf="parent">
 
             </FrameLayout>
 

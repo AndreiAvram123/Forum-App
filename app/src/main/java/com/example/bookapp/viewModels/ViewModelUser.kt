@@ -7,23 +7,20 @@ import com.example.dataLayer.models.UserDTO
 import com.example.dataLayer.repositories.UserRepository
 
 class ViewModelUser : ViewModel() {
-    var user = MutableLiveData<User>()
+    val user = MutableLiveData<User>()
 
     val errorResponseCode: MutableLiveData<Int> by lazy {
         UserRepository.responseCode
     }
 
-    fun setUser(user: User) {
-        this.user.value = user
-    }
 
     fun getUserFromThirdPartyEmailAccount(email: String): MutableLiveData<User> {
-        user = UserRepository.authenticateWithThirdPartyEmail(email)
+       // user = UserRepository.authenticateWithThirdPartyEmail(email)
         return user;
     }
 
     fun createThirdPartyAccount(userDTO: UserDTO): MutableLiveData<User> {
-        user = UserRepository.createThirdPartyAccount(userDTO)
+    //    user = UserRepository.createThirdPartyAccount(userDTO)
 
         return user;
     }

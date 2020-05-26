@@ -7,19 +7,20 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.bookapp.R
-import com.example.bookapp.fragments.AuthenticationOptionsFragment
+import com.example.bookapp.fragments.AuthenticationFragment
 import com.example.bookapp.models.ApiConstants
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.UserDTO
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
-class WelcomeActivity : AppCompatActivity() {
+class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.Callback {
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()
     private  val requestCodeGoogleSignIn = 1
@@ -36,7 +37,7 @@ class WelcomeActivity : AppCompatActivity() {
         })
         viewModelUser.user.observe(this, Observer {
             it?.let {
-                saveUserUserInMemory(it)
+                saveUserInMemory(it)
             }
         })
 
@@ -44,7 +45,7 @@ class WelcomeActivity : AppCompatActivity() {
 
     private fun createAccount() {
         googleSignInAccount?.let {
-            val userDTO: UserDTO = UserDTO(userID = it.id!!, username = it.displayName!!, email = it.email, profilePicture = it.photoUrl.toString())
+            val userDTO: UserDTO = UserDTO(userID = 0, username = it.displayName!!, email = it .email!!)
             viewModelUser.createThirdPartyAccount(userDTO)
         }
     }
@@ -58,7 +59,7 @@ class WelcomeActivity : AppCompatActivity() {
 
     private fun displayAuthenticationOptionsFragment() {
         supportFragmentManager.beginTransaction()
-                .replace(R.id.container_activity_welcome, AuthenticationOptionsFragment.newInstance())
+                .replace(R.id.container_activity_welcome, AuthenticationFragment())
                 .addToBackStack(null)
                 .commit()
     }
@@ -74,12 +75,16 @@ class WelcomeActivity : AppCompatActivity() {
                 // Google Sign In was successful, authenticate with Firebase
                 googleSignInAccount = task.getResult(ApiException::class.java)
                 googleSignInAccount?.email?.let {
-                    viewModelUser.getUserFromThirdPartyEmailAccount(it)
+                    saveUserInMemory(User(userID = 5,username = "sh", email = "dsfs"));
+                    startMainActivity()
+
+                    //viewModelUser.getUserFromThirdPartyEmailAccount(it)
                 }
 
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately
                 // ...
+               e.printStackTrace()
                 Snackbar.make(findViewById(R.id.container_activity_welcome), "Authentication Failed for google.", Snackbar.LENGTH_SHORT).show()
             }
         }
@@ -93,12 +98,26 @@ class WelcomeActivity : AppCompatActivity() {
     }
 
 
-    private fun saveUserUserInMemory(userDTO: User) {
+    private fun saveUserInMemory(user: User) {
         val editor = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE).edit()
-        editor.putString(getString(R.string.key_username), userDTO.username)
-        editor.putString(getString(R.string.key_user_id), userDTO.userID)
+        editor.putString(getString(R.string.key_email), user.email)
+        editor.putInt(getString(R.string.key_user_id), user.userID)
         editor.apply()
         startMainActivity()
+    }
+
+    override fun showLoginWithEmailFragment() {
+        TODO("Not yet implemented")
+    }
+
+
+    override fun loginWithGoogle() {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .build()
+        val signInIntent = GoogleSignIn.getClient(this,gso).signInIntent;
+        startActivityForResult(signInIntent,requestCodeGoogleSignIn)
     }
 
 }

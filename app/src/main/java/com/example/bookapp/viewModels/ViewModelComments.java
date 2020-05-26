@@ -19,11 +19,11 @@ public class ViewModelComments extends ViewModel {
     }
 
     public void uploadComment(@NonNull SerializeComment serializeComment) {
-        commentsRepository.uploadComment(serializeComment);
+       // commentsRepository.uploadComment(serializeComment);
     }
 
     public MutableLiveData<ArrayList<Comment>> getCommentsForPost(long postID) {
-        currentPostComments = commentsRepository.fetchCommentsForPost(postID);
+//        currentPostComments = commentsRepository.fetchCommentsForPost(postID);
 
         return currentPostComments;
     }

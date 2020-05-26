@@ -62,8 +62,8 @@ public class FragmentMyPosts extends Fragment {
         viewModelUser = new ViewModelProvider(requireActivity()).get(ViewModelUser.class);
         User user = viewModelUser.getUser().getValue();
         if (user != null) {
-            viewModelPost.getMyPosts().observe(getViewLifecycleOwner(),
-                    myPosts -> recyclerViewAdapterPosts.addData(myPosts));
+            viewModelPost.getUserPosts().observe(getViewLifecycleOwner(),
+                    myPosts -> recyclerViewAdapterPosts.addData(myPosts.getPosts()));
         }
     }
 

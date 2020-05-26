@@ -3,8 +3,11 @@ package com.example.bookapp.viewModels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.example.bookapp.models.Post
+import com.example.bookapp.models.User
+import com.example.dataLayer.models.UserWithPosts
 import com.example.dataLayer.repositories.PostRepository
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -13,14 +16,17 @@ import kotlinx.coroutines.launch
 class ViewModelPost(application: Application) : AndroidViewModel(application) {
 
     var lastSeenPostPosition: Int = 0;
-    lateinit var userID: String;
+
+    val user : MutableLiveData<User> by lazy {
+        MutableLiveData<User>()
+    }
 
     private val postRepository: PostRepository by lazy {
-        PostRepository(application, coroutineScope = viewModelScope, userID = this.userID)
+        PostRepository(application, coroutineScope = viewModelScope, user = user.value!!)
     }
 
 
-    fun getMyPosts(): LiveData<List<Post>> {
+    fun getUserPosts(): LiveData<UserWithPosts> {
         return postRepository.myPosts
     }
 
@@ -31,22 +37,22 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         return postRepository.currentFetchedPost
     }
 
-    fun getFirstPagePosts(): LiveData<List<Post>> {
-
-        return postRepository.recentPosts;
+    fun getRecentPosts(): LiveData<List<Post>> {
+        return postRepository.fetchedPosts
     }
 
     fun getFavoritePosts(): LiveData<List<Post>> {
         return postRepository.favoritePosts
     }
 
-    fun addPostToFavorites(post: Post, userID: String) {
+    fun addPostToFavorites(post: Post) {
         viewModelScope.launch {
-            postRepository.addPostToFavorites(post, userID)
+            postRepository.addPostToFavorites(post)
         }
     }
 
-    fun deletePostFromFavorites(post: Post, userID: String) = viewModelScope.launch { postRepository.deletePostFromFavorites(post, userID) }
+    fun deletePostFromFavorites(post: Post, user: User) =
+            viewModelScope.launch { postRepository.deletePostFromFavorites(post) }
 
 
     fun fetchNextPagePosts() = viewModelScope.launch { postRepository.fetchNextPagePosts() }

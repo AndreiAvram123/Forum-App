@@ -1,31 +1,29 @@
 package com.example.dataLayer.interfaces
 
 import com.example.dataLayer.models.PostDTO
-import retrofit2.Call
-import retrofit2.http.*
-import java.util.*
-import kotlin.collections.ArrayList
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface PostRepositoryInterface {
 
-    @GET("/recentPosts")
-    suspend fun fetchPostByPage(@Query("page") page:Int = 1): ArrayList<PostDTO>
+    @GET("/posts/page/{page}")
+    suspend fun fetchNextPage(@Path("page") page:Int): ArrayList<PostDTO>
 
-    @GET("/post")
-    suspend fun fetchPostByID(@Query("postID") postID: Long,@Query("userID") userID: String = ""): PostDTO
+    @GET("/post/{id}")
+    suspend fun fetchPostByID(@Path("id") postID: Long): PostDTO
 
-    @GET("RestfulRequestHandler.php?favoritePosts")
-   suspend fun fetchFavoritePostsByUserID(@Query("userID") userID: String): ArrayList<PostDTO>
+    @GET("/user/{id}/favoritePosts")
+    suspend fun fetchFavoritePostsByUserID(@Path("id") userID: Int): ArrayList<PostDTO>
 
-    @GET("RestfulRequestHandler.php?myPosts")
-    suspend fun fetchMyPosts(@Query("userID") userID: String?): ArrayList<PostDTO>
+    @GET("/user/{id}/posts")
+    suspend fun fetchMyPosts(@Path("id") userID: Int): ArrayList<PostDTO>
 
-    @FormUrlEncoded
-    @POST("RestfulRequestHandler.php?removePostFromFavorites")
-    suspend fun deletePostFromFavorites(@Field("postID") postID: Long, @Field("userID") userID: String)
+    @DELETE("/user/{userID}/removePost/{postID}")
+    suspend fun deletePostFromFavorites(@Path("userID") postID: Long, @Path("postID") userID: Int)
 
-    @FormUrlEncoded
-    @POST("RestfulRequestHandler.php?addPostToFavorites")
-    suspend fun addPostToFavorites(@Field("postID") postID: Long, @Field("userID") userID: String)
+    @POST("/user/{userID}/addToFavorites/{postID}")
+    suspend fun addPostToFavorites(@Path("postID") postID: Long, @Path("userID") userID: Int)
 
 }

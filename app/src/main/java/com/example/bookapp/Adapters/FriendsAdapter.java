@@ -7,16 +7,15 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.ItemFriendsBinding;
 import com.example.bookapp.interfaces.MainActivityInterface;
-import com.example.bookapp.models.Friend;
+import com.example.bookapp.models.User;
 
 import java.util.ArrayList;
 
 public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHolder> {
-    private ArrayList<Friend> friends;
+    private ArrayList<User> friends;
     private MainActivityInterface mainActivityInterface;
 
     public FriendsAdapter(@NonNull MainActivityInterface activityInterface) {
@@ -24,7 +23,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
         this.mainActivityInterface = activityInterface;
     }
 
-    public void setData(@NonNull ArrayList<Friend> friends) {
+    public void setData(@NonNull ArrayList<User> friends) {
         this.friends = friends;
         notifyDataSetChanged();
     }
@@ -55,12 +54,14 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
             this.binding = binding;
         }
 
-        void bindData(Friend friend) {
+        void bindData(User friend) {
             binding.setFriend(friend);
-            Glide.with(binding.getRoot())
-                    .load(friend.getProfilePictureURL())
-                    .into(binding.imageView2);
-            binding.getRoot().setOnClickListener(view->mainActivityInterface.startChat(friend.getUserID()));
+//            Glide.with(binding.getRoot())
+//                  //  .load(friend.getProfilePictureURL())
+//                    .into(binding.imageView2);
+      //TODo
+            //replace
+            //      binding.getRoot().setOnClickListener(view->mainActivityInterface.startChat(friend));
         }
     }
 }

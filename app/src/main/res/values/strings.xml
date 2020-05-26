@@ -47,7 +47,7 @@
     <string name="write_comment_text">Write a comment</string>
     <string name="submit_comment">Submit</string>
     <string name="key_user_id">key_user_id</string>
-    <string name="key_username">key_username</string>
+    <string name="key_email">key_username</string>
 
     <string name="number_saved_posts">Saved posts : %1$d </string>
     <string name="my_posts_label">My posts</string>
@@ -55,4 +55,5 @@
     <string name="added_to_favorites">Post added to favorites</string>
     <string name="removed_from_favorites">Post removed from favorites</string>
     <string name="please_connect_to_internet">Please connect to the internet to use this feature</string>
+    <string name="default_web_client_id">674587033588-40h9617ir14bbcohahha8rhvgck9420q.apps.googleusercontent.com</string>
 </resources>

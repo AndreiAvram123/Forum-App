@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 import com.example.bookapp.R;
 import com.example.bookapp.AppUtilities;
 
-public class LoginFragment extends AuthenticationFragment {
+public class LoginFragmentTemplate extends AuthenticationFragmentTemplate {
 
     private TextView emailHint;
     private TextView passwordHint;
@@ -27,8 +27,8 @@ public class LoginFragment extends AuthenticationFragment {
     private Button signUpButton;
     private LoginFragmentCallback loginFragmentCallback;
 
-    public static LoginFragment newInstance() {
-        return new LoginFragment();
+    public static LoginFragmentTemplate newInstance() {
+        return new LoginFragmentTemplate();
     }
 
     @Nullable
@@ -82,7 +82,7 @@ public class LoginFragment extends AuthenticationFragment {
     void configureButtons() {
         signUpButton.setOnClickListener(view -> getActivity().getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container_activity_welcome,SignUpFragment.newInstance())
+                .replace(R.id.container_activity_welcome, SignUpFragmentTemplate.newInstance())
                 .addToBackStack(null)
                 .commit());
         signInButton.setOnClickListener(view -> attemptAction());
@@ -96,7 +96,7 @@ public class LoginFragment extends AuthenticationFragment {
         passwordField = layout.findViewById(R.id.password_edit_text_main);
         errorMessage = layout.findViewById(R.id.error_message_text_view);
         loadingBar = layout.findViewById(R.id.logging_progress_bar);
-        signInButton = layout.findViewById(R.id.sign_in_button);
+        signInButton = layout.findViewById(R.id.sign_in);
         signUpButton = layout.findViewById(R.id.sign_up_button);
     }
 

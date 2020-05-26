@@ -77,10 +77,10 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
             binding.saveButtonExpanded.setOnClickListener {
                 if (post.isFavorite) {
                     informUserPostRemovedFromFavorites()
-                    user?.let { viewModelPost.deletePostFromFavorites(post, it.userID) }
+                    user?.let { viewModelPost.deletePostFromFavorites(post, it) }
                 } else {
                     informUserPostAddedToFavorites()
-                    user?.let { viewModelPost.addPostToFavorites(post, it.userID) }
+                    user?.let { viewModelPost.addPostToFavorites(post) }
                 }
                 post.isFavorite = !post.isFavorite
                 binding.post = post;
@@ -105,8 +105,8 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
 
     override fun submitComment(comment: String, postID: Long) {
         user?.let {
-            val serializeComment = SerializeComment(postID, comment, it.userID)
-            viewModelComments.uploadComment(serializeComment)
+           // val serializeComment = SerializeComment(postID, comment, it.userID)
+          //  viewModelComments.uploadComment(serializeComment)
         }
     }
 

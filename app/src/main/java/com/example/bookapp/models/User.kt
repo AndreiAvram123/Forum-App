@@ -1,10 +1,18 @@
 package com.example.bookapp.models
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "user")
 open class User(
-        val userID: String,
+        @PrimaryKey
+        @ColumnInfo(name = "userID")
+        val userID: Int,
+        @ColumnInfo(name="username")
         val username: String,
-        val email: String?,
-        val profilePictureURL: String?
+        @ColumnInfo(name = "email")
+        val email: String
 
 ) {
 

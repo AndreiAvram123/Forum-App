@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavDirections
@@ -45,22 +44,17 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
         setContentView(R.layout.layout_main_activity)
         configureDefaultVariables()
 
-        if (shouldShowWelcomeActivity()) {
-            startWelcomeActivity()
-        } else {
-            currentUser
-        }
-
+        currentUser
     }
 
 
     private val currentUser: Unit
         get() {
-            val userID = sharedPreferences!!.getString(getString(R.string.key_user_id), null)
-            val username = sharedPreferences!!.getString(getString(R.string.key_username), null)
-            if (userID != null && username != null) {
-                viewModelUser.setUser(User(userID = userID, username = username, email = null, profilePictureURL = null))
-                viewModelPost.userID = userID;
+            val userID = sharedPreferences!!.getInt(getString(R.string.key_user_id), 0)
+            val email = sharedPreferences!!.getString(getString(R.string.key_email), null)
+            if (userID != 0 && email != null) {
+                viewModelUser.user.value = (User(userID = userID, username = "username", email = email))
+                viewModelPost.user.value = User(userID = userID, username = "username", email = email)
             } else {
                 startWelcomeActivity()
             }
@@ -84,7 +78,7 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
 
 
     private val searchHistory: ArrayList<String?>
-        private get() {
+        get() {
             val searchHistorySet = sharedPreferences!!.getStringSet(getString(R.string.search_history_key), null)
             val searchHistoryArrayList = ArrayList<String?>()
             if (searchHistorySet != null) {
@@ -102,16 +96,17 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
         val navController = navHostFragment!!.navController
 
         NavigationUI.setupWithNavController(bottomNavigationView,
-               navController)
+                navController)
 
     }
 
 
     override fun startChat(userID: String) {
-        val action: NavDirections = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(viewModelUser.user.value!!.userID, userID)
-        Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action)
+        //  val action: NavDirections = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(viewModelUser.user.value!!.userID, userID)
+
+        //  Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action)
     }
-    
+
     /**
      * Use this method in order to display a bottom
      * sheet for the user to select a login option

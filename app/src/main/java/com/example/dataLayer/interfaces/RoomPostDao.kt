@@ -3,18 +3,21 @@ package com.example.dataLayer.interfaces
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.bookapp.models.Post
+import com.example.bookapp.models.User
+import com.example.dataLayer.models.UserWithPosts
 
 @Dao
 interface RoomPostDao {
 
     @Query("SELECT * FROM posts")
-    fun getRecentPosts(): LiveData<List<Post>>
+    fun getCachedPosts(): LiveData<List<Post>>
 
     @Query("SELECT * FROM posts WHERE isFavorite ='1'")
     fun getFavoritePosts(): LiveData<List<Post>>
-
-    @Query("SELECT * FROM posts WHERE postAuthorID = :userID")
-     fun getUserPosts(userID: String?): LiveData<List<Post>>
+//
+//    @Transaction
+//    @Query("SELECT * FROM user")
+//    fun getUserPosts(): LiveData<List<User>>
 
     @Query("SELECT * FROM posts WHERE postID = :postID LIMIT 1")
     suspend fun getPostByID(postID: Long): Post
@@ -26,7 +29,7 @@ interface RoomPostDao {
     suspend fun insertPosts(posts:List<Post>)
 
     @Query("DELETE FROM posts")
-    suspend fun removeOldFetchedData()
+    suspend fun removeCachedData()
 
 
     @Update

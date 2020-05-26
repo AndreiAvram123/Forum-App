@@ -16,7 +16,7 @@ import androidx.annotation.Nullable;
 import com.example.bookapp.R;
 import com.example.bookapp.AppUtilities;
 
-public class SignUpFragment extends AuthenticationFragment {
+public class SignUpFragmentTemplate extends AuthenticationFragmentTemplate {
 
     private EditText emailField;
     private EditText passwordField;
@@ -33,8 +33,8 @@ public class SignUpFragment extends AuthenticationFragment {
     private SignUpFragmentCallback signUpFragmentCallback;
 
 
-    static SignUpFragment newInstance() {
-        return new SignUpFragment();
+    static SignUpFragmentTemplate newInstance() {
+        return new SignUpFragmentTemplate();
     }
 
     @Nullable
