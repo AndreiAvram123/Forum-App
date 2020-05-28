@@ -30,7 +30,7 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         return postRepository.myPosts
     }
 
-    fun getPostByID(id: Long): LiveData<Post> {
+    fun getPostByID(id: Int): LiveData<Post> {
         viewModelScope.launch {
             postRepository.fetchPostByID(id)
         }

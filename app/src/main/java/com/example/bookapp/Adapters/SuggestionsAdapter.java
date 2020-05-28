@@ -48,10 +48,10 @@ public class SuggestionsAdapter extends RecyclerView.Adapter<SuggestionsAdapter.
         Post currentPost = data.get(position);
         holder.bindData(currentPost);
         Glide.with(context)
-                .load(currentPost.getPostImage())
+                .load(currentPost.getImage())
                 .into(holder.binding.suggestionImage);
         holder.binding.getRoot().setOnClickListener(view -> {
-            NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(currentPost.getPostID());
+            NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(currentPost.getId());
             Navigation.findNavController(holder.binding.getRoot()).navigate(action);
         });
     }

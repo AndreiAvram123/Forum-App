@@ -8,16 +8,18 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 
 import com.example.bookapp.R;
+import com.example.bookapp.models.Post;
 import com.google.android.material.textfield.TextInputLayout;
 
 public class CommentDialog extends Dialog {
 
     private CommentDialogInterface commentDialogInterface;
-    private long postID;
-    public CommentDialog(@NonNull Context context,@NonNull CommentDialogInterface commentDialogInterface, Long postID) {
+    private int postID;
+
+    public CommentDialog(@NonNull Context context, @NonNull CommentDialogInterface commentDialogInterface, @NonNull Post post) {
         super(context);
         this.commentDialogInterface = commentDialogInterface;
-        this.postID = postID;
+        this.postID = post.getId();
         
     }
 

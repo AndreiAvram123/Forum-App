@@ -122,7 +122,7 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
             binding.post = post
             binding.root.setOnClickListener {
                 if (AppUtilities.isNetworkAvailable(binding.root.context)) {
-                    val action: NavDirections = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(post.postID)
+                    val action: NavDirections = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(post.id)
                     Navigation.findNavController(binding.root).navigate(action)
                 } else {
                     Snackbar.make(binding.root, binding.root.context.getString(R.string.no_internet_connection), Snackbar.LENGTH_SHORT)

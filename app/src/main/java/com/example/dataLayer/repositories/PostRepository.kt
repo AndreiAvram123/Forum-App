@@ -9,7 +9,7 @@ import com.example.bookapp.models.User
 import com.example.dataLayer.PostDatabase
 import com.example.dataLayer.dataMappers.PostMapper
 import com.example.dataLayer.interfaces.PostRepositoryInterface
-import com.example.dataLayer.interfaces.RoomPostDao
+import com.example.dataLayer.interfaces.dao.RoomPostDao
 import com.example.dataLayer.models.PostDTO
 import com.example.dataLayer.models.UserWithPosts
 import kotlinx.coroutines.CoroutineScope
@@ -57,12 +57,9 @@ class PostRepository(application: Application, coroutineScope: CoroutineScope, v
     }
 
 
-
-
-
-    suspend fun fetchPostByID(id: Long, userID: String = "") {
+    suspend fun fetchPostByID(id: Int) {
+        currentFetchedPost.value = postDao.getPostByID(id);
         try {
-            currentFetchedPost.value = postDao.getPostByID(id);
             if (currentFetchedPost.value == null) {
                 val fetchedPost = PostMapper.mapDtoObjectToDomainObject(repositoryInterface.fetchPostByID(id))
                 currentFetchedPost.value = fetchedPost;
@@ -71,7 +68,6 @@ class PostRepository(application: Application, coroutineScope: CoroutineScope, v
         } catch (e: java.lang.Exception) {
             currentFetchedPost.value = Post.buildNullSafeObject();
             e.printStackTrace()
-
         }
     }
 
@@ -91,12 +87,12 @@ class PostRepository(application: Application, coroutineScope: CoroutineScope, v
 
     suspend fun addPostToFavorites(post: Post) {
         postDao.addPostToFavorites(post)
-        repositoryInterface.addPostToFavorites(post.postID,user.userID)
+        repositoryInterface.addPostToFavorites(post.id, user.userID)
     }
 
 
     suspend fun deletePostFromFavorites(post: Post) {
-        repositoryInterface.deletePostFromFavorites(postID = post.postID,userID = user.userID);
+        repositoryInterface.deletePostFromFavorites(postID = post.id, userID = user.userID);
         postDao.deletePostFromFavorites(post)
     }
 

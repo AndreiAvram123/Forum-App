@@ -1,24 +1,24 @@
 package com.example.bookapp.models
 
 import androidx.room.ColumnInfo
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "posts")
+@Entity
 data class Post(
-        @PrimaryKey @ColumnInfo(name = "postID" )var postID: Long,
-        @ColumnInfo(name = "postTitle") var postTitle: String,
-        @ColumnInfo(name = "postImage") var postImage: String,
-        @ColumnInfo(name = "date") var postDate: Long,
-        @ColumnInfo(name = "content") val postContent: String ,
+        @PrimaryKey
+        @ColumnInfo(name = "postID") val id: Int,
+        @ColumnInfo(name = "postTitle") val title: String,
+        @ColumnInfo(name = "postImage") val image: String,
+        @ColumnInfo(name = "date") val date: Long,
+        @ColumnInfo(name = "content") val content: String,
         @ColumnInfo(name = "isFavorite") var isFavorite:Boolean = false,
         @ColumnInfo(name = "authorID") val authorID:Int
 ) {
 
     companion object Empty {
         fun buildNullSafeObject(): Post {
-            return Post(postID = 0,postContent = "",postDate = 333,postTitle = "",postImage = "dfd",authorID = 3)
+            return Post(id = 0, content = "", date = 333, title = "", image = "dfd", authorID = 3)
         }
     }
 

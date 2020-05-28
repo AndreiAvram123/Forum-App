@@ -1,12 +1,11 @@
 package com.example.dataLayer.models
 
 import com.google.gson.annotations.SerializedName
-import java.util.*
 
 
 data class PostDTO(
         @SerializedName("id")
-        val id: Long,
+        val id: Int,
         @SerializedName("title")
         val title: String,
         @SerializedName("image")

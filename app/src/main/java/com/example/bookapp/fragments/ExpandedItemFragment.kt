@@ -4,11 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.bookapp.Adapters.AdapterComments
 import com.example.bookapp.R
 import com.example.bookapp.customViews.CommentDialog
 import com.example.bookapp.customViews.CommentDialog.CommentDialogInterface
@@ -19,10 +21,8 @@ import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelComments
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
-import com.example.dataLayer.dataObjectsToSerialize.SerializeComment
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
-import java.util.*
 
 @InternalCoroutinesApi
 class ExpandedItemFragment : Fragment(), CommentDialogInterface {
@@ -37,8 +37,8 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? { // Inflate the layout for this fragment
-        binding = DataBindingUtil
-                .inflate(inflater, R.layout.fragment_expanded_item, container, false)
+
+        binding = FragmentExpandedItemBinding.inflate(layoutInflater, container, false)
         attachObservers()
         user = viewModelUser.user.value
 
@@ -46,28 +46,33 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
     }
 
     private fun attachObservers() {
+        //observer whether the user signs in
         user?.let {
             viewModelUser.user.observe(viewLifecycleOwner, Observer { user = it })
         }
 
-        val postID = ExpandedItemFragmentArgs.fromBundle(requireArguments()).postID
+        val postID: Int = ExpandedItemFragmentArgs.fromBundle(requireArguments()).postID
 
-        viewModelPost.getPostByID(postID).observe(viewLifecycleOwner, Observer { fetchedPost: Post ->
-                post = fetchedPost
-                configureViews()
-        })
-        viewModelComments.getCommentsForPost(postID).observe(viewLifecycleOwner, Observer { fetchedComments: ArrayList<Comment>? ->
-            comments = fetchedComments
-            displayCommentsFragment()
+        viewModelPost.getPostByID(postID).observe(viewLifecycleOwner, Observer {
+            post = it
+            configureViews()
+            getComments();
         })
     }
 
-    private fun displayCommentsFragment() {
-        val commentsFragment = CommentsFragment.getInstance(comments)
-        requireActivity().supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.container_comments_fragment, commentsFragment)
-                .commit()
+    private fun getComments() {
+        viewModelComments.getCommentsForPost(post).observe(viewLifecycleOwner, Observer {
+            insertComments(ArrayList(it.comments))
+        })
+    }
+
+    private fun insertComments(comments: ArrayList<Comment>) {
+        val adapterComments = AdapterComments(comments)
+        val recyclerView = binding.recyclerComments;
+        recyclerView.adapter = adapterComments
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
     }
 
 
@@ -91,7 +96,7 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
     }
 
     private fun showCommentDialog() {
-        commentDialog = CommentDialog(requireActivity(), this, post.postID)
+        commentDialog = CommentDialog(requireActivity(), this, post)
         commentDialog!!.show()
     }
 
@@ -105,8 +110,8 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
 
     override fun submitComment(comment: String, postID: Long) {
         user?.let {
-           // val serializeComment = SerializeComment(postID, comment, it.userID)
-          //  viewModelComments.uploadComment(serializeComment)
+            // val serializeComment = SerializeComment(postID, comment, it.userID)
+            //  viewModelComments.uploadComment(serializeComment)
         }
     }
 

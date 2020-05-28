@@ -19,7 +19,7 @@
             style="@style/important_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{suggestionPost.postTitle}"
+            android:text="@{suggestionPost.title}"
             app:layout_constraintBottom_toBottomOf="@+id/suggestion_image"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/suggestion_image"

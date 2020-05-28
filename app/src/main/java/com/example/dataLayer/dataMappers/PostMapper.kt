@@ -19,12 +19,12 @@ object PostMapper {
 
     fun mapDtoObjectToDomainObject(postDTO: PostDTO?): Post {
         postDTO?.let {
-            val post: Post = Post(postID = postDTO.id,
-                    postTitle = postDTO.title,
-                    postImage = "",
-                    postDate = postDTO.date,
+            val post: Post = Post(id = postDTO.id,
+                    title = postDTO.title,
+                    image = "",
+                    date = postDTO.date,
                     authorID = UserMapper.mapNetworkToDomainObject(postDTO.author).userID,
-                    postContent = postDTO.content
+                    content = postDTO.content
 
             );
             return post;

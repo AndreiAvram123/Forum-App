@@ -1,26 +1,21 @@
-package com.example.dataLayer.interfaces
+package com.example.dataLayer.interfaces.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.bookapp.models.Post
-import com.example.bookapp.models.User
-import com.example.dataLayer.models.UserWithPosts
 
 @Dao
 interface RoomPostDao {
 
-    @Query("SELECT * FROM posts")
+    @Query("SELECT * FROM post")
     fun getCachedPosts(): LiveData<List<Post>>
 
-    @Query("SELECT * FROM posts WHERE isFavorite ='1'")
+    @Query("SELECT * FROM post WHERE isFavorite ='1'")
     fun getFavoritePosts(): LiveData<List<Post>>
-//
-//    @Transaction
-//    @Query("SELECT * FROM user")
-//    fun getUserPosts(): LiveData<List<User>>
 
-    @Query("SELECT * FROM posts WHERE postID = :postID LIMIT 1")
-    suspend fun getPostByID(postID: Long): Post
+
+    @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")
+    suspend fun getPostByID(postID: Int): Post
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPost(post: Post)
@@ -28,7 +23,7 @@ interface RoomPostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPosts(posts:List<Post>)
 
-    @Query("DELETE FROM posts")
+    @Query("DELETE FROM post")
     suspend fun removeCachedData()
 
 

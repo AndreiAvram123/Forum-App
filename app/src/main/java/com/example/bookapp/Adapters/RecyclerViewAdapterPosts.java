@@ -42,7 +42,7 @@ public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewA
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.binding.setPost(posts.get(position));
         holder.itemView.setOnClickListener(view -> {
-            NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(posts.get(position).getPostID());
+            NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(posts.get(position).getId());
             Navigation.findNavController(holder.binding.getRoot()).navigate(action);
         });
     }

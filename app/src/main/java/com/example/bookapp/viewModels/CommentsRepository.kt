@@ -1,63 +1,65 @@
 package com.example.bookapp.viewModels
 
-import androidx.lifecycle.MutableLiveData
+import android.app.Application
+import androidx.lifecycle.LiveData
+import com.example.bookapp.AppUtilities
 import com.example.bookapp.models.Comment
-import com.example.dataLayer.dataObjectsToSerialize.SerializeComment
+import com.example.bookapp.models.Post
+import com.example.dataLayer.PostDatabase
+import com.example.dataLayer.dataMappers.CommentMapper
+import com.example.dataLayer.dataObjectsToSerialize.CommentDTO
 import com.example.dataLayer.interfaces.CommentsInterface
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import java.lang.Exception
-import java.util.*
+import com.example.dataLayer.interfaces.dao.RoomCommentDao
+import com.example.dataLayer.models.PostWithComments
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 
-internal class CommentsRepository private constructor(retrofit: Retrofit) {
-    private val commentsInterface: CommentsInterface
-    private var postComments: MutableLiveData<ArrayList<Comment?>?>? = null
+@InternalCoroutinesApi
+class CommentsRepository(private val application: Application, private val coroutineScope: CoroutineScope) {
+    private val retrofit = AppUtilities.getRetrofit()
+    private val commentsInterface: CommentsInterface = retrofit.create(CommentsInterface::class.java)
+    private val dao: RoomCommentDao = PostDatabase.getDatabase(application).commentDao();
+
+    //maybe have a dictionary
+    private val currentlyFetchedComments: HashMap<Post, LiveData<PostWithComments>> = HashMap()
+
+    fun getCommentsForPost(post: Post): LiveData<PostWithComments> {
+        currentlyFetchedComments[post] = dao.getAllPostComments(post.id)
+        if (AppUtilities.isNetworkAvailable(application)) {
+            coroutineScope.launch {
+                fetchCommentsForPost(post)
+            }
+        }
+        return currentlyFetchedComments[post]!!;
+    }
 
 
-   suspend fun uploadComment(comment: SerializeComment) {
+    suspend fun uploadComment(commentDTO: CommentDTO) {
 
-       try{
-           val comment:Comment = commentsInterface.uploadComment(true,comment);
-           addCommentAndNotify(comment);
-       }catch (e:Exception){
-           e.printStackTrace()
-       }
+        try {
+            val comment: Comment = commentsInterface.uploadComment(true, commentDTO);
+            addCommentAndNotify(comment);
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun addCommentAndNotify(comment: Comment?) {
-        if (postComments != null && postComments!!.value != null) {
-            val newData = ArrayList(postComments!!.value!!)
-            newData.add(comment)
-            postComments!!.value = newData
+//        if (postComments != null && postComments!!.value != null) {
+//            val newData = ArrayList(postComments!!.value!!)
+//            newData.add(comment)
+//            postComments!!.value = newData
+//        }
+    }
+
+    private suspend fun fetchCommentsForPost(post: Post) {
+        try {
+            val fetchedComments = commentsInterface.fetchCommentsForPost(post.id)
+            dao.insertComments(CommentMapper.mapDTOObjectsToDomainObjects(fetchedComments))
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-   suspend fun fetchCommentsForPost(postID: Long): MutableLiveData<ArrayList<Comment?>?> {
-        postComments = MutableLiveData()
-        try{
-            postComments?.value = commentsInterface.fetchCommentsByPostID(postID) ;
-        }catch (e:Exception){
-
-        }
-        return postComments!!
-    }
-
-    companion object {
-        private var instance: CommentsRepository? = null
-
-        @JvmStatic
-        @Synchronized
-        fun getInstance(retrofit: Retrofit): CommentsRepository? {
-            if (instance == null) {
-                instance = CommentsRepository(retrofit)
-            }
-            return instance
-        }
-    }
-
-    init {
-        commentsInterface = retrofit.create(CommentsInterface::class.java)
-    }
 }

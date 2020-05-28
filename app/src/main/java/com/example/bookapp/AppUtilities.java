@@ -4,9 +4,6 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,7 +19,7 @@ public class AppUtilities {
 
     public static Retrofit getRetrofit() {
         if (retrofit == null) {
-            Retrofit.Builder builder = new Retrofit.Builder().baseUrl("http://139.162.192.88");
+            Retrofit.Builder builder = new Retrofit.Builder().baseUrl("http://www.andreiram.co.uk/");
             builder.addConverterFactory(GsonConverterFactory.create());
             retrofit = builder.build();
         }

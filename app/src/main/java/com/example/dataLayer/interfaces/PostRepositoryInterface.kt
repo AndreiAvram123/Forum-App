@@ -12,7 +12,7 @@ interface PostRepositoryInterface {
     suspend fun fetchNextPage(@Path("page") page:Int): ArrayList<PostDTO>
 
     @GET("/post/{id}")
-    suspend fun fetchPostByID(@Path("id") postID: Long): PostDTO
+    suspend fun fetchPostByID(@Path("id") postID: Int): PostDTO
 
     @GET("/user/{id}/favoritePosts")
     suspend fun fetchFavoritePostsByUserID(@Path("id") userID: Int): ArrayList<PostDTO>
@@ -21,9 +21,9 @@ interface PostRepositoryInterface {
     suspend fun fetchMyPosts(@Path("id") userID: Int): ArrayList<PostDTO>
 
     @DELETE("/user/{userID}/removePost/{postID}")
-    suspend fun deletePostFromFavorites(@Path("userID") postID: Long, @Path("postID") userID: Int)
+    suspend fun deletePostFromFavorites(@Path("userID") postID: Int, @Path("postID") userID: Int)
 
     @POST("/user/{userID}/addToFavorites/{postID}")
-    suspend fun addPostToFavorites(@Path("postID") postID: Long, @Path("userID") userID: Int)
+    suspend fun addPostToFavorites(@Path("postID") postID: Int, @Path("userID") userID: Int)
 
 }
