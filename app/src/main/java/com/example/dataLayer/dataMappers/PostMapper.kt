@@ -21,9 +21,9 @@ object PostMapper {
         postDTO?.let {
             val post: Post = Post(id = postDTO.id,
                     title = postDTO.title,
-                    image = "",
+                    image = postDTO.image,
                     date = postDTO.date,
-                    authorID = UserMapper.mapNetworkToDomainObject(postDTO.author).userID,
+                    author = UserMapper.mapNetworkToDomainObject(postDTO.author),
                     content = postDTO.content
 
             );

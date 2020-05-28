@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="#ffffff"
-            tools:context=".fragments.ExpandedItemFragment">
+            tools:context=".fragments.ExpandedPostFragment">
 
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -135,6 +135,7 @@
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="16dp"
                         android:autoSizeTextType="uniform"
+                        android:text="@{post.author.username}"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@+id/imageView5"
                         app:layout_constraintStart_toStartOf="@+id/imageView5"
@@ -194,9 +195,11 @@
                 android:id="@+id/recycler_comments"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toBottomOf="parent">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
             </androidx.recyclerview.widget.RecyclerView>
 

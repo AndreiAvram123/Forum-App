@@ -12,7 +12,7 @@ import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.databinding.LoadingItemListBinding
 import com.example.bookapp.databinding.PostItemHomePageBinding
-import com.example.bookapp.fragments.ExpandedItemFragmentDirections
+import com.example.bookapp.fragments.ExpandedPostFragmentDirections
 import com.example.bookapp.models.Post
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
@@ -120,9 +120,10 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
     inner class ViewHolder(val binding: PostItemHomePageBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(post: Post) {
             binding.post = post
+
             binding.root.setOnClickListener {
                 if (AppUtilities.isNetworkAvailable(binding.root.context)) {
-                    val action: NavDirections = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(post.id)
+                    val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(post.id)
                     Navigation.findNavController(binding.root).navigate(action)
                 } else {
                     Snackbar.make(binding.root, binding.root.context.getString(R.string.no_internet_connection), Snackbar.LENGTH_SHORT)

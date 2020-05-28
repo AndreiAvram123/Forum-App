@@ -1,26 +1,33 @@
 package com.example.bookapp.viewModels
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.bookapp.models.User
 import com.example.dataLayer.models.UserDTO
 import com.example.dataLayer.repositories.UserRepository
 
 class ViewModelUser : ViewModel() {
-    val user = MutableLiveData<User>()
 
-    val errorResponseCode: MutableLiveData<Int> by lazy {
-        UserRepository.responseCode
+
+    private val userRepository: UserRepository by lazy {
+        UserRepository(viewModelScope)
     }
+
+    val user: MutableLiveData<User> = MutableLiveData()
+
+    val friends: LiveData<List<User>> = Transformations.switchMap(user) {
+        user.value?.let {
+            userRepository.fetchFriends(it)
+        }
+    };
 
 
     fun getUserFromThirdPartyEmailAccount(email: String): MutableLiveData<User> {
-       // user = UserRepository.authenticateWithThirdPartyEmail(email)
+        // user = UserRepository.authenticateWithThirdPartyEmail(email)
         return user;
     }
 
     fun createThirdPartyAccount(userDTO: UserDTO): MutableLiveData<User> {
-    //    user = UserRepository.createThirdPartyAccount(userDTO)
+        //    user = UserRepository.createThirdPartyAccount(userDTO)
 
         return user;
     }

@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.example.bookapp.R
 import com.example.bookapp.fragments.AuthenticationFragment
-import com.example.bookapp.models.ApiConstants
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.UserDTO
@@ -30,11 +29,7 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.Callback {
         setContentView(R.layout.layout_activity_welcome)
         displayAuthenticationOptionsFragment()
         setFlatWelcomeActivityShown()
-        viewModelUser.errorResponseCode.observe(this, Observer {
-            if (it == ApiConstants.RESPONSE_CODE_ACCOUNT_UNEXISTENT) {
-                createAccount()
-            }
-        })
+
         viewModelUser.user.observe(this, Observer {
             it?.let {
                 saveUserInMemory(it)

@@ -14,11 +14,9 @@ import com.example.bookapp.Adapters.FriendsAdapter
 import com.example.bookapp.R
 import com.example.bookapp.databinding.FragmentFriendsBinding
 import com.example.bookapp.interfaces.MainActivityInterface
-import com.example.bookapp.viewModels.ViewModelFriends
 import com.example.bookapp.viewModels.ViewModelUser
 
 class FriendsFragment : Fragment() {
-    private val viewModelFriends: ViewModelFriends by activityViewModels()
     private val viewModelUser: ViewModelUser by activityViewModels()
 
     private lateinit var binding: FragmentFriendsBinding;
@@ -43,11 +41,8 @@ class FriendsFragment : Fragment() {
     }
 
     private fun attachObservers() {
-        val currentUser = viewModelUser.user.value
-        viewModelUser.user.value?.let { user ->
-            viewModelFriends.getFriends(user).observe(viewLifecycleOwner, Observer {
-                it?.let { friendsAdapter.setData(it) }
-            })
-        }
+        viewModelUser.friends.observe(viewLifecycleOwner, Observer {
+            friendsAdapter.setData(ArrayList(it))
+        })
     }
 }

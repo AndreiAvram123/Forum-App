@@ -15,7 +15,7 @@ interface RoomPostDao {
 
 
     @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")
-    suspend fun getPostByID(postID: Int): Post
+    fun getPostByID(postID: Int): LiveData<Post>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPost(post: Post)

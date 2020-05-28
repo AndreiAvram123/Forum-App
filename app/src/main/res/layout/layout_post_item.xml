@@ -6,7 +6,7 @@
     <data>
         <variable
             name="suggestionPost"
-            type="com.example.bookapp.models.Post" />
+            type="com.example.bookapp.models.LowDataPost" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -45,6 +45,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
+            app:imageFromURL="@{suggestionPost.image}"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"

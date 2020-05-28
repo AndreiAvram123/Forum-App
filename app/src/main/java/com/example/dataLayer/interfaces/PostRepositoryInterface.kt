@@ -1,5 +1,6 @@
 package com.example.dataLayer.interfaces
 
+import com.example.bookapp.models.LowDataPost
 import com.example.dataLayer.models.PostDTO
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -20,10 +21,14 @@ interface PostRepositoryInterface {
     @GET("/user/{id}/posts")
     suspend fun fetchMyPosts(@Path("id") userID: Int): ArrayList<PostDTO>
 
+    @GET("/posts/autocomplete/{query}")
+    suspend fun fetchSearchSuggestions(@Path("query") query: String): List<LowDataPost>
+
     @DELETE("/user/{userID}/removePost/{postID}")
     suspend fun deletePostFromFavorites(@Path("userID") postID: Int, @Path("postID") userID: Int)
 
     @POST("/user/{userID}/addToFavorites/{postID}")
     suspend fun addPostToFavorites(@Path("postID") postID: Int, @Path("userID") userID: Int)
+
 
 }

@@ -6,18 +6,14 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.NavDirections
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.bookapp.R
 import com.example.bookapp.fragments.BottomSheetPromptLogin
 import com.example.bookapp.fragments.BottomSheetPromptLogin.BottomSheetInterface
-import com.example.bookapp.fragments.FriendsFragmentDirections
 import com.example.bookapp.interfaces.MainActivityInterface
 import com.example.bookapp.models.AuthenticationService
 import com.example.bookapp.models.User
-import com.example.bookapp.viewModels.ViewModelFriends
 import com.example.bookapp.viewModels.ViewModelMessages
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
@@ -27,15 +23,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
 
-/**
- * The main activity acts as the controller
- * for the main screen
- */
 @InternalCoroutinesApi
 class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface {
     private var sharedPreferences: SharedPreferences? = null
     private val viewModelPost: ViewModelPost by viewModels()
-    private val viewModelFriends: ViewModelFriends by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
     private val viewModelMessages: ViewModelMessages by viewModels()
 

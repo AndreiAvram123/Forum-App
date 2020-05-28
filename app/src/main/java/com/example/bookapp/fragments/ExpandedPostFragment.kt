@@ -25,9 +25,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
-class ExpandedItemFragment : Fragment(), CommentDialogInterface {
-    private lateinit var post: Post;
-    private var comments: ArrayList<Comment>? = null
+class ExpandedPostFragment : Fragment(), CommentDialogInterface {
     lateinit var binding: FragmentExpandedItemBinding
     private var commentDialog: CommentDialog? = null
     private val viewModelPost: ViewModelPost by activityViewModels()
@@ -51,16 +49,17 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
             viewModelUser.user.observe(viewLifecycleOwner, Observer { user = it })
         }
 
-        val postID: Int = ExpandedItemFragmentArgs.fromBundle(requireArguments()).postID
+        val postID: Int = ExpandedPostFragmentArgs.fromBundle(requireArguments()).postID
 
         viewModelPost.getPostByID(postID).observe(viewLifecycleOwner, Observer {
-            post = it
-            configureViews()
-            getComments();
+            if (it != null) {
+                configureViews(it)
+                getComments(it);
+            }
         })
     }
 
-    private fun getComments() {
+    private fun getComments(post: Post) {
         viewModelComments.getCommentsForPost(post).observe(viewLifecycleOwner, Observer {
             insertComments(ArrayList(it.comments))
         })
@@ -76,7 +75,7 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
     }
 
 
-    private fun configureViews() {
+    private fun configureViews(post: Post) {
         binding.post = post
         if (user != null)
             binding.saveButtonExpanded.setOnClickListener {
@@ -96,8 +95,8 @@ class ExpandedItemFragment : Fragment(), CommentDialogInterface {
     }
 
     private fun showCommentDialog() {
-        commentDialog = CommentDialog(requireActivity(), this, post)
-        commentDialog!!.show()
+        // commentDialog = CommentDialog(requireActivity(), this, post)
+        //  commentDialog!!.show()
     }
 
     private fun informUserPostAddedToFavorites() {
