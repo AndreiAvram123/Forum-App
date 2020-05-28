@@ -1,10 +1,7 @@
 package com.example.bookapp.viewModels
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.example.bookapp.models.LowDataPost
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
@@ -28,8 +25,13 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
     private val postRepository: PostRepository by lazy {
         PostRepository(application, coroutineScope = viewModelScope, user = user.value!!)
     }
-    val searchSuggestions: LiveData<List<LowDataPost>> by lazy {
-        postRepository.currentSearchResults
+
+
+    val searchSuggestions: LiveData<List<LowDataPost>> = Transformations.switchMap(searchQuery) {
+        viewModelScope.launch {
+            searchQuery.value?.let { query -> postRepository.fetchSuggestions(query = query) }
+        }
+        return@switchMap postRepository.currentSearchResults
     }
 
 

@@ -17,7 +17,6 @@ import com.example.bookapp.interfaces.MessageInterface;
 import com.example.bookapp.models.Message;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class AdapterMessages extends RecyclerView.Adapter {
 
@@ -30,7 +29,7 @@ public class AdapterMessages extends RecyclerView.Adapter {
     private final int VIEW_TYPE_ITEM = 1;
     private int VIEW_TYPE_LOADING = 0;
 
-    public AdapterMessages(@NonNull RecyclerView recyclerView, @NonNull String user2ID) {
+    public AdapterMessages(@NonNull RecyclerView recyclerView, @NonNull int currentUserID) {
         this.messages = new ArrayList<>();
         this.recyclerView = recyclerView;
         this.user2ID = user2ID;

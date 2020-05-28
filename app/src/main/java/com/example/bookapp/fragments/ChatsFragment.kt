@@ -8,26 +8,26 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.FriendsAdapter
 import com.example.bookapp.R
-import com.example.bookapp.databinding.FragmentFriendsBinding
-import com.example.bookapp.interfaces.MainActivityInterface
+import com.example.bookapp.databinding.LayoutFragmentChatsBinding
 import com.example.bookapp.viewModels.ViewModelUser
 
-class FriendsFragment : Fragment() {
+class ChatsFragment : Fragment() {
     private val viewModelUser: ViewModelUser by activityViewModels()
 
-    private lateinit var binding: FragmentFriendsBinding;
-    private val friendsAdapter: FriendsAdapter by lazy {
-        FriendsAdapter(requireActivity() as MainActivityInterface)
-    }
+    private lateinit var binding: LayoutFragmentChatsBinding;
+    private lateinit var friendsAdapter: FriendsAdapter
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_friends, container, false)
-        //set the adapter
+        binding = DataBindingUtil.inflate(inflater, R.layout.layout_fragment_chats, container, false)
+
+        friendsAdapter = FriendsAdapter(this.findNavController())
         configureRecyclerView()
         attachObservers()
         return binding.root

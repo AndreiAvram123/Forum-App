@@ -47,9 +47,9 @@
     </fragment>
     <fragment
         android:id="@+id/friends"
-        android:name="com.example.bookapp.fragments.FriendsFragment"
+        android:name="com.example.bookapp.fragments.ChatsFragment"
         android:label="fragment_friends"
-        tools:layout="@layout/fragment_friends" >
+        tools:layout="@layout/layout_fragment_chats">
         <action
             android:id="@+id/action_friendsFragment_to_messagesFragment"
             app:destination="@id/messagesFragment" />
@@ -59,11 +59,8 @@
         android:name="com.example.bookapp.fragments.MessagesFragment"
         android:label="MessagesFragment" >
         <argument
-            android:name="currentUserID"
-            app:argType="string" />
-        <argument
-            android:name="user2ID"
-            app:argType="string" />
+            android:name="chatID"
+            app:argType="integer" />
     </fragment>
     <action android:id="@+id/action_global_expandedItemFragment" app:destination="@id/expandedItemFragment" />
     <fragment

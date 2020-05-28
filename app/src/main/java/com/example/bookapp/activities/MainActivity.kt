@@ -14,6 +14,7 @@ import com.example.bookapp.fragments.BottomSheetPromptLogin.BottomSheetInterface
 import com.example.bookapp.interfaces.MainActivityInterface
 import com.example.bookapp.models.AuthenticationService
 import com.example.bookapp.models.User
+import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelMessages
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
     private var sharedPreferences: SharedPreferences? = null
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
+    private val viewModelChat: ViewModelChat by viewModels()
     private val viewModelMessages: ViewModelMessages by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
