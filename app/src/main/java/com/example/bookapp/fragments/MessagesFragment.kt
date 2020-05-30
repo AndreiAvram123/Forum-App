@@ -5,34 +5,38 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.bookapp.Adapters.AdapterMessages
-import com.example.bookapp.R
+import com.example.bookapp.Adapters.CustomDivider
+import com.example.bookapp.Adapters.MessageAdapter
 import com.example.bookapp.databinding.MessagesFragmentBinding
-import com.example.bookapp.viewModels.ViewModelMessages
+import com.example.bookapp.models.MessageDTO
+import com.example.bookapp.viewModels.ViewModelUser
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.launchdarkly.eventsource.EventHandler
 import com.launchdarkly.eventsource.EventSource
 import com.launchdarkly.eventsource.MessageEvent
+import okhttp3.internal.closeQuietly
+import org.json.JSONObject
 import java.net.URI
 import java.time.Duration
 
 class MessagesFragment : Fragment() {
     private lateinit var binding: MessagesFragmentBinding
-    private val viewModelMessages: ViewModelMessages? = null
-    private lateinit var adapterMessages: AdapterMessages
+    private val viewModelUser: ViewModelUser by activityViewModels()
     private lateinit var eventSource: EventSource
+    private lateinit var adapter: MessageAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.messages_fragment, container, false)
-        //todo
-        //change this
-        adapterMessages = AdapterMessages(binding.recyclerViewMessages, 5);
-        initializeAdapter()
-        configureViews()
+        binding = MessagesFragmentBinding.inflate(inflater, container, false)
+
+        viewModelUser.user.value?.let {
+            adapter = MessageAdapter()
+            configureViews()
+        }
         return binding.root
     }
 
@@ -41,24 +45,43 @@ class MessagesFragment : Fragment() {
         configureServerEvents()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        eventSource.close()
+    override fun onStop() {
+        super.onStop()
+        eventSource.closeQuietly()
         Log.d(MessagesFragment::class.simpleName, "closing server side event")
     }
+
 
     private fun configureServerEvents() {
         val eventHandler: EventHandler = object : EventHandler {
             override fun onOpen() {
-                Log.d(MessagesFragment::class.simpleName, "Seriver side event opened")
+                Log.d(MessagesFragment::class.simpleName, "Server side event opened")
             }
 
             override fun onComment(comment: String?) {
 
             }
 
-            override fun onMessage(event: String?, messageEvent: MessageEvent?) {
-                Log.d(MessagesFragment::class.simpleName, messageEvent?.data.toString())
+            override fun onMessage(event: String?, messageEvent: MessageEvent) {
+                val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+                val data = messageEvent.data
+                if (data != null) {
+                    val jsonObject = JSONObject(data)
+                    when (jsonObject.get("type")) {
+                        "message" -> {
+                            val message = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
+
+                            requireActivity().runOnUiThread {
+                                adapter.add(message)
+                            }
+                        }
+                        else -> {
+                        }
+                    }
+
+                }
+
+
             }
 
             override fun onClosed() {
@@ -80,23 +103,21 @@ class MessagesFragment : Fragment() {
     }
 
     private fun configureViews() {
-        binding.sendMessageButton.setOnClickListener {
-            if (binding.messageTextArea.text != null) {
-                val messageContent = binding.messageTextArea.text.toString().trim { it <= ' ' }
-                if (messageContent.trim { it <= ' ' } != "") {
-                    binding.messageTextArea.text!!.clear()
-                }
-            }
-        }
+        configureRecyclerView()
+//        binding.sendMessageButton.setOnClickListener {
+//            if (binding.messageTextArea.text != null) {
+//                val messageContent = binding.messageTextArea.text.toString().trim { it <= ' ' }
+//                if (messageContent.trim { it <= ' ' } != "") {
+//                    binding.messageTextArea.text!!.clear()
+//                }
+//            }
+//        }
     }
 
-    private fun initializeAdapter() {
-        configureRecyclerView()
-    }
 
     private fun configureRecyclerView() {
-        binding.recyclerViewMessages.adapter = adapterMessages
-        binding.recyclerViewMessages.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.HORIZONTAL))
+        binding.recyclerViewMessages.adapter = adapter
+        binding.recyclerViewMessages.addItemDecoration(CustomDivider(10))
         binding.recyclerViewMessages.layoutManager = LinearLayoutManager(requireContext())
     }
 }

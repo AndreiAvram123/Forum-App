@@ -10,7 +10,6 @@ import com.example.bookapp.R
 import com.example.bookapp.fragments.AuthenticationFragment
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelUser
-import com.example.dataLayer.models.UserDTO
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -39,10 +38,7 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.Callback {
     }
 
     private fun createAccount() {
-        googleSignInAccount?.let {
-            val userDTO: UserDTO = UserDTO(userID = 0, username = it.displayName!!, email = it .email!!)
-            viewModelUser.createThirdPartyAccount(userDTO)
-        }
+
     }
 
     private fun setFlatWelcomeActivityShown() {

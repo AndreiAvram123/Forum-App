@@ -4,56 +4,56 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.bookapp.models.MessageDTO;
 import com.example.dataLayer.repositories.MessageRepository;
-import com.example.bookapp.models.Message;
 
 import java.util.ArrayList;
 
 
 public class ViewModelMessages extends ViewModel implements MessageRepository.MessageRepositoryCallback {
     //the last messages in the chat
-    private MutableLiveData<ArrayList<Message>> messages = new MutableLiveData<>();
-    private MutableLiveData<ArrayList<Message>> currentlyFetchedNewMessages = new MutableLiveData<>();
-    private MutableLiveData<Message> currentlySentMessage = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<MessageDTO>> messages = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<MessageDTO>> currentlyFetchedNewMessages = new MutableLiveData<>();
+    private MutableLiveData<MessageDTO> currentlySentMessage = new MutableLiveData<>();
 
-    public MutableLiveData<ArrayList<Message>> getMessages() {
+    public MutableLiveData<ArrayList<MessageDTO>> getMessages() {
         return messages;
     }
 
-    public MutableLiveData<Message> getCurrentlySentMessage() {
+    public MutableLiveData<MessageDTO> getCurrentlySentMessage() {
         return currentlySentMessage;
     }
 
-    public MutableLiveData<ArrayList<Message>> getCurrentlyFetchedNewMessages() {
+    public MutableLiveData<ArrayList<MessageDTO>> getCurrentlyFetchedNewMessages() {
         return currentlyFetchedNewMessages;
     }
 
     /*************************************************INTERFACE METHODS ************************************/
 
     @Override
-    public void onOldMessagesFetched(@NonNull ArrayList<Message> oldMessages) {
-        ArrayList<Message> newData = new ArrayList<>();
+    public void onOldMessagesFetched(@NonNull ArrayList<MessageDTO> oldMessageDTOS) {
+        ArrayList<MessageDTO> newData = new ArrayList<>();
         if (this.messages.getValue() != null) {
             newData.addAll(this.messages.getValue());
         }
-        newData.addAll(oldMessages);
+        newData.addAll(oldMessageDTOS);
 
         this.messages.setValue(newData);
     }
 
 
     @Override
-    public void onNewMessagesReady(@NonNull ArrayList<Message> newMessages) {
+    public void onNewMessagesReady(@NonNull ArrayList<MessageDTO> newMessageDTOS) {
         //create a new arrayList to trigger the observer
         if (this.messages.getValue() != null) {
-            this.messages.getValue().addAll(newMessages);
+            this.messages.getValue().addAll(newMessageDTOS);
         }
-        currentlyFetchedNewMessages.setValue(newMessages);
+        currentlyFetchedNewMessages.setValue(newMessageDTOS);
     }
 
     @Override
-    public void onSendMessageReady(@NonNull Message message) {
-        currentlySentMessage.setValue(message);
+    public void onSendMessageReady(@NonNull MessageDTO messageDTO) {
+        currentlySentMessage.setValue(messageDTO);
     }
 
 

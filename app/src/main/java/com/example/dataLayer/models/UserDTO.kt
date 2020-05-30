@@ -8,10 +8,12 @@ data class UserDTO(
         @SerializedName("displayName")
         val username: String,
         @SerializedName("email")
-        val email: String
+        val email: String,
+        @SerializedName("profilePicture")
+        val profilePicture: String?
 ) {
 
     companion object {
-        fun buildNullUserDTO() = UserDTO(userID = 0, username = "Unknown", email = "Unknown")
+        fun buildNullUserDTO() = UserDTO(userID = 0, username = "Unknown", email = "Unknown", profilePicture = "sdfsd")
     }
 }

@@ -8,8 +8,10 @@ apply plugin: 'kotlin-kapt'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
-    dataBinding {
-        enabled = true
+
+    buildFeatures{
+        dataBinding = true
+
     }
     packagingOptions {
         exclude 'META-INF/atomicfu.kotlin_module'
@@ -46,7 +48,7 @@ android {
 }
 dependencies {
 
-
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
     implementation 'com.squareup.okhttp3:okhttp:4.5.0'
     implementation group: 'com.launchdarkly', name: 'okhttp-eventsource', version: '2.2.0'
