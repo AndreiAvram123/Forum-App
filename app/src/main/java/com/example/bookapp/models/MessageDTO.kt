@@ -10,8 +10,6 @@ data class MessageDTO(
         val content: String,
         @SerializedName("date")
         val date: Long,
-        @SerializedName("receiverID")
-        val receiverID: Int,
         @SerializedName("sender")
         val sender: UserDTO
 )

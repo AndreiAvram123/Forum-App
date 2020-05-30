@@ -24,4 +24,14 @@ class ChatRepository(private val coroutineScope: CoroutineScope) {
         }
         return userChats;
     }
+
+    fun pushMessage(chatID: Int, senderID: Int, content: String) {
+        coroutineScope.launch {
+            try {
+                repositoryInterface.pushMessage(chatID, senderID, content)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }

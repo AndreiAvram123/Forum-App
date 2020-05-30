@@ -12,6 +12,7 @@ import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.MessageAdapter
 import com.example.bookapp.databinding.MessagesFragmentBinding
 import com.example.bookapp.models.MessageDTO
+import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -26,6 +27,7 @@ import java.time.Duration
 class MessagesFragment : Fragment() {
     private lateinit var binding: MessagesFragmentBinding
     private val viewModelUser: ViewModelUser by activityViewModels()
+    private val viewModelChat: ViewModelChat by activityViewModels()
     private lateinit var eventSource: EventSource
     private lateinit var adapter: MessageAdapter
 
@@ -34,7 +36,7 @@ class MessagesFragment : Fragment() {
         binding = MessagesFragmentBinding.inflate(inflater, container, false)
 
         viewModelUser.user.value?.let {
-            adapter = MessageAdapter()
+            adapter = MessageAdapter(it)
             configureViews()
         }
         return binding.root
@@ -70,12 +72,12 @@ class MessagesFragment : Fragment() {
                     when (jsonObject.get("type")) {
                         "message" -> {
                             val message = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
-
                             requireActivity().runOnUiThread {
                                 adapter.add(message)
                             }
                         }
                         else -> {
+
                         }
                     }
 
@@ -104,14 +106,18 @@ class MessagesFragment : Fragment() {
 
     private fun configureViews() {
         configureRecyclerView()
-//        binding.sendMessageButton.setOnClickListener {
-//            if (binding.messageTextArea.text != null) {
-//                val messageContent = binding.messageTextArea.text.toString().trim { it <= ' ' }
-//                if (messageContent.trim { it <= ' ' } != "") {
-//                    binding.messageTextArea.text!!.clear()
-//                }
-//            }
-//        }
+        binding.sendButton.setOnClickListener {
+            val text = binding.messageArea.text;
+            if (text != null) {
+                val messageContent = binding.messageArea.text.toString().trim { it <= ' ' }
+                if (messageContent.trim { it <= ' ' } != "") {
+                    viewModelUser.user.value?.let {
+                        viewModelChat.sendMessage(chatID = 1, senderID = it.userID, content = messageContent)
+                    }
+                    text.clear()
+                }
+            }
+        }
     }
 
 

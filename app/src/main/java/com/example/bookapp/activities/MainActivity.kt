@@ -15,7 +15,6 @@ import com.example.bookapp.interfaces.MainActivityInterface
 import com.example.bookapp.models.AuthenticationService
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelChat
-import com.example.bookapp.viewModels.ViewModelMessages
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -30,7 +29,6 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
     private val viewModelChat: ViewModelChat by viewModels()
-    private val viewModelMessages: ViewModelMessages by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

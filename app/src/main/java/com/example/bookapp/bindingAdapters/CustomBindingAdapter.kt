@@ -20,6 +20,7 @@ fun bindImageFromURL(imageView: ImageView, imageURl: String?) {
 @BindingAdapter("dateFromUnix")
 fun getDateFromUnix(textView: TextView, unixTime: Long) {
     val compareDate: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.UK)
+
     val nowDate = Date(Calendar.getInstance().timeInMillis)
     val messageDate = Date(unixTime * 1000)
 
