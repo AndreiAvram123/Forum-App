@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.MessageAdapter
@@ -38,14 +39,15 @@ class MessagesFragment : Fragment() {
         viewModelUser.user.value?.let {
             adapter = MessageAdapter(it)
             configureViews()
+            viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer { data ->
+                adapter.addNewMessages(data)
+                configureServerEvents()
+            })
+            viewModelChat.chat.value = 1
         }
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        configureServerEvents()
-    }
 
     override fun onStop() {
         super.onStop()
@@ -80,7 +82,6 @@ class MessagesFragment : Fragment() {
 
                         }
                     }
-
                 }
 
 

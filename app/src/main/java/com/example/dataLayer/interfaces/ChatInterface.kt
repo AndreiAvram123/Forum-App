@@ -1,10 +1,8 @@
 package com.example.dataLayer.interfaces
 
+import com.example.bookapp.models.MessageDTO
 import com.example.dataLayer.models.ChatDTO
-import retrofit2.http.Field
-import retrofit2.http.FormUrlEncoded
-import retrofit2.http.GET
-import retrofit2.http.POST
+import retrofit2.http.*
 
 interface ChatInterface {
 
@@ -16,4 +14,8 @@ interface ChatInterface {
     suspend fun pushMessage(@Field("chatID") chatID: Int,
                             @Field("senderID") senderID: Int,
                             @Field("content") content: String)
+
+    @GET("/chat/{chatID}/recentMessages")
+    suspend fun fetchRecentMessages(@Path("chatID") chatID: Int): List<MessageDTO>
+
 }

@@ -66,6 +66,12 @@ class MessageAdapter(private val currentUser: User) : RecyclerView.Adapter<Recyc
         notifyItemInserted(messages.size - 1)
     }
 
+    fun addNewMessages(newMessages: List<MessageDTO>) {
+        val oldIndex = messages.size - 1
+        messages.addAll(newMessages)
+        notifyItemRangeInserted(oldIndex, messages.size)
+    }
+
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
 
