@@ -18,7 +18,7 @@ class ChatRepository(private val coroutineScope: CoroutineScope) {
     }
     private val chatMessages: MutableLiveData<List<MessageDTO>> = MutableLiveData()
 
-    private val repositoryInterface: ChatInterface = AppUtilities.getRetrofit().create(ChatInterface::class.java)
+    private val repositoryInterface: ChatInterface = AppUtilities.retrofit.create(ChatInterface::class.java)
 
     fun fetchUserChats(user: User): LiveData<List<Chat>> {
         coroutineScope.launch {

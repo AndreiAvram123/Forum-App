@@ -45,7 +45,7 @@
                 app:srcCompat="@drawable/ic_mail" />
 
             <TextView
-                android:id="@+id/sign_in_with_email_text"
+                android:id="@+id/sign_in_with_email"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_alignParentEnd="true"

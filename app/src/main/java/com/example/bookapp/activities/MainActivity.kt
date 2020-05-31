@@ -21,11 +21,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.InternalCoroutinesApi
-import java.util.*
 
 @InternalCoroutinesApi
 class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface {
-    private var sharedPreferences: SharedPreferences? = null
+    private lateinit var sharedPreferences: SharedPreferences
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
     private val viewModelChat: ViewModelChat by viewModels()
@@ -33,27 +32,28 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_main_activity)
-        configureDefaultVariables()
-
-        currentUser
-    }
-
-
-    private val currentUser: Unit
-        get() {
-            val userID = sharedPreferences!!.getInt(getString(R.string.key_user_id), 0)
-            val email = sharedPreferences!!.getString(getString(R.string.key_email), null)
-            if (userID != 0 && email != null) {
-                viewModelUser.user.value = (User(userID = userID, username = "username", email = email))
-                viewModelPost.user.value = User(userID = userID, username = "username", email = email)
-            } else {
-                startWelcomeActivity()
-            }
+        sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
+        val user = getCurrentUser()
+        if (user != null) {
+            viewModelUser.user.value = user
+            viewModelPost.user.value = user
+        } else {
+            startWelcomeActivity()
         }
-
-    private fun shouldShowWelcomeActivity(): Boolean {
-        return !sharedPreferences!!.getBoolean(getString(R.string.welcome_activity_shown_key), false)
+        configureNavigationView()
     }
+
+
+    private fun getCurrentUser(): User? {
+        val userID = sharedPreferences.getInt(getString(R.string.key_user_id), 0)
+        if (userID > 0) {
+            return User(userID = userID,
+                    username = sharedPreferences.getStringNotNull(R.string.key_email),
+                    email = sharedPreferences.getStringNotNull(R.string.key_username))
+        }
+        return null
+    }
+
 
     private fun startWelcomeActivity() {
         val intent = Intent(this, WelcomeActivity::class.java)
@@ -62,23 +62,6 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
         finish()
     }
 
-    private fun configureDefaultVariables() {
-        sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE)
-        configureNavigationView()
-    }
-
-
-    private val searchHistory: ArrayList<String?>
-        get() {
-            val searchHistorySet = sharedPreferences!!.getStringSet(getString(R.string.search_history_key), null)
-            val searchHistoryArrayList = ArrayList<String?>()
-            if (searchHistorySet != null) {
-                searchHistoryArrayList.addAll(searchHistorySet)
-                searchHistoryArrayList.reverse()
-                return searchHistoryArrayList
-            }
-            return searchHistoryArrayList
-        }
 
     private fun configureNavigationView() {
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottom_navigation)
@@ -91,6 +74,25 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
 
     }
 
+
+    fun SharedPreferences.edit(commit: Boolean = true,
+                               action: SharedPreferences.Editor.() -> Unit) {
+
+        val editor = edit()
+        action(editor)
+        if (commit) {
+            editor.commit()
+        } else {
+            editor.apply()
+        }
+    }
+
+    private fun SharedPreferences.getStringNotNull(keyID: Int
+    ): String {
+        val value = getString(getString(keyID), "unknown")
+        value?.let { return it }
+        return "Unknown"
+    }
 
     override fun startChat(userID: String) {
         //  val action: NavDirections = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(viewModelUser.user.value!!.userID, userID)

@@ -2,7 +2,6 @@ package com.example.bookapp.fragments;
 
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -15,11 +14,9 @@ import androidx.fragment.app.Fragment;
 public abstract class AuthenticationFragmentTemplate extends Fragment {
 
 
-    abstract void attemptAction();
-
     abstract void clearFields();
 
-    abstract void initializeUI(View layout);
+    abstract void initializeUI();
 
     /**
      * This method should call the customiseField()

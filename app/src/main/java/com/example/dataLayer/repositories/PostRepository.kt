@@ -27,7 +27,7 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
     private val currentFetchedPosts: HashMap<Int, LiveData<Post>> = HashMap()
 
     private val repositoryInterface: PostRepositoryInterface by lazy {
-        AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
+        AppUtilities.retrofit.create(PostRepositoryInterface::class.java)
     }
 
     private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()
