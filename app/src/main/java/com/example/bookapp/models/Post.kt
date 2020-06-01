@@ -21,7 +21,7 @@ data class Post(
 
     companion object Empty {
         fun buildNullSafeObject(): Post {
-            return Post(id = 0, content = "", date = 333, title = "", image = "dfd", author = User(userID = 0, username = "Unknown", email = "unknown"))
+            return Post(id = 0, content = "", date = 333, title = "", image = "dfd", author = User(userID = 0, username = "Unknown", email = "unknown", profilePicture = "sdfs"))
         }
     }
 

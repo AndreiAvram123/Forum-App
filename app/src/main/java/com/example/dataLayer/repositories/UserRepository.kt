@@ -15,18 +15,13 @@ class UserRepository(private val coroutineScope: CoroutineScope) {
     private val userRepositoryInterface: UserRepositoryInterface by lazy {
         AppUtilities.retrofit.create(UserRepositoryInterface::class.java)
     }
-//    private val repoStringConverter: UserRepositoryInterface by lazy {
-//        Retrofit.Builder()
-//                .baseUrl("http://www.andreiram.co.uk/")
-//                .addConverterFactory(ScalarsConverterFactory.create())
-//                .build()
-//                .create(UserRepositoryInterface::class.java)
-//    }
 
     val friends: MutableLiveData<List<User>> = MutableLiveData()
 
 
     fun fetchFriends(user: User): LiveData<List<User>> {
+        //clear cache
+        friends.value = ArrayList()
         coroutineScope.launch {
             val fetchedData = userRepositoryInterface.fetchFriends(user.userID)
             friends.postValue(UserMapper.mapDTONetworkToDomainObjects(fetchedData))

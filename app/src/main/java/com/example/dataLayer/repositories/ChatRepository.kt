@@ -21,9 +21,10 @@ class ChatRepository(private val coroutineScope: CoroutineScope) {
     private val repositoryInterface: ChatInterface = AppUtilities.retrofit.create(ChatInterface::class.java)
 
     fun fetchUserChats(user: User): LiveData<List<Chat>> {
+        userChats.value = ArrayList()
         coroutineScope.launch {
             val fetchedData = repositoryInterface.fetchUserChats(user.userID)
-            userChats.postValue(ChatMapper.mapDTOObjectsToDomainObjects(fetchedData))
+            userChats.postValue(ChatMapper.mapDTOObjectsToDomainObjects(fetchedData, user))
         }
         return userChats;
     }

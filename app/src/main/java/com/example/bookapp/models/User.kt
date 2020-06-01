@@ -9,10 +9,12 @@ data class User(
         @PrimaryKey
         @ColumnInfo(name = "userID")
         val userID: Int,
-        @ColumnInfo(name="username")
+        @ColumnInfo(name = "username")
         val username: String,
         @ColumnInfo(name = "email")
-        val email: String
+        val email: String,
+        @ColumnInfo(name = "profilePicture")
+        val profilePicture: String
 
 ) {
 

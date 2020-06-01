@@ -42,17 +42,8 @@
         android:name="com.example.bookapp.fragments.FragmentMyPosts"
         android:label="FragmentMyPosts" >
         <action
-            android:id="@+id/action_fragmentMyPosts_to_friendsFragment"
+            android:id="@+id/action_my_posts_to_friendsFragment2"
             app:destination="@id/friends" />
-    </fragment>
-    <fragment
-        android:id="@+id/friends"
-        android:name="com.example.bookapp.fragments.ChatsFragment"
-        android:label="fragment_friends"
-        tools:layout="@layout/layout_fragment_chats">
-        <action
-            android:id="@+id/action_friendsFragment_to_messagesFragment"
-            app:destination="@id/messagesFragment" />
     </fragment>
     <fragment
         android:id="@+id/messagesFragment"
@@ -64,20 +55,25 @@
         <action
             android:id="@+id/action_messagesFragment_to_friends"
             app:destination="@id/friends" />
-        <action
-            android:id="@+id/action_messagesFragment_to_home"
-            app:destination="@id/home" />
     </fragment>
     <action android:id="@+id/action_global_expandedItemFragment" app:destination="@id/expandedItemFragment" />
     <fragment
         android:id="@+id/home"
         android:name="HomeFragment"
-        android:label="HomeFragment" >
+        android:label="HomeFragment">
         <action
             android:id="@+id/action_homeFragment2_to_searchFragment"
             app:destination="@id/search" />
         <action
             android:id="@+id/action_homeFragment2_to_fragmentAddPost"
             app:destination="@id/fragmentAddPost" />
+    </fragment>
+    <fragment
+        android:id="@+id/friends"
+        android:name="com.example.bookapp.fragments.FriendsFragment"
+        android:label="FriendsFragment">
+        <action
+            android:id="@+id/action_friends_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
     </fragment>
 </navigation>

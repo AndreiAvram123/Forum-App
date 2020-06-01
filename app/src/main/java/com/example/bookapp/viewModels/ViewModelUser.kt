@@ -14,13 +14,12 @@ class ViewModelUser : ViewModel() {
     val user: MutableLiveData<User> = userRepository.currentFetchedUser
 
 
-    //todo
-    //does it work?
     val friends: LiveData<List<User>> = Transformations.switchMap(user) {
         user.value?.let {
             userRepository.fetchFriends(it)
         }
     }
+
 
     fun loginWithGoogle(idToken: String, displayName: String, email: String) {
         userRepository.loginWithGoogle(idToken, displayName, email)

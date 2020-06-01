@@ -9,10 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.bookapp.R
-import com.example.bookapp.fragments.BottomSheetPromptLogin
-import com.example.bookapp.fragments.BottomSheetPromptLogin.BottomSheetInterface
-import com.example.bookapp.interfaces.MainActivityInterface
-import com.example.bookapp.models.AuthenticationService
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelPost
@@ -23,7 +19,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
-class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInterface {
+class MainActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
@@ -31,25 +27,30 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.layout_main_activity)
         sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
         val user = getCurrentUser()
+
         if (user != null) {
             viewModelUser.user.value = user
             viewModelPost.user.value = user
+            setContentView(R.layout.layout_main_activity)
+            configureNavigationView()
         } else {
             startWelcomeActivity()
         }
-        configureNavigationView()
+
     }
 
 
     private fun getCurrentUser(): User? {
         val userID = sharedPreferences.getInt(getString(R.string.key_user_id), 0)
         if (userID > 0) {
+            //todo
+            //modify profile picture
             return User(userID = userID,
                     username = sharedPreferences.getStringNotNull(R.string.key_email),
-                    email = sharedPreferences.getStringNotNull(R.string.key_username))
+                    email = sharedPreferences.getStringNotNull(R.string.key_username),
+                    profilePicture = "")
         }
         return null
     }
@@ -94,29 +95,7 @@ class MainActivity : AppCompatActivity(), MainActivityInterface, BottomSheetInte
         return "Unknown"
     }
 
-    override fun startChat(userID: String) {
-        //  val action: NavDirections = FriendsFragmentDirections.actionFriendsFragmentToMessagesFragment(viewModelUser.user.value!!.userID, userID)
 
-        //  Navigation.findNavController(this, R.id.nav_host_fragment).navigate(action)
-    }
-
-    /**
-     * Use this method in order to display a bottom
-     * sheet for the user to select a login option
-     */
-    private fun requestLogIn() {
-        val bottomSheetPromptLogin = BottomSheetPromptLogin.newInstance()
-        bottomSheetPromptLogin.show(supportFragmentManager, BottomSheetPromptLogin.TAG)
-    }
-
-    override fun onBottomSheetItemClicked(itemId: Int) {
-        if (itemId == R.id.login_with_google_item) {
-            startActivityForResult(AuthenticationService.getInstance().getGoogleSignInIntent(this), 1)
-        }
-        if (itemId == R.id.login_other_options_item) {
-            startWelcomeActivity()
-        }
-    }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)

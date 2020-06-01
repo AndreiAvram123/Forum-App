@@ -22,6 +22,9 @@ import kotlinx.coroutines.InternalCoroutinesApi
 class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCallback {
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()
+
+    //todo
+    //errors present wtf???
     private val requestCodeGoogleSignIn = 1
 
     //use share preferences to share data across activities
@@ -88,6 +91,7 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
             putInt(getString(R.string.key_user_id), user.userID)
             putString(getString(R.string.key_username), user.username)
             putString(getString(R.string.key_email), user.email)
+            putString(getString(R.string.key_profile_picture), user.profilePicture)
         }
         startMainActivity()
     }

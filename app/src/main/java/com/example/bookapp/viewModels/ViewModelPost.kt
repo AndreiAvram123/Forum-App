@@ -35,18 +35,11 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun fetchSearchSuggestions(query: String) {
-        viewModelScope.launch {
-            postRepository.fetchSuggestions(query)
-        }
-    }
-
     fun getUserPosts(): LiveData<UserWithPosts> {
         return postRepository.myPosts
     }
 
     fun getPostByID(id: Int): LiveData<Post> {
-
         return postRepository.fetchPostByID(id)
     }
 

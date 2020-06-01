@@ -7,7 +7,7 @@ import retrofit2.http.*
 interface ChatInterface {
 
     @GET("/user/{userID}/chats")
-    suspend fun fetchUserChats(userID: Int): List<ChatDTO>
+    suspend fun fetchUserChats(@Path("userID") userID: Int): List<ChatDTO>
 
     @FormUrlEncoded
     @POST("/push")

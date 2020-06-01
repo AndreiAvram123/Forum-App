@@ -8,10 +8,10 @@ import com.example.bookapp.models.Post
 interface RoomPostDao {
 
     @Query("SELECT * FROM post")
-    fun getCachedPosts(): LiveData<List<Post>>
+    suspend fun getCachedPosts(): List<Post>
 
-    @Query("SELECT * FROM post WHERE isFavorite ='1'")
-    fun getFavoritePosts(): LiveData<List<Post>>
+ @Query("SELECT * FROM post WHERE isFavorite ='1'")
+ suspend fun getFavoritePosts(): List<Post>
 
 
     @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")

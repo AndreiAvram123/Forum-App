@@ -12,13 +12,24 @@ class ViewModelChat : ViewModel() {
     val chat: MutableLiveData<Int> = MutableLiveData()
 
 
+    private var userChats: LiveData<List<Chat>>? = null
+
+
     val recentMessages: LiveData<List<MessageDTO>> = Transformations.switchMap(chat) {
         chat.value?.let {
             chatRepository.getChatMessages(it)
         }
     }
 
-    fun getUserChats(user: User): LiveData<List<Chat>> = chatRepository.fetchUserChats(user)
+
+    fun getUserChats(user: User): LiveData<List<Chat>> {
+        val temp = userChats
+        if (temp != null) {
+            return temp
+        }
+        return chatRepository.fetchUserChats(user)
+    }
+
 
     fun sendMessage(chatID: Int, senderID: Int, content: String) {
         chatRepository.pushMessage(chatID, senderID, content)

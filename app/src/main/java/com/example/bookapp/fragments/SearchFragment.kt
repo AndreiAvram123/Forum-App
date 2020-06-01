@@ -73,7 +73,7 @@ class SearchFragment : Fragment() {
             override fun onQueryTextChange(newQuery: String): Boolean {
                 if (newQuery.trim { it <= ' ' } != "") {
                     if (newQuery.trim { it <= ' ' } != "" && newQuery.length > 1) {
-                        viewModelPost.fetchSearchSuggestions(newQuery)
+                        viewModelPost.searchQuery.value = newQuery
                     }
                 } else {
                     suggestionsAdapter.data = ArrayList()

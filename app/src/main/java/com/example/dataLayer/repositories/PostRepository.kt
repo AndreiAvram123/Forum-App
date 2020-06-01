@@ -3,6 +3,7 @@ package com.example.dataLayer.repositories
 import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import com.example.bookapp.AppUtilities
 import com.example.bookapp.models.LowDataPost
 import com.example.bookapp.models.Post
@@ -16,6 +17,7 @@ import com.example.dataLayer.interfaces.dao.RoomUserDao
 import com.example.dataLayer.models.PostDTO
 import com.example.dataLayer.models.UserWithPosts
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
@@ -23,8 +25,9 @@ import kotlinx.coroutines.launch
 class PostRepository(application: Application, val coroutineScope: CoroutineScope, val user: User) {
 
     val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
+
     private var nextPageToFetch: Int = 1;
-    private val currentFetchedPosts: HashMap<Int, LiveData<Post>> = HashMap()
+    //private val currentFetchedPosts: HashMap<Int, LiveData<Post>> = HashMap()
 
     private val repositoryInterface: PostRepositoryInterface by lazy {
         AppUtilities.retrofit.create(PostRepositoryInterface::class.java)
@@ -33,21 +36,21 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
     private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()
     private val userDao: RoomUserDao = PostDatabase.getDatabase(application).userDao()
 
-    val fetchedPosts: LiveData<List<Post>> by lazy {
-        postDao.getCachedPosts()
-    }.also {
+    val fetchedPosts = liveData(Dispatchers.IO) {
+        emit(postDao.getCachedPosts())
         if (AppUtilities.isNetworkAvailable(application)) {
-            coroutineScope.launch { fetchNextPagePosts() }
+            fetchNextPagePosts()
         }
     }
 
-    val favoritePosts: LiveData<List<Post>> by lazy {
-        postDao.getFavoritePosts()
+    val favoritePosts = liveData(Dispatchers.IO) {
+        emit(postDao.getFavoritePosts())
     }.also {
         if (AppUtilities.isNetworkAvailable(application)) {
             coroutineScope.launch { fetchFavoritePosts() }
         }
     }
+
     val myPosts: LiveData<UserWithPosts> by lazy {
         MutableLiveData<UserWithPosts>()
         //postDao.getUserPosts(user.userID)
@@ -62,30 +65,19 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
     }
 
 
-    fun fetchPostByID(id: Int): LiveData<Post> {
-        val cachedPost = currentFetchedPosts[id];
-
-        if (cachedPost?.value != null) {
-            return cachedPost
+    fun fetchPostByID(id: Int): LiveData<Post> = liveData(Dispatchers.IO) {
+        emitSource(postDao.getPostByID(id))
+        val postDTO = repositoryInterface.fetchPostByID(id)
+        try {
+            val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
+            val author = UserMapper.mapNetworkToDomainObject(postDTO.author);
+            postDao.insertPost(post)
+            userDao.insertUser(author)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-
-        val toReturn = postDao.getPostByID(id)
-        coroutineScope.launch {
-            try {
-                val postDTO = repositoryInterface.fetchPostByID(id)
-                val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
-                val author = UserMapper.mapNetworkToDomainObject(postDTO.author);
-
-                postDao.insertPost(post)
-                userDao.insertUser(author)
-
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
-            }
-        }
-
-        return toReturn;
     }
+
 
     private suspend fun fetchFavoritePosts() {
         val data = repositoryInterface.fetchFavoritePostsByUserID(user.userID)
