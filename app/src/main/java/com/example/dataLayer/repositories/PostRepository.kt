@@ -30,21 +30,21 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
     //private val currentFetchedPosts: HashMap<Int, LiveData<Post>> = HashMap()
 
     private val repositoryInterface: PostRepositoryInterface by lazy {
-        AppUtilities.retrofit.create(PostRepositoryInterface::class.java)
+        AppUtilities.retrofitGsonConverter.create(PostRepositoryInterface::class.java)
     }
 
     private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()
     private val userDao: RoomUserDao = PostDatabase.getDatabase(application).userDao()
 
     val fetchedPosts = liveData(Dispatchers.IO) {
-        emit(postDao.getCachedPosts())
+        emitSource(postDao.getCachedPosts())
         if (AppUtilities.isNetworkAvailable(application)) {
             fetchNextPagePosts()
         }
     }
 
     val favoritePosts = liveData(Dispatchers.IO) {
-        emit(postDao.getFavoritePosts())
+        emitSource(postDao.getFavoritePosts())
     }.also {
         if (AppUtilities.isNetworkAvailable(application)) {
             coroutineScope.launch { fetchFavoritePosts() }

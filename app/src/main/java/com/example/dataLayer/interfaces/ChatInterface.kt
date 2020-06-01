@@ -2,6 +2,7 @@ package com.example.dataLayer.interfaces
 
 import com.example.bookapp.models.MessageDTO
 import com.example.dataLayer.models.ChatDTO
+import com.google.gson.annotations.SerializedName
 import retrofit2.http.*
 
 interface ChatInterface {
@@ -18,4 +19,10 @@ interface ChatInterface {
     @GET("/chat/{chatID}/recentMessages")
     suspend fun fetchRecentMessages(@Path("chatID") chatID: Int): List<MessageDTO>
 
+    @GET("/chat/discover/{chatID}")
+    suspend fun fetchChatLink(@Path("chatID") chatID: Int): ChatLink
+
 }
+
+data class ChatLink(@SerializedName("hubURL")
+                    val hubURL: String)

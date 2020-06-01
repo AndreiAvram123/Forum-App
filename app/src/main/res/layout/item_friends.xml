@@ -7,10 +7,6 @@
             name="chat"
             type="com.example.bookapp.models.Chat" />
 
-        <variable
-            name="name"
-            type="String" />
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"

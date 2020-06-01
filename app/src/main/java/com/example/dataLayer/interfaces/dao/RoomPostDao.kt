@@ -8,10 +8,10 @@ import com.example.bookapp.models.Post
 interface RoomPostDao {
 
     @Query("SELECT * FROM post")
-    suspend fun getCachedPosts(): List<Post>
+    fun getCachedPosts(): LiveData<List<Post>>
 
- @Query("SELECT * FROM post WHERE isFavorite ='1'")
- suspend fun getFavoritePosts(): List<Post>
+    @Query("SELECT * FROM post WHERE isFavorite ='1'")
+    fun getFavoritePosts(): LiveData<List<Post>>
 
 
     @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")
@@ -21,7 +21,7 @@ interface RoomPostDao {
     suspend fun insertPost(post: Post)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPosts(posts:List<Post>)
+    suspend fun insertPosts(posts: List<Post>)
 
     @Query("DELETE FROM post")
     suspend fun removeCachedData()

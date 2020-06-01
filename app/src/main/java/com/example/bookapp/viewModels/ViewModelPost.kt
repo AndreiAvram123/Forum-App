@@ -15,9 +15,7 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
 
     var lastSeenPostPosition: Int = 0;
 
-    val user: MutableLiveData<User> by lazy {
-        MutableLiveData<User>()
-    }
+    val user: MutableLiveData<User> = MutableLiveData()
     val searchQuery: MutableLiveData<String> = MutableLiveData()
 
     //todo

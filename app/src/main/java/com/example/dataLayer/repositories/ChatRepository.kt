@@ -8,6 +8,7 @@ import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.ChatMapper
 import com.example.dataLayer.interfaces.ChatInterface
+import com.example.dataLayer.interfaces.ChatLink
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -18,7 +19,7 @@ class ChatRepository(private val coroutineScope: CoroutineScope) {
     }
     private val chatMessages: MutableLiveData<List<MessageDTO>> = MutableLiveData()
 
-    private val repositoryInterface: ChatInterface = AppUtilities.retrofit.create(ChatInterface::class.java)
+    private val repositoryInterface: ChatInterface = AppUtilities.retrofitGsonConverter.create(ChatInterface::class.java)
 
     fun fetchUserChats(user: User): LiveData<List<Chat>> {
         userChats.value = ArrayList()
@@ -46,5 +47,14 @@ class ChatRepository(private val coroutineScope: CoroutineScope) {
             chatMessages.postValue(fetchedData)
         }
         return chatMessages
+    }
+
+    fun getChatLink(chatID: Int): LiveData<ChatLink> {
+        val liveDataLink = MutableLiveData<ChatLink>()
+        coroutineScope.launch {
+            val chatLink: ChatLink = repositoryInterface.fetchChatLink(chatID)
+            liveDataLink.postValue(chatLink)
+        }
+        return liveDataLink;
     }
 }

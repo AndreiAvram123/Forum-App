@@ -7,11 +7,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object AppUtilities {
 
-    var retrofit: Retrofit = Retrofit.Builder()
+    val retrofitGsonConverter: Retrofit = Retrofit.Builder()
             .baseUrl("http://www.andreiram.co.uk/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
 
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager

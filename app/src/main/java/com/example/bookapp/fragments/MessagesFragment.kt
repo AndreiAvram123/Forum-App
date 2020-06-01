@@ -29,21 +29,25 @@ class MessagesFragment : Fragment() {
     private lateinit var binding: MessagesFragmentBinding
     private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
-    private lateinit var eventSource: EventSource
+    private var eventSource: EventSource? = null
     private lateinit var adapter: MessageAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = MessagesFragmentBinding.inflate(inflater, container, false)
 
+        viewModelChat.chatID.value = 1
+
         viewModelUser.user.value?.let {
             adapter = MessageAdapter(it)
             configureViews()
             viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer { data ->
                 adapter.addNewMessages(data)
-                configureServerEvents()
             })
-            viewModelChat.chat.value = 1
+            viewModelChat.chatLink.observe(viewLifecycleOwner, Observer { chatLink ->
+                configureServerEvents(chatLink.hubURL)
+            })
+
         }
         return binding.root
     }
@@ -51,12 +55,12 @@ class MessagesFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
-        eventSource.closeQuietly()
+        eventSource?.closeQuietly()
         Log.d(MessagesFragment::class.simpleName, "closing server side event")
     }
 
 
-    private fun configureServerEvents() {
+    private fun configureServerEvents(url: String) {
         val eventHandler: EventHandler = object : EventHandler {
             override fun onOpen() {
                 Log.d(MessagesFragment::class.simpleName, "Server side event opened")
@@ -94,15 +98,16 @@ class MessagesFragment : Fragment() {
             override fun onError(t: Throwable?) {
 
             }
-
+            //"http://www.andreiram.co.uk:3000/.well-known/mercure?topic=/chat"
         }
         val event: EventSource.Builder = EventSource.Builder(
                 eventHandler,
-                URI.create("http://www.andreiram.co.uk:3000/.well-known/mercure?topic=/chat")
+                URI.create(url)
         )
                 .reconnectTime(Duration.ofMillis(10));
-        eventSource = event.build();
-        eventSource.start();
+        val temp = event.build()
+        eventSource = temp
+        temp.start()
     }
 
     private fun configureViews() {

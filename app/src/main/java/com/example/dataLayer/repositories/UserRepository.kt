@@ -13,15 +13,15 @@ class UserRepository(private val coroutineScope: CoroutineScope) {
     val currentFetchedUser = MutableLiveData<User>()
 
     private val userRepositoryInterface: UserRepositoryInterface by lazy {
-        AppUtilities.retrofit.create(UserRepositoryInterface::class.java)
+        AppUtilities.retrofitGsonConverter.create(UserRepositoryInterface::class.java)
     }
 
-    val friends: MutableLiveData<List<User>> = MutableLiveData()
+    var friends: MutableLiveData<List<User>> = MutableLiveData()
 
 
     fun fetchFriends(user: User): LiveData<List<User>> {
         //clear cache
-        friends.value = ArrayList()
+        friends = MutableLiveData()
         coroutineScope.launch {
             val fetchedData = userRepositoryInterface.fetchFriends(user.userID)
             friends.postValue(UserMapper.mapDTONetworkToDomainObjects(fetchedData))
