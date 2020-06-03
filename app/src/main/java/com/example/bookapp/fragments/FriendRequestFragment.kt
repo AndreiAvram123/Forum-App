@@ -37,6 +37,6 @@ class FriendRequestFragment : Fragment() {
     }
 
     private fun acceptRequest(request: DeserializeFriendRequest) {
-
+       viewModelUser.acceptFriendRequest(request)
     }
 }

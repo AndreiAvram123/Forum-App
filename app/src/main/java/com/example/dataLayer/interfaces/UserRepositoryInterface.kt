@@ -37,5 +37,9 @@ interface UserRepositoryInterface {
     @GET("/user/{userID}/receivedRequests")
     suspend fun fetchFriendRequests(@Path("userID") userID: Int): List<DeserializeFriendRequest>
 
+    @POST("/friendRequests/acceptRequest")
+    @FormUrlEncoded
+    suspend fun acceptFriendRequest(@Field("id") senderID: Int)
+
 
 }

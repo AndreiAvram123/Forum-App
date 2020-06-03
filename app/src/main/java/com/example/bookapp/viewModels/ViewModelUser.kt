@@ -26,13 +26,13 @@ class ViewModelUser : ViewModel() {
     val user: MutableLiveData<User> = userRepository.currentFetchedUser
 
 
-    val friends: LiveData<List<User>> = Transformations.switchMap(user) {
+    val friends: LiveData<ArrayList<User>> = Transformations.switchMap(user) {
         user.value?.let {
             userRepository.fetchFriends(it)
         }
     }
 
-    var friendRequests: LiveData<List<DeserializeFriendRequest>> = Transformations.switchMap(user) {
+    var friendRequests: LiveData<ArrayList<DeserializeFriendRequest>> = Transformations.switchMap(user) {
         user.value?.let {
             userRepository.fetchFriendRequests(it)
         }
@@ -45,6 +45,11 @@ class ViewModelUser : ViewModel() {
 
     fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
         userRepository.sendFriendRequest(friendRequest)
+    }
+
+    fun acceptFriendRequest(request: DeserializeFriendRequest) {
+        friendRequests.value?.remove(request)
+        userRepository.acceptFriendRequest(request)
     }
 
 

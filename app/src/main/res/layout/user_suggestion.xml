@@ -21,6 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:text="@{user.username}"
             app:layout_constraintBottom_toBottomOf="@+id/suggestion_image"
             app:layout_constraintStart_toEndOf="@+id/suggestion_image"
             app:layout_constraintTop_toTopOf="@+id/suggestion_image"

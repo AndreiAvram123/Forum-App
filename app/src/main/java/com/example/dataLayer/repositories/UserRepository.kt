@@ -15,21 +15,21 @@ class UserRepository(private val coroutineScope: CoroutineScope) {
     val currentFetchedUser = MutableLiveData<User>()
     private val currentSearchSuggestions = MutableLiveData<List<User>>()
 
-    private val friendRequests = MutableLiveData<List<DeserializeFriendRequest>>()
+    private val friendRequests = MutableLiveData<ArrayList<DeserializeFriendRequest>>()
 
     private val userRepositoryInterface: UserRepositoryInterface by lazy {
         AppUtilities.retrofitGsonConverter.create(UserRepositoryInterface::class.java)
     }
 
-    private var friends: MutableLiveData<List<User>> = MutableLiveData()
+    private var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
 
 
-    fun fetchFriends(user: User): LiveData<List<User>> {
+    fun fetchFriends(user: User): LiveData<ArrayList<User>> {
         //clear cache
         friends = MutableLiveData()
         coroutineScope.launch {
             val fetchedData = userRepositoryInterface.fetchFriends(user.userID)
-            friends.postValue(UserMapper.mapDTONetworkToDomainObjects(fetchedData))
+            friends.postValue(ArrayList(UserMapper.mapDTONetworkToDomainObjects(fetchedData)))
         }
         return friends;
 
@@ -78,12 +78,18 @@ class UserRepository(private val coroutineScope: CoroutineScope) {
         }
     }
 
-    fun fetchFriendRequests(user: User): LiveData<List<DeserializeFriendRequest>> {
+    fun fetchFriendRequests(user: User): LiveData<ArrayList<DeserializeFriendRequest>> {
         friendRequests.value = ArrayList()
         coroutineScope.launch {
             val fetchedData = userRepositoryInterface.fetchFriendRequests(user.userID)
-            friendRequests.postValue(fetchedData)
+            friendRequests.postValue(ArrayList(fetchedData))
         }
         return friendRequests;
+    }
+
+    fun acceptFriendRequest(request: DeserializeFriendRequest) {
+        coroutineScope.launch {
+            userRepositoryInterface.acceptFriendRequest(request.id)
+        }
     }
 }

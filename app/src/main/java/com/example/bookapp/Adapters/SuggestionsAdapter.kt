@@ -48,7 +48,7 @@ class SuggestionsAdapter(val callback: Callback) : RecyclerView.Adapter<Suggesti
     }
 
     interface Callback {
-        fun sendFriendRequest(user: User)
+        fun sendFriendRequest(receiver: User)
     }
 
 }
