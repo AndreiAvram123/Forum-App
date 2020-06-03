@@ -27,7 +27,7 @@
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
-            android:id="@+id/friend_name"
+            android:id="@+id/user_name_request"
             style="@style/important_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

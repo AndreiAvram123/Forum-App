@@ -40,10 +40,12 @@ class ChatsFragment : Fragment() {
     }
 
     private fun configureRecyclerView() {
-        binding.recyclerViewFriends.adapter = chatsAdapter
-        binding.recyclerViewFriends.setHasFixedSize(true)
-        binding.recyclerViewFriends.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.HORIZONTAL))
-        binding.recyclerViewFriends.layoutManager = LinearLayoutManager(requireContext())
+        with(binding.recyclerViewFriends) {
+            adapter = chatsAdapter
+            setHasFixedSize(true)
+            addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.HORIZONTAL))
+            layoutManager = LinearLayoutManager(requireContext())
+        }
     }
 
 

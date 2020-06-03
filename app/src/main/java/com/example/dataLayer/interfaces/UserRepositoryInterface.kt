@@ -1,6 +1,8 @@
 package com.example.dataLayer.interfaces
 
 import com.example.dataLayer.models.UserDTO
+import com.example.dataLayer.models.deserialization.DeserializeFriendRequest
+import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import retrofit2.http.*
 
 interface UserRepositoryInterface {
@@ -24,6 +26,16 @@ interface UserRepositoryInterface {
                                     displayName: String,
                                     @Field("email")
                                     email: String): UserDTO
+
+    @GET("/user/autocomplete/{query}")
+    suspend fun fetchSuggestions(@Path("query") query: String): List<UserDTO>
+
+    @Headers("Content-Type: application/json")
+    @POST("/friendRequests/send")
+    suspend fun pushFriendRequest(@Body friendRequest: SerializeFriendRequest)
+
+    @GET("/user/{userID}/receivedRequests")
+    suspend fun fetchFriendRequests(@Path("userID") userID: Int): List<DeserializeFriendRequest>
 
 
 }

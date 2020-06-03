@@ -12,7 +12,7 @@ class FriendsViewPagerAdapter(fragment: Fragment) : FragmentStateAdapter(fragmen
     override fun createFragment(position: Int): Fragment {
         return when (position) {
             0 -> ChatsFragment()
-            else -> ChatsFragment()
+            else -> FriendRequestFragment()
         }
     }
 

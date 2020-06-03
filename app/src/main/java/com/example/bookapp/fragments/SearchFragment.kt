@@ -13,15 +13,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.SuggestionsAdapter
 import com.example.bookapp.R
 import com.example.bookapp.databinding.FragmentSearchBinding
-import com.example.bookapp.viewModels.ViewModelPost
+import com.example.bookapp.models.User
+import com.example.bookapp.viewModels.ViewModelUser
+import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
-class SearchFragment : Fragment() {
+class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
     private var searchView: SearchView? = null
-    private val suggestionsAdapter: SuggestionsAdapter = SuggestionsAdapter()
+    private val suggestionsAdapter: SuggestionsAdapter = SuggestionsAdapter(this)
     private lateinit var binding: FragmentSearchBinding;
-    private val viewModelPost: ViewModelPost by activityViewModels()
+    private val viewModelUser: ViewModelUser by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -32,9 +34,11 @@ class SearchFragment : Fragment() {
         searchView = binding.searchView
         configureRecyclerView()
         configureSearch()
-        viewModelPost.searchSuggestions.observe(viewLifecycleOwner, Observer {
+        viewModelUser.searchSuggestions.observe(viewLifecycleOwner, Observer {
             suggestionsAdapter.data = ArrayList(it)
         })
+
+
         return binding.root
     }
 
@@ -73,7 +77,7 @@ class SearchFragment : Fragment() {
             override fun onQueryTextChange(newQuery: String): Boolean {
                 if (newQuery.trim { it <= ' ' } != "") {
                     if (newQuery.trim { it <= ' ' } != "" && newQuery.length > 1) {
-                        viewModelPost.searchQuery.value = newQuery
+                        viewModelUser.searchQuery.value = newQuery
                     }
                 } else {
                     suggestionsAdapter.data = ArrayList()
@@ -83,4 +87,13 @@ class SearchFragment : Fragment() {
         })
     }
 
+    override fun sendFriendRequest(user: User) {
+        val user = viewModelUser.user.value
+        if (user != null) {
+            val userID = user.userID
+            val friendRequest = SerializeFriendRequest(senderID = userID, receiverID = user.userID)
+            viewModelUser.sendFriendRequest(friendRequest)
+        }
+    }
 }
+

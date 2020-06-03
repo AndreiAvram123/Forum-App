@@ -6,17 +6,22 @@ import com.example.bookapp.AppUtilities
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.interfaces.UserRepositoryInterface
+import com.example.dataLayer.models.deserialization.DeserializeFriendRequest
+import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 class UserRepository(private val coroutineScope: CoroutineScope) {
     val currentFetchedUser = MutableLiveData<User>()
+    private val currentSearchSuggestions = MutableLiveData<List<User>>()
+
+    private val friendRequests = MutableLiveData<List<DeserializeFriendRequest>>()
 
     private val userRepositoryInterface: UserRepositoryInterface by lazy {
         AppUtilities.retrofitGsonConverter.create(UserRepositoryInterface::class.java)
     }
 
-    var friends: MutableLiveData<List<User>> = MutableLiveData()
+    private var friends: MutableLiveData<List<User>> = MutableLiveData()
 
 
     fun fetchFriends(user: User): LiveData<List<User>> {
@@ -55,5 +60,30 @@ class UserRepository(private val coroutineScope: CoroutineScope) {
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun fetchSearchSuggestions(query: String): LiveData<List<User>> {
+        //clear previous data
+        currentSearchSuggestions.value = ArrayList()
+        coroutineScope.launch {
+            val fetchedSuggestions = userRepositoryInterface.fetchSuggestions(query)
+            currentSearchSuggestions.postValue(UserMapper.mapDTONetworkToDomainObjects(fetchedSuggestions))
+        }
+        return currentSearchSuggestions;
+    }
+
+    fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
+        coroutineScope.launch {
+            userRepositoryInterface.pushFriendRequest(friendRequest)
+        }
+    }
+
+    fun fetchFriendRequests(user: User): LiveData<List<DeserializeFriendRequest>> {
+        friendRequests.value = ArrayList()
+        coroutineScope.launch {
+            val fetchedData = userRepositoryInterface.fetchFriendRequests(user.userID)
+            friendRequests.postValue(fetchedData)
+        }
+        return friendRequests;
     }
 }

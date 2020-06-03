@@ -44,9 +44,11 @@ class HomeFragment : Fragment(), HomeAdapter.Callback {
     }
 
     private fun initializeRecyclerView() {
-        binding.recyclerViewHome.adapter = homeAdapter;
-        binding.recyclerViewHome.addItemDecoration(CustomDivider(20));
-        binding.recyclerViewHome.layoutManager = LinearLayoutManager(requireContext())
+        with(binding.recyclerViewHome) {
+            adapter = homeAdapter
+            addItemDecoration(CustomDivider(20))
+            layoutManager = LinearLayoutManager(requireContext())
+        }
     }
 
     private fun attachObserver() {

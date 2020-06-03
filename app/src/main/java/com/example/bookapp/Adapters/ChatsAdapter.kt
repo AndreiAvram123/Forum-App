@@ -11,7 +11,7 @@ import com.example.bookapp.databinding.ItemFriendsBinding
 import com.example.bookapp.fragments.FriendsFragmentDirections
 import com.example.bookapp.models.Chat
 
-class ChatsAdapter() : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
+class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
     private var chats: ArrayList<Chat> = ArrayList()
 
     fun setData(chats: ArrayList<Chat>) {

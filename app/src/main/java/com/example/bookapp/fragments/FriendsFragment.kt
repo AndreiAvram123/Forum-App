@@ -20,10 +20,11 @@ class FriendsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val adapter = FriendsViewPagerAdapter(this)
         binding.pager.adapter = adapter
+
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
             when (position) {
-                0 -> tab.text = "Friends"
-                1 -> tab.text = "Requests"
+                0 -> tab.text = "Chats"
+                1 -> tab.text = "Notifications"
             }
 
         }.attach()
