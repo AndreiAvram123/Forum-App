@@ -16,10 +16,13 @@ import androidx.navigation.fragment.findNavController
 import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.databinding.LayoutFragmentAddPostBinding
+import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelPost
+import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.serialization.SerializePost
 import com.example.dataLayer.repositories.UploadProgress
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -31,12 +34,14 @@ class FragmentAddPost : Fragment() {
     private lateinit var binding: LayoutFragmentAddPostBinding
     private val CODE_FILE_EXPLORER = 10
     private val viewModelPost: ViewModelPost by activityViewModels()
+    private val viewModelUser: ViewModelUser by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_fragment_add_post, container, false)
         configureViews()
+
         return binding.root
     }
 
@@ -47,12 +52,34 @@ class FragmentAddPost : Fragment() {
             startActivityForResult(fileIntent, CODE_FILE_EXPLORER)
         }
         binding.submitPostButton.setOnClickListener {
-            //perform checks
-            //todo
-            //perform checks
-            toggleUi()
-            uploadPost()
+            if (areFieldsValid()) {
+                viewModelUser.user.value?.let {
+                    toggleUi()
+                    uploadPost(it)
+                }
+            } else {
+                Snackbar.make(binding.root, R.string.fields_not_completed, Snackbar.LENGTH_SHORT)
+                        .show();
+            }
         }
+    }
+
+    private fun areFieldsValid(): Boolean {
+        val editTextContent = binding.postContentAdd.editText
+        if (editTextContent == null || editTextContent.text.isEmpty()) {
+            return false
+        }
+        val editTextTitle = binding.postTitleAdd.text
+
+        if (editTextTitle.isEmpty()) {
+            return false
+        }
+        if (binding.postImageAdd.drawable != requireContext().getDrawable(R.drawable.ic_add_image)) {
+            return false
+        }
+
+        return true
+
     }
 
     private fun toggleUi() {
@@ -78,9 +105,10 @@ class FragmentAddPost : Fragment() {
         })
     }
 
-    private fun uploadPost() {
+    private fun uploadPost(user: User) {
         //get image data
         val drawable = binding.postImageAdd.drawable
+
         if (drawable != null) {
             lifecycleScope.launch(Dispatchers.IO) {
                 val imageData = AppUtilities.getBase64ImageFromDrawable(drawable)
@@ -93,7 +121,7 @@ class FragmentAddPost : Fragment() {
                             val post = SerializePost(
                                     title = binding.postTitleAdd.text.toString(),
                                     content = binding.postContentAdd.editText?.text.toString(),
-                                    userID = 109,
+                                    userID = user.userID,
                                     image = it
                             )
                             pushPost(post)
