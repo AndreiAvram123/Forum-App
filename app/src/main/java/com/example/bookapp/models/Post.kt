@@ -23,6 +23,10 @@ data class Post(
         fun buildNullSafeObject(): Post {
             return Post(id = 0, content = "", date = 333, title = "", image = "dfd", author = User(userID = 0, username = "Unknown", email = "unknown", profilePicture = "sdfs"))
         }
+
+        fun buildWaitingToUploadPost(): Post {
+            return Post(id = -1, content = "", date = 333, title = "", image = "dfd", author = User(userID = 0, username = "Unknown", email = "unknown", profilePicture = "sdfs"))
+        }
     }
 
 }

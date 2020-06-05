@@ -41,5 +41,8 @@ interface UserRepositoryInterface {
     @FormUrlEncoded
     suspend fun acceptFriendRequest(@Field("id") senderID: Int)
 
+    @DELETE("/user/{userID}/removeFriend/{friendID}")
+    suspend fun removeFriend(@Path("userID") userID: Int, @Path("friendID") friendID: Int)
+
 
 }

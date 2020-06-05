@@ -10,8 +10,6 @@ import com.example.dataLayer.repositories.ChatRepository
 class ViewModelChat : ViewModel() {
     private val chatRepository: ChatRepository = ChatRepository(viewModelScope)
 
-    //todo
-    //replace with chat
     val chatID: MutableLiveData<Int> = MutableLiveData()
 
 

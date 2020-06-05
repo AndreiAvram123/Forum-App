@@ -18,7 +18,7 @@ class UserRepository(private val coroutineScope: CoroutineScope) {
     private val friendRequests = MutableLiveData<ArrayList<DeserializeFriendRequest>>()
 
     private val userRepositoryInterface: UserRepositoryInterface by lazy {
-        AppUtilities.retrofitGsonConverter.create(UserRepositoryInterface::class.java)
+        AppUtilities.getRetrofit().create(UserRepositoryInterface::class.java)
     }
 
     private var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()

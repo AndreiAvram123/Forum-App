@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 
 @InternalCoroutinesApi
 class CommentsRepository(private val application: Application, private val coroutineScope: CoroutineScope) {
-    private val commentsInterface: CommentsInterface = AppUtilities.retrofitGsonConverter.create(CommentsInterface::class.java)
+    private val commentsInterface: CommentsInterface = AppUtilities.getRetrofit().create(CommentsInterface::class.java)
     private val dao: RoomCommentDao = PostDatabase.getDatabase(application).commentDao();
 
     //maybe have a dictionary

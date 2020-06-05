@@ -1,16 +1,24 @@
 package com.example.bookapp
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
+import android.util.Base64
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.io.ByteArrayOutputStream
 
 object AppUtilities {
 
-    val retrofitGsonConverter: Retrofit = Retrofit.Builder()
-            .baseUrl("http://www.andreiram.co.uk/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    fun getRetrofit ():Retrofit{
+        return   Retrofit.Builder()
+                .baseUrl("http://www.andreiram.co.uk/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build()
+    }
+
 
     fun isNetworkAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -31,4 +39,11 @@ object AppUtilities {
         return email.matches(regex.toRegex())
     }
 
+    suspend fun getBase64ImageFromDrawable(drawable: Drawable): String {
+        val bitmap = (drawable as BitmapDrawable).bitmap
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT);
+    }
 }

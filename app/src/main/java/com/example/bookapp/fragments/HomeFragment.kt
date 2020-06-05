@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.HomeAdapter
@@ -23,8 +24,7 @@ class HomeFragment : Fragment(), HomeAdapter.Callback {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_home_fragment, container, false);
         attachObserver()
-        initializeRefreshLayout()
-        initializeRecyclerView()
+        initializeUI()
         val layoutManager: LinearLayoutManager = binding.recyclerViewHome.layoutManager as LinearLayoutManager
         layoutManager.scrollToPosition(viewModelPost.lastSeenPostPosition)
         return binding.root
@@ -37,9 +37,14 @@ class HomeFragment : Fragment(), HomeAdapter.Callback {
         viewModelPost.lastSeenPostPosition = layoutManager.findFirstVisibleItemPosition()
     }
 
-    private fun initializeRefreshLayout() {
+    private fun initializeUI() {
         binding.homeSwipeRefreshLayout.setOnRefreshListener {
             binding.homeSwipeRefreshLayout.isRefreshing = false
+        }
+        initializeRecyclerView()
+        binding.addPostButton.setOnClickListener {
+            val action = HomeFragmentDirections.actionHomeToFragmentAddPost()
+            findNavController().navigate(action)
         }
     }
 

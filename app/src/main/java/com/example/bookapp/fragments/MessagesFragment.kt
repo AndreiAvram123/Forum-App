@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.MessageAdapter
@@ -30,20 +31,21 @@ class MessagesFragment : Fragment() {
     private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
     private var eventSource: EventSource? = null
-    private lateinit var adapter: MessageAdapter
+    private lateinit var messageAdapter: MessageAdapter
+    private val args: MessagesFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = MessagesFragmentBinding.inflate(inflater, container, false)
-
-        viewModelChat.chatID.value = 1
+        viewModelChat.chatID.value = args.chatID
 
         viewModelUser.user.value?.let {
-            adapter = MessageAdapter(it)
+            messageAdapter = MessageAdapter(it)
             configureViews()
             viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer { data ->
-                adapter.addNewMessages(data)
+                messageAdapter.addNewMessages(data)
             })
+
             viewModelChat.chatLink.observe(viewLifecycleOwner, Observer { chatLink ->
                 configureServerEvents(chatLink.hubURL)
             })
@@ -79,7 +81,7 @@ class MessagesFragment : Fragment() {
                         "message" -> {
                             val message = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
                             requireActivity().runOnUiThread {
-                                adapter.add(message)
+                                messageAdapter.add(message)
                             }
                         }
                         else -> {
@@ -98,7 +100,6 @@ class MessagesFragment : Fragment() {
             override fun onError(t: Throwable?) {
 
             }
-            //"http://www.andreiram.co.uk:3000/.well-known/mercure?topic=/chat"
         }
         val event: EventSource.Builder = EventSource.Builder(
                 eventHandler,
@@ -118,7 +119,7 @@ class MessagesFragment : Fragment() {
                 val messageContent = binding.messageArea.text.toString().trim { it <= ' ' }
                 if (messageContent.trim { it <= ' ' } != "") {
                     viewModelUser.user.value?.let {
-                        viewModelChat.sendMessage(chatID = 1, senderID = it.userID, content = messageContent)
+                        viewModelChat.sendMessage(chatID = args.chatID, senderID = it.userID, content = messageContent)
                     }
                     text.clear()
                 }
@@ -128,8 +129,10 @@ class MessagesFragment : Fragment() {
 
 
     private fun configureRecyclerView() {
-        binding.recyclerViewMessages.adapter = adapter
-        binding.recyclerViewMessages.addItemDecoration(CustomDivider(10))
-        binding.recyclerViewMessages.layoutManager = LinearLayoutManager(requireContext())
+        with(binding.recyclerViewMessages) {
+            adapter = messageAdapter
+            addItemDecoration(CustomDivider(10))
+            layoutManager = LinearLayoutManager(requireContext())
+        }
     }
 }

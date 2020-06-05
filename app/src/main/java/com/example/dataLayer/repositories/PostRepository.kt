@@ -15,7 +15,9 @@ import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.dao.RoomPostDao
 import com.example.dataLayer.interfaces.dao.RoomUserDao
 import com.example.dataLayer.models.PostDTO
+import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.UserWithPosts
+import com.example.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -25,12 +27,14 @@ import kotlinx.coroutines.launch
 class PostRepository(application: Application, val coroutineScope: CoroutineScope, val user: User) {
 
     val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
+    val currentUploadImagePath: MutableLiveData<String> = MutableLiveData()
+    private val currentUploadedPost: MutableLiveData<Post> = MutableLiveData()
 
     private var nextPageToFetch: Int = 1;
     //private val currentFetchedPosts: HashMap<Int, LiveData<Post>> = HashMap()
 
     private val repositoryInterface: PostRepositoryInterface by lazy {
-        AppUtilities.retrofitGsonConverter.create(PostRepositoryInterface::class.java)
+        AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
     }
 
     private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()
@@ -127,6 +131,27 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun uploadImage(serializeImage: SerializeImage): LiveData<String> {
+        currentUploadImagePath.value = String()
+        coroutineScope.launch(Dispatchers.IO) {
+            val imagePath = repositoryInterface.uploadImage(serializeImage).message
+            currentUploadImagePath.postValue(imagePath)
+        }
+        return currentUploadImagePath;
+    }
+
+    fun uploadPost(post: SerializePost): LiveData<Post> {
+        currentUploadedPost.value = Post.buildWaitingToUploadPost()
+        coroutineScope.launch {
+            val serverResponse = repositoryInterface.uploadPost(post)
+            val fetchedPost = repositoryInterface.fetchPostByID(serverResponse.message.toInt())
+            val post = PostMapper.mapDtoObjectToDomainObject(fetchedPost);
+            currentUploadedPost.postValue(post)
+            postDao.insertPost(post)
+        }
+        return currentUploadedPost;
     }
 
 }

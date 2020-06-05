@@ -25,25 +25,27 @@ class UserRepositoryTests {
 
     @Test
     fun usersShouldBeFriendIfRequestIsAccepted() = runBlocking {
+        val receiverID = 27
+        val senderID = 28
         //create a friend request
         //and push it
-        val friendRequest = SerializeFriendRequest(senderID = 28, receiverID = 27)
+        val friendRequest = SerializeFriendRequest(senderID = senderID, receiverID = receiverID)
         repo.pushFriendRequest(friendRequest)
 
         //fetch the friend requests and get the id of the last
-        val requests: ArrayList<DeserializeFriendRequest> = ArrayList(repo.fetchFriendRequests(27))
+        val requests: ArrayList<DeserializeFriendRequest> = ArrayList(repo.fetchFriendRequests(receiverID))
 
 
         //accept the friend request
         repo.acceptFriendRequest(requests.last().id)
 
         //get the receiver friends and check if the sender is now part of the friends
-        val fetchedFriends = repo.fetchFriends(27)
-        val friend = fetchedFriends.find { it.userID == 28 }
+        val fetchedFriends = repo.fetchFriends(receiverID)
+        val friend = fetchedFriends.find { it.userID == senderID }
 
         Assert.assertNotNull(friend)
-        //todo
-        //remove from friends as well
+
+        repo.removeFriend(userID = receiverID, friendID = senderID)
 
     }
 }

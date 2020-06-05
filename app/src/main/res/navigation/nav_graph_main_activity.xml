@@ -65,7 +65,7 @@
             android:id="@+id/action_homeFragment2_to_searchFragment"
             app:destination="@id/search" />
         <action
-            android:id="@+id/action_homeFragment2_to_fragmentAddPost"
+            android:id="@+id/action_home_to_fragmentAddPost"
             app:destination="@id/fragmentAddPost" />
     </fragment>
     <fragment
@@ -74,6 +74,7 @@
         android:label="FriendsFragment">
         <action
             android:id="@+id/action_friends_to_messagesFragment"
-            app:destination="@id/messagesFragment" />
+            app:destination="@id/messagesFragment"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim" />
     </fragment>
 </navigation>

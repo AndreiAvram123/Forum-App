@@ -7,7 +7,7 @@ import com.example.bookapp.models.Post
 @Dao
 interface RoomPostDao {
 
-    @Query("SELECT * FROM post")
+    @Query("SELECT * FROM post ORDER BY postID DESC")
     fun getCachedPosts(): LiveData<List<Post>>
 
     @Query("SELECT * FROM post WHERE isFavorite ='1'")
@@ -25,7 +25,6 @@ interface RoomPostDao {
 
     @Query("DELETE FROM post")
     suspend fun removeCachedData()
-
 
     @Update
     suspend fun addPostToFavorites(post: Post)

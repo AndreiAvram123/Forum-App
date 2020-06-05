@@ -5,7 +5,9 @@ import androidx.lifecycle.*
 import com.example.bookapp.models.LowDataPost
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
+import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.UserWithPosts
+import com.example.dataLayer.models.serialization.SerializePost
 import com.example.dataLayer.repositories.PostRepository
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -60,6 +62,10 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
 
 
     fun fetchNextPagePosts() = viewModelScope.launch { postRepository.fetchNextPagePosts() }
+
+    fun uploadImage(serializeImage: SerializeImage) = postRepository.uploadImage(serializeImage)
+
+    fun uploadPost(post: SerializePost) = postRepository.uploadPost(post)
 
 
 }
