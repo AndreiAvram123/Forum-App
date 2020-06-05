@@ -1,19 +1,23 @@
 package com.example.bookapp
 
 import android.content.Context
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
+import android.net.Uri
+import android.provider.MediaStore
 import android.util.Base64
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayOutputStream
 
+
 object AppUtilities {
 
-    fun getRetrofit ():Retrofit{
-        return   Retrofit.Builder()
+    fun getRetrofit(): Retrofit {
+        return Retrofit.Builder()
                 .baseUrl("http://www.andreiram.co.uk/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
@@ -42,8 +46,9 @@ object AppUtilities {
     suspend fun getBase64ImageFromDrawable(drawable: Drawable): String {
         val bitmap = (drawable as BitmapDrawable).bitmap
         val byteArrayOutputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
         return Base64.encodeToString(byteArray, Base64.DEFAULT);
     }
+
 }

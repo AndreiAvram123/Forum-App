@@ -1,8 +1,8 @@
 package com.example.bookapp.fragments
 
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.databinding.LayoutFragmentAddPostBinding
-import com.example.bookapp.models.Post
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.serialization.SerializePost
@@ -24,12 +23,15 @@ import com.example.dataLayer.repositories.UploadProgress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import java.io.File
+import java.net.URI
 
 @InternalCoroutinesApi
 class FragmentAddPost : Fragment() {
     private lateinit var binding: LayoutFragmentAddPostBinding
     private val CODE_FILE_EXPLORER = 10
     private val viewModelPost: ViewModelPost by activityViewModels()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -45,8 +47,20 @@ class FragmentAddPost : Fragment() {
             startActivityForResult(fileIntent, CODE_FILE_EXPLORER)
         }
         binding.submitPostButton.setOnClickListener {
+            //perform checks
+            //todo
+            //perform checks
+            toggleUi()
             uploadPost()
         }
+    }
+
+    private fun toggleUi() {
+        binding.uploadProgressBar.visibility = View.VISIBLE
+        binding.postImageAdd.isEnabled = false
+        binding.postContentAdd.isEnabled = false
+        binding.postTitleAdd.isEnabled = false
+        binding.submitPostButton.visibility = View.INVISIBLE
     }
 
     private fun pushImage(data: String): LiveData<String> {
@@ -75,7 +89,6 @@ class FragmentAddPost : Fragment() {
                 lifecycleScope.launch(Dispatchers.Main) {
 
                     pushImage(imageData).observe(viewLifecycleOwner, Observer {
-
                         if (!it.isNullOrEmpty()) {
                             val post = SerializePost(
                                     title = binding.postTitleAdd.text.toString(),
@@ -99,7 +112,6 @@ class FragmentAddPost : Fragment() {
                 val path = it.data
                 if (path != null) {
                     binding.postImageAdd.setImageURI(path)
-
                 }
             }
         }
