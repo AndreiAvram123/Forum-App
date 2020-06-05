@@ -58,7 +58,7 @@ class HomeFragment : Fragment(), HomeAdapter.Callback {
 
     private fun attachObserver() {
         viewModelPost.getRecentPosts().observe(viewLifecycleOwner, Observer { posts ->
-            homeAdapter.addData(ArrayList(posts));
+            homeAdapter.setData(posts)
         })
 
     }

@@ -28,7 +28,7 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
 
     val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
     val currentUploadImagePath: MutableLiveData<String> = MutableLiveData()
-    private val currentUploadedPost: MutableLiveData<Post> = MutableLiveData()
+    private val currentUploadedPostProgress: MutableLiveData<UploadProgress> = MutableLiveData()
 
     private var nextPageToFetch: Int = 1;
     //private val currentFetchedPosts: HashMap<Int, LiveData<Post>> = HashMap()
@@ -142,16 +142,19 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
         return currentUploadImagePath;
     }
 
-    fun uploadPost(post: SerializePost): LiveData<Post> {
-        currentUploadedPost.value = Post.buildWaitingToUploadPost()
+    fun uploadPost(post: SerializePost): LiveData<UploadProgress> {
+        currentUploadedPostProgress.value = UploadProgress.UPLOADING
         coroutineScope.launch {
             val serverResponse = repositoryInterface.uploadPost(post)
+
             val fetchedPost = repositoryInterface.fetchPostByID(serverResponse.message.toInt())
-            val post = PostMapper.mapDtoObjectToDomainObject(fetchedPost);
-            currentUploadedPost.postValue(post)
+
+            val post = PostMapper.mapDtoObjectToDomainObject(fetchedPost)
+
+            currentUploadedPostProgress.value = UploadProgress.UPLOADED
             postDao.insertPost(post)
         }
-        return currentUploadedPost;
+        return currentUploadedPostProgress;
     }
 
 }

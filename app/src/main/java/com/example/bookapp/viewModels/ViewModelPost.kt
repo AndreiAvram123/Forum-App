@@ -9,6 +9,7 @@ import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.UserWithPosts
 import com.example.dataLayer.models.serialization.SerializePost
 import com.example.dataLayer.repositories.PostRepository
+import com.example.dataLayer.repositories.UploadProgress
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
@@ -65,7 +66,7 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
 
     fun uploadImage(serializeImage: SerializeImage) = postRepository.uploadImage(serializeImage)
 
-    fun uploadPost(post: SerializePost) = postRepository.uploadPost(post)
+    fun uploadPost(post: SerializePost): LiveData<UploadProgress> = postRepository.uploadPost(post)
 
 
 }

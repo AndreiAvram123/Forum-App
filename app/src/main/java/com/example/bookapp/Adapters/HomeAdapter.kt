@@ -35,20 +35,12 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
     private val loadingObject: Post = Post.buildNullSafeObject()
 
 
-    fun addData(newPosts: ArrayList<Post>) {
-        val oldIndex: Int = posts.size
-        newPosts.forEach {
-            if(!posts.contains(it)){
-                posts.add(it)
-            }
-        }
-        if(posts.size > oldIndex){
-            notifyItemRangeInserted(oldIndex, posts.size)
-        }
-        toggleLoading()
-        timeout.cancel()
-        timeout = Timer()
+    fun setData(data: List<Post>) {
+        posts.clear()
+        posts.addAll(data)
+        notifyDataSetChanged()
     }
+
 
     private fun toggleLoading() {
         if (currentState == State.LOADING) {
@@ -58,7 +50,7 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
         } else {
             currentState = State.LOADING;
             posts.add(loadingObject)
-            notifyItemInserted(posts.size-1)
+            notifyItemInserted(posts.size - 1)
         }
     }
 

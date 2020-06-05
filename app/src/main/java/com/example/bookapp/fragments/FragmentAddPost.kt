@@ -20,6 +20,7 @@ import com.example.bookapp.models.Post
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.serialization.SerializePost
+import com.example.dataLayer.repositories.UploadProgress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -56,9 +57,9 @@ class FragmentAddPost : Fragment() {
     }
 
     private fun pushPost(post: SerializePost) {
-        viewModelPost.uploadPost(post).observe(viewLifecycleOwner, Observer { uploadPost ->
-            if (uploadPost != Post.buildWaitingToUploadPost()) {
-                 findNavController().popBackStack()
+        viewModelPost.uploadPost(post).observe(viewLifecycleOwner, Observer {
+            if (it == UploadProgress.UPLOADED) {
+                findNavController().popBackStack()
             }
         })
     }
@@ -72,11 +73,13 @@ class FragmentAddPost : Fragment() {
 
 
                 lifecycleScope.launch(Dispatchers.Main) {
+
                     pushImage(imageData).observe(viewLifecycleOwner, Observer {
+
                         if (!it.isNullOrEmpty()) {
                             val post = SerializePost(
-                                    title = "pupu",
-                                    content = "more pupu",
+                                    title = binding.postTitleAdd.text.toString(),
+                                    content = binding.postContentAdd.editText?.text.toString(),
                                     userID = 109,
                                     image = it
                             )
