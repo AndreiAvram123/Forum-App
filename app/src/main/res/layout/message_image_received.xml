@@ -19,25 +19,26 @@
             android:id="@+id/text_message_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:textSize="10sp"
             app:dateFromUnix="@{message.date}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/message_image"
+            app:layout_constraintBottom_toBottomOf="@+id/message_image"
+            app:layout_constraintStart_toEndOf="@+id/message_image"
             tools:text="12:30" />
 
         <ImageView
             android:id="@+id/message_image"
             android:layout_width="wrap_content"
             android:layout_height="200dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
             android:scaleType="centerInside"
             app:imageFromURL="@{message.content}"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/backgrounds/scenic" />
 

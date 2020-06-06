@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
@@ -55,7 +56,7 @@ class MessagesFragment : Fragment() {
             user = it
         }
 
-        messageAdapter = MessageAdapter(user)
+        messageAdapter = MessageAdapter(user, ::expandImage)
         configureViews()
         viewModelChat.chatID.value = args.chatID
 
@@ -76,6 +77,10 @@ class MessagesFragment : Fragment() {
         return binding.root
     }
 
+    private fun expandImage(imageURL: String) {
+        val action = MessagesFragmentDirections.actionMessagesFragmentToImageZoomFragment(imageURL)
+        binding.root.findNavController().navigate(action)
+    }
 
     override fun onDetach() {
         super.onDetach()

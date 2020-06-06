@@ -2,20 +2,23 @@ package com.example.bookapp.Adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bookapp.databinding.MessageImageReceivedBinding
 import com.example.bookapp.databinding.MessageImageSentBinding
 import com.example.bookapp.databinding.MessageReceivedBinding
 import com.example.bookapp.databinding.MessageSentBinding
+import com.example.bookapp.fragments.MessagesFragmentDirections
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.dataLayer.serverConstants.MessageTypes
 
-class MessageAdapter(private val currentUser: User) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: String) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val messages: ArrayList<MessageDTO> = ArrayList()
     private var adapterRecyclerView: RecyclerView? = null
 
     internal enum class ViewTypes(val id: Int) {
-        LOADING(0), MESSAGE_RECEIVED_TEXT(1), MESSAGE_SENT_TEXT(2), MESSAGE_SENT_IMAGE(3)
+        LOADING(0), MESSAGE_RECEIVED_TEXT(1), MESSAGE_SENT_TEXT(2), MESSAGE_SENT_IMAGE(3), MESSAGE_RECEIVED_IMAGE(4),
     }
 
     inner class MessageReceivedViewHolder(val binding: MessageReceivedBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -33,7 +36,20 @@ class MessageAdapter(private val currentUser: User) : RecyclerView.Adapter<Recyc
     inner class MessageImageSentViewHolder(val binding: MessageImageSentBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(messageDTO: MessageDTO) {
             binding.message = messageDTO
+            binding.messageImage.setOnClickListener {
+                expandImage(messageDTO.content)
+            }
         }
+    }
+
+    inner class MessageImageReceivedViewHolder(val binding: MessageImageReceivedBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(messageDTO: MessageDTO) {
+            binding.message = messageDTO
+            binding.messageImage.setOnClickListener {
+                expandImage(messageDTO.content)
+            }
+        }
+
     }
 
 
@@ -51,6 +67,10 @@ class MessageAdapter(private val currentUser: User) : RecyclerView.Adapter<Recyc
             ViewTypes.MESSAGE_SENT_IMAGE.id -> {
                 val binding = MessageImageSentBinding.inflate(inflator, parent, false)
                 return MessageImageSentViewHolder(binding)
+            }
+            ViewTypes.MESSAGE_RECEIVED_IMAGE.id -> {
+                val binding = MessageImageReceivedBinding.inflate(inflator, parent, false)
+                return MessageImageReceivedViewHolder(binding)
             }
 
             else -> {
@@ -82,6 +102,9 @@ class MessageAdapter(private val currentUser: User) : RecyclerView.Adapter<Recyc
         if (viewHolder is MessageImageSentViewHolder) {
             viewHolder.bind(messages[position])
         }
+        if (viewHolder is MessageImageReceivedViewHolder) {
+            viewHolder.bind(messages[position])
+        }
     }
 
     fun add(message: MessageDTO) {
@@ -107,6 +130,8 @@ class MessageAdapter(private val currentUser: User) : RecyclerView.Adapter<Recyc
             MessageTypes.imageMessageType -> {
                 if (message.sender.userID == currentUser.userID) {
                     return ViewTypes.MESSAGE_SENT_IMAGE.id
+                } else {
+                    return ViewTypes.MESSAGE_RECEIVED_IMAGE.id
                 }
             }
             MessageTypes.textMessage -> {

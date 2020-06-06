@@ -55,6 +55,9 @@
         <action
             android:id="@+id/action_messagesFragment_to_friends"
             app:destination="@id/friends" />
+        <action
+            android:id="@+id/action_messagesFragment_to_imageZoomFragment"
+            app:destination="@id/imageZoomFragment" />
     </fragment>
     <action android:id="@+id/action_global_expandedItemFragment" app:destination="@id/expandedItemFragment" />
     <fragment
@@ -76,5 +79,14 @@
             android:id="@+id/action_friends_to_messagesFragment"
             app:destination="@id/messagesFragment"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim" />
+    </fragment>
+    <fragment
+        android:id="@+id/imageZoomFragment"
+        android:name="com.example.bookapp.fragments.ImageZoomFragment"
+        android:label="fragment_image_zoom"
+        tools:layout="@layout/fragment_image_zoom" >
+        <argument
+            android:name="imageURl"
+            app:argType="string" />
     </fragment>
 </navigation>
