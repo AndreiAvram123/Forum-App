@@ -58,15 +58,19 @@ class FragmentAddPost : Fragment() {
                     uploadPost(it)
                 }
             } else {
-                Snackbar.make(binding.root, R.string.fields_not_completed, Snackbar.LENGTH_SHORT)
-                        .show();
+                displayError()
             }
         }
     }
 
+    private fun displayError() {
+        binding.errorMessageAdd.visibility = View.VISIBLE
+        binding.errorMessageAdd.text = getString(R.string.fields_not_completed)
+    }
+
     private fun areFieldsValid(): Boolean {
-        val editTextContent = binding.postContentAdd.editText
-        if (editTextContent == null || editTextContent.text.isEmpty()) {
+        val editTextContent = binding.postContentAdd
+        if (editTextContent.text.isEmpty()) {
             return false
         }
         val editTextTitle = binding.postTitleAdd.text
@@ -120,7 +124,7 @@ class FragmentAddPost : Fragment() {
                         if (!it.isNullOrEmpty()) {
                             val post = SerializePost(
                                     title = binding.postTitleAdd.text.toString(),
-                                    content = binding.postContentAdd.editText?.text.toString(),
+                                    content = binding.postContentAdd.text.toString(),
                                     userID = user.userID,
                                     image = it
                             )

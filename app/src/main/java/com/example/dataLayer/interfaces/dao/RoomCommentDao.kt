@@ -11,7 +11,12 @@ interface RoomCommentDao {
     @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")
     fun getAllPostComments(postID: Int): LiveData<PostWithComments>
 
+
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertComments(comments: List<Comment>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertComment(comment:Comment)
 
 }

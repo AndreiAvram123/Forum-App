@@ -39,29 +39,26 @@
         android:layout_marginEnd="32dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Name"
+        android:hint="Post title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.google.android.material.textfield.TextInputLayout
+    <EditText
         android:id="@+id/post_content_add"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
-        android:layout_marginBottom="16dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Post content"
         app:layout_constraintBottom_toTopOf="@+id/submit_post_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/post_image_add">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="hint" />
-    </com.google.android.material.textfield.TextInputLayout>
+        app:layout_constraintTop_toBottomOf="@+id/post_image_add"
+        app:layout_constraintVertical_bias="0.25" />
 
     <ProgressBar
         android:id="@+id/upload_progress_bar"
@@ -73,5 +70,19 @@
         app:layout_constraintEnd_toEndOf="@+id/submit_post_button"
         app:layout_constraintStart_toStartOf="@+id/submit_post_button"
         app:layout_constraintTop_toTopOf="@+id/submit_post_button" />
+
+    <TextView
+        android:id="@+id/error_message_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/design_default_color_error"
+        android:textSize="24sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/submit_post_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/post_content_add"
+        tools:text="You should be careful" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

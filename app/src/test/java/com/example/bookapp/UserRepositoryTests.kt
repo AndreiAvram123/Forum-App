@@ -9,7 +9,7 @@ import org.junit.Test
 
 class UserRepositoryTests {
 
-    val repo = AppUtilities.retrofitGsonConverter.create(UserRepositoryInterface::class.java)
+    val repo = AppUtilities.getRetrofit().create(UserRepositoryInterface::class.java)
 
     @Test
     fun shouldUploadComment() = runBlocking {

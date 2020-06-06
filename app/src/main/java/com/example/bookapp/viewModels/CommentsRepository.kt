@@ -2,6 +2,7 @@ package com.example.bookapp.viewModels
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.bookapp.AppUtilities
 import com.example.bookapp.models.Comment
 import com.example.bookapp.models.Post
@@ -11,6 +12,8 @@ import com.example.dataLayer.dataObjectsToSerialize.CommentDTO
 import com.example.dataLayer.interfaces.CommentsInterface
 import com.example.dataLayer.interfaces.dao.RoomCommentDao
 import com.example.dataLayer.models.PostWithComments
+import com.example.dataLayer.models.serialization.SerializeComment
+import com.example.dataLayer.repositories.UploadProgress
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -19,6 +22,7 @@ import kotlinx.coroutines.launch
 class CommentsRepository(private val application: Application, private val coroutineScope: CoroutineScope) {
     private val commentsInterface: CommentsInterface = AppUtilities.getRetrofit().create(CommentsInterface::class.java)
     private val dao: RoomCommentDao = PostDatabase.getDatabase(application).commentDao();
+    private val uploadProgress = MutableLiveData<UploadProgress>()
 
     //maybe have a dictionary
     private val currentlyFetchedComments: HashMap<Post, LiveData<PostWithComments>> = HashMap()
@@ -34,23 +38,26 @@ class CommentsRepository(private val application: Application, private val corou
     }
 
 
-    suspend fun uploadComment(commentDTO: CommentDTO) {
+    fun uploadComment(comment: SerializeComment): LiveData<UploadProgress> {
+        uploadProgress.value = UploadProgress.UPLOADING
+        coroutineScope.launch {
+            try {
 
-        try {
-            val comment: Comment = commentsInterface.uploadComment(true, commentDTO);
-            addCommentAndNotify(comment);
-        } catch (e: Exception) {
-            e.printStackTrace()
+                val serverResponse = commentsInterface.uploadComment(comment)
+                val commentID = serverResponse.message.toIntOrNull()
+                commentID?.let {
+                    val fetchedComment = commentsInterface.fetchCommentById(it)
+                    dao.insertComment(CommentMapper.mapDtoObjectToDomainObject(fetchedComment))
+                }
+                uploadProgress.postValue(UploadProgress.UPLOADED)
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
+        return uploadProgress
     }
 
-    private fun addCommentAndNotify(comment: Comment?) {
-//        if (postComments != null && postComments!!.value != null) {
-//            val newData = ArrayList(postComments!!.value!!)
-//            newData.add(comment)
-//            postComments!!.value = newData
-//        }
-    }
 
     private suspend fun fetchCommentsForPost(post: Post) {
         try {

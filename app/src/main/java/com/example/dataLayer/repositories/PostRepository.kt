@@ -149,10 +149,10 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
 
             val fetchedPost = repositoryInterface.fetchPostByID(serverResponse.message.toInt())
 
-            val post = PostMapper.mapDtoObjectToDomainObject(fetchedPost)
+            val postDomain = PostMapper.mapDtoObjectToDomainObject(fetchedPost)
 
             currentUploadedPostProgress.value = UploadProgress.UPLOADED
-            postDao.insertPost(post)
+            postDao.insertPost(postDomain)
         }
         return currentUploadedPostProgress;
     }

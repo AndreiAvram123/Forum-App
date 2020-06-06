@@ -17,7 +17,7 @@ import java.net.URI
 import java.time.Duration
 
 class MessageSystemTest {
-    val chatRepo = AppUtilities.retrofitGsonConverter.create(ChatInterface::class.java)
+    val chatRepo = AppUtilities.getRetrofit().create(ChatInterface::class.java)
 
     @Test
     fun shouldReturnChatLink() = runBlocking {

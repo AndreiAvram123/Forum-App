@@ -23,7 +23,7 @@ import org.robolectric.annotation.Config
 class AddPostTest {
 
 
-    private val repo = AppUtilities.retrofitGsonConverter.create(PostRepositoryInterface::class.java)
+    private val repo = AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
     private lateinit var activity: WelcomeActivity
 
     @Before

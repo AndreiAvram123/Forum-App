@@ -12,8 +12,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.AdapterComments
 import com.example.bookapp.R
-import com.example.bookapp.customViews.CommentDialog
-import com.example.bookapp.customViews.CommentDialog.CommentDialogInterface
+import com.example.bookapp.bottomSheets.CommentBottomSheet
 import com.example.bookapp.databinding.FragmentExpandedItemBinding
 import com.example.bookapp.models.Comment
 import com.example.bookapp.models.Post
@@ -21,45 +20,49 @@ import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelComments
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
+import com.example.dataLayer.models.serialization.SerializeComment
+import com.example.dataLayer.repositories.UploadProgress
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
 
+
 @InternalCoroutinesApi
-class ExpandedPostFragment : Fragment(), CommentDialogInterface {
+class ExpandedPostFragment : Fragment() {
     lateinit var binding: FragmentExpandedItemBinding
-    private var commentDialog: CommentDialog? = null
+
     private val viewModelPost: ViewModelPost by activityViewModels()
     private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelComments: ViewModelComments by activityViewModels()
-    private var user: User? = null
-
+    private lateinit var user: User
+    private lateinit var post: Post
+    private val commentDialog = CommentBottomSheet(::submitComment)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? { // Inflate the layout for this fragment
 
         binding = FragmentExpandedItemBinding.inflate(layoutInflater, container, false)
         attachObservers()
-        user = viewModelUser.user.value
+        viewModelUser.user.value?.let {
+            user = it
+        }
 
         return binding.root
     }
 
     private fun attachObservers() {
-        //observer whether the user signs in
-        user?.let {
-            viewModelUser.user.observe(viewLifecycleOwner, Observer { user = it })
-        }
+
 
         val postID: Int = ExpandedPostFragmentArgs.fromBundle(requireArguments()).postID
 
         viewModelPost.getPostByID(postID).observe(viewLifecycleOwner, Observer {
             if (it != null) {
-                configureViews(it)
-                getComments(it);
+                post = it
+                configureViews()
+                getComments();
             }
         })
     }
 
-    private fun getComments(post: Post) {
+    private fun getComments() {
         viewModelComments.getCommentsForPost(post).observe(viewLifecycleOwner, Observer {
             insertComments(ArrayList(it.comments))
         })
@@ -75,28 +78,37 @@ class ExpandedPostFragment : Fragment(), CommentDialogInterface {
     }
 
 
-    private fun configureViews(post: Post) {
+    private fun configureViews() {
         binding.post = post
-        if (user != null)
-            binding.saveButtonExpanded.setOnClickListener {
-                if (post.isFavorite) {
-                    informUserPostRemovedFromFavorites()
-                    user?.let { viewModelPost.deletePostFromFavorites(post, it) }
-                } else {
-                    informUserPostAddedToFavorites()
-                    user?.let { viewModelPost.addPostToFavorites(post) }
-                }
-                post.isFavorite = !post.isFavorite
-                binding.post = post;
-                binding.notifyChange()
+        binding.saveButtonExpanded.setOnClickListener {
+            if (post.isFavorite) {
+                informUserPostRemovedFromFavorites()
+                user.let { viewModelPost.deletePostFromFavorites(post, it) }
+            } else {
+                informUserPostAddedToFavorites()
+                user.let { viewModelPost.addPostToFavorites(post) }
             }
+            post.isFavorite = !post.isFavorite
+            binding.post = post;
+            binding.notifyChange()
+        }
         binding.backButtonExpanded.setOnClickListener { Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).popBackStack() }
-        binding.writeCommentButton.setOnClickListener { showCommentDialog() }
+        binding.writeCommentButton.setOnClickListener { showCommentSheet() }
     }
 
-    private fun showCommentDialog() {
-        // commentDialog = CommentDialog(requireActivity(), this, post)
-        //  commentDialog!!.show()
+    private fun showCommentSheet() {
+        commentDialog.show(requireActivity().supportFragmentManager, "commentSheet")
+    }
+
+    private fun submitComment(content: String) {
+        val commentToUpload = SerializeComment(content = content,
+                postID = post.id,
+                userID = user.userID)
+        viewModelComments.uploadComment(commentToUpload).observe(viewLifecycleOwner, Observer {
+            if (it == UploadProgress.UPLOADED) {
+                commentDialog.dismiss()
+            }
+        })
     }
 
     private fun informUserPostAddedToFavorites() {
@@ -107,16 +119,5 @@ class ExpandedPostFragment : Fragment(), CommentDialogInterface {
         Snackbar.make(binding.root, getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT).show()
     }
 
-    override fun submitComment(comment: String, postID: Long) {
-        user?.let {
-            // val serializeComment = SerializeComment(postID, comment, it.userID)
-            //  viewModelComments.uploadComment(serializeComment)
-        }
-    }
 
-    override fun onStop() {
-        super.onStop()
-        commentDialog?.hide()
-
-    }
 }

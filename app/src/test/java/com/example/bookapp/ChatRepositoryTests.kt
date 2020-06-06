@@ -5,11 +5,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
 import retrofit2.Retrofit
-import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class ChatRepositoryTests {
-    private val chatInterface: ChatInterface = Retrofit.Builder().baseUrl("http://www.andreiram.co.uk/")
-            .addConverterFactory(ScalarsConverterFactory.create()).build()
+    private val chatInterface: ChatInterface = AppUtilities.getRetrofit()
             .create(ChatInterface::class.java)
 
     @Test
