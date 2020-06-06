@@ -1,27 +1,31 @@
 package com.example.bookapp.models
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "posts")
+@Entity
 data class Post(
-        @PrimaryKey @ColumnInfo(name = "postID" )var postID: Long,
-        @ColumnInfo(name = "postTitle") var postTitle: String,
-        @ColumnInfo(name = "postImage") var postImage: String,
-        @ColumnInfo (name = "postAuthorID") var postAuthorID:String? = null,
-        @ColumnInfo(name = "postDate") var postDate: String? = null,
-        @ColumnInfo(name = "postAuthor") var postAuthor: String? = null,
-        @ColumnInfo(name = "postCategory") var postCategory: String? = null,
-        @ColumnInfo(name = "postContent") var postContent: String? = null,
-        @ColumnInfo(name = "isFavorite") var isFavorite:Boolean = false
+        @PrimaryKey
+        @ColumnInfo(name = "postID") val id: Int,
+        @ColumnInfo(name = "postTitle") val title: String,
+        @ColumnInfo(name = "postImage") val image: String,
+        @ColumnInfo(name = "date") val date: Long,
+        @ColumnInfo(name = "content") val content: String,
+        @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false,
+        @Embedded
+        val author: User
+
 ) {
 
     companion object Empty {
-
         fun buildNullSafeObject(): Post {
+            return Post(id = 0, content = "", date = 333, title = "", image = "dfd", author = User(userID = 0, username = "Unknown", email = "unknown", profilePicture = "sdfs"))
+        }
 
-            return Post(0, "Unknown", "","Unknown","Unknown","Unknown","Unknown");
+        fun buildWaitingToUploadPost(): Post {
+            return Post(id = -1, content = "", date = 333, title = "", image = "dfd", author = User(userID = 0, username = "Unknown", email = "unknown", profilePicture = "sdfs"))
         }
     }
 

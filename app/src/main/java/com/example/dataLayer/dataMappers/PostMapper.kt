@@ -18,19 +18,17 @@ object PostMapper {
     }
 
     fun mapDtoObjectToDomainObject(postDTO: PostDTO?): Post {
-          postDTO?.let{
-              if (!postDTO.postImage.contains("https://i.picsum.photos/")) {
-                  postDTO.postImage = "http://sgb967.poseidon.salford.ac.uk/cms/" + postDTO.postImage
-              }
-              val post: Post = Post(postDTO.postID, postDTO.postTitle, postImage = postDTO.postImage);
-              post.postDate = postDTO.postDate;
-              post.postAuthor = postDTO.postAuthor;
-              post.postCategory = postDTO.postCategory
-              post.postContent = postDTO.postContent
-              post.isFavorite = postDTO.isFavorite
-              post.postAuthorID = postDTO.postAuthorID;
-              return post;
-          }
+        postDTO?.let {
+            val post: Post = Post(id = postDTO.id,
+                    title = postDTO.title,
+                    image = postDTO.image,
+                    date = postDTO.date,
+                    author = UserMapper.mapNetworkToDomainObject(postDTO.author),
+                    content = postDTO.content
+
+            );
+            return post;
+        }
 
         return Post.buildNullSafeObject()
 

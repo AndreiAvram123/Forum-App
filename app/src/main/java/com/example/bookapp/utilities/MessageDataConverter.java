@@ -2,7 +2,7 @@ package com.example.bookapp.utilities;
 
 import androidx.annotation.NonNull;
 
-import com.example.bookapp.models.Message;
+import com.example.bookapp.models.MessageDTO;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class MessageDataConverter {
 
     @NonNull
-    public static ArrayList<Message> convertJsonArrayToMessages(String response) {
+    public static ArrayList<MessageDTO> convertJsonArrayToMessages(String response) {
         JSONArray jsonArray = null;
         try {
             jsonArray = new JSONArray(response);
@@ -28,12 +28,12 @@ public class MessageDataConverter {
     }
 
     @NonNull
-    public static ArrayList<Message> convertJsonArrayToMessages(@NonNull JSONArray jsonArray) {
-        ArrayList<Message> dataToReturn = new ArrayList<>();
+    public static ArrayList<MessageDTO> convertJsonArrayToMessages(@NonNull JSONArray jsonArray) {
+        ArrayList<MessageDTO> dataToReturn = new ArrayList<>();
         try {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject messageJson = jsonArray.getJSONObject(i);
-                dataToReturn.add(convertJsonObjectToMessage(messageJson));
+
             }
 
         } catch (JSONException e) {
@@ -42,13 +42,4 @@ public class MessageDataConverter {
         return dataToReturn;
     }
 
-    @NonNull
-    public static Message convertJsonObjectToMessage(@NonNull JSONObject messageJson) throws JSONException {
-        Message.Builder builder = new Message.Builder();
-        builder.setMessageContent(messageJson.getString("messageContent"));
-        builder.setMessageDate(messageJson.getLong("messageDate"));
-        builder.setMessageID(messageJson.getString("messageId"));
-        builder.setSenderID(messageJson.getString("senderId"));
-        return builder.createMessage();
-    }
 }

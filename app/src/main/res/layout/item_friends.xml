@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
+
     <data>
+
         <variable
-            name="friend"
-            type="com.example.bookapp.models.Friend" />
+            name="chat"
+            type="com.example.bookapp.models.Chat" />
+
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -13,38 +16,28 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/user_image"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
+            app:imageFromURL="@{chat.image}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
-            android:id="@+id/friend_name"
+            android:id="@+id/user_name_request"
             style="@style/important_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:text="@{friend.username}"
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
-            app:layout_constraintTop_toTopOf="@+id/imageView2"
+            android:text="@{chat.name}"
+            app:layout_constraintStart_toEndOf="@+id/user_image"
+            app:layout_constraintTop_toTopOf="@+id/user_image"
             tools:text="Nela Ion" />
 
 
-        <TextView
-            android:id="@+id/last_message"
-            style="@style/important_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:text='@{friend.lastMessage == null ? "Start a message with your friend" : friend.lastMessage.messageContent }'
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
-            app:layout_constraintTop_toBottomOf="@+id/friend_name"
-            tools:text="Hello there" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

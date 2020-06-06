@@ -7,12 +7,12 @@
 
     <fragment
         android:id="@+id/expandedItemFragment"
-        android:name="com.example.bookapp.fragments.ExpandedItemFragment"
+        android:name="com.example.bookapp.fragments.ExpandedPostFragment"
         android:label="fragment_expanded_item"
         tools:layout="@layout/fragment_expanded_item" >
         <argument
             android:name="postID"
-            app:argType="long" />
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/favorite_posts"
@@ -42,39 +42,39 @@
         android:name="com.example.bookapp.fragments.FragmentMyPosts"
         android:label="FragmentMyPosts" >
         <action
-            android:id="@+id/action_fragmentMyPosts_to_friendsFragment"
+            android:id="@+id/action_my_posts_to_friendsFragment2"
             app:destination="@id/friends" />
-    </fragment>
-    <fragment
-        android:id="@+id/friends"
-        android:name="com.example.bookapp.fragments.FriendsFragment"
-        android:label="fragment_friends"
-        tools:layout="@layout/fragment_friends" >
-        <action
-            android:id="@+id/action_friendsFragment_to_messagesFragment"
-            app:destination="@id/messagesFragment" />
     </fragment>
     <fragment
         android:id="@+id/messagesFragment"
         android:name="com.example.bookapp.fragments.MessagesFragment"
-        android:label="MessagesFragment" >
+        android:label="MessagesFragment">
         <argument
-            android:name="currentUserID"
-            app:argType="string" />
-        <argument
-            android:name="user2ID"
-            app:argType="string" />
+            android:name="chatID"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_messagesFragment_to_friends"
+            app:destination="@id/friends" />
     </fragment>
     <action android:id="@+id/action_global_expandedItemFragment" app:destination="@id/expandedItemFragment" />
     <fragment
         android:id="@+id/home"
         android:name="HomeFragment"
-        android:label="HomeFragment" >
+        android:label="HomeFragment">
         <action
             android:id="@+id/action_homeFragment2_to_searchFragment"
             app:destination="@id/search" />
         <action
-            android:id="@+id/action_homeFragment2_to_fragmentAddPost"
+            android:id="@+id/action_home_to_fragmentAddPost"
             app:destination="@id/fragmentAddPost" />
+    </fragment>
+    <fragment
+        android:id="@+id/friends"
+        android:name="com.example.bookapp.fragments.FriendsFragment"
+        android:label="FriendsFragment">
+        <action
+            android:id="@+id/action_friends_to_messagesFragment"
+            app:destination="@id/messagesFragment"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim" />
     </fragment>
 </navigation>

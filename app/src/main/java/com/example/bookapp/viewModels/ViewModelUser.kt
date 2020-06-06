@@ -1,31 +1,55 @@
 package com.example.bookapp.viewModels
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import com.example.bookapp.models.User
-import com.example.dataLayer.models.UserDTO
+import com.example.dataLayer.models.deserialization.DeserializeFriendRequest
+import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.repositories.UserRepository
 
 class ViewModelUser : ViewModel() {
-    var user = MutableLiveData<User>()
 
-    val errorResponseCode: MutableLiveData<Int> by lazy {
-        UserRepository.responseCode
+
+    val searchQuery = MutableLiveData<String>()
+
+    private val userRepository: UserRepository by lazy {
+        UserRepository(viewModelScope)
     }
 
-    fun setUser(user: User) {
-        this.user.value = user
+
+    val searchSuggestions: LiveData<List<User>> = Transformations.switchMap(searchQuery) {
+        it?.let {
+            return@switchMap userRepository.fetchSearchSuggestions(it)
+        }
     }
 
-    fun getUserFromThirdPartyEmailAccount(email: String): MutableLiveData<User> {
-        user = UserRepository.authenticateWithThirdPartyEmail(email)
-        return user;
+
+    val user: MutableLiveData<User> = userRepository.currentFetchedUser
+
+
+    val friends: LiveData<ArrayList<User>> = Transformations.switchMap(user) {
+        user.value?.let {
+            userRepository.fetchFriends(it)
+        }
     }
 
-    fun createThirdPartyAccount(userDTO: UserDTO): MutableLiveData<User> {
-        user = UserRepository.createThirdPartyAccount(userDTO)
+    var friendRequests: LiveData<ArrayList<DeserializeFriendRequest>> = Transformations.switchMap(user) {
+        user.value?.let {
+            userRepository.fetchFriendRequests(it)
+        }
+    }
 
-        return user;
+
+    fun loginWithGoogle(idToken: String, displayName: String, email: String) {
+        userRepository.loginWithGoogle(idToken, displayName, email)
+    }
+
+    fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
+        userRepository.sendFriendRequest(friendRequest)
+    }
+
+    fun acceptFriendRequest(request: DeserializeFriendRequest) {
+        friendRequests.value?.remove(request)
+        userRepository.acceptFriendRequest(request)
     }
 
 

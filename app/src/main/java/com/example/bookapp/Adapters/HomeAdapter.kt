@@ -12,7 +12,7 @@ import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.databinding.LoadingItemListBinding
 import com.example.bookapp.databinding.PostItemHomePageBinding
-import com.example.bookapp.fragments.ExpandedItemFragmentDirections
+import com.example.bookapp.fragments.ExpandedPostFragmentDirections
 import com.example.bookapp.models.Post
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
@@ -35,20 +35,12 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
     private val loadingObject: Post = Post.buildNullSafeObject()
 
 
-    fun addData(newPosts: ArrayList<Post>) {
-        val oldIndex: Int = posts.size
-        newPosts.forEach {
-            if(!posts.contains(it)){
-                posts.add(it)
-            }
-        }
-        if(posts.size > oldIndex){
-            notifyItemRangeInserted(oldIndex, posts.size)
-        }
-        toggleLoading()
-        timeout.cancel()
-        timeout = Timer()
+    fun setData(data: List<Post>) {
+        posts.clear()
+        posts.addAll(data)
+        notifyDataSetChanged()
     }
+
 
     private fun toggleLoading() {
         if (currentState == State.LOADING) {
@@ -58,7 +50,7 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
         } else {
             currentState = State.LOADING;
             posts.add(loadingObject)
-            notifyItemInserted(posts.size-1)
+            notifyItemInserted(posts.size - 1)
         }
     }
 
@@ -120,9 +112,10 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
     inner class ViewHolder(val binding: PostItemHomePageBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(post: Post) {
             binding.post = post
+
             binding.root.setOnClickListener {
                 if (AppUtilities.isNetworkAvailable(binding.root.context)) {
-                    val action: NavDirections = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(post.postID)
+                    val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(post.id)
                     Navigation.findNavController(binding.root).navigate(action)
                 } else {
                     Snackbar.make(binding.root, binding.root.context.getString(R.string.no_internet_connection), Snackbar.LENGTH_SHORT)

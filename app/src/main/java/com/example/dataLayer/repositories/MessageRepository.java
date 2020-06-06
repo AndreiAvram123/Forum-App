@@ -1,21 +1,10 @@
 package com.example.dataLayer.repositories;
 
 import androidx.annotation.NonNull;
-import com.example.bookapp.models.ApiConstants;
-import com.example.bookapp.models.Message;
-import com.example.bookapp.utilities.MessageDataConverter;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.bookapp.models.MessageDTO;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import static com.example.bookapp.models.ApiConstants.URL_SEND_MESSAGE;
 
 public class MessageRepository {
 
@@ -151,11 +140,11 @@ public class MessageRepository {
 //
     public interface MessageRepositoryCallback {
 
-        void onOldMessagesFetched(@NonNull ArrayList<Message> oldMessages);
+    void onOldMessagesFetched(@NonNull ArrayList<MessageDTO> oldMessageDTOS);
 
-        void onNewMessagesReady(@NonNull ArrayList<Message> messages);
+    void onNewMessagesReady(@NonNull ArrayList<MessageDTO> messageDTOS);
 
-        void onSendMessageReady(@NonNull Message message);
+    void onSendMessageReady(@NonNull MessageDTO messageDTO);
 
     }
 }

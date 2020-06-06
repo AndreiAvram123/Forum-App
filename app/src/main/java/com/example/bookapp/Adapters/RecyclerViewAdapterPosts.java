@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.bookapp.R;
 import com.example.bookapp.databinding.LayoutItemPostBinding;
-import com.example.bookapp.fragments.ExpandedItemFragmentDirections;
+import com.example.bookapp.fragments.ExpandedPostFragmentDirections;
 import com.example.bookapp.models.Post;
 
 import java.util.ArrayList;
@@ -42,7 +42,7 @@ public class RecyclerViewAdapterPosts extends RecyclerView.Adapter<RecyclerViewA
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.binding.setPost(posts.get(position));
         holder.itemView.setOnClickListener(view -> {
-            NavDirections action = ExpandedItemFragmentDirections.actionGlobalExpandedItemFragment(posts.get(position).getPostID());
+            NavDirections action = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(posts.get(position).getId());
             Navigation.findNavController(holder.binding.getRoot()).navigate(action);
         });
     }
