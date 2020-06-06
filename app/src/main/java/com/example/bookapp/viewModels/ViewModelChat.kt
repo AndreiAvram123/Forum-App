@@ -5,6 +5,7 @@ import com.example.bookapp.models.Chat
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.ChatLink
+import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.repositories.ChatRepository
 
 class ViewModelChat : ViewModel() {
@@ -37,9 +38,9 @@ class ViewModelChat : ViewModel() {
     }
 
 
-    fun sendMessage(chatID: Int, senderID: Int, content: String) {
-        chatRepository.pushMessage(chatID, senderID, content)
-    }
+    fun sendMessage(serializeMessage: SerializeMessage)  = chatRepository.pushMessage(serializeMessage)
+
+
 
 
 }

@@ -9,9 +9,12 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Base64
+import androidx.core.content.ContentProviderCompat.requireContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayOutputStream
+import java.io.FileNotFoundException
+import java.io.InputStream
 
 
 object AppUtilities {
@@ -41,6 +44,13 @@ object AppUtilities {
     fun isEmailValid(email: String): Boolean {
         val regex = "[a-zA-Z0-9]+@[a-z]+\\.[a-z]+"
         return email.matches(regex.toRegex())
+    }
+
+    fun convertFromUriToDrawable(path: Uri, context: Context): Drawable {
+
+        val inputStream: InputStream? = context.contentResolver.openInputStream(path)
+        return Drawable.createFromStream(inputStream, path.toString())
+
     }
 
     suspend fun getBase64ImageFromDrawable(drawable: Drawable): String {

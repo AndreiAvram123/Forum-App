@@ -11,5 +11,7 @@ data class MessageDTO(
         @SerializedName("date")
         val date: Long,
         @SerializedName("sender")
-        val sender: UserDTO
+        val sender: UserDTO,
+        @SerializedName("type")
+        val type: String
 )

@@ -3,6 +3,8 @@ package com.example.dataLayer.models
 import com.google.gson.annotations.SerializedName
 
 data class ServerResponse(
-        @SerializedName("message")
+        @SerializedName("RequestCompleted")
+        val successful: Boolean,
+        @SerializedName("Message")
         val message: String
 )

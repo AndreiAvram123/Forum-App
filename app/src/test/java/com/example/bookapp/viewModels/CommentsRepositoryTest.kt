@@ -1,11 +1,9 @@
 package com.example.bookapp.viewModels
 
 import com.example.bookapp.AppUtilities
-import com.example.dataLayer.interfaces.ChatInterface
 import com.example.dataLayer.interfaces.CommentsInterface
 import com.example.dataLayer.models.serialization.SerializeComment
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.*
 import org.junit.Test
 
