@@ -1,9 +1,10 @@
 package com.example.bookapp.models
 
+import android.graphics.drawable.Drawable
 import com.example.dataLayer.models.UserDTO
 import com.google.gson.annotations.SerializedName
 
-data class MessageDTO(
+open class MessageDTO(
         @SerializedName("id")
         val id: Int,
         @SerializedName("content")
@@ -13,5 +14,7 @@ data class MessageDTO(
         @SerializedName("sender")
         val sender: UserDTO,
         @SerializedName("type")
-        val type: String
+        val type: String,
+        @SerializedName("localID")
+        val localID: String?
 )

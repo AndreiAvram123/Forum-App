@@ -29,17 +29,19 @@ fun getImage(photoView: PhotoView, imageURl: String?) {
 
 @BindingAdapter("dateFromUnix")
 fun getDateFromUnix(textView: TextView, unixTime: Long) {
-    val compareDate: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.UK)
+    if (unixTime > 0) {
+        val compareDate: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.UK)
 
-    val nowDate = Date(Calendar.getInstance().timeInMillis)
-    val messageDate = Date(unixTime * 1000)
+        val nowDate = Date(Calendar.getInstance().timeInMillis)
+        val messageDate = Date(unixTime * 1000)
 
-    if (compareDate.format(nowDate) == compareDate.format(messageDate)) {
-        val dateFormat: SimpleDateFormat = SimpleDateFormat("HH:mm", Locale.UK);
-        textView.text = dateFormat.format(messageDate)
-    } else {
-        val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK);
-        textView.text = dateFormat.format(messageDate)
+        if (compareDate.format(nowDate) == compareDate.format(messageDate)) {
+            val dateFormat: SimpleDateFormat = SimpleDateFormat("HH:mm", Locale.UK);
+            textView.text = dateFormat.format(messageDate)
+        } else {
+            val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK);
+            textView.text = dateFormat.format(messageDate)
+        }
     }
 
 

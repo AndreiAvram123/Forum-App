@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <import type="com.example.bookapp.models.LocalImageMessage"/>
         <variable
             name="message"
             type="com.example.bookapp.models.MessageDTO" />
@@ -14,16 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="8dp">
-
-        <TextView
-            android:id="@+id/text_message_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="10sp"
-            app:dateFromUnix="@{message.date}"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/message_image"
-            tools:text="12:30" />
 
         <ImageView
             android:id="@+id/message_image"
@@ -35,7 +25,7 @@
             android:adjustViewBounds="true"
             android:cropToPadding="true"
             android:scaleType="centerInside"
-            app:imageFromURL="@{message.content}"
+            app:imageFromURL="@{message instanceof LocalImageMessage ? `` : message.content }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

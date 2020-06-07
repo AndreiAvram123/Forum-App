@@ -3,6 +3,7 @@ package com.example.bookapp.fragments
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.UserManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,10 +18,13 @@ import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.MessageAdapter
 import com.example.bookapp.AppUtilities
 import com.example.bookapp.databinding.MessagesFragmentBinding
+import com.example.bookapp.models.LocalImageMessage
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
+import com.example.dataLayer.dataMappers.UserMapper
+import com.example.dataLayer.models.UserDTO
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.serverConstants.MessageTypes
 import com.google.gson.Gson
@@ -34,6 +38,7 @@ import okhttp3.internal.closeQuietly
 import org.json.JSONObject
 import java.net.URI
 import java.time.Duration
+import java.util.*
 
 
 class MessagesFragment : Fragment() {
@@ -135,6 +140,7 @@ class MessagesFragment : Fragment() {
     }
 
     private fun addNewMessage(message: MessageDTO) {
+
         requireActivity().runOnUiThread {
             messageAdapter.add(message)
         }
@@ -156,9 +162,9 @@ class MessagesFragment : Fragment() {
             val messageContent = binding.messageArea.text.toString()
             if (messageContent.trim().isNotEmpty()) {
 
-                val message = SerializeMessage(type = MessageTypes.textMessage, chatID = args.chatID, senderID = user.userID, content = messageContent)
+                val message = SerializeMessage(type = MessageTypes.textMessage,
+                        chatID = args.chatID, senderID = user.userID, content = messageContent, localIdentifier = null)
                 viewModelChat.sendMessage(message)
-
                 text.clear()
             }
         }
@@ -197,15 +203,26 @@ class MessagesFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
             val data = AppUtilities.getBase64ImageFromDrawable(image)
 
-
+            val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
             lifecycleScope.launch(Dispatchers.Main) {
                 val message = SerializeMessage(
                         type = MessageTypes.imageMessageType,
                         chatID = args.chatID,
                         senderID = user.userID,
-                        content = data
+                        content = data,
+                        localIdentifier = uniqueID
+
                 )
                 viewModelChat.sendMessage(message)
+
+                val localImageMessage = LocalImageMessage(
+                        id = -1,
+                        sender = UserMapper.mapDomainToNetworkObject(user),
+                        type = MessageTypes.imageMessageType,
+                        localID = uniqueID,
+                        drawable = image
+                )
+                messageAdapter.add(localImageMessage)
             }
         }
     }

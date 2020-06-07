@@ -8,4 +8,6 @@ object UserMapper {
     fun mapNetworkToDomainObject(userDTO: UserDTO) = User(userID = userDTO.userID, username = userDTO.username, email = userDTO.email, profilePicture = userDTO.profilePicture)
 
     fun mapDTONetworkToDomainObjects(dtoUsers: List<UserDTO>) = dtoUsers.map { mapNetworkToDomainObject(it) }
+
+    fun mapDomainToNetworkObject(user:User)  = UserDTO(userID = user.userID,username = user.username,email = user.email,profilePicture = user.profilePicture,token = null)
 }

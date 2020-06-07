@@ -16,6 +16,7 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import java.util.*
 
 @InternalCoroutinesApi
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
@@ -40,7 +41,12 @@ class MessagesFragmentTest {
             val drawable = activity.applicationContext.getDrawable(R.drawable.placeholder)
             drawable?.let {
                 val base64Image = AppUtilities.getBase64ImageFromDrawable(it)
-                val message = SerializeMessage(type = MessageTypes.imageMessageType, chatID = 12, senderID = 109, content = base64Image)
+                val localID: Int = Calendar.getInstance().timeInMillis.hashCode()
+                val message = SerializeMessage(type = MessageTypes.imageMessageType,
+                        chatID = 12,
+                        senderID = 109,
+                        content = base64Image,
+                        localIdentifier = localID.toString())
                 val serverResponse = repo.pushMessage(message)
                 Assert.assertTrue(serverResponse.successful)
             }

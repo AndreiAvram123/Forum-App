@@ -9,8 +9,10 @@ import com.example.bookapp.databinding.MessageImageSentBinding
 import com.example.bookapp.databinding.MessageReceivedBinding
 import com.example.bookapp.databinding.MessageSentBinding
 import com.example.bookapp.fragments.MessagesFragmentDirections
+import com.example.bookapp.models.LocalImageMessage
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
+import com.example.dataLayer.repositories.UploadProgress
 import com.example.dataLayer.serverConstants.MessageTypes
 
 class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: String) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -33,9 +35,17 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
         }
     }
 
+
     inner class MessageImageSentViewHolder(val binding: MessageImageSentBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(messageDTO: MessageDTO) {
             binding.message = messageDTO
+            if (messageDTO is LocalImageMessage) {
+                binding.messageImage.setImageDrawable(messageDTO.drawable)
+                if (messageDTO.currentStatus == UploadProgress.UPLOADING) {
+                    binding.messageImage.alpha = 0.5f
+                }
+            }
+
             binding.messageImage.setOnClickListener {
                 expandImage(messageDTO.content)
             }
@@ -108,9 +118,19 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
     }
 
     fun add(message: MessageDTO) {
-        messages.add(message)
-        notifyItemInserted(messages.size - 1)
-        scrollToLast()
+        messages.find { it is LocalImageMessage && it.localID == message.localID }.also {
+            if (it == null) {
+                messages.add(message)
+                notifyItemInserted(messages.size - 1)
+                scrollToLast()
+            } else {
+                if (it is LocalImageMessage) {
+                    it.currentStatus = UploadProgress.UPLOADED
+                    notifyItemChanged(messages.indexOf(it))
+                }
+            }
+        }
+
     }
 
     private fun scrollToLast() {
