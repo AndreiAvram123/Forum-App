@@ -29,7 +29,7 @@ class SimpleTests {
 
     @Test
     fun shouldReturnPost() = runBlocking {
-        val subject = userRepoInterface.fetchPostByID(1144)
+        val subject = userRepoInterface.fetchPostByID(2236)
         Assert.assertNotNull(subject)
     }
 

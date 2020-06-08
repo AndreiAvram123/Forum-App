@@ -118,7 +118,7 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
     }
 
     fun add(message: MessageDTO) {
-        messages.find { it is LocalImageMessage && it.localID == message.localID }.also {
+        messages.find { it is LocalImageMessage &&  it.localID == message.localID }.also {
             if (it == null) {
                 messages.add(message)
                 notifyItemInserted(messages.size - 1)

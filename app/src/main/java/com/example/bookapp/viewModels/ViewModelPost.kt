@@ -36,9 +36,10 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun getUserPosts(): LiveData<UserWithPosts> {
-        return postRepository.myPosts
+    fun getUserPosts(): LiveData<UserWithPosts> = Transformations.map(postRepository.myPosts) {
+        it
     }
+
 
     fun getPostByID(id: Int): LiveData<Post> {
         return postRepository.fetchPostByID(id)

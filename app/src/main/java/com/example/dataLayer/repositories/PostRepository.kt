@@ -1,6 +1,7 @@
 package com.example.dataLayer.repositories
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
@@ -18,10 +19,7 @@ import com.example.dataLayer.models.PostDTO
 import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.UserWithPosts
 import com.example.dataLayer.models.serialization.SerializePost
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 @InternalCoroutinesApi
 class PostRepository(application: Application, val coroutineScope: CoroutineScope, val user: User) {
@@ -33,12 +31,15 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
     private var nextPageToFetch: Int = 1;
     //private val currentFetchedPosts: HashMap<Int, LiveData<Post>> = HashMap()
 
-    private val repositoryInterface: PostRepositoryInterface by lazy {
-        AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
-    }
+    private val repositoryInterface: PostRepositoryInterface = AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
 
     private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()
-    private val userDao: RoomUserDao = PostDatabase.getDatabase(application).userDao()
+
+    private val userDao: RoomUserDao = PostDatabase.getDatabase(application).userDao().also {
+        coroutineScope.launch {
+            it.insertUser(user)
+        }
+    }
 
     val fetchedPosts = liveData(Dispatchers.IO) {
         emitSource(postDao.getCachedPosts())
@@ -55,31 +56,24 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
         }
     }
 
-    val myPosts: LiveData<UserWithPosts> by lazy {
-        MutableLiveData<UserWithPosts>()
-        //postDao.getUserPosts(user.userID)
+    val myPosts: LiveData<UserWithPosts> = liveData {
+        emitSource(postDao.getAllUserPosts(user.userID))
     }.also {
         if (AppUtilities.isNetworkAvailable(application)) {
             coroutineScope.launch {
-                //todo
-                //change
                 fetchMyPosts()
             }
         }
     }
 
 
-    fun fetchPostByID(id: Int): LiveData<Post> = liveData(Dispatchers.IO) {
-        emitSource(postDao.getPostByID(id))
+    fun fetchPostByID(id: Int): LiveData<Post> = liveData {
         val postDTO = repositoryInterface.fetchPostByID(id)
-        try {
-            val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
-            val author = UserMapper.mapNetworkToDomainObject(postDTO.author);
-            postDao.insertPost(post)
-            userDao.insertUser(author)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
+        val author = UserMapper.mapNetworkToDomainObject(postDTO.author);
+        postDao.insertPost(post)
+        userDao.insertUser(author)
+        emit(post)
     }
 
 
@@ -90,8 +84,8 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
 
     private suspend fun fetchMyPosts() {
         try {
-            val fetchedPosts = PostMapper.mapDTONetworkToDomainObjects(repositoryInterface.fetchMyPosts(user.userID))
-            postDao.insertPosts(fetchedPosts)
+            val fetchedPosts = repositoryInterface.fetchMyPosts(user.userID)
+            postDao.insertPosts(PostMapper.mapDTONetworkToDomainObjects(fetchedPosts))
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
         }

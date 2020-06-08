@@ -13,7 +13,7 @@ import com.example.dataLayer.interfaces.dao.RoomUserDao
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 
-@Database(entities = [Post::class, Comment::class, User::class], version = 10, exportSchema = false)
+@Database(entities = [Post::class, Comment::class, User::class], version = 11, exportSchema = false)
 abstract class PostDatabase : RoomDatabase() {
     abstract fun postDao(): RoomPostDao
     abstract fun commentDao(): RoomCommentDao

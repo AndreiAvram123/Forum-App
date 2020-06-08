@@ -1,9 +1,6 @@
 package com.example.bookapp.models
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 @Entity
 data class Post(
@@ -14,19 +11,16 @@ data class Post(
         @ColumnInfo(name = "date") val date: Long,
         @ColumnInfo(name = "content") val content: String,
         @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false,
-        @Embedded
-        val author: User
-
+        @ColumnInfo(name = "authorID") val authorID: Int
 ) {
+    @Ignore
+    var author: User? = null
 
     companion object Empty {
         fun buildNullSafeObject(): Post {
-            return Post(id = 0, content = "", date = 333, title = "", image = "dfd", author = User(userID = 0, username = "Unknown", email = "unknown", profilePicture = "sdfs"))
+            return Post(id = 0, content = "", date = 333, title = "", image = "dfd", authorID = 0)
         }
 
-        fun buildWaitingToUploadPost(): Post {
-            return Post(id = -1, content = "", date = 333, title = "", image = "dfd", author = User(userID = 0, username = "Unknown", email = "unknown", profilePicture = "sdfs"))
-        }
     }
 
 }

@@ -9,7 +9,7 @@
         android:id="@+id/expandedItemFragment"
         android:name="com.example.bookapp.fragments.ExpandedPostFragment"
         android:label="fragment_expanded_item"
-        tools:layout="@layout/fragment_expanded_item" >
+        tools:layout="@layout/post_expanded_fragment" >
         <argument
             android:name="postID"
             app:argType="integer" />
@@ -18,7 +18,7 @@
         android:id="@+id/favorite_posts"
         android:name="com.example.bookapp.fragments.FavoritePostsFragment"
         android:label="layout_fragment_posts_data"
-        tools:layout="@layout/layout_fragment_posts_data" >
+        tools:layout="@layout/fragment_favorite_posts" >
         <action
             android:id="@+id/action_favoriteItems_to_fragmentMyPosts"
             app:destination="@id/my_posts" />
@@ -39,7 +39,7 @@
     <action android:id="@+id/action_global_searchFragment" app:destination="@id/search" />
     <fragment
         android:id="@+id/my_posts"
-        android:name="com.example.bookapp.fragments.FragmentMyPosts"
+        android:name="com.example.bookapp.fragments.FragmentUserPosts"
         android:label="FragmentMyPosts" >
         <action
             android:id="@+id/action_my_posts_to_friendsFragment2"
