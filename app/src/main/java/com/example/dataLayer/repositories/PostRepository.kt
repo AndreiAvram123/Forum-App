@@ -1,7 +1,6 @@
 package com.example.dataLayer.repositories
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
@@ -15,9 +14,7 @@ import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.dao.RoomPostDao
 import com.example.dataLayer.interfaces.dao.RoomUserDao
-import com.example.dataLayer.models.PostDTO
-import com.example.dataLayer.models.SerializeImage
-import com.example.dataLayer.models.UserWithPosts
+import com.example.dataLayer.models.*
 import com.example.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.*
 
@@ -48,14 +45,15 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
         }
     }
 
-    val favoritePosts = liveData(Dispatchers.IO) {
-        emitSource(postDao.getFavoritePosts())
-    }.also {
-        if (AppUtilities.isNetworkAvailable(application)) {
-            coroutineScope.launch { fetchFavoritePosts() }
+    val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
+        liveData(Dispatchers.IO) {
+            emitSource(postDao.getFavoritePosts(user.userID))
+        }.also {
+            if (AppUtilities.isNetworkAvailable(application)) {
+                coroutineScope.launch { fetchFavoritePosts() }
+            }
         }
     }
-
     val myPosts: LiveData<UserWithPosts> = liveData {
         emitSource(postDao.getAllUserPosts(user.userID))
     }.also {
@@ -78,8 +76,14 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
 
 
     private suspend fun fetchFavoritePosts() {
-        val data = repositoryInterface.fetchFavoritePostsByUserID(user.userID)
-        postDao.insertPosts(PostMapper.mapDTONetworkToDomainObjects(data))
+        val data = PostMapper.mapDTONetworkToDomainObjects(
+                repositoryInterface.fetchUserFavoritePosts(user.userID))
+
+        val toInsert = ArrayList<UserWithFavoritePostsCrossRef>()
+        data.forEach {
+            toInsert.add(UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID))
+        }
+        postDao.insertAllFavoritePosts(toInsert)
     }
 
     private suspend fun fetchMyPosts() {
@@ -92,13 +96,15 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
     }
 
     suspend fun addPostToFavorites(post: Post) {
-        postDao.addPostToFavorites(post)
+        postDao.addFavoritePost(UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID))
         repositoryInterface.addPostToFavorites(post.id, user.userID)
     }
 
 
     suspend fun deletePostFromFavorites(post: Post) {
-        repositoryInterface.deletePostFromFavorites(postID = post.id, userID = user.userID);
+        //todo
+        //remove
+        //   repositoryInterface.removePostFromFavorites(postID = post.id, userID = user.userID);
         postDao.deletePostFromFavorites(post)
     }
 
@@ -150,6 +156,6 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
         }
         return currentUploadedPostProgress;
     }
-
 }
+
 

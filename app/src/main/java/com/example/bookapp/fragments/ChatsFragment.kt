@@ -20,7 +20,7 @@ class ChatsFragment : Fragment() {
     private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
 
-    private lateinit var binding: LayoutFragmentChatsBinding;
+    private lateinit var binding: LayoutFragmentChatsBinding
     private val chatsAdapter: ChatsAdapter by lazy {
         ChatsAdapter()
     }
@@ -28,12 +28,14 @@ class ChatsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.layout_fragment_chats, container, false)
+
+        binding = LayoutFragmentChatsBinding.inflate(inflater, container, false)
+
 
         viewModelUser.user.value?.let {
             configureRecyclerView()
             viewModelChat.getUserChats(it).observe(viewLifecycleOwner, Observer { chats ->
-                chatsAdapter.setData(ArrayList(chats))
+                chatsAdapter.setData(chats)
             })
         }
         return binding.root
@@ -42,7 +44,6 @@ class ChatsFragment : Fragment() {
     private fun configureRecyclerView() {
         with(binding.recyclerViewFriends) {
             adapter = chatsAdapter
-            setHasFixedSize(true)
             addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.HORIZONTAL))
             layoutManager = LinearLayoutManager(requireContext())
         }

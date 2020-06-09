@@ -6,6 +6,7 @@ import com.example.bookapp.models.LowDataPost
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
 import com.example.dataLayer.models.SerializeImage
+import com.example.dataLayer.models.UserWithFavoritePosts
 import com.example.dataLayer.models.UserWithPosts
 import com.example.dataLayer.models.serialization.SerializePost
 import com.example.dataLayer.repositories.PostRepository
@@ -20,6 +21,9 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
 
     val user: MutableLiveData<User> = MutableLiveData()
     val searchQuery: MutableLiveData<String> = MutableLiveData()
+
+
+    fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts;
 
     //todo
     //not great... don't pass the user
@@ -49,9 +53,6 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         return postRepository.fetchedPosts
     }
 
-    fun getFavoritePosts(): LiveData<List<Post>> {
-        return postRepository.favoritePosts
-    }
 
     fun addPostToFavorites(post: Post) {
         viewModelScope.launch {
@@ -59,7 +60,7 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deletePostFromFavorites(post: Post, user: User) =
+    fun deletePostFromFavorites(post: Post) =
             viewModelScope.launch { postRepository.deletePostFromFavorites(post) }
 
 

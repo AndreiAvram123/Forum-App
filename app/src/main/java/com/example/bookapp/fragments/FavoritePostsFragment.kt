@@ -20,10 +20,11 @@ import java.util.*
 
 @InternalCoroutinesApi
 class FavoritePostsFragment : Fragment() {
-    private val recyclerViewAdapterPosts: RecyclerViewAdapterPosts? = null
+    private val recyclerViewAdapterPosts: RecyclerViewAdapterPosts by lazy {
+        RecyclerViewAdapterPosts()
+    }
     private val viewModelPost: ViewModelPost by activityViewModels()
     private val viewModelUser: ViewModelUser by activityViewModels()
-    private val favoritePosts: ArrayList<Post>? = null
     private lateinit var binding: FragmentFavoritePostsBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -40,10 +41,8 @@ class FavoritePostsFragment : Fragment() {
         val user = viewModelUser.user.value
         if (user != null) {
             viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, Observer {
-                if (it.isNullOrEmpty()) {
-                    recyclerViewAdapterPosts!!.setData(ArrayList(it))
-                    binding.numberResults.text = getString(R.string.number_saved_posts, it.size)
-                }
+                recyclerViewAdapterPosts.setData(ArrayList(it.posts))
+                binding.numberResults.text = getString(R.string.number_saved_posts, it.posts.size)
             })
         }
     }

@@ -10,10 +10,11 @@ import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.dao.RoomCommentDao
 import com.example.dataLayer.interfaces.dao.RoomPostDao
 import com.example.dataLayer.interfaces.dao.RoomUserDao
+import com.example.dataLayer.models.UserWithFavoritePostsCrossRef
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 
-@Database(entities = [Post::class, Comment::class, User::class], version = 11, exportSchema = false)
+@Database(entities = [Post::class, Comment::class, User::class,UserWithFavoritePostsCrossRef::class], version = 13, exportSchema = false)
 abstract class PostDatabase : RoomDatabase() {
     abstract fun postDao(): RoomPostDao
     abstract fun commentDao(): RoomCommentDao

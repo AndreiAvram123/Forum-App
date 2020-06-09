@@ -12,6 +12,7 @@ data class Post(
         @ColumnInfo(name = "content") val content: String,
         @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false,
         @ColumnInfo(name = "authorID") val authorID: Int
+
 ) {
     @Ignore
     var author: User? = null

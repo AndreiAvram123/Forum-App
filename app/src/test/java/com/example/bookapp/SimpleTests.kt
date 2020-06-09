@@ -35,7 +35,7 @@ class SimpleTests {
 
     @Test
     fun shouldReturnUserFavoritePost() = runBlocking {
-        val favoritePosts = userRepoInterface.fetchFavoritePostsByUserID(109)
+        val favoritePosts = userRepoInterface.fetchUserFavoritePosts(109)
         Assert.assertNotNull(favoritePosts)
 
     }

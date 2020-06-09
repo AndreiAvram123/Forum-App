@@ -7,6 +7,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.databinding.LayoutItemPostBinding
 import com.example.bookapp.fragments.ExpandedPostFragmentDirections
@@ -29,10 +30,7 @@ class RecyclerViewAdapterPosts : RecyclerView.Adapter<RecyclerViewAdapterPosts.V
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(posts[position])
-        holder.itemView.setOnClickListener {
-            val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(posts[position].id)
-            Navigation.findNavController(holder.binding.root).navigate(action)
-        }
+
     }
 
     override fun getItemCount() = posts.size
@@ -40,6 +38,13 @@ class RecyclerViewAdapterPosts : RecyclerView.Adapter<RecyclerViewAdapterPosts.V
     inner class ViewHolder(val binding: LayoutItemPostBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(post: Post) {
             binding.post = post
+            binding.root.setOnClickListener {
+                if (AppUtilities.isNetworkAvailable(binding.root.context)) {
+                    val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(posts[position].id)
+                    Navigation.findNavController(binding.root).navigate(action)
+
+                }
+            }
         }
     }
 }

@@ -12,6 +12,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.AdapterComments
+import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.bottomSheets.CommentBottomSheet
 import com.example.bookapp.databinding.PostExpandedFragmentBinding
@@ -37,12 +38,14 @@ class ExpandedPostFragment : Fragment() {
     private lateinit var user: User
     private lateinit var post: Post
     private val commentDialog = CommentBottomSheet(::submitComment)
+    private lateinit var favoritePosts: List<Post>
     private val args: ExpandedPostFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? { // Inflate the layout for this fragment
 
         binding = PostExpandedFragmentBinding.inflate(layoutInflater, container, false)
+
         attachObservers()
         viewModelUser.user.value?.let {
             user = it
@@ -53,14 +56,21 @@ class ExpandedPostFragment : Fragment() {
 
     private fun attachObservers() {
 
+        viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, Observer {
+            favoritePosts = it.posts
+        })
 
         viewModelPost.getPostByID(args.postID).observe(viewLifecycleOwner, Observer {
             if (it != null) {
+                if(favoritePosts.contains(it)){
+                    it.isFavorite = true
+                }
                 post = it
                 configureViews()
                 getComments();
             }
         })
+
     }
 
     private fun getComments() {
@@ -84,10 +94,11 @@ class ExpandedPostFragment : Fragment() {
         binding.saveButtonExpanded.setOnClickListener {
             if (post.isFavorite) {
                 informUserPostRemovedFromFavorites()
-                user.let { viewModelPost.deletePostFromFavorites(post, it) }
+                viewModelPost.deletePostFromFavorites(post)
+
             } else {
                 informUserPostAddedToFavorites()
-                user.let { viewModelPost.addPostToFavorites(post) }
+                viewModelPost.addPostToFavorites(post)
             }
             post.isFavorite = !post.isFavorite
             binding.post = post;

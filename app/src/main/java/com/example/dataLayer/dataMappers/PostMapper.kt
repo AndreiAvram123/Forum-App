@@ -23,7 +23,7 @@ object PostMapper {
                     authorID = user.userID,
                     content = postDTO.content
 
-            );
+            )
             post.author = user
             return post;
         }
