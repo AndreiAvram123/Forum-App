@@ -8,12 +8,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.AdapterComments
+import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.bottomSheets.CommentBottomSheet
-import com.example.bookapp.databinding.FragmentExpandedItemBinding
+import com.example.bookapp.databinding.PostExpandedFragmentBinding
 import com.example.bookapp.models.Comment
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
@@ -28,7 +30,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
 class ExpandedPostFragment : Fragment() {
-    lateinit var binding: FragmentExpandedItemBinding
+    lateinit var binding: PostExpandedFragmentBinding
 
     private val viewModelPost: ViewModelPost by activityViewModels()
     private val viewModelUser: ViewModelUser by activityViewModels()
@@ -36,10 +38,14 @@ class ExpandedPostFragment : Fragment() {
     private lateinit var user: User
     private lateinit var post: Post
     private val commentDialog = CommentBottomSheet(::submitComment)
+    private lateinit var favoritePosts: List<Post>
+    private val args: ExpandedPostFragmentArgs by navArgs()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? { // Inflate the layout for this fragment
 
-        binding = FragmentExpandedItemBinding.inflate(layoutInflater, container, false)
+        binding = PostExpandedFragmentBinding.inflate(layoutInflater, container, false)
+
         attachObservers()
         viewModelUser.user.value?.let {
             user = it
@@ -50,16 +56,21 @@ class ExpandedPostFragment : Fragment() {
 
     private fun attachObservers() {
 
+        viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, Observer {
+            favoritePosts = it.posts
+        })
 
-        val postID: Int = ExpandedPostFragmentArgs.fromBundle(requireArguments()).postID
-
-        viewModelPost.getPostByID(postID).observe(viewLifecycleOwner, Observer {
+        viewModelPost.getPostByID(args.postID).observe(viewLifecycleOwner, Observer {
             if (it != null) {
+                if(favoritePosts.contains(it)){
+                    it.isFavorite = true
+                }
                 post = it
                 configureViews()
                 getComments();
             }
         })
+
     }
 
     private fun getComments() {
@@ -83,10 +94,11 @@ class ExpandedPostFragment : Fragment() {
         binding.saveButtonExpanded.setOnClickListener {
             if (post.isFavorite) {
                 informUserPostRemovedFromFavorites()
-                user.let { viewModelPost.deletePostFromFavorites(post, it) }
+                viewModelPost.deletePostFromFavorites(post)
+
             } else {
                 informUserPostAddedToFavorites()
-                user.let { viewModelPost.addPostToFavorites(post) }
+                viewModelPost.addPostToFavorites(post)
             }
             post.isFavorite = !post.isFavorite
             binding.post = post;

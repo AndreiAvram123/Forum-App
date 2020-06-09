@@ -1,6 +1,6 @@
 package com.example.dataLayer.repositories
 
-import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
@@ -14,98 +14,103 @@ import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.dao.RoomPostDao
 import com.example.dataLayer.interfaces.dao.RoomUserDao
-import com.example.dataLayer.models.PostDTO
-import com.example.dataLayer.models.SerializeImage
-import com.example.dataLayer.models.UserWithPosts
+import com.example.dataLayer.models.*
 import com.example.dataLayer.models.serialization.SerializePost
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import javax.inject.Inject
 
 @InternalCoroutinesApi
-class PostRepository(application: Application, val coroutineScope: CoroutineScope, val user: User) {
+class PostRepository @Inject constructor(private val application: Context, val coroutineScope: CoroutineScope,
+                                         val user: User,
+                                         private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
+
 
     val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
     val currentUploadImagePath: MutableLiveData<String> = MutableLiveData()
     private val currentUploadedPostProgress: MutableLiveData<UploadProgress> = MutableLiveData()
 
     private var nextPageToFetch: Int = 1;
-    //private val currentFetchedPosts: HashMap<Int, LiveData<Post>> = HashMap()
 
-    private val repositoryInterface: PostRepositoryInterface by lazy {
-        AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
-    }
+    private val repositoryInterface: PostRepositoryInterface = AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
 
     private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()
-    private val userDao: RoomUserDao = PostDatabase.getDatabase(application).userDao()
 
-    val fetchedPosts = liveData(Dispatchers.IO) {
+    private val userDao: RoomUserDao = PostDatabase.getDatabase(application).userDao().also {
+        coroutineScope.launch {
+            it.insertUser(user)
+        }
+    }
+
+    val fetchedPosts = liveData(defaultDispatcher) {
         emitSource(postDao.getCachedPosts())
         if (AppUtilities.isNetworkAvailable(application)) {
             fetchNextPagePosts()
         }
     }
 
-    val favoritePosts = liveData(Dispatchers.IO) {
-        emitSource(postDao.getFavoritePosts())
-    }.also {
-        if (AppUtilities.isNetworkAvailable(application)) {
-            coroutineScope.launch { fetchFavoritePosts() }
+    val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
+        liveData(defaultDispatcher) {
+            emitSource(postDao.getFavoritePosts(user.userID))
+        }.also {
+            if (AppUtilities.isNetworkAvailable(application)) {
+                coroutineScope.launch { fetchFavoritePosts() }
+            }
         }
     }
-
-    val myPosts: LiveData<UserWithPosts> by lazy {
-        MutableLiveData<UserWithPosts>()
-        //postDao.getUserPosts(user.userID)
+    val myPosts: LiveData<UserWithPosts> = liveData {
+        emitSource(postDao.getAllUserPosts(user.userID))
     }.also {
         if (AppUtilities.isNetworkAvailable(application)) {
             coroutineScope.launch {
-                //todo
-                //change
                 fetchMyPosts()
             }
         }
     }
 
 
-    fun fetchPostByID(id: Int): LiveData<Post> = liveData(Dispatchers.IO) {
-        emitSource(postDao.getPostByID(id))
+    fun fetchPostByID(id: Int): LiveData<Post> = liveData {
         val postDTO = repositoryInterface.fetchPostByID(id)
-        try {
-            val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
-            val author = UserMapper.mapNetworkToDomainObject(postDTO.author);
-            postDao.insertPost(post)
-            userDao.insertUser(author)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
+        val author = UserMapper.mapNetworkToDomainObject(postDTO.author);
+        postDao.insertPost(post)
+        userDao.insertUser(author)
+        emit(post)
     }
 
 
     private suspend fun fetchFavoritePosts() {
-        val data = repositoryInterface.fetchFavoritePostsByUserID(user.userID)
-        postDao.insertPosts(PostMapper.mapDTONetworkToDomainObjects(data))
+        val data = PostMapper.mapDTONetworkToDomainObjects(
+                repositoryInterface.fetchUserFavoritePosts(user.userID))
+
+        val toInsert = ArrayList<UserWithFavoritePostsCrossRef>()
+        data.forEach {
+            toInsert.add(UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID))
+        }
+        postDao.insertAllFavoritePosts(toInsert)
     }
 
     private suspend fun fetchMyPosts() {
         try {
-            val fetchedPosts = PostMapper.mapDTONetworkToDomainObjects(repositoryInterface.fetchMyPosts(user.userID))
-            postDao.insertPosts(fetchedPosts)
+            val fetchedPosts = repositoryInterface.fetchMyPosts(user.userID)
+            postDao.insertPosts(PostMapper.mapDTONetworkToDomainObjects(fetchedPosts))
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
         }
     }
 
     suspend fun addPostToFavorites(post: Post) {
-        postDao.addPostToFavorites(post)
+        postDao.addFavoritePost(UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID))
         repositoryInterface.addPostToFavorites(post.id, user.userID)
     }
 
 
     suspend fun deletePostFromFavorites(post: Post) {
-        repositoryInterface.deletePostFromFavorites(postID = post.id, userID = user.userID);
-        postDao.deletePostFromFavorites(post)
+
+        repositoryInterface.removePostFromFavorites(postID = post.id, userID = user.userID)
+        val toRemove = UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID)
+        postDao.deletePostFromFavorites(toRemove)
+
     }
 
 
@@ -156,6 +161,6 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
         }
         return currentUploadedPostProgress;
     }
-
 }
+
 

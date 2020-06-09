@@ -1,19 +1,23 @@
 package com.example.bookapp.viewModels
 
+import android.content.Context
 import androidx.lifecycle.*
 import com.example.bookapp.models.User
 import com.example.dataLayer.models.deserialization.DeserializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
+import com.example.dataLayer.repositories.PostRepository
 import com.example.dataLayer.repositories.UserRepository
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ViewModelUser : ViewModel() {
 
 
-    val searchQuery = MutableLiveData<String>()
 
-    private val userRepository: UserRepository by lazy {
-        UserRepository(viewModelScope)
-    }
+    val  userRepository: UserRepository = UserRepository(viewModelScope)
+
+    val searchQuery = MutableLiveData<String>()
 
 
     val searchSuggestions: LiveData<List<User>> = Transformations.switchMap(searchQuery) {
@@ -49,7 +53,9 @@ class ViewModelUser : ViewModel() {
 
     fun acceptFriendRequest(request: DeserializeFriendRequest) {
         friendRequests.value?.remove(request)
-        userRepository.acceptFriendRequest(request)
+        viewModelScope.launch {
+            userRepository.acceptFriendRequest(request)
+        }
     }
 
 

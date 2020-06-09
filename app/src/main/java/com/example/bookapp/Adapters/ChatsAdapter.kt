@@ -14,14 +14,14 @@ import com.example.bookapp.models.Chat
 class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
     private var chats: ArrayList<Chat> = ArrayList()
 
-    fun setData(chats: ArrayList<Chat>) {
-        this.chats = chats
+    fun setData(data: List<Chat>) {
+        chats.clear()
+        chats.addAll(data)
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding: ItemFriendsBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_friends, parent, false)
-        //ViewHolder viewHolder = new View
         return ViewHolder(binding)
     }
 

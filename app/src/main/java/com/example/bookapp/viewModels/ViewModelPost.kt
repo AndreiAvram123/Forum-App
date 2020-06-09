@@ -6,26 +6,28 @@ import com.example.bookapp.models.LowDataPost
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
 import com.example.dataLayer.models.SerializeImage
+import com.example.dataLayer.models.UserWithFavoritePosts
 import com.example.dataLayer.models.UserWithPosts
 import com.example.dataLayer.models.serialization.SerializePost
 import com.example.dataLayer.repositories.PostRepository
 import com.example.dataLayer.repositories.UploadProgress
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InternalCoroutinesApi
-class ViewModelPost(application: Application) : AndroidViewModel(application) {
+class ViewModelPost : ViewModel() {
 
     var lastSeenPostPosition: Int = 0;
 
     val user: MutableLiveData<User> = MutableLiveData()
     val searchQuery: MutableLiveData<String> = MutableLiveData()
 
-    //todo
-    //not great... don't pass the user
-    private val postRepository: PostRepository by lazy {
-        PostRepository(application, coroutineScope = viewModelScope, user = user.value!!)
-    }
+
+    fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts;
+
+    @Inject
+    lateinit var postRepository: PostRepository
 
 
     val searchSuggestions: LiveData<List<LowDataPost>> = Transformations.switchMap(searchQuery) {
@@ -36,9 +38,10 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun getUserPosts(): LiveData<UserWithPosts> {
-        return postRepository.myPosts
+    fun getUserPosts(): LiveData<UserWithPosts> = Transformations.map(postRepository.myPosts) {
+        it
     }
+
 
     fun getPostByID(id: Int): LiveData<Post> {
         return postRepository.fetchPostByID(id)
@@ -48,9 +51,6 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         return postRepository.fetchedPosts
     }
 
-    fun getFavoritePosts(): LiveData<List<Post>> {
-        return postRepository.favoritePosts
-    }
 
     fun addPostToFavorites(post: Post) {
         viewModelScope.launch {
@@ -58,7 +58,7 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun deletePostFromFavorites(post: Post, user: User) =
+    fun deletePostFromFavorites(post: Post) =
             viewModelScope.launch { postRepository.deletePostFromFavorites(post) }
 
 

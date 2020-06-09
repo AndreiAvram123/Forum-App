@@ -16,7 +16,8 @@ interface PostRepositoryInterface {
     suspend fun fetchPostByID(@Path("id") postID: Int): PostDTO
 
     @GET("/user/{id}/favoritePosts")
-    suspend fun fetchFavoritePostsByUserID(@Path("id") userID: Int): ArrayList<PostDTO>
+    suspend fun fetchUserFavoritePosts(@Path("id") userID: Int): ArrayList<PostDTO>
+
 
     @GET("/user/{id}/posts")
     suspend fun fetchMyPosts(@Path("id") userID: Int): ArrayList<PostDTO>
@@ -25,7 +26,7 @@ interface PostRepositoryInterface {
     suspend fun fetchSearchSuggestions(@Path("query") query: String): List<LowDataPost>
 
     @DELETE("/user/{userID}/removePost/{postID}")
-    suspend fun deletePostFromFavorites(@Path("userID") postID: Int, @Path("postID") userID: Int)
+    suspend fun removePostFromFavorites(@Path("userID") userID: Int, @Path("postID") postID: Int): ServerResponse
 
     @POST("/user/{userID}/addToFavorites/{postID}")
     suspend fun addPostToFavorites(@Path("postID") postID: Int, @Path("userID") userID: Int)

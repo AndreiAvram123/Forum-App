@@ -28,16 +28,6 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/text_message_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="4dp"
-            app:dateFromUnix="@{message.date}"
-            android:textSize="10sp"
-            app:layout_constraintBottom_toBottomOf="@+id/text_message_body"
-            app:layout_constraintRight_toLeftOf="@+id/text_message_body" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

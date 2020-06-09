@@ -4,8 +4,10 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.bookapp.R
@@ -13,10 +15,16 @@ import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
+import com.example.bookapp.dagger.AppComponent
+import com.example.bookapp.dagger.AppModule
+import com.example.bookapp.dagger.DaggerAppComponent
+import com.example.bookapp.dagger.RepositoryModule
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.android.synthetic.main.messages_fragment.*
 import kotlinx.coroutines.InternalCoroutinesApi
+import javax.inject.Inject
 
 @InternalCoroutinesApi
 class MainActivity : AppCompatActivity() {
@@ -27,17 +35,34 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
         sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
         val user = getCurrentUser()
 
         if (user != null) {
+            startDagger(user)
             viewModelUser.user.value = user
             viewModelPost.user.value = user
+
             setContentView(R.layout.layout_main_activity)
             configureNavigationView()
         } else {
             startWelcomeActivity()
         }
+
+    }
+
+    private fun startDagger(user: User) {
+        val applicationComponent: AppComponent = DaggerAppComponent.builder()
+                .appModule(AppModule(application))
+                .repositoryModule(RepositoryModule(viewModelPost.viewModelScope, user))
+                .build()
+
+
+        applicationComponent.inject(viewModelPost)
+        applicationComponent.inject(viewModelUser)
 
     }
 
@@ -94,7 +119,6 @@ class MainActivity : AppCompatActivity() {
         value?.let { return it }
         return "Unknown"
     }
-
 
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

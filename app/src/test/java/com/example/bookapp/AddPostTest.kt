@@ -48,6 +48,8 @@ class AddPostTest {
         }
     }
 
+
+
     @Test
     fun uploadedPostShouldBeFoundOnServer() {
         runBlocking {
@@ -60,6 +62,7 @@ class AddPostTest {
                 val response = repo.uploadImage(image)
 
                 val imageLink = response.message
+
                 val uploadPost = SerializePost(
                         title = "Placeholder title",
                         content = "Placeholder content",
