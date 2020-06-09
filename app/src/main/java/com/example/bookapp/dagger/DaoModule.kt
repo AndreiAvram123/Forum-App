@@ -1,20 +1,24 @@
 package com.example.bookapp.dagger
 
 import android.app.Application
+import android.content.Context
 import com.example.dataLayer.PostDatabase
 import com.example.dataLayer.interfaces.dao.RoomPostDao
 import com.example.dataLayer.interfaces.dao.RoomUserDao
 import com.example.dataLayer.interfaces.dao.RoomUserDao_Impl
 import dagger.Module
+import dagger.Provides
 import kotlinx.coroutines.InternalCoroutinesApi
+import javax.inject.Inject
 
 @InternalCoroutinesApi
 @Module
-class DaoModule(private val application: Application) {
-    private val db = PostDatabase.getDatabase(application)
+class DaoModule() {
 
-    fun postDao(): RoomPostDao = db.postDao()
+    @Provides
+    fun postDao(context: Context): RoomPostDao = PostDatabase.getDatabase(context).postDao()
 
-    fun userDao(): RoomUserDao = db.userDao()
+    @Provides
+    fun userDao(context: Context): RoomUserDao = PostDatabase.getDatabase(context).userDao()
 
 }

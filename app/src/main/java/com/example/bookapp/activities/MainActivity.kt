@@ -11,14 +11,11 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.example.bookapp.R
+import com.example.bookapp.dagger.*
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
-import com.example.bookapp.dagger.AppComponent
-import com.example.bookapp.dagger.AppModule
-import com.example.bookapp.dagger.DaggerAppComponent
-import com.example.bookapp.dagger.RepositoryModule
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -55,14 +52,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startDagger(user: User) {
-        val applicationComponent: AppComponent = DaggerAppComponent.builder()
-                .appModule(AppModule(application))
-                .repositoryModule(RepositoryModule(viewModelPost.viewModelScope, user))
-                .build()
+        (application as MyApplication).appComponent  = DaggerAppComponent.factory().create(applicationContext,viewModelPost.viewModelScope,user)
+        val appComponent = (application as MyApplication).appComponent
 
-
-        applicationComponent.inject(viewModelPost)
-        applicationComponent.inject(viewModelUser)
+        appComponent.inject(this)
+        appComponent.inject(viewModelPost)
+        appComponent.inject(viewModelUser)
 
     }
 

@@ -1,6 +1,7 @@
 package com.example.dataLayer.repositories
 
 import android.content.Context
+import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
@@ -20,10 +21,13 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @InternalCoroutinesApi
-class PostRepository @Inject constructor(private val application: Context, val coroutineScope: CoroutineScope,
-                                         val user: User,
-                                         private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO
+class PostRepository @Inject constructor(val connectivityManager: ConnectivityManager,
+                                         val postDao: RoomPostDao,
+                                         val coroutineScope: CoroutineScope,
+                                         val user: User
 ) {
+
+
 
 
     val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
@@ -34,26 +38,19 @@ class PostRepository @Inject constructor(private val application: Context, val c
 
     private val repositoryInterface: PostRepositoryInterface = AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
 
-    private val postDao: RoomPostDao = PostDatabase.getDatabase(application).postDao()
 
-    private val userDao: RoomUserDao = PostDatabase.getDatabase(application).userDao().also {
-        coroutineScope.launch {
-            it.insertUser(user)
-        }
-    }
-
-    val fetchedPosts = liveData(defaultDispatcher) {
+    val fetchedPosts = liveData(Dispatchers.IO) {
         emitSource(postDao.getCachedPosts())
-        if (AppUtilities.isNetworkAvailable(application)) {
+        if (connectivityManager.isDefaultNetworkActive) {
             fetchNextPagePosts()
         }
     }
 
     val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
-        liveData(defaultDispatcher) {
+        liveData(Dispatchers.IO) {
             emitSource(postDao.getFavoritePosts(user.userID))
         }.also {
-            if (AppUtilities.isNetworkAvailable(application)) {
+            if (connectivityManager.isDefaultNetworkActive) {
                 coroutineScope.launch { fetchFavoritePosts() }
             }
         }
@@ -61,7 +58,7 @@ class PostRepository @Inject constructor(private val application: Context, val c
     val myPosts: LiveData<UserWithPosts> = liveData {
         emitSource(postDao.getAllUserPosts(user.userID))
     }.also {
-        if (AppUtilities.isNetworkAvailable(application)) {
+        if (connectivityManager.isDefaultNetworkActive) {
             coroutineScope.launch {
                 fetchMyPosts()
             }
@@ -74,7 +71,9 @@ class PostRepository @Inject constructor(private val application: Context, val c
         val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
         val author = UserMapper.mapNetworkToDomainObject(postDTO.author);
         postDao.insertPost(post)
-        userDao.insertUser(author)
+        //todo
+        //did it break?
+        // userDao.insertUser(author)
         emit(post)
     }
 
