@@ -1,6 +1,6 @@
 package com.example.dataLayer.repositories
 
-import android.app.Application
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
@@ -17,20 +17,20 @@ import com.example.dataLayer.interfaces.dao.RoomUserDao
 import com.example.dataLayer.models.*
 import com.example.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 @InternalCoroutinesApi
-class PostRepository(application: Application
-                     , val coroutineScope: CoroutineScope
-                     , val user: User,
-                       private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO
-                     ) {
+class PostRepository @Inject constructor(private val application: Context, val coroutineScope: CoroutineScope,
+                                         val user: User,
+                                         private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
+
 
     val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
     val currentUploadImagePath: MutableLiveData<String> = MutableLiveData()
     private val currentUploadedPostProgress: MutableLiveData<UploadProgress> = MutableLiveData()
 
     private var nextPageToFetch: Int = 1;
-    //private val currentFetchedPosts: HashMap<Int, LiveData<Post>> = HashMap()
 
     private val repositoryInterface: PostRepositoryInterface = AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
 

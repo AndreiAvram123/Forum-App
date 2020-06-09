@@ -13,9 +13,10 @@ import com.example.dataLayer.repositories.PostRepository
 import com.example.dataLayer.repositories.UploadProgress
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InternalCoroutinesApi
-class ViewModelPost(application: Application) : AndroidViewModel(application) {
+class ViewModelPost : ViewModel() {
 
     var lastSeenPostPosition: Int = 0;
 
@@ -25,11 +26,8 @@ class ViewModelPost(application: Application) : AndroidViewModel(application) {
 
     fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts;
 
-    //todo
-    //not great... don't pass the user
-    private val postRepository: PostRepository by lazy {
-        PostRepository(application, coroutineScope = viewModelScope, user = user.value!!)
-    }
+    @Inject
+    lateinit var postRepository: PostRepository
 
 
     val searchSuggestions: LiveData<List<LowDataPost>> = Transformations.switchMap(searchQuery) {

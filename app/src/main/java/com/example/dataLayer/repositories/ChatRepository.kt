@@ -12,8 +12,9 @@ import com.example.dataLayer.interfaces.ChatLink
 import com.example.dataLayer.models.serialization.SerializeMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ChatRepository(private val coroutineScope: CoroutineScope) {
+class ChatRepository @Inject constructor(private val coroutineScope: CoroutineScope) {
 
     val userChats: MutableLiveData<List<Chat>> by lazy {
         MutableLiveData<List<Chat>>()

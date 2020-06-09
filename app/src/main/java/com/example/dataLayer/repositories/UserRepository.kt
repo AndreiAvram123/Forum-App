@@ -10,8 +10,10 @@ import com.example.dataLayer.models.deserialization.DeserializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UserRepository(private val coroutineScope: CoroutineScope) {
+class UserRepository @Inject constructor(private val coroutineScope: CoroutineScope) {
+
     val currentFetchedUser = MutableLiveData<User>()
     private val currentSearchSuggestions = MutableLiveData<List<User>>()
 
@@ -20,6 +22,7 @@ class UserRepository(private val coroutineScope: CoroutineScope) {
     private val userRepositoryInterface: UserRepositoryInterface by lazy {
         AppUtilities.getRetrofit().create(UserRepositoryInterface::class.java)
     }
+
 
     private var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
 
@@ -87,9 +90,8 @@ class UserRepository(private val coroutineScope: CoroutineScope) {
         return friendRequests;
     }
 
-    fun acceptFriendRequest(request: DeserializeFriendRequest) {
-        coroutineScope.launch {
-            userRepositoryInterface.acceptFriendRequest(request.id)
-        }
+    suspend fun acceptFriendRequest(request: DeserializeFriendRequest) {
+        userRepositoryInterface.acceptFriendRequest(request.id)
+
     }
 }

@@ -15,6 +15,7 @@ import com.example.bookapp.R
 import com.example.bookapp.databinding.LayoutFragmentChatsBinding
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
+import kotlinx.coroutines.InternalCoroutinesApi
 
 class ChatsFragment : Fragment() {
     private val viewModelUser: ViewModelUser by activityViewModels()
