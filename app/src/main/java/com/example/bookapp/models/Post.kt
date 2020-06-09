@@ -18,7 +18,7 @@ data class Post(
     var author: User? = null
 
     companion object Empty {
-        fun buildNullSafeObject(): Post {
+        fun buildTestPost(): Post {
             return Post(id = 0, content = "", date = 333, title = "", image = "dfd", authorID = 0)
         }
 

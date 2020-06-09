@@ -28,7 +28,7 @@ object PostMapper {
             return post;
         }
 
-        return Post.buildNullSafeObject()
+        return Post.buildTestPost()
 
     }
 

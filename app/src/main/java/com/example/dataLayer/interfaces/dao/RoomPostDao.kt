@@ -6,6 +6,7 @@ import com.example.bookapp.models.Post
 import com.example.dataLayer.models.UserWithFavoritePosts
 import com.example.dataLayer.models.UserWithFavoritePostsCrossRef
 import com.example.dataLayer.models.UserWithPosts
+import retrofit2.http.DELETE
 
 @Dao
 interface RoomPostDao {
@@ -17,12 +18,14 @@ interface RoomPostDao {
     fun getFavoritePosts(userID: Int): LiveData<UserWithFavoritePosts>
 
 
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAllFavoritePosts(usersWithFavoritePostsCrossRef: List<UserWithFavoritePostsCrossRef>)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addFavoritePost(usersWithFavoritePostsCrossRef: UserWithFavoritePostsCrossRef)
+
+    @Delete
+    suspend fun deletePostFromFavorites(usersWithFavoritePostsCrossRef: UserWithFavoritePostsCrossRef)
 
 
     @Query("SELECT * FROM user WHERE userID = :userID")
@@ -41,12 +44,8 @@ interface RoomPostDao {
     suspend fun removeCachedData()
 
 
-    @Update
-    suspend fun deletePostFromFavorites(post: Post)
-
-
     @Query("SELECT * FROM user WHERE userID = :userID LIMIT 1")
-    fun getFavoritePostsTest(userID: Int): UserWithFavoritePosts
+    suspend fun getFavoritePostsTest(userID: Int): UserWithFavoritePosts
 
 
 }

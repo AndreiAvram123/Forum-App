@@ -32,7 +32,7 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
 
     private var posts: ArrayList<Post> = ArrayList()
     var currentState: State = State.LOADING
-    private val loadingObject: Post = Post.buildNullSafeObject()
+    private val loadingObject: Post = Post.buildTestPost()
 
 
     fun setData(data: List<Post>) {

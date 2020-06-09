@@ -19,7 +19,11 @@ import com.example.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.*
 
 @InternalCoroutinesApi
-class PostRepository(application: Application, val coroutineScope: CoroutineScope, val user: User) {
+class PostRepository(application: Application
+                     , val coroutineScope: CoroutineScope
+                     , val user: User,
+                       private val defaultDispatcher: CoroutineDispatcher = Dispatchers.IO
+                     ) {
 
     val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
     val currentUploadImagePath: MutableLiveData<String> = MutableLiveData()
@@ -38,7 +42,7 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
         }
     }
 
-    val fetchedPosts = liveData(Dispatchers.IO) {
+    val fetchedPosts = liveData(defaultDispatcher) {
         emitSource(postDao.getCachedPosts())
         if (AppUtilities.isNetworkAvailable(application)) {
             fetchNextPagePosts()
@@ -46,7 +50,7 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
     }
 
     val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
-        liveData(Dispatchers.IO) {
+        liveData(defaultDispatcher) {
             emitSource(postDao.getFavoritePosts(user.userID))
         }.also {
             if (AppUtilities.isNetworkAvailable(application)) {
@@ -102,10 +106,11 @@ class PostRepository(application: Application, val coroutineScope: CoroutineScop
 
 
     suspend fun deletePostFromFavorites(post: Post) {
-        //todo
-        //remove
-        //   repositoryInterface.removePostFromFavorites(postID = post.id, userID = user.userID);
-        postDao.deletePostFromFavorites(post)
+
+        repositoryInterface.removePostFromFavorites(postID = post.id, userID = user.userID)
+        val toRemove = UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID)
+        postDao.deletePostFromFavorites(toRemove)
+
     }
 
 

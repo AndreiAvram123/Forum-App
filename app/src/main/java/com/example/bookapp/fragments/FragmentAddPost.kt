@@ -78,7 +78,7 @@ class FragmentAddPost : Fragment() {
         if (editTextTitle.isEmpty()) {
             return false
         }
-        if (binding.postImageAdd.drawable != requireContext().getDrawable(R.drawable.ic_add_image)) {
+        if (binding.postImageAdd.drawable == requireContext().getDrawable(R.drawable.ic_add_image)) {
             return false
         }
 
