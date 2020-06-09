@@ -1,5 +1,6 @@
 package com.example.bookapp
 
+import android.app.Activity
 import android.content.Context
 import android.database.Cursor
 import android.graphics.Bitmap
@@ -9,6 +10,7 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Base64
+import android.util.DisplayMetrics
 import androidx.core.content.ContentProviderCompat.requireContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -24,6 +26,12 @@ object AppUtilities {
                 .baseUrl("http://www.andreiram.co.uk/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
+    }
+
+    fun getScreenWidth(activity: Activity):Int {
+        val displayMetrics = DisplayMetrics()
+        activity.windowManager.defaultDisplay.getMetrics(displayMetrics)
+        return  displayMetrics.widthPixels
     }
 
 

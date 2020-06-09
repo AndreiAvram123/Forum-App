@@ -10,13 +10,15 @@ import java.util.*
 
 
 @BindingAdapter("imageFromURL")
-fun bindImageFromURL(imageView: ImageView, imageURl: String?) {
+fun bindImageFromURL(imageView: ImageView,
+                     imageURl: String?) {
     if (!imageURl.isNullOrEmpty()) {
         Glide.with(imageView).load(imageURl)
                 .centerInside()
                 .into(imageView)
     }
 }
+
 
 @BindingAdapter("photoViewImageFromURl")
 fun getImage(photoView: PhotoView, imageURl: String?) {

@@ -4,10 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="com.example.bookapp.models.LocalImageMessage"/>
+
+        <import type="com.example.bookapp.models.LocalImageMessage" />
+        <import type="com.example.dataLayer.repositories.UploadProgress"/>
         <variable
             name="message"
             type="com.example.bookapp.models.MessageDTO" />
+
+        <variable
+            name="halfScreenWidth"
+            type="Integer" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -25,7 +31,7 @@
             android:adjustViewBounds="true"
             android:cropToPadding="true"
             android:scaleType="centerInside"
-            app:imageFromURL="@{message instanceof LocalImageMessage ? `` : message.content }"
+            app:imageFromURL="@{message instanceof LocalImageMessage ? `` : (message.content + `?width=` + halfScreenWidth) }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
