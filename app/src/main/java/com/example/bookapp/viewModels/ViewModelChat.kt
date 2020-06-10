@@ -5,6 +5,7 @@ import com.example.bookapp.models.Chat
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.ChatLink
+import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
@@ -21,6 +22,18 @@ class ViewModelChat : ViewModel() {
 
 
     val user: MutableLiveData<User> = MutableLiveData()
+
+    val fetchChatNotifications = MutableLiveData<Boolean>()
+
+    val chatNotifications: LiveData<ArrayList<ChatNotificationDTO>> = Transformations.switchMap(fetchChatNotifications) {
+        liveData {
+            val user = user.value
+            if (it && user != null) {
+                emit(chatRepository.fetchChatsNotification(user))
+            }
+        }
+    }
+
 
     var userChats: LiveData<ArrayList<Chat>> = Transformations.switchMap(user) {
         liveData {

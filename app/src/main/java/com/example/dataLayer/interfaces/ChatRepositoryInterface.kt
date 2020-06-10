@@ -2,6 +2,7 @@ package com.example.dataLayer.interfaces
 
 import com.example.bookapp.models.MessageDTO
 import com.example.dataLayer.models.ChatDTO
+import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.ServerResponse
 import com.example.dataLayer.models.UserDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
@@ -41,6 +42,9 @@ interface ChatRepositoryInterface {
 
     @GET("/user/{userID}/friends")
     suspend fun fetchFriends(@Path("userID") userID: Int): List<UserDTO>
+
+    @GET("/user/{userID}/chatsNotifications")
+    suspend fun fetchChatNotification(@Path("userID") userID: Int): List<ChatNotificationDTO>
 
 }
 

@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
@@ -19,9 +19,7 @@ import com.example.bookapp.viewModels.ViewModelUser
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import kotlinx.android.synthetic.main.messages_fragment.*
 import kotlinx.coroutines.InternalCoroutinesApi
-import javax.inject.Inject
 
 @InternalCoroutinesApi
 class MainActivity : AppCompatActivity() {
@@ -90,7 +88,22 @@ class MainActivity : AppCompatActivity() {
 
         NavigationUI.setupWithNavController(bottomNavigationView,
                 navController)
+        showNotifications(bottomNavigationView)
+    }
 
+    private fun showNotifications(bottomNavigationView: BottomNavigationView) {
+        val chatBadge = bottomNavigationView.getOrCreateBadge(
+                R.id.friends
+        )
+        viewModelChat.chatNotifications.observe(this, Observer {
+            if(it.isNotEmpty()) {
+                chatBadge.number = it.size
+                chatBadge.isVisible = true
+            }else{
+                chatBadge.isVisible = false
+            }
+        })
+        viewModelChat.fetchChatNotifications.value = true
     }
 
 

@@ -26,8 +26,6 @@ class ChatRepository @Inject constructor(private val coroutineScope: CoroutineSc
         MutableLiveData<List<MessageDTO>>()
     }
 
-    private val friendRequests = MutableLiveData<List<FriendRequest>>()
-
     suspend fun fetchUserChats(user: User): LiveData<ArrayList<Chat>> {
 
         val fetchedData = repoInterface.fetchUserChats(user.userID)
@@ -66,9 +64,11 @@ class ChatRepository @Inject constructor(private val coroutineScope: CoroutineSc
 
     suspend fun acceptFriendRequest(request: FriendRequest) {
         val chat = repoInterface.acceptFriendRequest(request.id)
-
         userChats.value?.add(ChatMapper.mapDtoObjectToDomainObject(chat, request.receiver.userID))
     }
+
+
+    suspend fun fetchChatsNotification(user: User) = ArrayList(repoInterface.fetchChatNotification(user.userID))
 
 
     suspend fun fetchFriendRequests(user: User): ArrayList<FriendRequest> = ArrayList(repoInterface.fetchFriendRequests(user.userID))
