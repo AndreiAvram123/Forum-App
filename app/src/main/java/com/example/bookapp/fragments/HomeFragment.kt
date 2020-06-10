@@ -25,17 +25,10 @@ class HomeFragment : Fragment(), HomeAdapter.Callback {
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_home_fragment, container, false);
         attachObserver()
         initializeUI()
-        val layoutManager: LinearLayoutManager = binding.recyclerViewHome.layoutManager as LinearLayoutManager
-        layoutManager.scrollToPosition(viewModelPost.lastSeenPostPosition)
         return binding.root
     }
 
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        val layoutManager: LinearLayoutManager = binding.recyclerViewHome.layoutManager as LinearLayoutManager
-        viewModelPost.lastSeenPostPosition = layoutManager.findFirstVisibleItemPosition()
-    }
 
     private fun initializeUI() {
         binding.homeSwipeRefreshLayout.setOnRefreshListener {

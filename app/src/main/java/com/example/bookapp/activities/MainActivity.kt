@@ -31,18 +31,12 @@ class MainActivity : AppCompatActivity() {
     private val viewModelChat: ViewModelChat by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-
-
         sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
         val user = getCurrentUser()
 
         if (user != null) {
             startDagger(user)
-            viewModelUser.user.value = user
-            viewModelPost.user.value = user
-
+            super.onCreate(savedInstanceState)
             setContentView(R.layout.layout_main_activity)
             configureNavigationView()
         } else {
@@ -52,12 +46,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startDagger(user: User) {
-        (application as MyApplication).appComponent  = DaggerAppComponent.factory().create(applicationContext,viewModelPost.viewModelScope,user)
+        (application as MyApplication).appComponent = DaggerAppComponent.factory().create(applicationContext, viewModelPost.viewModelScope, user)
         val appComponent = (application as MyApplication).appComponent
+
+
+        viewModelChat.user.value = user
+
 
         appComponent.inject(this)
         appComponent.inject(viewModelPost)
         appComponent.inject(viewModelUser)
+        appComponent.inject(viewModelChat)
+
 
     }
 
@@ -65,8 +65,6 @@ class MainActivity : AppCompatActivity() {
     private fun getCurrentUser(): User? {
         val userID = sharedPreferences.getInt(getString(R.string.key_user_id), 0)
         if (userID > 0) {
-            //todo
-            //modify profile picture
             return User(userID = userID,
                     username = sharedPreferences.getStringNotNull(R.string.key_email),
                     email = sharedPreferences.getStringNotNull(R.string.key_username),

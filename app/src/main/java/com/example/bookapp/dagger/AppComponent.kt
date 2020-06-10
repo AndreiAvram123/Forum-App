@@ -4,11 +4,13 @@ import android.app.Application
 import android.content.Context
 import com.example.bookapp.activities.MainActivity
 import com.example.bookapp.models.User
+import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.PostDatabase
 import dagger.BindsInstance
 import dagger.Component
+import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Singleton
@@ -21,10 +23,14 @@ interface AppComponent {
     //for field parameters you must call inject
     fun inject(viewModelPost: ViewModelPost)
 
-    fun inject(viewModelPost: ViewModelUser)
+    fun inject(viewModelUser: ViewModelUser)
+
+    fun inject(viewModelPost: ViewModelChat)
 
     fun inject(mainActivity: MainActivity)
 
+    //todo
+    //user ... really
     @Component.Factory
     interface Factory {
         // With @BindsInstance, the Context passed in will be available in the graph

@@ -2,43 +2,40 @@ package com.example.dataLayer.repositories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import com.example.bookapp.AppUtilities
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.interfaces.UserRepositoryInterface
-import com.example.dataLayer.models.deserialization.DeserializeFriendRequest
-import com.example.dataLayer.models.serialization.SerializeFriendRequest
+import com.example.dataLayer.models.deserialization.FriendRequest
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class UserRepository @Inject constructor(private val coroutineScope: CoroutineScope) {
+class UserRepository @Inject constructor(private val coroutineScope: CoroutineScope,
+                                         private val user: User) {
 
-    val currentFetchedUser = MutableLiveData<User>()
     private val currentSearchSuggestions = MutableLiveData<List<User>>()
 
-    private val friendRequests = MutableLiveData<ArrayList<DeserializeFriendRequest>>()
+    private val friendRequests = MutableLiveData<ArrayList<FriendRequest>>()
 
     private val userRepositoryInterface: UserRepositoryInterface by lazy {
         AppUtilities.getRetrofit().create(UserRepositoryInterface::class.java)
     }
 
 
-    private var friends: MutableLiveData<ArrayList<User>> = MutableLiveData()
-
-
-    fun fetchFriends(user: User): LiveData<ArrayList<User>> {
-        //clear cache
-        friends = MutableLiveData()
-        coroutineScope.launch {
+    val friends: LiveData<List<User>> by lazy {
+        liveData(Dispatchers.IO) {
             val fetchedData = userRepositoryInterface.fetchFriends(user.userID)
-            friends.postValue(ArrayList(UserMapper.mapDTONetworkToDomainObjects(fetchedData)))
+            val friendsDomain = UserMapper.mapDTONetworkToDomainObjects(fetchedData)
+            emit(friendsDomain)
         }
-        return friends;
-
     }
 
-    fun loginWithGoogle(idToken: String, displayName: String, email: String) {
+
+    fun loginWithGoogle(idToken: String, displayName: String, email: String): LiveData<User> {
+        val liveData = MutableLiveData<User>()
         coroutineScope.launch {
             try {
 
@@ -47,22 +44,25 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
                 if (fetchedUser.userID == 0) {
                     createGoogleAccount(idToken, displayName, email)
                 } else {
-                    currentFetchedUser.postValue(UserMapper.mapNetworkToDomainObject(fetchedUser))
+                    liveData.postValue(UserMapper.mapNetworkToDomainObject(fetchedUser))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
+        return liveData
     }
 
-    private suspend fun createGoogleAccount(idToken: String, displayName: String, email: String) {
+    private suspend fun createGoogleAccount(idToken: String, displayName: String, email: String): LiveData<User> {
+        val liveData = MutableLiveData<User>()
         try {
             val newUser = userRepositoryInterface.createGoogleAccount(idToken, displayName, email)
-            currentFetchedUser.postValue(UserMapper.mapNetworkToDomainObject(newUser))
+            liveData.postValue(UserMapper.mapNetworkToDomainObject(newUser))
 
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
+        return liveData
     }
 
     fun fetchSearchSuggestions(query: String): LiveData<List<User>> {
@@ -73,25 +73,5 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
             currentSearchSuggestions.postValue(UserMapper.mapDTONetworkToDomainObjects(fetchedSuggestions))
         }
         return currentSearchSuggestions;
-    }
-
-    fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
-        coroutineScope.launch {
-            userRepositoryInterface.pushFriendRequest(friendRequest)
-        }
-    }
-
-    fun fetchFriendRequests(user: User): LiveData<ArrayList<DeserializeFriendRequest>> {
-        friendRequests.value = ArrayList()
-        coroutineScope.launch {
-            val fetchedData = userRepositoryInterface.fetchFriendRequests(user.userID)
-            friendRequests.postValue(ArrayList(fetchedData))
-        }
-        return friendRequests;
-    }
-
-    suspend fun acceptFriendRequest(request: DeserializeFriendRequest) {
-        userRepositoryInterface.acceptFriendRequest(request.id)
-
     }
 }

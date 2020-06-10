@@ -17,7 +17,8 @@ import java.io.InputStream
 
 object AppUtilities {
 
-
+//todo
+    //inject here activity
     fun getRetrofit(): Retrofit {
         return Retrofit.Builder()
                 .baseUrl("http://www.andreiram.co.uk/")

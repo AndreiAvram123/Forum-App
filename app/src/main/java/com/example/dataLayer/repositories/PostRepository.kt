@@ -21,16 +21,14 @@ import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @InternalCoroutinesApi
-class PostRepository @Inject constructor(val connectivityManager: ConnectivityManager,
-                                         val postDao: RoomPostDao,
+class PostRepository @Inject constructor(private val connectivityManager: ConnectivityManager,
+                                         private val postDao: RoomPostDao,
                                          val coroutineScope: CoroutineScope,
                                          val user: User
 ) {
 
 
-
-
-    val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
+    private val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
     val currentUploadImagePath: MutableLiveData<String> = MutableLiveData()
     private val currentUploadedPostProgress: MutableLiveData<UploadProgress> = MutableLiveData()
 

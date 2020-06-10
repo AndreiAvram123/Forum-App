@@ -18,24 +18,11 @@ import javax.inject.Inject
 @InternalCoroutinesApi
 class ViewModelPost : ViewModel() {
 
-    var lastSeenPostPosition: Int = 0;
-
-    val user: MutableLiveData<User> = MutableLiveData()
-    val searchQuery: MutableLiveData<String> = MutableLiveData()
-
 
     fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts;
 
     @Inject
     lateinit var postRepository: PostRepository
-
-
-    val searchSuggestions: LiveData<List<LowDataPost>> = Transformations.switchMap(searchQuery) {
-        viewModelScope.launch {
-            searchQuery.value?.let { query -> postRepository.fetchSuggestions(query = query) }
-        }
-        return@switchMap postRepository.currentSearchResults
-    }
 
 
     fun getUserPosts(): LiveData<UserWithPosts> = Transformations.map(postRepository.myPosts) {

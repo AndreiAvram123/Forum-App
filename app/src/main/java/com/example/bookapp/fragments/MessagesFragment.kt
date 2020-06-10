@@ -2,8 +2,8 @@ package com.example.bookapp.fragments
 
 import android.content.Intent
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
-import android.os.UserManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +24,6 @@ import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.dataMappers.UserMapper
-import com.example.dataLayer.models.UserDTO
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.serverConstants.MessageTypes
 import com.google.gson.Gson
@@ -56,10 +55,8 @@ class MessagesFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = MessagesFragmentBinding.inflate(inflater, container, false)
+        user = viewModelUser.user
 
-        viewModelUser.user.value?.let {
-            user = it
-        }
 
         messageAdapter = MessageAdapter(user, ::expandImage)
         configureViews()
@@ -82,10 +79,11 @@ class MessagesFragment : Fragment() {
         return binding.root
     }
 
-    private fun expandImage(imageURL: String) {
-        val action = MessagesFragmentDirections.actionMessagesFragmentToImageZoomFragment(imageURL)
+    private fun expandImage(imageURL: String, localImage: Boolean) {
+        val action = MessagesFragmentDirections.actionMessagesFragmentToImageZoomFragment(imageURL, localImage)
         binding.root.findNavController().navigate(action)
     }
+
 
     override fun onDetach() {
         super.onDetach()
@@ -191,17 +189,18 @@ class MessagesFragment : Fragment() {
             data?.let {
                 val path = it.data
                 if (path != null) {
-                    val drawable = AppUtilities.convertFromUriToDrawable(path, requireContext())
-                    pushImage(drawable)
+                    pushImage(path)
 
                 }
             }
         }
     }
 
-    private fun pushImage(image: Drawable) {
+    private fun pushImage(path: Uri) {
+        val drawable = AppUtilities.convertFromUriToDrawable(path, requireContext())
+
         lifecycleScope.launch(Dispatchers.IO) {
-            val data = AppUtilities.getBase64ImageFromDrawable(image)
+            val data = AppUtilities.getBase64ImageFromDrawable(drawable)
 
             val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
             lifecycleScope.launch(Dispatchers.Main) {
@@ -216,11 +215,10 @@ class MessagesFragment : Fragment() {
                 viewModelChat.sendMessage(message)
 
                 val localImageMessage = LocalImageMessage(
-                        id = -1,
                         sender = UserMapper.mapDomainToNetworkObject(user),
                         type = MessageTypes.imageMessageType,
                         localID = uniqueID,
-                        drawable = image
+                        resourcePath = path
                 )
                 messageAdapter.add(localImageMessage)
             }

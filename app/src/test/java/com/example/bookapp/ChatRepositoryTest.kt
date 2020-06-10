@@ -1,15 +1,24 @@
 package com.example.bookapp
 
+import com.example.dataLayer.interfaces.ChatRepositoryInterface
 import com.example.dataLayer.interfaces.UserRepositoryInterface
-import com.example.dataLayer.models.deserialization.DeserializeFriendRequest
+import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
+import com.google.android.gms.common.UserRecoverableException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 
-class UserRepositoryTests {
+class ChatRepositoryTest {
 
-    val repo = AppUtilities.getRetrofit().create(UserRepositoryInterface::class.java)
+    private lateinit var repo: ChatRepositoryInterface
+
+    @Before
+    fun setUp() {
+        repo = AppUtilities.getRetrofit().create(ChatRepositoryInterface::class.java)
+    }
+
 
     @Test
     fun shouldUploadComment() = runBlocking {
@@ -33,7 +42,7 @@ class UserRepositoryTests {
         repo.pushFriendRequest(friendRequest)
 
         //fetch the friend requests and get the id of the last
-        val requests: ArrayList<DeserializeFriendRequest> = ArrayList(repo.fetchFriendRequests(receiverID))
+        val requests: ArrayList<FriendRequest> = ArrayList(repo.fetchFriendRequests(receiverID))
 
 
         //accept the friend request

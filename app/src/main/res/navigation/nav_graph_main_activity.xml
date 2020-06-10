@@ -88,5 +88,8 @@
         <argument
             android:name="imageURl"
             app:argType="string" />
+        <argument
+            android:name="localImage"
+            app:argType="boolean" />
     </fragment>
 </navigation>

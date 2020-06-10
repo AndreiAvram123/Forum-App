@@ -27,18 +27,14 @@ class FragmentUserPosts : Fragment() {
         RecyclerViewAdapterPosts()
     }
     private val viewModelPost: ViewModelPost by activityViewModels()
-    private val viewModelUser: ViewModelUser by activityViewModels()
-    private val myPosts: ArrayList<Post>? = null
-    private lateinit var user: User
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = FragmentMyPostsBinding.inflate(inflater, container, false)
         initializeRecyclerView()
 
-        viewModelUser.user.value?.let {
-            user = it
-        }
+
         attachObserver()
         // Inflate the layout for this fragment
         return binding.root

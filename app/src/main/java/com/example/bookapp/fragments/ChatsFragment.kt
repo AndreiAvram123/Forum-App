@@ -18,7 +18,6 @@ import com.example.bookapp.viewModels.ViewModelUser
 import kotlinx.coroutines.InternalCoroutinesApi
 
 class ChatsFragment : Fragment() {
-    private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
 
     private lateinit var binding: LayoutFragmentChatsBinding
@@ -31,14 +30,11 @@ class ChatsFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
 
         binding = LayoutFragmentChatsBinding.inflate(inflater, container, false)
-
-
-        viewModelUser.user.value?.let {
             configureRecyclerView()
-            viewModelChat.getUserChats(it).observe(viewLifecycleOwner, Observer { chats ->
+            viewModelChat.userChats.observe(viewLifecycleOwner, Observer { chats ->
                 chatsAdapter.setData(chats)
             })
-        }
+
         return binding.root
     }
 

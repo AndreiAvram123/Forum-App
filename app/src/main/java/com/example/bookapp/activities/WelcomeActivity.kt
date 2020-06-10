@@ -7,7 +7,11 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import com.example.bookapp.R
+import com.example.bookapp.dagger.AppComponent
+import com.example.bookapp.dagger.DaggerAppComponent
+import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.fragments.AuthenticationFragment
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelUser
@@ -23,23 +27,22 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()
 
-    //todo
-    //errors present wtf???
     private val requestCodeGoogleSignIn = 1
 
     //use share preferences to share data across activities
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val appComponent: AppComponent = DaggerAppComponent.factory().create(applicationContext, viewModelUser.viewModelScope, User(userID = 1, username = "", email = "", profilePicture = ""))
+
+        (application as MyApplication).appComponent = appComponent
+        appComponent.inject(viewModelUser)
+
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
         sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
 
-        viewModelUser.user.observe(this, Observer {
-            it?.let {
-                saveUserInMemory(it)
-            }
-        })
 
     }
 
@@ -66,7 +69,11 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
                 // Google Sign In was successful, authenticate with Firebase
                 googleSignInAccount = task.getResult(ApiException::class.java)
                 googleSignInAccount?.let {
-                    viewModelUser.loginWithGoogle(it.id!!, it.displayName!!, it.email!!)
+                    viewModelUser.loginWithGoogle(it.id!!, it.displayName!!, it.email!!).observe(this, Observer { user ->
+                        if (user != null) {
+                            saveUserInMemory(user)
+                        }
+                    })
                 }
 
             } catch (e: ApiException) {

@@ -1,7 +1,7 @@
 package com.example.bookapp.Adapters
 
 import android.app.Activity
-import android.util.DisplayMetrics
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -15,9 +15,11 @@ import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.dataLayer.repositories.UploadProgress
 import com.example.dataLayer.serverConstants.MessageTypes
+import kotlin.math.exp
 
 
-class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: String) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class MessageAdapter(private val currentUser: User,
+                     val expand: (imageURL: String, local: Boolean) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     private val messages: ArrayList<MessageDTO> = ArrayList()
     private var adapterRecyclerView: RecyclerView? = null
 
@@ -44,7 +46,8 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
         fun bind(messageDTO: MessageDTO) {
             binding.message = messageDTO
             if (messageDTO is LocalImageMessage) {
-                binding.messageImage.setImageDrawable(messageDTO.drawable)
+                val drawable = AppUtilities.convertFromUriToDrawable(messageDTO.resourcePath, binding.root.context)
+                binding.messageImage.setImageDrawable(drawable)
 
                 if (messageDTO.currentStatus == UploadProgress.UPLOADING) {
                     binding.messageImage.alpha = 0.5f
@@ -53,8 +56,16 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
             binding.halfScreenWidth = AppUtilities.getScreenWidth(binding.root.context as Activity)
 
             binding.messageImage.setOnClickListener {
-                expandImage(messageDTO.content)
+                expandImage(messageDTO)
             }
+        }
+    }
+
+    fun expandImage(messageDTO: MessageDTO) {
+        if (messageDTO is LocalImageMessage) {
+            expand(messageDTO.resourcePath.toString(), true)
+        } else {
+            expand(messageDTO.content, false)
         }
     }
 
@@ -64,7 +75,9 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
             binding.halfScreenWidth = AppUtilities.getScreenWidth(binding.root.context as Activity)
 
             binding.messageImage.setOnClickListener {
-                expandImage(messageDTO.content)
+                if (messageDTO is LocalImageMessage) {
+
+                }
             }
 
         }

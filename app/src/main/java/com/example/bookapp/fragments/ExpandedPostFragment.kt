@@ -47,10 +47,6 @@ class ExpandedPostFragment : Fragment() {
         binding = PostExpandedFragmentBinding.inflate(layoutInflater, container, false)
 
         attachObservers()
-        viewModelUser.user.value?.let {
-            user = it
-        }
-
         return binding.root
     }
 

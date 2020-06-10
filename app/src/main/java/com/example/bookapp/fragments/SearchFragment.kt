@@ -14,24 +14,22 @@ import com.example.bookapp.Adapters.SuggestionsAdapter
 import com.example.bookapp.R
 import com.example.bookapp.databinding.FragmentSearchBinding
 import com.example.bookapp.models.User
+import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
 class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
-    private var searchView: SearchView? = null
     private val suggestionsAdapter: SuggestionsAdapter = SuggestionsAdapter(this)
     private lateinit var binding: FragmentSearchBinding;
     private val viewModelUser: ViewModelUser by activityViewModels()
+    private val viewModelChat: ViewModelChat by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-        super.onViewCreated(container!!, savedInstanceState)
 
         binding = FragmentSearchBinding.inflate(inflater, container, false)
-        searchView = binding.searchView
         configureRecyclerView()
         configureSearch()
         viewModelUser.searchSuggestions.observe(viewLifecycleOwner, Observer {
@@ -43,56 +41,48 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
     }
 
     private fun configureRecyclerView() {
-        binding.recyclerViewSearchResults.adapter = suggestionsAdapter
-        binding.recyclerViewSearchResults.setHasFixedSize(true)
-        binding.recyclerViewSearchResults.layoutManager = LinearLayoutManager(context)
-        binding.recyclerViewSearchResults.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        with(binding.recyclerViewSearchResults) {
+            adapter = suggestionsAdapter
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
+
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onResume() {
-        super.onResume()
-    }
-
-    private fun clearSearch() {
-        searchView!!.onActionViewCollapsed()
-        searchView!!.background = requireActivity().getDrawable(R.drawable.search_background)
-    }
 
     private fun configureSearch() {
-        searchView!!.setOnClickListener {
-            if (searchView!!.isIconified) {
-                searchView!!.background = requireActivity().getDrawable(R.drawable.search_background_highlighted)
-                searchView!!.isIconified = false
-            }
-        }
-        searchView!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                return true
+
+        binding.searchView.setOnClickListener {
+            with(binding.searchView) {
+                if (isIconified) {
+                    background = requireActivity().getDrawable(R.drawable.search_background_highlighted)
+                    isIconified = false
+                }
             }
 
-            override fun onQueryTextChange(newQuery: String): Boolean {
-                if (newQuery.trim { it <= ' ' } != "") {
-                    if (newQuery.trim { it <= ' ' } != "" && newQuery.length > 1) {
-                        viewModelUser.searchQuery.value = newQuery
-                    }
-                } else {
-                    suggestionsAdapter.data = ArrayList()
+            binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    return true
                 }
-                return false
-            }
-        })
+
+                override fun onQueryTextChange(newQuery: String): Boolean {
+                    if (newQuery.trim { it <= ' ' } != "") {
+                        if (newQuery.trim { it <= ' ' } != "" && newQuery.length > 1) {
+                            viewModelUser.searchQuery.value = newQuery
+                        }
+                    } else {
+                        suggestionsAdapter.data = ArrayList()
+                    }
+                    return false
+                }
+            })
+        }
     }
 
     override fun sendFriendRequest(receiver: User) {
-        val user = viewModelUser.user.value
-        if (user != null) {
-            val friendRequest = SerializeFriendRequest(senderID = user.userID, receiverID = receiver.userID)
-            viewModelUser.sendFriendRequest(friendRequest)
-        }
+            val friendRequest = SerializeFriendRequest(senderID =viewModelUser.user.userID, receiverID = receiver.userID)
+            viewModelChat.sendFriendRequest(friendRequest)
     }
 }
 

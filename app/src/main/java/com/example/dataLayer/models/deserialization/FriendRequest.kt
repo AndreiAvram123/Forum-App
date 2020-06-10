@@ -3,7 +3,7 @@ package com.example.dataLayer.models.deserialization
 import com.example.dataLayer.models.UserDTO
 import com.google.gson.annotations.SerializedName
 
-data class DeserializeFriendRequest(
+data class FriendRequest(
         @SerializedName("id")
         val id: Int,
         @SerializedName("sender")
