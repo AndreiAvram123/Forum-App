@@ -17,7 +17,7 @@ import java.io.InputStream
 
 object AppUtilities {
 
-//todo
+    //todo
     //inject here activity
     fun getRetrofit(): Retrofit {
         return Retrofit.Builder()
@@ -35,7 +35,7 @@ object AppUtilities {
 
     fun isNetworkAvailable(context: Context): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return cm.isDefaultNetworkActive
+        return cm.activeNetwork != null
     }
 
     /**

@@ -46,6 +46,9 @@ interface ChatRepositoryInterface {
     @GET("/user/{userID}/chatsNotifications")
     suspend fun fetchChatNotification(@Path("userID") userID: Int): List<ChatNotificationDTO>
 
+    @PATCH("/message/{messageID}/user/{userID}")
+    suspend fun markMessageAsSeen(@Path("userID") userID: Int, @Path("messageID") messageID: Int)
+
 }
 
 data class ChatLink(@SerializedName("hubURL")

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,8 +63,13 @@ class MessagesFragment : Fragment() {
         configureViews()
         viewModelChat.chatID.value = args.chatID
 
+
         viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer { data ->
             messageAdapter.addNewMessages(data)
+            if (data.isNotEmpty() && !(data.last().seenBy.contains(user.userID))) {
+                viewModelChat.markMessageAsSeen(data.last(), user)
+            }
+
         })
 
         viewModelChat.chatLink.observe(viewLifecycleOwner, Observer { chatLink ->
@@ -110,6 +116,9 @@ class MessagesFragment : Fragment() {
                         "message" -> {
                             val message = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
                             addNewMessage(message)
+                            if (message.sender.userID != user.userID) {
+                                viewModelChat.markMessageAsSeen(message, user);
+                            }
                         }
                         else -> {
 
@@ -136,6 +145,7 @@ class MessagesFragment : Fragment() {
         eventSource = temp
         temp.start()
     }
+
 
     private fun addNewMessage(message: MessageDTO) {
 

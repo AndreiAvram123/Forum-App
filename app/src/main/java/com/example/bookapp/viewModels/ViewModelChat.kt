@@ -11,6 +11,7 @@ import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.repositories.ChatRepository
 import kotlinx.coroutines.launch
+import okhttp3.internal.notifyAll
 import javax.inject.Inject
 
 class ViewModelChat : ViewModel() {
@@ -29,9 +30,10 @@ class ViewModelChat : ViewModel() {
         liveData {
             val user = user.value
             if (it && user != null) {
-                emit(chatRepository.fetchChatsNotification(user))
+                emitSource(chatRepository.fetchChatsNotification(user))
             }
         }
+
     }
 
 
@@ -74,5 +76,11 @@ class ViewModelChat : ViewModel() {
             chatRepository.acceptFriendRequest(request)
         }
     }
+
+    fun markMessageAsSeen(message: MessageDTO, user: User) {
+        viewModelScope.launch { chatRepository.markMessageAsSeen(message, user) }
+
+    }
+
 
 }

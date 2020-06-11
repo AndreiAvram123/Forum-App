@@ -15,6 +15,10 @@ open class MessageDTO(
         val sender: UserDTO,
         @SerializedName("type")
         val type: String,
+        @SerializedName("chatID")
+        val chatID: Int,
+        @SerializedName("seenBy")
+        val seenBy: List<Int>,
         @SerializedName("localID")
         val localID: String?
 )

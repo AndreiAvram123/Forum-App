@@ -6,5 +6,5 @@ data class ChatNotificationDTO(
         @SerializedName("chatID")
         val chatID: Int,
         @SerializedName("lastMessageSeen")
-        val lastMessageSeen: Boolean
+        var lastMessageSeen: Boolean = false
 )

@@ -8,6 +8,7 @@ import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.ChatMapper
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
 import com.example.dataLayer.interfaces.ChatLink
+import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
@@ -24,6 +25,10 @@ class ChatRepository @Inject constructor(private val coroutineScope: CoroutineSc
     }
     private val chatMessages: MutableLiveData<List<MessageDTO>> by lazy {
         MutableLiveData<List<MessageDTO>>()
+    }
+
+    private val chatNotifications by lazy {
+        MutableLiveData<ArrayList<ChatNotificationDTO>>()
     }
 
     suspend fun fetchUserChats(user: User): LiveData<ArrayList<Chat>> {
@@ -68,7 +73,11 @@ class ChatRepository @Inject constructor(private val coroutineScope: CoroutineSc
     }
 
 
-    suspend fun fetchChatsNotification(user: User) = ArrayList(repoInterface.fetchChatNotification(user.userID))
+    suspend fun fetchChatsNotification(user: User): MutableLiveData<ArrayList<ChatNotificationDTO>> {
+        chatNotifications.value?.clear()
+        chatNotifications.postValue(ArrayList(repoInterface.fetchChatNotification(user.userID)))
+        return chatNotifications
+    }
 
 
     suspend fun fetchFriendRequests(user: User): ArrayList<FriendRequest> = ArrayList(repoInterface.fetchFriendRequests(user.userID))
@@ -78,5 +87,25 @@ class ChatRepository @Inject constructor(private val coroutineScope: CoroutineSc
         coroutineScope.launch {
             repoInterface.pushFriendRequest(friendRequest)
         }
+    }
+
+    suspend fun markMessageAsSeen(message: MessageDTO, user: User) {
+        repoInterface.markMessageAsSeen(messageID = message.id,
+                userID = user.userID)
+
+        removeLocalNotification(message)
+    }
+
+    private fun removeLocalNotification(message: MessageDTO) {
+        chatNotifications.value?.find { it.chatID == message.chatID }.also {
+            if (it != null) {
+                chatNotifications.value?.remove(it)
+                chatNotifications.notifyObserver()
+            }
+        }
+    }
+
+    fun <T> MutableLiveData<T>.notifyObserver() {
+        this.value = this.value
     }
 }

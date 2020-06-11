@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -37,10 +38,17 @@ class MainActivity : AppCompatActivity() {
             super.onCreate(savedInstanceState)
             setContentView(R.layout.layout_main_activity)
             configureNavigationView()
+
         } else {
             startWelcomeActivity()
         }
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        //fetch new notifications every time on start is called
+        viewModelChat.fetchChatNotifications.value = true
     }
 
     private fun startDagger(user: User) {
@@ -96,10 +104,11 @@ class MainActivity : AppCompatActivity() {
                 R.id.friends
         )
         viewModelChat.chatNotifications.observe(this, Observer {
-            if(it.isNotEmpty()) {
+            if (it.isNotEmpty()) {
+
                 chatBadge.number = it.size
                 chatBadge.isVisible = true
-            }else{
+            } else {
                 chatBadge.isVisible = false
             }
         })
