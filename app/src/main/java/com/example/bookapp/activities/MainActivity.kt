@@ -2,11 +2,11 @@ package com.example.bookapp.activities
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
-import android.content.Intent
-import android.content.SharedPreferences
+import android.app.PendingIntent
+import android.content.*
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -17,19 +17,24 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import com.example.bookapp.AppUtilities
 import com.example.bookapp.NavGraphMainActivityDirections
 import com.example.bookapp.R
 import com.example.bookapp.dagger.*
 import com.example.bookapp.fragments.MessagesFragment
+import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
+import com.example.bookapp.services.MessengerService
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
+import com.example.dataLayer.interfaces.dao.ChatDao
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.layout_main_activity.view.*
 import kotlinx.coroutines.InternalCoroutinesApi
+import javax.inject.Inject
 
 @InternalCoroutinesApi
 class MainActivity : AppCompatActivity() {
@@ -37,28 +42,77 @@ class MainActivity : AppCompatActivity() {
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
     private val viewModelChat: ViewModelChat by viewModels()
+    private var mBound: Boolean = false
+    private lateinit var mService: MessengerService
+
+    /** Defines callbacks for service binding, passed to bindService()  */
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            val binder = service as MessengerService.LocalBinder
+            mService = binder.getService()
+            (application as MyApplication).appComponent.inject(mService)
+            mBound = true
+            mService.pendingIntent = getPendingIntent()
+            mService.shouldPlayNotification = false
+
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
+
+    private fun getPendingIntent(): PendingIntent {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        return PendingIntent.getActivity(this, 0, intent, 0)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
+        super.onCreate(savedInstanceState)
 
         executeDefaultOperations()
-        val user = getCurrentUser()
+        startDagger(getCurrentUser())
+        createMessageNotificationChannel()
 
-        if (user != null) {
-            startDagger(user)
-            super.onCreate(savedInstanceState)
-            setContentView(R.layout.layout_main_activity)
-            configureNavigationView()
+        startMessengerService()
+
+        setContentView(R.layout.layout_main_activity)
+        configureNavigationView()
 
 
-        } else {
-            startWelcomeActivity()
-        }
+        viewModelChat.chatLink.observe(this, Observer {
+            mService.chatLink = it.hubURL
+        })
 
     }
 
+
+    override fun onStop() {
+        super.onStop()
+        mBound = false
+        if (this::mService.isInitialized) {
+            mService.shouldPlayNotification = true
+        }
+    }
+
+
+    private fun startMessengerService() {
+        Intent(this, MessengerService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unbindService(connection)
+        mBound = false
+    }
+
     private fun executeDefaultOperations() {
-        createMessageNotificationChannel()
         sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
     }
 
@@ -84,15 +138,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun getCurrentUser(): User? {
+    private fun getCurrentUser(): User {
         val userID = sharedPreferences.getInt(getString(R.string.key_user_id), 0)
-        if (userID > 0) {
-            return User(userID = userID,
-                    username = sharedPreferences.getStringNotNull(R.string.key_email),
-                    email = sharedPreferences.getStringNotNull(R.string.key_username),
-                    profilePicture = "")
-        }
-        return null
+        return User(userID = userID,
+                username = sharedPreferences.getStringNotNull(R.string.key_email),
+                email = sharedPreferences.getStringNotNull(R.string.key_username),
+                profilePicture = "")
     }
 
 
@@ -113,16 +164,6 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(bottomNavigationView,
                 navController)
         showNotifications(bottomNavigationView)
-        intent.getStringExtra(getString(R.string.start_fragment))?.let {
-            when (it) {
-                MessagesFragment::class.java.simpleName -> {
-                    Log.d("haha", "pupu")
-                }
-                else -> {
-
-                }
-            }
-        }
 
     }
 
@@ -132,7 +173,6 @@ class MainActivity : AppCompatActivity() {
         )
         viewModelChat.chatNotifications.observe(this, Observer {
             if (it.isNotEmpty()) {
-
                 chatBadge.number = it.size
                 chatBadge.isVisible = true
             } else {
@@ -142,18 +182,6 @@ class MainActivity : AppCompatActivity() {
         viewModelChat.fetchChatNotifications.value = true
     }
 
-
-    fun SharedPreferences.edit(commit: Boolean = true,
-                               action: SharedPreferences.Editor.() -> Unit) {
-
-        val editor = edit()
-        action(editor)
-        if (commit) {
-            editor.commit()
-        } else {
-            editor.apply()
-        }
-    }
 
     private fun SharedPreferences.getStringNotNull(keyID: Int
     ): String {

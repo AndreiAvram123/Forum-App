@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.example.bookapp.activities.MainActivity
 import com.example.bookapp.models.User
+import com.example.bookapp.services.MessengerService
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
@@ -29,8 +30,9 @@ interface AppComponent {
 
     fun inject(mainActivity: MainActivity)
 
-    //todo
-    //user ... really
+    fun inject(messengerService: MessengerService)
+
+
     @Component.Factory
     interface Factory {
         // With @BindsInstance, the Context passed in will be available in the graph

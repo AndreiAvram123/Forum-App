@@ -33,17 +33,17 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.layout_activity_welcome)
         val appComponent: AppComponent = DaggerAppComponent.factory().create(applicationContext, viewModelUser.viewModelScope, User(userID = 1, username = "", email = "", profilePicture = ""))
-
         (application as MyApplication).appComponent = appComponent
         appComponent.inject(viewModelUser)
 
-
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.layout_activity_welcome)
         sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
-
-
+        val userID = sharedPreferences.getInt(getString(R.string.key_user_id), 0)
+        if (userID > 0) {
+            startMainActivity()
+        }
     }
 
 

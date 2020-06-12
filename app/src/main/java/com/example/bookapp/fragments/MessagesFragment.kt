@@ -1,13 +1,8 @@
 package com.example.bookapp.fragments
 
-import android.app.PendingIntent
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,19 +16,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.MessageAdapter
 import com.example.bookapp.AppUtilities
-import com.example.bookapp.R
-import com.example.bookapp.activities.MainActivity
 import com.example.bookapp.databinding.MessagesFragmentBinding
 import com.example.bookapp.models.LocalImageMessage
+import com.example.bookapp.models.Message
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
-import com.example.bookapp.services.MessengerService
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.serverConstants.MessageTypes
-import com.launchdarkly.eventsource.EventSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -46,52 +38,10 @@ class MessagesFragment : Fragment() {
     private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
 
-
     private lateinit var messageAdapter: MessageAdapter
     private val args: MessagesFragmentArgs by navArgs()
     private val codeFileExplorer = 10
     private lateinit var user: User
-
-    private var mBound: Boolean = false
-    private lateinit var mService: MessengerService
-
-    /** Defines callbacks for service binding, passed to bindService()  */
-    private val connection = object : ServiceConnection {
-
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            val binder = service as MessengerService.LocalBinder
-            mService = binder.getService()
-            mBound = true
-
-            mService.callback = this@MessagesFragment::addNewMessage
-            mService.pendingIntent = getPendingIntent()
-
-            viewModelChat.chatLink.value?.let {
-                mService.startChatEvent(it.hubURL)
-            }
-
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-            mService.callback = null
-        }
-
-        private fun getPendingIntent(): PendingIntent {
-            val intent = Intent(requireActivity(), MainActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-            return PendingIntent.getActivity(requireActivity(), 0, intent, 0)
-        }
-    }
-
-
-    override fun onStop() {
-        super.onStop()
-        mService.callback = null
-        mBound = false
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -104,41 +54,27 @@ class MessagesFragment : Fragment() {
         viewModelChat.chatID.value = args.chatID
 
 
-        viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer { data ->
-            messageAdapter.addNewMessages(data)
-            if (data.isNotEmpty() && !(data.last().seenBy.contains(user.userID))) {
-                viewModelChat.markMessageAsSeen(data.last(), user)
+        viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer {
+            messageAdapter.setData(it.reversed())
+            if (!it.last().seenByCurrentUser) {
+                viewModelChat.markMessageAsSeen(it.last(), user)
             }
-
         })
+
 
         binding.sendImageButton.setOnClickListener {
             startFileExplorer()
         }
-        viewModelChat.chatLink.observe(viewLifecycleOwner, Observer {
-            if (!mBound) {
-                //todo
-                //should be started by main activity
-                Intent(requireContext(), MessengerService::class.java).also { intent ->
-                    requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE)
-                }
-            }
-        })
 
         return binding.root
     }
+
 
     private fun expandImage(imageURL: String, localImage: Boolean) {
         val action = MessagesFragmentDirections.actionMessagesFragmentToImageZoomFragment(imageURL, localImage)
         binding.root.findNavController().navigate(action)
     }
 
-
-    private fun addNewMessage(message: MessageDTO) {
-        requireActivity().runOnUiThread {
-            messageAdapter.add(message)
-        }
-    }
 
     private fun configureViews() {
         configureRecyclerView()
@@ -219,10 +155,5 @@ class MessagesFragment : Fragment() {
                 messageAdapter.add(localImageMessage)
             }
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        requireActivity().unbindService(connection)
     }
 }

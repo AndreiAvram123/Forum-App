@@ -9,7 +9,7 @@
         <import type="com.example.dataLayer.repositories.UploadProgress"/>
         <variable
             name="message"
-            type="com.example.bookapp.models.MessageDTO" />
+            type="com.example.bookapp.models.Message" />
 
         <variable
             name="halfScreenWidth"

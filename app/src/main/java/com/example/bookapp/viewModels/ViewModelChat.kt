@@ -2,6 +2,7 @@ package com.example.bookapp.viewModels
 
 import androidx.lifecycle.*
 import com.example.bookapp.models.Chat
+import com.example.bookapp.models.Message
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.ChatLink
@@ -21,7 +22,6 @@ class ViewModelChat : ViewModel() {
 
     val chatID: MutableLiveData<Int> = MutableLiveData()
 
-
     val user: MutableLiveData<User> = MutableLiveData()
 
     val fetchChatNotifications = MutableLiveData<Boolean>()
@@ -33,9 +33,7 @@ class ViewModelChat : ViewModel() {
                 emitSource(chatRepository.fetchChatsNotification(user))
             }
         }
-
     }
-
 
     var userChats: LiveData<ArrayList<Chat>> = Transformations.switchMap(user) {
         liveData {
@@ -48,15 +46,17 @@ class ViewModelChat : ViewModel() {
 
     val friendRequests: LiveData<ArrayList<FriendRequest>> = Transformations.switchMap(user) {
         liveData {
-            emit(chatRepository.fetchFriendRequests(it))
+            emit(ArrayList(chatRepository.fetchFriendRequests(it)))
         }
     }
 
-    val recentMessages: LiveData<List<MessageDTO>> = Transformations.switchMap(chatID) {
+    val recentMessages: LiveData<List<Message>> = Transformations.switchMap(chatID) {
         chatID.value?.let {
             chatRepository.getChatMessages(it)
         }
     }
+
+
     val chatLink: LiveData<ChatLink> = Transformations.switchMap(chatID) {
         chatID.value?.let {
             liveData {
@@ -79,7 +79,7 @@ class ViewModelChat : ViewModel() {
         }
     }
 
-    fun markMessageAsSeen(message: MessageDTO, user: User) {
+    fun markMessageAsSeen(message: Message, user: User) {
         viewModelScope.launch { chatRepository.markMessageAsSeen(message, user) }
 
     }

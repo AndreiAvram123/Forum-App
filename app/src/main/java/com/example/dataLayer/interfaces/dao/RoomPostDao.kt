@@ -18,7 +18,7 @@ interface RoomPostDao {
     fun getFavoritePosts(userID: Int): LiveData<UserWithFavoritePosts>
 
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllFavoritePosts(usersWithFavoritePostsCrossRef: List<UserWithFavoritePostsCrossRef>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

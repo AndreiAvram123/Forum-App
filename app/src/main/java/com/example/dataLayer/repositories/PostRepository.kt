@@ -1,6 +1,5 @@
 package com.example.dataLayer.repositories
 
-import android.content.Context
 import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,12 +8,10 @@ import com.example.bookapp.AppUtilities
 import com.example.bookapp.models.LowDataPost
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
-import com.example.dataLayer.PostDatabase
 import com.example.dataLayer.dataMappers.PostMapper
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.dao.RoomPostDao
-import com.example.dataLayer.interfaces.dao.RoomUserDao
 import com.example.dataLayer.models.*
 import com.example.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.*
@@ -39,7 +36,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
 
     val fetchedPosts = liveData(Dispatchers.IO) {
         emitSource(postDao.getCachedPosts())
-        if (connectivityManager.isDefaultNetworkActive) {
+        if (connectivityManager.activeNetwork!=null) {
             fetchNextPagePosts()
         }
     }
@@ -48,7 +45,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
         liveData(Dispatchers.IO) {
             emitSource(postDao.getFavoritePosts(user.userID))
         }.also {
-            if (connectivityManager.isDefaultNetworkActive) {
+            if (connectivityManager.activeNetwork!=null) {
                 coroutineScope.launch { fetchFavoritePosts() }
             }
         }
@@ -56,7 +53,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
     val myPosts: LiveData<UserWithPosts> = liveData {
         emitSource(postDao.getAllUserPosts(user.userID))
     }.also {
-        if (connectivityManager.isDefaultNetworkActive) {
+        if (connectivityManager.activeNetwork!=null) {
             coroutineScope.launch {
                 fetchMyPosts()
             }
@@ -67,7 +64,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
     fun fetchPostByID(id: Int): LiveData<Post> = liveData {
         val postDTO = repositoryInterface.fetchPostByID(id)
         val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
-        val author = UserMapper.mapNetworkToDomainObject(postDTO.author);
+        val author = UserMapper.mapToDomainObject(postDTO.author);
         postDao.insertPost(post)
         //todo
         //did it break?

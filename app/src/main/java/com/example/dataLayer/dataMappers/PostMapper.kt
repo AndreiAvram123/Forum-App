@@ -14,7 +14,7 @@ object PostMapper {
 
     fun mapDtoObjectToDomainObject(postDTO: PostDTO?): Post {
         postDTO?.let {
-            val user = UserMapper.mapNetworkToDomainObject(postDTO.author)
+            val user = UserMapper.mapToDomainObject(postDTO.author)
 
             val post = Post(id = postDTO.id,
                     title = postDTO.title,

@@ -44,7 +44,7 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
                 if (fetchedUser.userID == 0) {
                     createGoogleAccount(idToken, displayName, email)
                 } else {
-                    liveData.postValue(UserMapper.mapNetworkToDomainObject(fetchedUser))
+                    liveData.postValue(UserMapper.mapToDomainObject(fetchedUser))
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -57,7 +57,7 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
         val liveData = MutableLiveData<User>()
         try {
             val newUser = userRepositoryInterface.createGoogleAccount(idToken, displayName, email)
-            liveData.postValue(UserMapper.mapNetworkToDomainObject(newUser))
+            liveData.postValue(UserMapper.mapToDomainObject(newUser))
 
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
