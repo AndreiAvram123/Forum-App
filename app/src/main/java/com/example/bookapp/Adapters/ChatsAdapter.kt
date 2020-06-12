@@ -38,7 +38,7 @@ class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
             binding.chat = chat
 
             binding.root.setOnClickListener {
-                val action: NavDirections = FriendsFragmentDirections.actionFriendsToMessagesFragment(chat.chatID)
+                val action: NavDirections = FriendsFragmentDirections.actionGlobalMessagesFragment(chat.chatID)
                 Navigation.findNavController(binding.root).navigate(action)
             }
         }

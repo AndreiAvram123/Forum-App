@@ -150,4 +150,9 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="key_profile_picture">key_profile_picture</string>
     <string name="fields_not_completed">Not all fields are filled</string>
+    <string name="message_channel">Message Channel</string>
+    <string name="channel_description">This channel is used for new messages</string>
+    <string name="message_channel_id">mesage_channel_id</string>
+    <string name="fragment_argument">fragment_argument</string>
+    <string name="start_fragment">start_fragment</string>
 </resources>

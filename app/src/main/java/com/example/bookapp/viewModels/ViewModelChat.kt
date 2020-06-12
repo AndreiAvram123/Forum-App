@@ -59,7 +59,9 @@ class ViewModelChat : ViewModel() {
     }
     val chatLink: LiveData<ChatLink> = Transformations.switchMap(chatID) {
         chatID.value?.let {
-            chatRepository.getChatLink(it)
+            liveData {
+                emit(chatRepository.getChatLink(it))
+            }
         }
     }
 

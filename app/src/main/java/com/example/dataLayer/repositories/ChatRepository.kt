@@ -58,14 +58,9 @@ class ChatRepository @Inject constructor(private val coroutineScope: CoroutineSc
         return chatMessages
     }
 
-    fun getChatLink(chatID: Int): LiveData<ChatLink> {
-        val liveDataLink = MutableLiveData<ChatLink>()
-        coroutineScope.launch {
-            val chatLink: ChatLink = repoInterface.fetchChatLink(chatID)
-            liveDataLink.postValue(chatLink)
-        }
-        return liveDataLink;
-    }
+   suspend fun getChatLink(chatID: Int): ChatLink =repoInterface.fetchChatLink(chatID)
+
+
 
     suspend fun acceptFriendRequest(request: FriendRequest) {
         val chat = repoInterface.acceptFriendRequest(request.id)

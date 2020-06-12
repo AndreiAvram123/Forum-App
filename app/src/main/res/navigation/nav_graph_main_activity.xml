@@ -53,9 +53,6 @@
             android:name="chatID"
             app:argType="integer" />
         <action
-            android:id="@+id/action_messagesFragment_to_friends"
-            app:destination="@id/friends" />
-        <action
             android:id="@+id/action_messagesFragment_to_imageZoomFragment"
             app:destination="@id/imageZoomFragment" />
     </fragment>
@@ -77,8 +74,7 @@
         android:label="FriendsFragment">
         <action
             android:id="@+id/action_friends_to_messagesFragment"
-            app:destination="@id/messagesFragment"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim" />
+            app:destination="@id/messagesFragment" />
     </fragment>
     <fragment
         android:id="@+id/imageZoomFragment"
@@ -92,4 +88,5 @@
             android:name="localImage"
             app:argType="boolean" />
     </fragment>
+    <action android:id="@+id/action_global_messagesFragment" app:destination="@id/messagesFragment" />
 </navigation>

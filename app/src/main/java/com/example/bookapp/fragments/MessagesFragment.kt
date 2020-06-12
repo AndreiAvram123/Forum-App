@@ -1,10 +1,13 @@
 package com.example.bookapp.fragments
 
+import android.app.PendingIntent
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
+import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,40 +21,77 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.MessageAdapter
 import com.example.bookapp.AppUtilities
+import com.example.bookapp.R
+import com.example.bookapp.activities.MainActivity
 import com.example.bookapp.databinding.MessagesFragmentBinding
 import com.example.bookapp.models.LocalImageMessage
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
+import com.example.bookapp.services.MessengerService
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.serverConstants.MessageTypes
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.launchdarkly.eventsource.EventHandler
 import com.launchdarkly.eventsource.EventSource
-import com.launchdarkly.eventsource.MessageEvent
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import okhttp3.internal.closeQuietly
-import org.json.JSONObject
-import java.net.URI
-import java.time.Duration
 import java.util.*
 
 
+@InternalCoroutinesApi
 class MessagesFragment : Fragment() {
     private lateinit var binding: MessagesFragmentBinding
     private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
 
-    private var eventSource: EventSource? = null
 
     private lateinit var messageAdapter: MessageAdapter
     private val args: MessagesFragmentArgs by navArgs()
     private val codeFileExplorer = 10
     private lateinit var user: User
+
+    private var mBound: Boolean = false
+    private lateinit var mService: MessengerService
+
+    /** Defines callbacks for service binding, passed to bindService()  */
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+            val binder = service as MessengerService.LocalBinder
+            mService = binder.getService()
+            mBound = true
+
+            mService.callback = this@MessagesFragment::addNewMessage
+            mService.pendingIntent = getPendingIntent()
+
+            viewModelChat.chatLink.value?.let {
+                mService.startChatEvent(it.hubURL)
+            }
+
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+            mService.callback = null
+        }
+
+        private fun getPendingIntent(): PendingIntent {
+            val intent = Intent(requireActivity(), MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            return PendingIntent.getActivity(requireActivity(), 0, intent, 0)
+        }
+    }
+
+
+    override fun onStop() {
+        super.onStop()
+        mService.callback = null
+        mBound = false
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -72,16 +112,19 @@ class MessagesFragment : Fragment() {
 
         })
 
-        viewModelChat.chatLink.observe(viewLifecycleOwner, Observer { chatLink ->
-            if (eventSource == null) {
-                configureServerEvents(chatLink.hubURL)
-            }
-        })
-
-
         binding.sendImageButton.setOnClickListener {
             startFileExplorer()
         }
+        viewModelChat.chatLink.observe(viewLifecycleOwner, Observer {
+            if (!mBound) {
+                //todo
+                //should be started by main activity
+                Intent(requireContext(), MessengerService::class.java).also { intent ->
+                    requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE)
+                }
+            }
+        })
+
         return binding.root
     }
 
@@ -91,64 +134,7 @@ class MessagesFragment : Fragment() {
     }
 
 
-    override fun onDetach() {
-        super.onDetach()
-        eventSource?.closeQuietly()
-    }
-
-    private fun configureServerEvents(url: String) {
-        val eventHandler: EventHandler = object : EventHandler {
-            override fun onOpen() {
-            }
-
-            override fun onComment(comment: String?) {
-
-            }
-
-            override fun onMessage(event: String?, messageEvent: MessageEvent) {
-                val gson: Gson = GsonBuilder().setPrettyPrinting().create()
-                val data = messageEvent.data
-
-                if (data != null) {
-                    val jsonObject = JSONObject(data)
-
-                    when (jsonObject.get("type")) {
-                        "message" -> {
-                            val message = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
-                            addNewMessage(message)
-                            if (message.sender.userID != user.userID) {
-                                viewModelChat.markMessageAsSeen(message, user);
-                            }
-                        }
-                        else -> {
-
-                        }
-                    }
-                }
-
-            }
-
-            override fun onClosed() {
-
-            }
-
-            override fun onError(t: Throwable?) {
-
-            }
-        }
-        val event: EventSource.Builder = EventSource.Builder(
-                eventHandler,
-                URI.create(url)
-        )
-                .reconnectTime(Duration.ofMillis(10));
-        val temp = event.build()
-        eventSource = temp
-        temp.start()
-    }
-
-
     private fun addNewMessage(message: MessageDTO) {
-
         requireActivity().runOnUiThread {
             messageAdapter.add(message)
         }
@@ -233,5 +219,10 @@ class MessagesFragment : Fragment() {
                 messageAdapter.add(localImageMessage)
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        requireActivity().unbindService(connection)
     }
 }
