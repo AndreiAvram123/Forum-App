@@ -36,7 +36,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
 
     val fetchedPosts = liveData(Dispatchers.IO) {
         emitSource(postDao.getCachedPosts())
-        if (connectivityManager.activeNetwork!=null) {
+        if (connectivityManager.activeNetwork != null) {
             fetchNextPagePosts()
         }
     }
@@ -45,7 +45,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
         liveData(Dispatchers.IO) {
             emitSource(postDao.getFavoritePosts(user.userID))
         }.also {
-            if (connectivityManager.activeNetwork!=null) {
+            if (connectivityManager.activeNetwork != null) {
                 coroutineScope.launch { fetchFavoritePosts() }
             }
         }
@@ -53,7 +53,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
     val myPosts: LiveData<UserWithPosts> = liveData {
         emitSource(postDao.getAllUserPosts(user.userID))
     }.also {
-        if (connectivityManager.activeNetwork!=null) {
+        if (connectivityManager.activeNetwork != null) {
             coroutineScope.launch {
                 fetchMyPosts()
             }
@@ -66,6 +66,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
         val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
         val author = UserMapper.mapToDomainObject(postDTO.author);
         postDao.insertPost(post)
+
         //todo
         //did it break?
         // userDao.insertUser(author)

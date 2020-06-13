@@ -11,7 +11,7 @@ import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.dao.ChatDao
 import com.example.dataLayer.interfaces.dao.RoomCommentDao
 import com.example.dataLayer.interfaces.dao.RoomPostDao
-import com.example.dataLayer.interfaces.dao.RoomUserDao
+import com.example.dataLayer.interfaces.dao.UserDao
 import com.example.dataLayer.models.UserWithFavoritePostsCrossRef
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
@@ -20,7 +20,7 @@ import kotlinx.coroutines.internal.synchronized
 abstract class PostDatabase : RoomDatabase() {
     abstract fun postDao(): RoomPostDao
     abstract fun commentDao(): RoomCommentDao
-    abstract fun userDao(): RoomUserDao
+    abstract fun userDao(): UserDao
     abstract fun chatDao(): ChatDao
 
     companion object {

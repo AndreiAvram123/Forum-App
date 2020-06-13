@@ -38,7 +38,9 @@ import javax.inject.Inject
 
 @InternalCoroutinesApi
 class MainActivity : AppCompatActivity() {
-    private lateinit var sharedPreferences: SharedPreferences
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
     private val viewModelChat: ViewModelChat by viewModels()

@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.bookapp.R
 import com.example.bookapp.dagger.AppComponent
@@ -15,28 +16,44 @@ import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.fragments.AuthenticationFragment
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelUser
+import com.example.dataLayer.PostDatabase
+import com.example.dataLayer.interfaces.dao.ChatDao
+import com.example.dataLayer.interfaces.dao.UserDao
+import com.example.dataLayer.interfaces.dao.UserDao_Impl
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InternalCoroutinesApi
 class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCallback {
+
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()
 
     private val requestCodeGoogleSignIn = 1
 
-    //use share preferences to share data across activities
-    private lateinit var sharedPreferences: SharedPreferences
+
+
+
+    @Inject
+    lateinit var userDao: UserDao
+
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
         val appComponent: AppComponent = DaggerAppComponent.factory().create(applicationContext, viewModelUser.viewModelScope, User(userID = 1, username = "", email = "", profilePicture = ""))
         (application as MyApplication).appComponent = appComponent
+        appComponent.inject(this)
         appComponent.inject(viewModelUser)
 
         sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
@@ -100,7 +117,11 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
             putString(getString(R.string.key_email), user.email)
             putString(getString(R.string.key_profile_picture), user.profilePicture)
         }
+        lifecycleScope.launch {
+            userDao.insertUser(user)
+        }
         startMainActivity()
+
     }
 
 

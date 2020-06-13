@@ -7,7 +7,7 @@ import com.example.bookapp.models.User
 import com.google.android.material.circularreveal.CircularRevealHelper
 
 @Dao
-interface RoomUserDao {
+interface UserDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUser(user: User)
 }

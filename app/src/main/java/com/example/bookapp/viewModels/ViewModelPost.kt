@@ -19,7 +19,7 @@ import javax.inject.Inject
 class ViewModelPost : ViewModel() {
 
 
-    fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts;
+    fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts
 
     @Inject
     lateinit var postRepository: PostRepository

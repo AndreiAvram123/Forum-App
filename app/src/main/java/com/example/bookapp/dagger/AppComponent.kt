@@ -3,6 +3,7 @@ package com.example.bookapp.dagger
 import android.app.Application
 import android.content.Context
 import com.example.bookapp.activities.MainActivity
+import com.example.bookapp.activities.WelcomeActivity
 import com.example.bookapp.models.User
 import com.example.bookapp.services.MessengerService
 import com.example.bookapp.viewModels.ViewModelChat
@@ -31,6 +32,7 @@ interface AppComponent {
     fun inject(mainActivity: MainActivity)
 
     fun inject(messengerService: MessengerService)
+    fun inject(welcomeActivity: WelcomeActivity)
 
 
     @Component.Factory
