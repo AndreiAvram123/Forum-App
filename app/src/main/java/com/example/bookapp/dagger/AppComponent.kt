@@ -46,9 +46,4 @@ interface AppComponent {
     }
 
 
-//    //go and make this instances
-//    fun userRepo(): UserRepository
-//
-//    fun postRepo(): PostRepository
-
 }

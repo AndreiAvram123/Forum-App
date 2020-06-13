@@ -55,9 +55,10 @@ class MessagesFragment : Fragment() {
 
 
         viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer {
-            messageAdapter.setData(it.reversed())
-            if (!it.last().seenByCurrentUser) {
-                viewModelChat.markMessageAsSeen(it.last(), user)
+            val ordered = it.reversed()
+            messageAdapter.setData(ordered)
+            if (ordered.isNotEmpty() && !ordered.last().seenByCurrentUser) {
+                viewModelChat.markMessageAsSeen(ordered.last(), user)
             }
         })
 

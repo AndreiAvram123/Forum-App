@@ -6,6 +6,7 @@ import android.net.Network
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import com.example.bookapp.models.Chat
 import com.example.bookapp.models.Message
 import com.example.bookapp.models.User
@@ -22,19 +23,19 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ChatRepository @Inject constructor(private val coroutineScope: CoroutineScope,
-                                         private val repoInterface: ChatRepositoryInterface,
-                                         private val chatDao: ChatDao,
-                                         private val connectivityManager: ConnectivityManager
+class ChatRepository @Inject constructor(
+        private val repoInterface: ChatRepositoryInterface,
+        private val chatDao: ChatDao,
+        private val connectivityManager: ConnectivityManager
 ) {
 
     init {
         connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 //take action when network connection is gained
-                  //todo
+                //todo
                 //continue here
-                    Log.d("haha", "uuuu")
+                Log.d("haha", "uuuu")
 
             }
 
@@ -62,32 +63,32 @@ class ChatRepository @Inject constructor(private val coroutineScope: CoroutineSc
         return userChats
     }
 
-    fun pushMessage(serializeMessage: SerializeMessage) {
-        coroutineScope.launch {
-            try {
-                repoInterface.pushMessage(serializeMessage)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+    suspend fun pushMessage(serializeMessage: SerializeMessage) {
+        try {
+            repoInterface.pushMessage(serializeMessage)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
-    fun getChatMessages(chatID: Int): LiveData<List<Message>> {
-        if (connectivityManager.activeNetwork != null) {
-            coroutineScope.launch {
-                val fetchedData = repoInterface.fetchRecentMessages(chatID)
-                val messages = fetchedData.map { MessageMapper.mapToDomainObject(it) }
-                chatDao.insertMessages(messages)
-            }
-        }
-        return chatDao.getRecentChatMessages(chatID)
-    }
 
-    suspend fun getChatLink(chatID: Int): ChatLink {
-        if (connectivityManager.activeNetwork != null) {
+    fun getChatMessages(chatID: Int): LiveData<List<Message>> =
+            liveData {
+                emitSource(chatDao.getRecentChatMessages(chatID))
+
+                if (connectivityManager.activeNetwork != null) {
+                    val fetchedData = repoInterface.fetchRecentMessages(chatID)
+                    val messages = fetchedData.map { MessageMapper.mapToDomainObject(it) }
+                    chatDao.insertMessages(messages)
+                }
+            }
+
+    suspend fun getChatLink(chatID: Int): ChatLink? {
+        return if (connectivityManager.activeNetwork != null) {
             repoInterface.fetchChatLink(chatID)
+        } else {
+            return null
         }
-        return ChatLink("")
     }
 
 
@@ -113,8 +114,8 @@ class ChatRepository @Inject constructor(private val coroutineScope: CoroutineSc
         return ArrayList()
     }
 
-    fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
-        coroutineScope.launch {
+    suspend fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
+        if (connectivityManager.activeNetwork != null) {
             repoInterface.pushFriendRequest(friendRequest)
         }
     }
@@ -138,6 +139,4 @@ class ChatRepository @Inject constructor(private val coroutineScope: CoroutineSc
     fun <T> MutableLiveData<T>.notifyObserver() {
         this.value = this.value
     }
-
-    fun getLastMessage(chatID: Int): LiveData<Message> = chatDao.getLastMessage(chatID)
 }

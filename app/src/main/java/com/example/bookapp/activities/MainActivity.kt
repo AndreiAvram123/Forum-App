@@ -87,7 +87,11 @@ class MainActivity : AppCompatActivity() {
 
 
         viewModelChat.chatLink.observe(this, Observer {
-            mService.chatLink = it.hubURL
+            it?.let {
+                if (it.hubURL.isNotEmpty()) {
+                    mService.chatLink = it.hubURL
+                }
+            }
         })
 
     }

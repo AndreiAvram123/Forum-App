@@ -20,14 +20,8 @@ import javax.inject.Inject
 @InternalCoroutinesApi
 class PostRepository @Inject constructor(private val connectivityManager: ConnectivityManager,
                                          private val postDao: RoomPostDao,
-                                         val coroutineScope: CoroutineScope,
                                          val user: User
 ) {
-
-
-    private val currentSearchResults: MutableLiveData<List<LowDataPost>> = MutableLiveData()
-    val currentUploadImagePath: MutableLiveData<String> = MutableLiveData()
-    private val currentUploadedPostProgress: MutableLiveData<UploadProgress> = MutableLiveData()
 
     private var nextPageToFetch: Int = 1;
 
@@ -44,22 +38,17 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
     val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
         liveData(Dispatchers.IO) {
             emitSource(postDao.getFavoritePosts(user.userID))
-        }.also {
             if (connectivityManager.activeNetwork != null) {
-                coroutineScope.launch { fetchFavoritePosts() }
+                fetchFavoritePosts()
             }
         }
     }
     val myPosts: LiveData<UserWithPosts> = liveData {
         emitSource(postDao.getAllUserPosts(user.userID))
-    }.also {
         if (connectivityManager.activeNetwork != null) {
-            coroutineScope.launch {
-                fetchMyPosts()
-            }
+            fetchMyPosts()
         }
     }
-
 
     fun fetchPostByID(id: Int): LiveData<Post> = liveData {
         val postDTO = repositoryInterface.fetchPostByID(id)
@@ -124,38 +113,27 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
 
     }
 
-    suspend fun fetchSuggestions(query: String) {
-        try {
-            val fetchedData = repositoryInterface.fetchSearchSuggestions(query)
-            currentSearchResults.postValue(fetchedData)
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
-        }
-    }
-
-    fun uploadImage(serializeImage: SerializeImage): LiveData<String> {
-        currentUploadImagePath.value = String()
-        coroutineScope.launch(Dispatchers.IO) {
-            val imagePath = repositoryInterface.uploadImage(serializeImage).message
-            currentUploadImagePath.postValue(imagePath)
-        }
-        return currentUploadImagePath;
-    }
+    fun uploadImage(serializeImage: SerializeImage): LiveData<String> =
+            liveData {
+                emit(String())
+                val imagePath = repositoryInterface.uploadImage(serializeImage).message
+                emit(imagePath)
+            }
 
     fun uploadPost(post: SerializePost): LiveData<UploadProgress> {
-        currentUploadedPostProgress.value = UploadProgress.UPLOADING
-        coroutineScope.launch {
+        return liveData {
+            emit(UploadProgress.UPLOADING)
+
             val serverResponse = repositoryInterface.uploadPost(post)
 
             val fetchedPost = repositoryInterface.fetchPostByID(serverResponse.message.toInt())
 
             val postDomain = PostMapper.mapDtoObjectToDomainObject(fetchedPost)
-
-            currentUploadedPostProgress.value = UploadProgress.UPLOADED
+            emit(UploadProgress.UPLOADED)
             postDao.insertPost(postDomain)
         }
-        return currentUploadedPostProgress;
     }
 }
+
 
 

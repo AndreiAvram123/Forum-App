@@ -57,7 +57,7 @@ class ViewModelChat : ViewModel() {
     }
 
 
-    val chatLink: LiveData<ChatLink> = Transformations.switchMap(chatID) {
+    val chatLink: LiveData<ChatLink?> = Transformations.switchMap(chatID) {
         chatID.value?.let {
             liveData {
                 emit(chatRepository.getChatLink(it))
@@ -66,10 +66,16 @@ class ViewModelChat : ViewModel() {
     }
 
 
-    fun sendMessage(serializeMessage: SerializeMessage) = chatRepository.pushMessage(serializeMessage)
+    fun sendMessage(serializeMessage: SerializeMessage) {
+        viewModelScope.launch {
+            chatRepository.pushMessage(serializeMessage)
+        }
+    }
 
     fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
-        chatRepository.sendFriendRequest(friendRequest)
+        viewModelScope.launch {
+            chatRepository.sendFriendRequest(friendRequest)
+        }
     }
 
     fun acceptFriendRequest(request: FriendRequest) {
@@ -79,10 +85,7 @@ class ViewModelChat : ViewModel() {
         }
     }
 
-    fun markMessageAsSeen(message: Message, user: User) {
-        viewModelScope.launch { chatRepository.markMessageAsSeen(message, user) }
-
-    }
+    fun markMessageAsSeen(message: Message, user: User) = viewModelScope.launch { chatRepository.markMessageAsSeen(message, user) }
 
 
 }

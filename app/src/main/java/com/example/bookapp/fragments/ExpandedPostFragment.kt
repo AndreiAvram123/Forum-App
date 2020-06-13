@@ -45,7 +45,7 @@ class ExpandedPostFragment : Fragment() {
                               savedInstanceState: Bundle?): View? { // Inflate the layout for this fragment
 
         binding = PostExpandedFragmentBinding.inflate(layoutInflater, container, false)
-
+        user = viewModelUser.user
         attachObservers()
         return binding.root
     }
