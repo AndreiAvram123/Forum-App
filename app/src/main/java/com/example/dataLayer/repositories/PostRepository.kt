@@ -2,10 +2,8 @@ package com.example.dataLayer.repositories
 
 import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
-import com.example.bookapp.AppUtilities
-import com.example.bookapp.models.LowDataPost
+import androidx.paging.PagedList
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.PostMapper
@@ -20,18 +18,35 @@ import javax.inject.Inject
 @InternalCoroutinesApi
 class PostRepository @Inject constructor(private val connectivityManager: ConnectivityManager,
                                          private val postDao: RoomPostDao,
-                                         val user: User
+                                         private val user: User,
+                                         private val coroutineScope: CoroutineScope,
+                                         private val repositoryInterface: PostRepositoryInterface
 ) {
 
-    private var nextPageToFetch: Int = 1;
 
-    private val repositoryInterface: PostRepositoryInterface = AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
-
-
-    val fetchedPosts = liveData(Dispatchers.IO) {
-        emitSource(postDao.getCachedPosts())
+    fun getPosts() = postDao.getCachedPosts().also {
         if (connectivityManager.activeNetwork != null) {
-            fetchNextPagePosts()
+            coroutineScope.launch {
+                //if network is active remove old data and
+                //perform a fresh fetch
+                postDao.removeCachedData()
+            }
+        }
+    }
+
+
+    inner class PostRepoBoundaryCallback : PagedList.BoundaryCallback<Post>() {
+        override fun onZeroItemsLoaded() {
+            //when no items were loaded from room ,trigger a network call
+            coroutineScope.launch {
+                fetchInitialPosts()
+            }
+        }
+
+        override fun onItemAtEndLoaded(itemAtEnd: Post) {
+            coroutineScope.launch {
+               fetchNextPosts(itemAtEnd.id)
+            }
         }
     }
 
@@ -64,7 +79,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
 
 
     private suspend fun fetchFavoritePosts() {
-        val data = PostMapper.mapDTONetworkToDomainObjects(
+        val data = PostMapper.mapToDomainObjects(
                 repositoryInterface.fetchUserFavoritePosts(user.userID))
 
         val toInsert = ArrayList<UserWithFavoritePostsCrossRef>()
@@ -77,7 +92,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
     private suspend fun fetchMyPosts() {
         try {
             val fetchedPosts = repositoryInterface.fetchMyPosts(user.userID)
-            postDao.insertPosts(PostMapper.mapDTONetworkToDomainObjects(fetchedPosts))
+            postDao.insertPosts(PostMapper.mapToDomainObjects(fetchedPosts))
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
         }
@@ -98,19 +113,27 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
     }
 
 
-    suspend fun fetchNextPagePosts() {
-        try {
-            if (nextPageToFetch == 1) {
-                //if we have to fetch the first page then delete the cached posts
-                postDao.removeCachedData()
+    suspend fun fetchInitialPosts() {
+        if (connectivityManager.activeNetwork != null) {
+            try {
+                val fetchedData: ArrayList<PostDTO> = repositoryInterface.fetchRecentPosts()
+                postDao.insertPosts(PostMapper.mapToDomainObjects(fetchedData))
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            val fetchedData: ArrayList<PostDTO> = repositoryInterface.fetchNextPage(nextPageToFetch);
-            nextPageToFetch++
-            postDao.insertPosts(PostMapper.mapDTONetworkToDomainObjects(fetchedData));
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
+    }
 
+    private suspend fun fetchNextPosts(lastPostID: Int) {
+        if (connectivityManager.activeNetwork != null) {
+            try {
+              val fetchedData = repositoryInterface.fetchNextPagePosts(lastPostID)
+              val posts = PostMapper.mapToDomainObjects(fetchedData)
+                postDao.insertPosts(posts)
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     fun uploadImage(serializeImage: SerializeImage): LiveData<String> =

@@ -1,18 +1,19 @@
 package com.example.dataLayer.interfaces.dao
 
 import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
 import androidx.room.*
 import com.example.bookapp.models.Post
 import com.example.dataLayer.models.UserWithFavoritePosts
 import com.example.dataLayer.models.UserWithFavoritePostsCrossRef
 import com.example.dataLayer.models.UserWithPosts
-import retrofit2.http.DELETE
+
 
 @Dao
 interface RoomPostDao {
 
     @Query("SELECT * FROM post ORDER BY postID DESC")
-    fun getCachedPosts(): LiveData<List<Post>>
+    fun getCachedPosts(): DataSource.Factory<Int, Post>
 
     @Query("SELECT * FROM user WHERE userID = :userID LIMIT 1")
     fun getFavoritePosts(userID: Int): LiveData<UserWithFavoritePosts>

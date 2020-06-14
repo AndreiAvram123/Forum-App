@@ -6,6 +6,7 @@ import com.example.bookapp.activities.WelcomeActivity
 import com.example.bookapp.dagger.modules.DaoModule
 import com.example.bookapp.dagger.modules.RepositoryModule
 import com.example.bookapp.dagger.modules.UtilitiesModule
+import com.example.bookapp.fragments.SettingsFragment
 import com.example.bookapp.models.User
 import com.example.bookapp.services.MessengerService
 import com.example.bookapp.viewModels.ViewModelChat
@@ -33,6 +34,8 @@ interface AppComponent {
 
     fun inject(messengerService: MessengerService)
     fun inject(welcomeActivity: WelcomeActivity)
+
+    fun inject(settingsFragment: SettingsFragment)
 
 
     @Component.Factory

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.HomeAdapter
@@ -16,10 +17,12 @@ import com.example.bookapp.viewModels.ViewModelPost
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
-class HomeFragment : Fragment(), HomeAdapter.Callback {
+class HomeFragment : Fragment() {
     lateinit var binding: LayoutHomeFragmentBinding
     private val viewModelPost: ViewModelPost by activityViewModels()
-    private val homeAdapter: HomeAdapter = HomeAdapter(this)
+    private val homeAdapter: HomeAdapter by lazy {
+        HomeAdapter()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_home_fragment, container, false);
@@ -27,7 +30,6 @@ class HomeFragment : Fragment(), HomeAdapter.Callback {
         initializeUI()
         return binding.root
     }
-
 
 
     private fun initializeUI() {
@@ -50,13 +52,11 @@ class HomeFragment : Fragment(), HomeAdapter.Callback {
     }
 
     private fun attachObserver() {
-        viewModelPost.getRecentPosts().observe(viewLifecycleOwner, Observer { posts ->
-            homeAdapter.setData(posts)
+        viewModelPost.recentPosts.observe(viewLifecycleOwner, Observer {
+            homeAdapter.submitList(it)
         })
 
     }
 
-    override fun requestMoreData() {
-        viewModelPost.fetchNextPagePosts()
-    }
+
 }

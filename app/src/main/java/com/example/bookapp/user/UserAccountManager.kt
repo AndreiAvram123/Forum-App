@@ -23,6 +23,28 @@ class UserAccountManager @Inject constructor(val sharedPreferences: SharedPrefer
                 profilePicture = "")
     }
 
+    suspend fun saveUserInMemory(user: User) {
+        persistUser(user)
+        userDao.insertUser(user)
+    }
+
+    private fun persistUser(user: User) {
+        sharedPreferences.edit {
+            putInt(getString(R.string.key_user_id), user.userID)
+            putString(getString(R.string.key_username), user.username)
+            putString(getString(R.string.key_email), user.email)
+            putString(getString(R.string.key_profile_picture), user.profilePicture)
+        }
+    }
+
+    fun deleteUserFromMemory() {
+        //todo
+        //google logout
+        sharedPreferences.edit {
+            putInt(getString(R.string.key_user_id), 0)
+        }
+    }
+
 
     private fun SharedPreferences.getStringNotNull(keyID: Int
     ): String {
@@ -45,15 +67,5 @@ class UserAccountManager @Inject constructor(val sharedPreferences: SharedPrefer
 
     fun getString(key: Int): String {
         return context.getString(key)
-    }
-
-    suspend fun saveUserInMemory(user: User) {
-        sharedPreferences.edit {
-            putInt(getString(R.string.key_user_id), user.userID)
-            putString(getString(R.string.key_username), user.username)
-            putString(getString(R.string.key_email), user.email)
-            putString(getString(R.string.key_profile_picture), user.profilePicture)
-        }
-        userDao.insertUser(user)
     }
 }

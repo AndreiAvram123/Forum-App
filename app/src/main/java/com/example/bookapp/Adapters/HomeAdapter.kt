@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookapp.AppUtilities
@@ -14,102 +16,29 @@ import com.example.bookapp.databinding.LoadingItemListBinding
 import com.example.bookapp.databinding.PostItemHomePageBinding
 import com.example.bookapp.fragments.ExpandedPostFragmentDirections
 import com.example.bookapp.models.Post
+import com.example.bookapp.viewModels.ViewModelPost
 import com.google.android.material.snackbar.Snackbar
 import java.util.*
+import java.util.zip.Inflater
 import kotlin.collections.ArrayList
 
-class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class HomeAdapter : PagedListAdapter<Post, HomeAdapter.ViewHolder>(DIFF_CALLBACK) {
 
-    private var timeout: Timer = Timer();
+    companion object {
+        private val DIFF_CALLBACK = object :
+                DiffUtil.ItemCallback<Post>() {
+            // Concert details may have changed if reloaded from the database,
+            // but ID is fixed.
+            override fun areItemsTheSame(oldConcert: Post,
+                                         newConcert: Post) = oldConcert.id == newConcert.id
 
-    enum class State {
-        LOADING, LOADED
-    }
-
-    enum class ItemTypes(val id: Int) {
-        LOADING_ITEM(1), LIST_ITEM(2)
-    }
-
-    private var posts: ArrayList<Post> = ArrayList()
-    var currentState: State = State.LOADING
-    private val loadingObject: Post = Post.buildTestPost()
-
-
-    fun setData(data: List<Post>) {
-        posts.clear()
-        posts.addAll(data)
-        notifyDataSetChanged()
-    }
-
-
-    private fun toggleLoading() {
-        if (currentState == State.LOADING) {
-            currentState = State.LOADED
-            posts.remove(loadingObject)
-            notifyItemRemoved(posts.size);
-        } else {
-            currentState = State.LOADING;
-            posts.add(loadingObject)
-            notifyItemInserted(posts.size - 1)
+            override fun areContentsTheSame(oldConcert: Post,
+                                            newConcert: Post) = oldConcert == newConcert
         }
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return if (posts[position] == loadingObject) {
-            ItemTypes.LOADING_ITEM.id
-        } else {
-            ItemTypes.LIST_ITEM.id
-        }
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val linearLayoutManager: LinearLayoutManager = recyclerView.layoutManager as LinearLayoutManager
-                if (linearLayoutManager.findLastCompletelyVisibleItemPosition() > posts.size - 2 && currentState == State.LOADED) {
-                    loadMore(recyclerView)
-                }
-            }
-
-            private fun loadMore(recyclerView: RecyclerView) {
-                toggleLoading()
-                callback.requestMoreData()
-                timeout.schedule(object : TimerTask() {
-                    override fun run() {
-                        recyclerView.post { toggleLoading() }
-                    }
-                }, 7000)
-            }
-        })
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-            ItemTypes.LIST_ITEM.id -> {
-                val binding: PostItemHomePageBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.post_item_home_page, parent, false)
-                ViewHolder(binding)
-            }
-            else -> {
-                val binding: LoadingItemListBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.loading_item_list, parent, false)
-                LoadingViewHolder(binding.root)
-
-            }
-        }
-    }
-
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder is ViewHolder) {
-            holder.bind(posts[position])
-        }
-    }
-
-    override fun getItemCount(): Int {
-        return posts.size
     }
 
     inner class ViewHolder(val binding: PostItemHomePageBinding) : RecyclerView.ViewHolder(binding.root) {
+
         fun bind(post: Post) {
             binding.post = post
 
@@ -125,10 +54,17 @@ class HomeAdapter(val callback: Callback) : RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    private inner class LoadingViewHolder(view: View) : RecyclerView.ViewHolder(view)
-
-
-    interface Callback {
-        fun requestMoreData()
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = PostItemHomePageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val post = getItem(position)
+        // Note that "concert" is a placeholder if it's null
+        post?.let {
+            holder.bind(post)
+        }
+    }
+
 }
