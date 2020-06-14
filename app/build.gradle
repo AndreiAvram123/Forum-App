@@ -53,6 +53,7 @@ android {
 
 
 dependencies {
+    implementation 'androidx.preference:preference:1.1.0'
     testImplementation "androidx.arch.core:core-testing:2.1.0"
 
     implementation 'com.google.dagger:dagger:2.27'

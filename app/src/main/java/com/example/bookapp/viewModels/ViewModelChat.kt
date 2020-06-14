@@ -22,31 +22,27 @@ class ViewModelChat : ViewModel() {
 
     val chatID: MutableLiveData<Int> = MutableLiveData()
 
-    val user: MutableLiveData<User> = MutableLiveData()
+    @Inject
+    lateinit var user: User
+
 
     val fetchChatNotifications = MutableLiveData<Boolean>()
 
     val chatNotifications: LiveData<ArrayList<ChatNotificationDTO>> = Transformations.switchMap(fetchChatNotifications) {
         liveData {
-            val user = user.value
-            if (it && user != null) {
-                emitSource(chatRepository.fetchChatsNotification(user))
-            }
+            emitSource(chatRepository.fetchChatsNotification(user))
+
         }
     }
 
-    var userChats: LiveData<ArrayList<Chat>> = Transformations.switchMap(user) {
-        liveData {
-            user.value?.let {
-                emitSource(chatRepository.fetchUserChats(it))
-            }
-        }
+    val userChats: LiveData<List<Chat>> by lazy {
+        chatRepository.fetchUserChats(user)
     }
 
 
-    val friendRequests: LiveData<ArrayList<FriendRequest>> = Transformations.switchMap(user) {
+    val friendRequests: LiveData<ArrayList<FriendRequest>> by lazy {
         liveData {
-            emit(ArrayList(chatRepository.fetchFriendRequests(it)))
+            emit(ArrayList(chatRepository.fetchFriendRequests(user)))
         }
     }
 

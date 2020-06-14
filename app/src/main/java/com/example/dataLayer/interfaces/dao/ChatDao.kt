@@ -5,23 +5,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.bookapp.models.Message
+import com.example.bookapp.models.Chat
 
 @Dao
 interface ChatDao {
 
-    @Query("SELECT * FROM message WHERE chatID = :chatID ORDER BY date DESC LIMIT 20")
-    fun getRecentChatMessages(chatID: Int): LiveData<List<Message>>
+    @Query("SELECT * FROM chat ")
+    fun getChats(): LiveData<List<Chat>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMessages(messages: List<Message>)
+    suspend fun insert(chats: List<Chat>)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMessage(message: Message)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMessageCurrentThread(message: Message)
-
-    @Query("SELECT * FROM message WHERE chatID = :chatID ORDER BY date DESC LIMIT 1")
-    fun getLastMessage(chatID: Int): LiveData<Message>
 }

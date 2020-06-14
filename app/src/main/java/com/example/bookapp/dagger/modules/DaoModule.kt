@@ -1,10 +1,10 @@
-package com.example.bookapp.dagger
+package com.example.bookapp.dagger.modules
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.example.bookapp.R
 import com.example.dataLayer.PostDatabase
 import com.example.dataLayer.interfaces.dao.ChatDao
+import com.example.dataLayer.interfaces.dao.MessageDao
 import com.example.dataLayer.interfaces.dao.RoomPostDao
 import com.example.dataLayer.interfaces.dao.UserDao
 import dagger.Module
@@ -26,8 +26,10 @@ class DaoModule() {
 
     @Provides
     @Singleton
-    fun messageDao(context: Context): ChatDao = PostDatabase.getDatabase(context).chatDao()
+    fun messageDao(context: Context): MessageDao = PostDatabase.getDatabase(context).messageDao()
 
     @Provides
-    fun getPreferences(context: Context) = context.getSharedPreferences(context.getString(R.string.key_preferences), Context.MODE_PRIVATE)
+    @Singleton
+    fun chatDao(context: Context): ChatDao = PostDatabase.getDatabase(context).chatDao()
+
 }

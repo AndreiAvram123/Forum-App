@@ -1,8 +1,16 @@
 package com.example.bookapp.models
 
+import androidx.room.*
+
+@Entity(tableName = "chat")
 data class Chat(
+        @PrimaryKey
+        @ColumnInfo(name = "id")
         val chatID: Int,
-        val users: List<User>,
+        @ColumnInfo(name = "name")
         val name: String,
-        val image: String
+        @ColumnInfo(name = "image")
+        val image: String,
+        @Embedded
+        val user2: User
 )

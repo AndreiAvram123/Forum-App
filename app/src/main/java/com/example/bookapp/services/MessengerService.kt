@@ -5,7 +5,6 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.bookapp.AppUtilities
@@ -14,13 +13,12 @@ import com.example.bookapp.models.Message
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.MessageMapper
-import com.example.dataLayer.interfaces.dao.ChatDao
+import com.example.dataLayer.interfaces.dao.MessageDao
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.launchdarkly.eventsource.EventHandler
 import com.launchdarkly.eventsource.EventSource
 import com.launchdarkly.eventsource.MessageEvent
-import kotlinx.coroutines.coroutineScope
 import org.json.JSONObject
 import java.net.URI
 import java.time.Duration
@@ -35,7 +33,7 @@ class MessengerService : Service() {
     var pendingIntent: PendingIntent? = null
 
     @Inject
-    lateinit var chatDao: ChatDao
+    lateinit var messageDao: MessageDao
 
     @Inject
     lateinit var user: User
@@ -87,7 +85,7 @@ class MessengerService : Service() {
                         "message" -> {
                             val messageDTO = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
                             val message = MessageMapper.mapToDomainObject(messageDTO)
-                            chatDao.insertMessageCurrentThread(message)
+                            messageDao.insertMessageCurrentThread(message)
                             if (shouldPlayNotification && message.sender.userID != user.userID) {
                                 playNotification(message)
                             }

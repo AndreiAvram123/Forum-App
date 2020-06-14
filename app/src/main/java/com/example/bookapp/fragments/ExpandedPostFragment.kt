@@ -54,16 +54,17 @@ class ExpandedPostFragment : Fragment() {
 
         viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, Observer {
             favoritePosts = it.posts
+
         })
 
         viewModelPost.getPostByID(args.postID).observe(viewLifecycleOwner, Observer {
             if (it != null) {
-                if(favoritePosts.contains(it)){
+                if (this::favoritePosts.isInitialized && favoritePosts.contains(it)) {
                     it.isFavorite = true
                 }
                 post = it
                 configureViews()
-                getComments();
+                getComments()
             }
         })
 

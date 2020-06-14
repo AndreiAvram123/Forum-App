@@ -15,18 +15,15 @@ import com.example.bookapp.dagger.DaggerAppComponent
 import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.fragments.AuthenticationFragment
 import com.example.bookapp.models.User
+import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelUser
-import com.example.dataLayer.PostDatabase
-import com.example.dataLayer.interfaces.dao.ChatDao
 import com.example.dataLayer.interfaces.dao.UserDao
-import com.example.dataLayer.interfaces.dao.UserDao_Impl
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -39,39 +36,25 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
     private val requestCodeGoogleSignIn = 1
 
 
-
-
     @Inject
     lateinit var userDao: UserDao
 
     @Inject
-    lateinit var sharedPreferences: SharedPreferences
+    lateinit var userAccountManager: UserAccountManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
-        val appComponent: AppComponent = DaggerAppComponent.factory().create(applicationContext, viewModelUser.viewModelScope, User(userID = 1, username = "", email = "", profilePicture = ""))
+        val appComponent: AppComponent = DaggerAppComponent.factory().create(applicationContext, viewModelUser.viewModelScope)
         (application as MyApplication).appComponent = appComponent
+
         appComponent.inject(this)
         appComponent.inject(viewModelUser)
 
-        sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
-        val userID = sharedPreferences.getInt(getString(R.string.key_user_id), 0)
-        if (userID > 0) {
+        val user = userAccountManager.getCurrentUser()
+        if (user.userID > 0) {
             startMainActivity()
-        }
-    }
-
-
-    private fun SharedPreferences.edit(commit: Boolean = true,
-                                       action: SharedPreferences.Editor.() -> Unit) {
-        val editor = edit()
-        action(editor)
-        if (commit) {
-            editor.commit()
-        } else {
-            editor.apply()
         }
     }
 
@@ -88,7 +71,10 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
                 googleSignInAccount?.let {
                     viewModelUser.loginWithGoogle(it.id!!, it.displayName!!, it.email!!).observe(this, Observer { user ->
                         if (user != null) {
-                            saveUserInMemory(user)
+                            lifecycleScope.launch {
+                                userAccountManager.saveUserInMemory(user)
+                                runOnUiThread { startMainActivity() }
+                            }
                         }
                     })
                 }
@@ -111,15 +97,7 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
 
 
     private fun saveUserInMemory(user: User) {
-        sharedPreferences.edit {
-            putInt(getString(R.string.key_user_id), user.userID)
-            putString(getString(R.string.key_username), user.username)
-            putString(getString(R.string.key_email), user.email)
-            putString(getString(R.string.key_profile_picture), user.profilePicture)
-        }
-        lifecycleScope.launch {
-            userDao.insertUser(user)
-        }
+
         startMainActivity()
 
     }

@@ -67,15 +67,14 @@
         <action
             android:id="@+id/action_home_to_fragmentAddPost"
             app:destination="@id/fragmentAddPost" />
+        <action
+            android:id="@+id/action_home_to_settingFragment"
+            app:destination="@id/settingFragment" />
     </fragment>
     <fragment
         android:id="@+id/friends"
         android:name="com.example.bookapp.fragments.FriendsFragment"
-        android:label="FriendsFragment">
-        <action
-            android:id="@+id/action_friends_to_messagesFragment"
-            app:destination="@id/messagesFragment" />
-    </fragment>
+        android:label="FriendsFragment"/>
     <fragment
         android:id="@+id/imageZoomFragment"
         android:name="com.example.bookapp.fragments.ImageZoomFragment"
@@ -89,4 +88,8 @@
             app:argType="boolean" />
     </fragment>
     <action android:id="@+id/action_global_messagesFragment" app:destination="@id/messagesFragment" />
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.example.bookapp.fragments.SettingsFragment"
+        android:label="SettingsFragment" />
 </navigation>

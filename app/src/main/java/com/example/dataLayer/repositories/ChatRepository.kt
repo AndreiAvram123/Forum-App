@@ -1,6 +1,5 @@
 package com.example.dataLayer.repositories
 
-import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.util.Log
@@ -15,16 +14,16 @@ import com.example.dataLayer.dataMappers.MessageMapper
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
 import com.example.dataLayer.interfaces.ChatLink
 import com.example.dataLayer.interfaces.dao.ChatDao
+import com.example.dataLayer.interfaces.dao.MessageDao
 import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ChatRepository @Inject constructor(
         private val repoInterface: ChatRepositoryInterface,
+        private val messageDao: MessageDao,
         private val chatDao: ChatDao,
         private val connectivityManager: ConnectivityManager
 ) {
@@ -55,13 +54,16 @@ class ChatRepository @Inject constructor(
         MutableLiveData<ArrayList<ChatNotificationDTO>>()
     }
 
-    suspend fun fetchUserChats(user: User): LiveData<ArrayList<Chat>> {
-        if (connectivityManager.activeNetwork != null) {
-            val fetchedData = repoInterface.fetchUserChats(user.userID)
-            userChats.postValue(ArrayList(ChatMapper.mapToDomainObjects(fetchedData, user.userID)))
-        }
-        return userChats
-    }
+    fun fetchUserChats(user: User): LiveData<List<Chat>> =
+            liveData {
+                emitSource(chatDao.getChats())
+                if (connectivityManager.activeNetwork != null) {
+                    val fetchedData = repoInterface.fetchUserChats(user.userID)
+                    val chats = ChatMapper.mapToDomainObjects(fetchedData, user.userID)
+                    chatDao.insert(chats)
+                }
+            }
+
 
     suspend fun pushMessage(serializeMessage: SerializeMessage) {
         try {
@@ -74,12 +76,12 @@ class ChatRepository @Inject constructor(
 
     fun getChatMessages(chatID: Int): LiveData<List<Message>> =
             liveData {
-                emitSource(chatDao.getRecentChatMessages(chatID))
+                emitSource(messageDao.getRecentChatMessages(chatID))
 
                 if (connectivityManager.activeNetwork != null) {
                     val fetchedData = repoInterface.fetchRecentMessages(chatID)
                     val messages = fetchedData.map { MessageMapper.mapToDomainObject(it) }
-                    chatDao.insertMessages(messages)
+                    messageDao.insertMessages(messages)
                 }
             }
 
@@ -121,9 +123,10 @@ class ChatRepository @Inject constructor(
     }
 
     suspend fun markMessageAsSeen(message: Message, user: User) {
-        repoInterface.markMessageAsSeen(messageID = message.id,
-                userID = user.userID)
-
+        if (connectivityManager.activeNetwork != null) {
+            repoInterface.markMessageAsSeen(messageID = message.id,
+                    userID = user.userID)
+        }
         removeLocalNotification(message)
     }
 

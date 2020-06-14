@@ -1,4 +1,4 @@
-package com.example.bookapp.dagger
+package com.example.bookapp.dagger.modules
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -7,13 +7,8 @@ import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.UserRepositoryInterface
-import com.example.dataLayer.repositories.PostRepository
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton

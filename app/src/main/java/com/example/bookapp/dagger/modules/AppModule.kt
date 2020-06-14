@@ -1,4 +1,4 @@
-package com.example.bookapp.dagger
+package com.example.bookapp.dagger.modules
 
 import android.app.Application
 import android.content.Context
