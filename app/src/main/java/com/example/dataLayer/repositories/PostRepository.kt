@@ -14,23 +14,26 @@ import com.example.dataLayer.models.*
 import com.example.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import com.example.dataLayer.repositories.RequestExecutor.DeferredFunction
+import kotlin.collections.ArrayList
 
+@Suppress("MemberVisibilityCanBePrivate")
 @InternalCoroutinesApi
-class PostRepository @Inject constructor(private val connectivityManager: ConnectivityManager,
-                                         private val postDao: RoomPostDao,
-                                         private val user: User,
+
+class PostRepository @Inject constructor(private val user: User,
+                                         private val requestExecutor: RequestExecutor,
                                          private val coroutineScope: CoroutineScope,
-                                         private val repositoryInterface: PostRepositoryInterface
+                                         private val repo: PostRepositoryInterface,
+                                         private val postDao: RoomPostDao
 ) {
 
-
     fun getPosts() = postDao.getCachedPosts().also {
-        if (connectivityManager.activeNetwork != null) {
-            coroutineScope.launch {
-                //if network is active remove old data and
-                //perform a fresh fetch
-                postDao.removeCachedData()
-            }
+        coroutineScope.launch {
+            //if network is active remove old data and
+            //perform a fresh fetch
+            fetchInitialPosts()
+            requestExecutor.executeSuspend(DeferredFunction(this@PostRepository::fetchFavoritePostsImpl))
+
         }
     }
 
@@ -45,7 +48,7 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
 
         override fun onItemAtEndLoaded(itemAtEnd: Post) {
             coroutineScope.launch {
-               fetchNextPosts(itemAtEnd.id)
+                fetchNextPosts(itemAtEnd.id)
             }
         }
     }
@@ -53,20 +56,17 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
     val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
         liveData(Dispatchers.IO) {
             emitSource(postDao.getFavoritePosts(user.userID))
-            if (connectivityManager.activeNetwork != null) {
-                fetchFavoritePosts()
-            }
-        }
-    }
-    val myPosts: LiveData<UserWithPosts> = liveData {
-        emitSource(postDao.getAllUserPosts(user.userID))
-        if (connectivityManager.activeNetwork != null) {
-            fetchMyPosts()
+            requestExecutor.executeSuspend(DeferredFunction(this@PostRepository::fetchFavoritePostsImpl))
         }
     }
 
+    val myPosts: LiveData<UserWithPosts> = liveData {
+        emitSource(postDao.getAllUserPosts(user.userID))
+        fetchMyPosts()
+    }
+
     fun fetchPostByID(id: Int): LiveData<Post> = liveData {
-        val postDTO = repositoryInterface.fetchPostByID(id)
+        val postDTO = repo.fetchPostByID(id)
         val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
         val author = UserMapper.mapToDomainObject(postDTO.author);
         postDao.insertPost(post)
@@ -78,9 +78,9 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
     }
 
 
-    private suspend fun fetchFavoritePosts() {
+    suspend fun fetchFavoritePostsImpl() {
         val data = PostMapper.mapToDomainObjects(
-                repositoryInterface.fetchUserFavoritePosts(user.userID))
+                repo.fetchUserFavoritePosts(user.userID))
 
         val toInsert = ArrayList<UserWithFavoritePostsCrossRef>()
         data.forEach {
@@ -89,9 +89,10 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
         postDao.insertAllFavoritePosts(toInsert)
     }
 
-    private suspend fun fetchMyPosts() {
+
+    suspend fun fetchMyPosts() {
         try {
-            val fetchedPosts = repositoryInterface.fetchMyPosts(user.userID)
+            val fetchedPosts = repo.fetchMyPosts(user.userID)
             postDao.insertPosts(PostMapper.mapToDomainObjects(fetchedPosts))
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
@@ -100,46 +101,46 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
 
     suspend fun addPostToFavorites(post: Post) {
         postDao.addFavoritePost(UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID))
-        repositoryInterface.addPostToFavorites(post.id, user.userID)
+        repo.addPostToFavorites(post.id, user.userID)
     }
 
 
     suspend fun deletePostFromFavorites(post: Post) {
 
-        repositoryInterface.removePostFromFavorites(postID = post.id, userID = user.userID)
+        repo.removePostFromFavorites(postID = post.id, userID = user.userID)
         val toRemove = UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID)
         postDao.deletePostFromFavorites(toRemove)
 
     }
 
 
-    suspend fun fetchInitialPosts() {
-        if (connectivityManager.activeNetwork != null) {
-            try {
-                val fetchedData: ArrayList<PostDTO> = repositoryInterface.fetchRecentPosts()
-                postDao.insertPosts(PostMapper.mapToDomainObjects(fetchedData))
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+    suspend fun fetchInitialPosts() =
+            requestExecutor.executeSuspend(DeferredFunction(
+                    this::fetchInitialPostsImpl))
+
+
+    internal suspend fun fetchInitialPostsImpl() {
+        postDao.removeCachedData()
+        val fetchedData: ArrayList<PostDTO> = repo.fetchRecentPosts()
+        postDao.insertPosts(PostMapper.mapToDomainObjects(fetchedData))
+
     }
 
-    private suspend fun fetchNextPosts(lastPostID: Int) {
-        if (connectivityManager.activeNetwork != null) {
-            try {
-              val fetchedData = repositoryInterface.fetchNextPagePosts(lastPostID)
-              val posts = PostMapper.mapToDomainObjects(fetchedData)
-                postDao.insertPosts(posts)
-            } catch (e: java.lang.Exception) {
-                e.printStackTrace()
-            }
+
+    internal suspend fun fetchNextPosts(lastPostID: Int) {
+        try {
+            val fetchedData = repo.fetchNextPagePosts(lastPostID)
+            val posts = PostMapper.mapToDomainObjects(fetchedData)
+            postDao.insertPosts(posts)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
         }
     }
 
     fun uploadImage(serializeImage: SerializeImage): LiveData<String> =
             liveData {
                 emit(String())
-                val imagePath = repositoryInterface.uploadImage(serializeImage).message
+                val imagePath = repo.uploadImage(serializeImage).message
                 emit(imagePath)
             }
 
@@ -147,9 +148,9 @@ class PostRepository @Inject constructor(private val connectivityManager: Connec
         return liveData {
             emit(UploadProgress.UPLOADING)
 
-            val serverResponse = repositoryInterface.uploadPost(post)
+            val serverResponse = repo.uploadPost(post)
 
-            val fetchedPost = repositoryInterface.fetchPostByID(serverResponse.message.toInt())
+            val fetchedPost = repo.fetchPostByID(serverResponse.message.toInt())
 
             val postDomain = PostMapper.mapDtoObjectToDomainObject(fetchedPost)
             emit(UploadProgress.UPLOADED)

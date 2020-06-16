@@ -28,22 +28,6 @@ class ChatRepository @Inject constructor(
         private val connectivityManager: ConnectivityManager
 ) {
 
-    init {
-        connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: Network) {
-                //take action when network connection is gained
-                //todo
-                //continue here
-                Log.d("haha", "uuuu")
-
-            }
-
-            override fun onLost(network: Network?) {
-                //take action when network connection is lost
-            }
-        })
-
-    }
 
     private val userChats: MutableLiveData<ArrayList<Chat>> by lazy {
         MutableLiveData<ArrayList<Chat>>()

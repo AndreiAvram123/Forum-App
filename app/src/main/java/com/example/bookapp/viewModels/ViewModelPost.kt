@@ -57,7 +57,7 @@ class ViewModelPost : ViewModel() {
             viewModelScope.launch { postRepository.deletePostFromFavorites(post) }
 
 
-    fun fetchNextPagePosts() = viewModelScope.launch { postRepository.fetchInitialPosts() }
+    fun fetchNewPosts() = viewModelScope.launch { postRepository.fetchInitialPosts() }
 
     fun uploadImage(serializeImage: SerializeImage) = postRepository.uploadImage(serializeImage)
 

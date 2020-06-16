@@ -7,7 +7,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import androidx.paging.PagedList
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.HomeAdapter
@@ -26,14 +25,15 @@ class HomeFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_home_fragment, container, false);
-        attachObserver()
         initializeUI()
+        attachObserver()
         return binding.root
     }
 
 
     private fun initializeUI() {
         binding.homeSwipeRefreshLayout.setOnRefreshListener {
+            viewModelPost.fetchNewPosts()
             binding.homeSwipeRefreshLayout.isRefreshing = false
         }
         initializeRecyclerView()
