@@ -1,26 +1,26 @@
 package com.example.dataLayer.repositories
 
-import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.paging.PagedList
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.PostMapper
-import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.dao.RoomPostDao
 import com.example.dataLayer.models.*
 import com.example.dataLayer.models.serialization.SerializePost
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.ArrayList
+
 
 @Suppress("MemberVisibilityCanBePrivate")
 @InternalCoroutinesApi
 
 class PostRepository @Inject constructor(private val user: User,
-                                         private val connectivityManager: ConnectivityManager,
                                          private val requestExecutor: RequestExecutor,
                                          private val coroutineScope: CoroutineScope,
                                          private val repo: PostRepositoryInterface,
@@ -32,7 +32,7 @@ class PostRepository @Inject constructor(private val user: User,
             //if network is active remove old data and
             //perform a fresh fetch
             fetchInitialPosts()
-            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl)
+            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl,null)
 
         }
     }
@@ -56,7 +56,7 @@ class PostRepository @Inject constructor(private val user: User,
     val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
         liveData(Dispatchers.IO) {
             emitSource(postDao.getFavoritePosts(user.userID))
-            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl)
+            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl,null)
         }
     }
 
@@ -68,12 +68,7 @@ class PostRepository @Inject constructor(private val user: User,
     fun fetchPostByID(id: Int): LiveData<Post> = liveData {
         val postDTO = repo.fetchPostByID(id)
         val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
-        val author = UserMapper.mapToDomainObject(postDTO.author);
         postDao.insertPost(post)
-
-        //todo
-        //did it break?
-        // userDao.insertUser(author)
         emit(post)
     }
 
@@ -82,11 +77,9 @@ class PostRepository @Inject constructor(private val user: User,
         val data = PostMapper.mapToDomainObjects(
                 repo.fetchUserFavoritePosts(user.userID))
 
-        val toInsert = ArrayList<UserWithFavoritePostsCrossRef>()
-        data.forEach {
-            toInsert.add(UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID))
-        }
-        postDao.insertAllFavoritePosts(toInsert)
+        postDao.insertAllFavoritePosts(data.map {
+            UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID)
+        })
     }
 
 
@@ -116,7 +109,7 @@ class PostRepository @Inject constructor(private val user: User,
 
     suspend fun fetchInitialPosts() =
             requestExecutor.add(
-                    this::fetchInitialPostsImpl)
+                    this::fetchInitialPostsImpl,null)
 
 
     internal suspend fun fetchInitialPostsImpl() {

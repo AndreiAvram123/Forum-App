@@ -20,7 +20,6 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.bookapp.R
 import com.example.bookapp.dagger.*
 import com.example.bookapp.databinding.LayoutMainActivityBinding
-import com.example.bookapp.models.User
 import com.example.bookapp.services.MessengerService
 import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelChat
@@ -56,6 +55,11 @@ class MainActivity : AppCompatActivity() {
             mService.pendingIntent = getPendingIntent()
             mService.shouldPlayNotification = false
 
+            viewModelChat.chatLink.observe(this@MainActivity, Observer {
+                it?.let {
+                    mService.chatLinks = it
+                }
+            })
         }
 
         override fun onServiceDisconnected(arg0: ComponentName) {
@@ -78,14 +82,6 @@ class MainActivity : AppCompatActivity() {
         createMessageNotificationChannel()
         configureNavigation()
 
-
-        viewModelChat.chatLink.observe(this, Observer {
-            it?.let {
-                if (it.hubURL.isNotEmpty()) {
-                    mService.chatLink = it.hubURL
-                }
-            }
-        })
 
     }
 

@@ -11,7 +11,7 @@ class ChatRepositoryTests {
 
     @Test
     fun shouldReturnHubLink() = runBlocking {
-        val data = chatRepositoryInterface.fetchChatLink(1)
+        val data = chatRepositoryInterface.fetchChatURL(1)
         Assert.assertNotNull(data)
     }
 }

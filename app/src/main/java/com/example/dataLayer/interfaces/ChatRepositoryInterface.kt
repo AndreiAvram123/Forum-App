@@ -23,12 +23,11 @@ interface ChatRepositoryInterface {
     @GET("/chat/{chatID}/recentMessages")
     suspend fun fetchRecentMessages(@Path("chatID") chatID: Int): List<MessageDTO>
 
-    @GET("/chat/discover/{chatID}")
-    suspend fun fetchChatLink(@Path("chatID") chatID: Int): ChatLink
+    @GET("/chats/discover/{userID}")
+    suspend fun fetchChatURL(@Path("userID") userID: Int): ServerResponse
 
-    @POST("/friendRequests/acceptRequest")
-    @FormUrlEncoded
-    suspend fun acceptFriendRequest(@Field("id") requestID: Int): ChatDTO
+    @PATCH("/friendRequests/acceptRequest/{requestID}")
+    suspend fun acceptFriendRequest(@Path("requestID") requestID: Int): ChatDTO
 
     @DELETE("/user/{userID}/removeFriend/{friendID}")
     suspend fun removeFriend(@Path("userID") userID: Int, @Path("friendID") friendID: Int)
@@ -50,6 +49,3 @@ interface ChatRepositoryInterface {
     suspend fun markMessageAsSeen(@Path("userID") userID: Int, @Path("messageID") messageID: Int)
 
 }
-
-data class ChatLink(@SerializedName("hubURL")
-                    val hubURL: String)

@@ -7,7 +7,7 @@ import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookapp.R
-import com.example.bookapp.databinding.ItemFriendsBinding
+import com.example.bookapp.databinding.ItemChatBinding
 import com.example.bookapp.fragments.FriendsFragmentDirections
 import com.example.bookapp.models.Chat
 
@@ -21,7 +21,7 @@ class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding: ItemFriendsBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_friends, parent, false)
+        val binding: ItemChatBinding = ItemChatBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -33,7 +33,7 @@ class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
         return chats.size
     }
 
-    inner class ViewHolder(private val binding: ItemFriendsBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(private val binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(chat: Chat) {
             binding.chat = chat
 

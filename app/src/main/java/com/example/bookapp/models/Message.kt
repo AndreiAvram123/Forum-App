@@ -26,6 +26,8 @@ open class Message(
         @ColumnInfo(name = "localID")
         val localID: String?
 ){
+        //todo
+        //nopeeeeeeeeeeeeeeeeeee
         override fun equals(other: Any?): Boolean {
                 if (this === other) return true
                 if (javaClass != other?.javaClass) return false

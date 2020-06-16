@@ -25,9 +25,9 @@ import java.time.Duration
 import javax.inject.Inject
 
 class MessengerService : Service() {
+
+
     // Binder given to clients
-
-
     private val binder = LocalBinder()
     private var eventSource: EventSource? = null
     var pendingIntent: PendingIntent? = null
@@ -41,7 +41,7 @@ class MessengerService : Service() {
     var shouldPlayNotification = true
 
 
-    var chatLink: String? = null
+    var chatLinks: String? = null
         set(value) {
             field = value
             value?.let {
@@ -85,6 +85,7 @@ class MessengerService : Service() {
                         "message" -> {
                             val messageDTO = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
                             val message = MessageMapper.mapToDomainObject(messageDTO)
+
                             messageDao.insertMessageCurrentThread(message)
                             if (shouldPlayNotification && message.sender.userID != user.userID) {
                                 playNotification(message)

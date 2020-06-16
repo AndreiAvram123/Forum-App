@@ -5,7 +5,6 @@ import com.example.bookapp.models.Chat
 import com.example.bookapp.models.Message
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
-import com.example.dataLayer.interfaces.ChatLink
 import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
@@ -36,7 +35,7 @@ class ViewModelChat : ViewModel() {
     }
 
     val userChats: LiveData<List<Chat>> by lazy {
-        chatRepository.fetchUserChats(user)
+        chatRepository.userChats
     }
 
 
@@ -53,12 +52,8 @@ class ViewModelChat : ViewModel() {
     }
 
 
-    val chatLink: LiveData<ChatLink?> = Transformations.switchMap(chatID) {
-        chatID.value?.let {
-            liveData {
-                emit(chatRepository.getChatLink(it))
-            }
-        }
+    val chatLink: LiveData<String?> by lazy {
+        chatRepository.getChatLink()
     }
 
 

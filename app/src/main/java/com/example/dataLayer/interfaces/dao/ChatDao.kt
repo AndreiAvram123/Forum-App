@@ -16,5 +16,7 @@ interface ChatDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(chats: List<Chat>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(chat: Chat)
 
 }
