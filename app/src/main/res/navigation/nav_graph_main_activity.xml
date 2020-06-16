@@ -92,4 +92,14 @@
         android:id="@+id/settingFragment"
         android:name="com.example.bookapp.fragments.SettingsFragment"
         android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/noInternetFragment"
+        android:name="com.example.bookapp.fragments.NoInternetFragment"
+        android:label="fragment_no_internet"
+        tools:layout="@layout/fragment_no_internet" />
+    <action
+        android:id="@+id/action_global_noInternetFragment"
+        app:destination="@id/noInternetFragment"
+        app:enterAnim="@anim/nav_default_pop_enter_anim"
+        app:exitAnim="@anim/nav_default_pop_exit_anim" />
 </navigation>

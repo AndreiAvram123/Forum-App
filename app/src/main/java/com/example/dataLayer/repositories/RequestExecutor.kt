@@ -16,7 +16,7 @@ class RequestExecutor @Inject constructor(
 ) {
 
 
-    private val uncompletedNetworkRequests: Queue<DeferredFunction> = LinkedList()
+    private val uncompletedNetworkRequests: Queue<KFunction<Any>> = LinkedList()
 
     init {
         connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
@@ -24,7 +24,7 @@ class RequestExecutor @Inject constructor(
                 coroutineScope.launch {
                     //execute requests that are not finished
                     while (uncompletedNetworkRequests.peek() != null) {
-                        uncompletedNetworkRequests.poll().function.callSuspend()
+                        uncompletedNetworkRequests.poll().callSuspend()
                     }
                 }
             }
@@ -37,18 +37,11 @@ class RequestExecutor @Inject constructor(
     }
 
 
-    class DeferredFunction(val function: KFunction<Any>) {
-        @Suppress("UNCHECKED_CAST")
-        operator fun <T> invoke(): T {
-            return function.call() as T
-        }
-    }
+    internal fun add(function: KFunction<Any>) {
 
-
-    internal fun executeSuspend(function: DeferredFunction) {
         if (connectivityManager.activeNetwork != null) {
             coroutineScope.launch {
-                function.function.callSuspend()
+                function.callSuspend()
             }
         } else {
             uncompletedNetworkRequests.add(function)

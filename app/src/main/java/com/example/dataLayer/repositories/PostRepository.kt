@@ -14,13 +14,13 @@ import com.example.dataLayer.models.*
 import com.example.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.*
 import javax.inject.Inject
-import com.example.dataLayer.repositories.RequestExecutor.DeferredFunction
 import kotlin.collections.ArrayList
 
 @Suppress("MemberVisibilityCanBePrivate")
 @InternalCoroutinesApi
 
 class PostRepository @Inject constructor(private val user: User,
+                                         private val connectivityManager: ConnectivityManager,
                                          private val requestExecutor: RequestExecutor,
                                          private val coroutineScope: CoroutineScope,
                                          private val repo: PostRepositoryInterface,
@@ -32,7 +32,7 @@ class PostRepository @Inject constructor(private val user: User,
             //if network is active remove old data and
             //perform a fresh fetch
             fetchInitialPosts()
-            requestExecutor.executeSuspend(DeferredFunction(this@PostRepository::fetchFavoritePostsImpl))
+            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl)
 
         }
     }
@@ -56,7 +56,7 @@ class PostRepository @Inject constructor(private val user: User,
     val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
         liveData(Dispatchers.IO) {
             emitSource(postDao.getFavoritePosts(user.userID))
-            requestExecutor.executeSuspend(DeferredFunction(this@PostRepository::fetchFavoritePostsImpl))
+            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl)
         }
     }
 
@@ -78,7 +78,7 @@ class PostRepository @Inject constructor(private val user: User,
     }
 
 
-    suspend fun fetchFavoritePostsImpl() {
+    internal suspend fun fetchFavoritePostsImpl() {
         val data = PostMapper.mapToDomainObjects(
                 repo.fetchUserFavoritePosts(user.userID))
 
@@ -115,8 +115,8 @@ class PostRepository @Inject constructor(private val user: User,
 
 
     suspend fun fetchInitialPosts() =
-            requestExecutor.executeSuspend(DeferredFunction(
-                    this::fetchInitialPostsImpl))
+            requestExecutor.add(
+                    this::fetchInitialPostsImpl)
 
 
     internal suspend fun fetchInitialPostsImpl() {

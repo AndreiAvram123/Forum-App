@@ -1,5 +1,7 @@
 package com.example.bookapp.fragments
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +10,7 @@ import android.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.SuggestionsAdapter
@@ -29,6 +32,11 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
+        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager.activeNetwork == null) {
+            val action = SearchFragmentDirections.actionGlobalNoInternetFragment()
+            findNavController().navigate(action)
+        }
         binding = FragmentSearchBinding.inflate(inflater, container, false)
         configureRecyclerView()
         configureSearch()
@@ -81,8 +89,8 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
     }
 
     override fun sendFriendRequest(receiver: User) {
-            val friendRequest = SerializeFriendRequest(senderID =viewModelUser.user.userID, receiverID = receiver.userID)
-            viewModelChat.sendFriendRequest(friendRequest)
+        val friendRequest = SerializeFriendRequest(senderID = viewModelUser.user.userID, receiverID = receiver.userID)
+        viewModelChat.sendFriendRequest(friendRequest)
     }
 }
 
