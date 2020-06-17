@@ -99,7 +99,6 @@ class PostRepository @Inject constructor(private val user: User,
 
 
     suspend fun deletePostFromFavorites(post: Post) {
-
         repo.removePostFromFavorites(postID = post.id, userID = user.userID)
         val toRemove = UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID)
         postDao.deletePostFromFavorites(toRemove)

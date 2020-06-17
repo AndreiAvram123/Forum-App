@@ -49,16 +49,20 @@ class MessagesFragment : Fragment() {
 
         messageAdapter = MessageAdapter(user, ::expandImage)
         configureViews()
+
         viewModelChat.currentChatId.value = args.chatID
 
-
         viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer {
-            val ordered = it.reversed()
-            messageAdapter.setData(ordered)
-            if (ordered.isNotEmpty() && !ordered.last().seenByCurrentUser) {
-                viewModelChat.markMessageAsSeen(ordered.last(), user)
+            if (it.isNotEmpty() && it.first().chatID == args.chatID) {
+                val ordered = it.reversed()
+                messageAdapter.setData(ordered)
+                if (!ordered.last().seenByCurrentUser) {
+                    viewModelChat.markMessageAsSeen(ordered.last(), user)
+                }
             }
         })
+
+
 
 
         binding.sendImageButton.setOnClickListener {
@@ -68,6 +72,11 @@ class MessagesFragment : Fragment() {
         return binding.root
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        messageAdapter.clear()
+        viewModelChat.currentChatId.value = 0
+    }
 
     private fun expandImage(imageURL: String, localImage: Boolean) {
         val action = MessagesFragmentDirections.actionMessagesFragmentToImageZoomFragment(imageURL, localImage)

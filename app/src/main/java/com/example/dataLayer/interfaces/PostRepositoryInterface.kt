@@ -26,7 +26,7 @@ interface PostRepositoryInterface {
     @GET("/user/{id}/posts")
     suspend fun fetchMyPosts(@Path("id") userID: Int): ArrayList<PostDTO>
 
-    @DELETE("/user/{userID}/removePost/{postID}")
+    @DELETE("/user/{userID}/removeFromFavorites/{postID}")
     suspend fun removePostFromFavorites(@Path("userID") userID: Int, @Path("postID") postID: Int): ServerResponse
 
     @POST("/user/{userID}/addToFavorites/{postID}")

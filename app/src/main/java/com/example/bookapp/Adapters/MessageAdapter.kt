@@ -155,6 +155,10 @@ class MessageAdapter(private val currentUser: User,
             }
         }
     }
+    fun clear(){
+        messages.clear()
+        notifyDataSetChanged()
+    }
 
 
     override fun getItemViewType(position: Int): Int {
