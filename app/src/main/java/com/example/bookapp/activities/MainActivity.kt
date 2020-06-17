@@ -7,6 +7,7 @@ import android.content.*
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -167,7 +168,7 @@ class MainActivity : AppCompatActivity() {
         val chatBadge = binding.bottomNavigation.getOrCreateBadge(
                 R.id.friends
         )
-        viewModelChat.chatNotifications.observe(this, Observer {
+        viewModelChat.lastMessageChats.observe(this, Observer {
             if (it.isNotEmpty()) {
                 chatBadge.number = it.size
                 chatBadge.isVisible = true

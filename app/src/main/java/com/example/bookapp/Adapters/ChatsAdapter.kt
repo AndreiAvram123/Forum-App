@@ -10,6 +10,7 @@ import com.example.bookapp.R
 import com.example.bookapp.databinding.ItemChatBinding
 import com.example.bookapp.fragments.FriendsFragmentDirections
 import com.example.bookapp.models.Chat
+import com.example.dataLayer.models.ChatNotificationDTO
 
 class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
     private var chats: ArrayList<Chat> = ArrayList()
@@ -33,11 +34,31 @@ class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
         return chats.size
     }
 
+    fun showNotifications(chatIDs: List<Int>) {
+
+        chatIDs.forEach { chatID ->
+            chats.find { it.chatID == chatID }.also {
+                if (it != null) {
+                    it.newMessage = true
+                    notifyItemChanged(chats.indexOf(it))
+                }
+            }
+        }
+
+    }
+
     inner class ViewHolder(private val binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(chat: Chat) {
             binding.chat = chat
 
             binding.root.setOnClickListener {
+                //remove notification,as the user clicked on the chat
+                chats.find { it.chatID == chat.chatID }.also {
+                    if (it != null) {
+                        it.newMessage = false
+                        notifyItemChanged(chats.indexOf(it))
+                    }
+                }
                 val action: NavDirections = FriendsFragmentDirections.actionGlobalMessagesFragment(chat.chatID)
                 Navigation.findNavController(binding.root).navigate(action)
             }

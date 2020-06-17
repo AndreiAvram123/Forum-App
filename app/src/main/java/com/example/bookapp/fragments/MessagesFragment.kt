@@ -18,8 +18,6 @@ import com.example.bookapp.Adapters.MessageAdapter
 import com.example.bookapp.AppUtilities
 import com.example.bookapp.databinding.MessagesFragmentBinding
 import com.example.bookapp.models.LocalImageMessage
-import com.example.bookapp.models.Message
-import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
@@ -51,7 +49,7 @@ class MessagesFragment : Fragment() {
 
         messageAdapter = MessageAdapter(user, ::expandImage)
         configureViews()
-        viewModelChat.chatID.value = args.chatID
+        viewModelChat.currentChatId.value = args.chatID
 
 
         viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer {

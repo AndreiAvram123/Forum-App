@@ -39,9 +39,6 @@ class RequestExecutor @Inject constructor(
                 }
             }
 
-            override fun onLost(network: Network?) {
-                //take action when network connection is lost
-            }
         })
 
     }

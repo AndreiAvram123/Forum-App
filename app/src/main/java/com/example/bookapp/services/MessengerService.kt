@@ -40,7 +40,8 @@ class MessengerService : Service() {
 
     var shouldPlayNotification = true
 
-
+    //todo
+    //stop when netowork is lost
     var chatLinks: String? = null
         set(value) {
             field = value
@@ -85,7 +86,9 @@ class MessengerService : Service() {
                         "message" -> {
                             val messageDTO = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
                             val message = MessageMapper.mapToDomainObject(messageDTO)
-
+                            if (message.sender.userID == user.userID) {
+                                message.seenByCurrentUser = true
+                            }
                             messageDao.insertMessageCurrentThread(message)
                             if (shouldPlayNotification && message.sender.userID != user.userID) {
                                 playNotification(message)

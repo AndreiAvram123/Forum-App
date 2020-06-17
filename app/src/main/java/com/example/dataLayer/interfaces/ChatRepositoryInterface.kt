@@ -42,10 +42,16 @@ interface ChatRepositoryInterface {
     @GET("/user/{userID}/friends")
     suspend fun fetchFriends(@Path("userID") userID: Int): List<UserDTO>
 
-    @GET("/user/{userID}/chatsNotifications")
-    suspend fun fetchChatNotification(@Path("userID") userID: Int): List<ChatNotificationDTO>
+//    @GET("/user/{userID}/chatsNotifications")
+//    suspend fun fetchChatNotification(@Path("userID") userID: Int): List<ChatNotificationDTO>
 
     @PATCH("/message/{messageID}/user/{userID}")
     suspend fun markMessageAsSeen(@Path("userID") userID: Int, @Path("messageID") messageID: Int)
+
+    @GET("/notifications/discover/{userID}")
+    suspend fun fetchNotificationLink(@Path("userID") userID: Int): ServerResponse
+
+    @GET("/user/{userID}/chats/lastMessages")
+    suspend fun fetchLastChatsMessage(@Path("userID") userID: Int): List<MessageDTO>
 
 }

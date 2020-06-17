@@ -3,7 +3,6 @@ package com.example.bookapp.viewModels
 import androidx.lifecycle.*
 import com.example.bookapp.models.Chat
 import com.example.bookapp.models.Message
-import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
@@ -11,7 +10,6 @@ import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.repositories.ChatRepository
 import kotlinx.coroutines.launch
-import okhttp3.internal.notifyAll
 import javax.inject.Inject
 
 class ViewModelChat : ViewModel() {
@@ -19,7 +17,7 @@ class ViewModelChat : ViewModel() {
     @Inject
     lateinit var chatRepository: ChatRepository
 
-    val chatID: MutableLiveData<Int> = MutableLiveData()
+    val currentChatId: MutableLiveData<Int> = MutableLiveData()
 
     @Inject
     lateinit var user: User
@@ -27,12 +25,10 @@ class ViewModelChat : ViewModel() {
 
     val fetchChatNotifications = MutableLiveData<Boolean>()
 
-    val chatNotifications: LiveData<ArrayList<ChatNotificationDTO>> = Transformations.switchMap(fetchChatNotifications) {
-        liveData {
-            emitSource(chatRepository.fetchChatsNotification(user))
-
-        }
+    val lastMessageChats: LiveData<List<Int>> by lazy {
+        chatRepository.lastChatsMessage
     }
+
 
     val userChats: LiveData<List<Chat>> by lazy {
         chatRepository.userChats
@@ -45,15 +41,15 @@ class ViewModelChat : ViewModel() {
         }
     }
 
-    val recentMessages: LiveData<List<Message>> = Transformations.switchMap(chatID) {
-        chatID.value?.let {
+    val recentMessages: LiveData<List<Message>> = Transformations.switchMap(currentChatId) {
+        currentChatId.value?.let {
             chatRepository.getChatMessages(it)
         }
     }
 
 
     val chatLink: LiveData<String?> by lazy {
-        chatRepository.getChatLink()
+        chatRepository.chatLink
     }
 
 

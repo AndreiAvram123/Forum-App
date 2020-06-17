@@ -16,6 +16,7 @@ import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,6 +31,8 @@ class ChatRepository @Inject constructor(
         private val requestExecutor: RequestExecutor
 ) {
 
+    private lateinit var notificationHandler: NotificationHandler
+
 
     private val chatNotifications by lazy {
         MutableLiveData<ArrayList<ChatNotificationDTO>>()
@@ -40,6 +43,25 @@ class ChatRepository @Inject constructor(
             emitSource(chatDao.getChats())
             requestExecutor.add(this@ChatRepository::fetchUserChats, null)
         }
+    }
+    val chatLink by lazy {
+        MutableLiveData<String?>()
+    }.also {
+        requestExecutor.add(this::fetchChatsLink, null)
+        requestExecutor.add(this::fetchNotificationLink, null)
+
+    }
+
+    val lastChatsMessage: LiveData<List<Int>> by lazy {
+        chatDao.getLastChatsMessage()
+    }.also {
+        requestExecutor.add(this::fetchLastChatsMessage, null)
+    }
+
+    internal suspend fun fetchLastChatsMessage() {
+        val data = repo.fetchLastChatsMessage(user.userID)
+        val messages = data.map { MessageMapper.mapToDomainObject(it) }
+        messageDao.insertMessages(messages)
     }
 
     internal suspend fun fetchUserChats() {
@@ -70,34 +92,33 @@ class ChatRepository @Inject constructor(
         messageDao.insertMessages(messages)
     }
 
-    private val chatLink by lazy {
-        MutableLiveData<String?>()
-    }
 
-    fun getChatLink(): LiveData<String?> {
-        requestExecutor.add(this::fetchChatLink, user.userID)
-        return chatLink
-    }
-
-    internal suspend fun fetchChatLink(userID: Int) {
-        val link = repo.fetchChatURL(userID).message
+    internal suspend fun fetchChatsLink() {
+        val link = repo.fetchChatURL(user.userID).message
         chatLink.postValue(link)
     }
 
+    internal suspend fun fetchNotificationLink() {
+        try {
+            val link = repo.fetchNotificationLink(user.userID).message
+            notificationHandler = NotificationHandler(connectivityManager, this::addNotification, link)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun addNotification(notificationDTO: ChatNotificationDTO) {
+        chatNotifications.value?.let {
+            it.add(notificationDTO)
+            chatNotifications.notifyObserver()
+        }
+
+    }
 
     suspend fun acceptFriendRequest(request: FriendRequest) {
         val data = repo.acceptFriendRequest(request.id)
         val chat = ChatMapper.mapDtoObjectToDomainObject(data, request.receiver.userID)
         chatDao.insert(chat)
-    }
-
-
-    suspend fun fetchChatsNotification(user: User): MutableLiveData<ArrayList<ChatNotificationDTO>> {
-        chatNotifications.value?.clear()
-        if (connectivityManager.activeNetwork != null) {
-            chatNotifications.postValue(ArrayList(repo.fetchChatNotification(user.userID)))
-        }
-        return chatNotifications
     }
 
 
@@ -118,6 +139,8 @@ class ChatRepository @Inject constructor(
         if (connectivityManager.activeNetwork != null) {
             repo.markMessageAsSeen(messageID = message.id,
                     userID = user.userID)
+            message.seenByCurrentUser = true
+            messageDao.update(message)
         }
         removeLocalNotification(message)
     }
@@ -134,4 +157,6 @@ class ChatRepository @Inject constructor(
     fun <T> MutableLiveData<T>.notifyObserver() {
         this.value = this.value
     }
+
+
 }

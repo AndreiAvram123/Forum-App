@@ -1,10 +1,7 @@
 package com.example.dataLayer.interfaces.dao
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.bookapp.models.Message
 
 @Dao
@@ -24,4 +21,7 @@ interface MessageDao {
 
     @Query("SELECT * FROM message WHERE chatID = :chatID ORDER BY date DESC LIMIT 1")
     fun getLastMessage(chatID: Int): LiveData<Message>
+
+    @Update
+    suspend fun update(message: Message)
 }

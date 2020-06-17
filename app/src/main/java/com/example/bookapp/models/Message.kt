@@ -22,7 +22,7 @@ open class Message(
         @ColumnInfo(name = "chatID")
         val chatID: Int,
         @ColumnInfo(name = "seenBy")
-        val seenByCurrentUser: Boolean,
+        var seenByCurrentUser: Boolean = false,
         @ColumnInfo(name = "localID")
         val localID: String?
 ){
