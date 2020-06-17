@@ -5,9 +5,8 @@ import com.example.dataLayer.dataObjectsToSerialize.CommentDTO
 
 object CommentMapper {
 
-    fun mapDTOObjectsToDomainObjects(comments: List<CommentDTO>): List<Comment> = comments.map { mapDtoObjectToDomainObject(it) }
 
-    fun mapDtoObjectToDomainObject(commentDTO: CommentDTO) = Comment(
+    fun mapToDomainObject(commentDTO: CommentDTO) = Comment(
             id = commentDTO.id,
             date = commentDTO.date,
             content = commentDTO.content,

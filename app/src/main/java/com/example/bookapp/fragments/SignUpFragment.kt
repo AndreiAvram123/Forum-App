@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.databinding.FragmentSignUpBinding
+import com.example.bookapp.isEmail
 
 class SignUpFragment : AuthenticationFragmentTemplate() {
 
@@ -59,7 +59,7 @@ class SignUpFragment : AuthenticationFragmentTemplate() {
 
     private fun areCredentialsValid(email: String, password: String, reenteredPassword: String,
                                     nickname: String): Boolean {
-        if (!AppUtilities.isEmailValid(email)) {
+        if (email.isEmail()) {
             displayErrorMessage(getString(R.string.error_invalid_email))
             return false
         }

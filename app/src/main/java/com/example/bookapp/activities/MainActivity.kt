@@ -24,6 +24,7 @@ import com.example.bookapp.databinding.LayoutMainActivityBinding
 import com.example.bookapp.services.MessengerService
 import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelChat
+import com.example.bookapp.viewModels.ViewModelComments
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -40,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
     private val viewModelChat: ViewModelChat by viewModels()
+    private val viewModelComment: ViewModelComments by viewModels()
     private var mBound: Boolean = false
     private lateinit var mService: MessengerService
     private lateinit var binding: LayoutMainActivityBinding
@@ -90,6 +92,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         mBound = false
+
         if (this::mService.isInitialized) {
             mService.shouldPlayNotification = true
         }
@@ -118,7 +121,6 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         //fetch new notifications every time on start is called
-        viewModelChat.fetchChatNotifications.value = true
         createMessageNotificationChannel()
         startMessengerService()
         bindToMessengerService()
@@ -135,6 +137,7 @@ class MainActivity : AppCompatActivity() {
         appComponent.inject(viewModelPost)
         appComponent.inject(viewModelUser)
         appComponent.inject(viewModelChat)
+        appComponent.inject(viewModelComment)
 
 
     }
@@ -176,7 +179,6 @@ class MainActivity : AppCompatActivity() {
                 chatBadge.isVisible = false
             }
         })
-        viewModelChat.fetchChatNotifications.value = true
     }
 
 

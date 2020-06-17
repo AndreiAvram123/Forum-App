@@ -3,10 +3,7 @@ package com.example.bookapp.dagger.modules
 import android.content.Context
 import com.example.bookapp.R
 import com.example.dataLayer.PostDatabase
-import com.example.dataLayer.interfaces.dao.ChatDao
-import com.example.dataLayer.interfaces.dao.MessageDao
-import com.example.dataLayer.interfaces.dao.RoomPostDao
-import com.example.dataLayer.interfaces.dao.UserDao
+import com.example.dataLayer.interfaces.dao.*
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -31,5 +28,9 @@ class DaoModule() {
     @Provides
     @Singleton
     fun chatDao(context: Context): ChatDao = PostDatabase.getDatabase(context).chatDao()
+
+    @Provides
+    @Singleton
+    fun commentDao(context: Context): RoomCommentDao = PostDatabase.getDatabase(context).commentDao()
 
 }

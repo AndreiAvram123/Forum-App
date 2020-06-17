@@ -8,9 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.databinding.FragmentImageZoomBinding
+import com.example.bookapp.toDrawable
 
 
 class ImageZoomFragment : Fragment() {
@@ -23,8 +23,8 @@ class ImageZoomFragment : Fragment() {
         val binding = FragmentImageZoomBinding.inflate(inflater, container, false)
 
         if (args.localImage) {
-            binding.photoView.setImageDrawable(AppUtilities.convertFromUriToDrawable(Uri.parse(args.imageURl), requireContext()))
-        }else {
+            binding.photoView.setImageDrawable(Uri.parse(args.imageURl).toDrawable(requireContext()))
+        } else {
             binding.imageURL = args.imageURl
         }
 

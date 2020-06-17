@@ -44,7 +44,7 @@ fun getDateFromUnix(textView: TextView, unixTime: Long) {
             val dateFormat: SimpleDateFormat = SimpleDateFormat("HH:mm", Locale.UK);
             textView.text = dateFormat.format(messageDate)
         } else {
-            val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.UK);
+            val dateFormat: SimpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.UK);
             textView.text = dateFormat.format(messageDate)
         }
     }

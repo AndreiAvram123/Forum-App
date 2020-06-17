@@ -24,8 +24,8 @@ class ViewModelPost : ViewModel() {
     fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts
 
 
-    fun getUserPosts(): LiveData<UserWithPosts> = Transformations.map(postRepository.myPosts) {
-        it
+    val userPosts by lazy {
+        postRepository.fetchMyPosts()
     }
 
 

@@ -24,9 +24,6 @@ class ViewModelUser : ViewModel() {
     }
 
 
-    val friends: LiveData<List<User>> by lazy {
-        Transformations.map(userRepository.friends) { it }
-    }
 
 
     fun loginWithGoogle(idToken: String, displayName: String, email: String) = userRepository.loginWithGoogle(idToken, displayName, email)

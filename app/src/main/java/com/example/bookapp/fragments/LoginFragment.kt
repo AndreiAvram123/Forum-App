@@ -8,16 +8,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.databinding.FragmentLoginBinding
+import com.example.bookapp.isEmail
 
 class LoginFragment : AuthenticationFragmentTemplate() {
 
-    private var errorMessage: TextView? = null
-    private var emailField: EditText? = null
-    private var passwordField: EditText? = null
-    private var signInButton: Button? = null
-    private var signUpButton: Button? = null
     private lateinit var binding: FragmentLoginBinding
 
 
@@ -29,8 +24,8 @@ class LoginFragment : AuthenticationFragmentTemplate() {
 
 
     private fun attemptLogin() {
-        val email = emailField!!.text.toString().trim { it <= ' ' }
-        val password = passwordField!!.text.toString().trim { it <= ' ' }
+        val email = binding.emailFieldLogin.text.trim().toString()
+        val password = binding.passwordFieldLogin.text.trim().toString()
         if (areLoginDetailsValid(email, password)) {
             //todo
             //login
@@ -38,9 +33,9 @@ class LoginFragment : AuthenticationFragmentTemplate() {
         }
     }
 
-    public override fun clearFields() {
-        emailField!!.setText("")
-        passwordField!!.setText("")
+    override fun clearFields() {
+        binding.emailFieldLogin.text.clear()
+        binding.passwordFieldLogin.text.clear()
     }
 
     public override fun initializeUI() {
@@ -94,7 +89,7 @@ class LoginFragment : AuthenticationFragmentTemplate() {
      * @return
      */
     private fun areLoginDetailsValid(email: String, password: String): Boolean {
-        if (!AppUtilities.isEmailValid(email)) {
+        if (email.isEmail()) {
             displayErrorMessage("Please enter a valid email")
             return false
         }
@@ -106,8 +101,8 @@ class LoginFragment : AuthenticationFragmentTemplate() {
     }
 
     override fun displayErrorMessage(message: String) {
-        errorMessage!!.visibility = View.VISIBLE
-        errorMessage!!.text = message
+        binding.errorMessage.visibility = View.VISIBLE
+        binding.errorMessage.text = message
     }
 
 

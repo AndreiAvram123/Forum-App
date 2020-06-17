@@ -8,11 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.AdapterComments
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.bottomSheets.CommentBottomSheet
 import com.example.bookapp.databinding.PostExpandedFragmentBinding
@@ -103,6 +103,10 @@ class ExpandedPostFragment : Fragment() {
         }
         binding.backButtonExpanded.setOnClickListener { Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).popBackStack() }
         binding.writeCommentButton.setOnClickListener { showCommentSheet() }
+        binding.postImageExpanded.setOnClickListener {
+            val action = ExpandedPostFragmentDirections.actionGlobalImageZoomFragment(post.image, false)
+            findNavController().navigate(action)
+        }
     }
 
     private fun showCommentSheet() {
@@ -113,6 +117,7 @@ class ExpandedPostFragment : Fragment() {
         val commentToUpload = SerializeComment(content = content,
                 postID = post.id,
                 userID = user.userID)
+
         viewModelComments.uploadComment(commentToUpload).observe(viewLifecycleOwner, Observer {
             if (it == UploadProgress.UPLOADED) {
                 commentDialog.dismiss()

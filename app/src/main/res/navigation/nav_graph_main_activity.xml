@@ -52,9 +52,6 @@
         <argument
             android:name="chatID"
             app:argType="integer" />
-        <action
-            android:id="@+id/action_messagesFragment_to_imageZoomFragment"
-            app:destination="@id/imageZoomFragment" />
     </fragment>
     <action android:id="@+id/action_global_expandedItemFragment" app:destination="@id/expandedItemFragment" />
     <fragment
@@ -101,5 +98,5 @@
         android:id="@+id/action_global_noInternetFragment"
         app:destination="@id/noInternetFragment"
         app:enterAnim="@anim/nav_default_pop_enter_anim"
-        app:exitAnim="@anim/nav_default_pop_exit_anim" />
+        app:exitAnim="@anim/nav_default_pop_exit_anim" /><action android:id="@+id/action_global_imageZoomFragment" app:destination="@id/imageZoomFragment"/>
 </navigation>

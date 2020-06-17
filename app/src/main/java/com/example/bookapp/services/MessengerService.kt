@@ -3,12 +3,14 @@ package com.example.bookapp.services
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
+import com.example.bookapp.getConnectivityManager
 import com.example.bookapp.models.Message
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
@@ -38,18 +40,14 @@ class MessengerService : Service() {
     @Inject
     lateinit var user: User
 
-    var shouldPlayNotification = true
+    var shouldPlayNotification = false
 
-    //todo
-    //stop when netowork is lost
+    private val eventHandler = getEventHandler()
+
     var chatLinks: String? = null
         set(value) {
             field = value
-            value?.let {
-                if (AppUtilities.isNetworkAvailable(applicationContext)) {
-                    configureServeSideEvents(it)
-                }
-            }
+            startServerSideEvent()
         }
 
 
@@ -65,50 +63,55 @@ class MessengerService : Service() {
         return binder
     }
 
-    private fun configureServeSideEvents(url: String) {
-        eventSource?.close()
-
-        val eventHandler: EventHandler = object : EventHandler {
-            override fun onOpen() {}
-            override fun onComment(comment: String?) {}
-            override fun onClosed() {}
-            override fun onError(t: Throwable?) {}
+    private fun getEventHandler(): EventHandler = object : EventHandler {
+        override fun onOpen() {}
+        override fun onComment(comment: String?) {}
+        override fun onClosed() {}
+        override fun onError(t: Throwable?) {}
 
 
-            override fun onMessage(event: String?, messageEvent: MessageEvent) {
-                val gson: Gson = GsonBuilder().setPrettyPrinting().create()
-                val data = messageEvent.data
+        override fun onMessage(event: String?, messageEvent: MessageEvent) {
+            val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+            val data = messageEvent.data
 
-                if (data != null) {
-                    val jsonObject = JSONObject(data)
+            if (data != null) {
+                val jsonObject = JSONObject(data)
 
-                    when (jsonObject.get("type")) {
-                        "message" -> {
-                            val messageDTO = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
-                            val message = MessageMapper.mapToDomainObject(messageDTO)
-                            if (message.sender.userID == user.userID) {
-                                message.seenByCurrentUser = true
-                            }
-                            messageDao.insertMessageCurrentThread(message)
-                            if (shouldPlayNotification && message.sender.userID != user.userID) {
-                                playNotification(message)
-                            }
+                when (jsonObject.get("type")) {
+                    "message" -> {
+                        val messageDTO = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
+                        val message = MessageMapper.mapToDomainObject(messageDTO)
+                        if (message.sender.userID == user.userID) {
+                            message.seenByCurrentUser = true
                         }
+                        messageDao.insertMessageCurrentThread(message)
 
+                        if (shouldPlayNotification && message.sender.userID != user.userID) {
+                            playNotification(message)
+                        }
                     }
+
                 }
             }
-
         }
+    }
 
-        val event: EventSource.Builder = EventSource.Builder(
-                eventHandler,
-                URI.create(url)
-        )
-                .reconnectTime(Duration.ofMillis(10));
-        val temp = event.build()
-        eventSource = temp
-        temp.start()
+
+    private fun startServerSideEvent() {
+        chatLinks?.let {
+            val event: EventSource.Builder = EventSource.Builder(
+                    eventHandler,
+                    URI.create(it)
+            ).reconnectTime(Duration.ofMillis(10))
+            eventSource = event.build()
+            startEvent()
+        }
+    }
+
+    private fun startEvent() {
+        if (applicationContext.getConnectivityManager().activeNetwork != null) {
+            eventSource?.start()
+        }
     }
 
     override fun onDestroy() {
@@ -120,7 +123,7 @@ class MessengerService : Service() {
         val builder = NotificationCompat.Builder(this@MessengerService, getString(R.string.message_channel_id))
                 .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("New message")
-                .setContentText(message.content.take(10))
+                .setContentText(message.content.take(10) + "...")
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 

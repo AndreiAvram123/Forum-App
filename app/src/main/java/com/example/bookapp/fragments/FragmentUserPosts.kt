@@ -43,11 +43,9 @@ class FragmentUserPosts : Fragment() {
 
     private fun attachObserver() {
 
-        viewModelPost.getUserPosts().observe(viewLifecycleOwner,
+        viewModelPost.userPosts.observe(viewLifecycleOwner,
                 Observer {
-                    it?.let {
                         recyclerViewAdapterPosts.setData(it.posts)
-                    }
                 })
     }
 

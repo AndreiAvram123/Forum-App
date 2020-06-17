@@ -3,8 +3,10 @@ package com.example.bookapp.dagger.modules
 import android.content.Context
 import android.net.ConnectivityManager
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.liveData
 import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
+import com.example.dataLayer.interfaces.CommentRepoInterface
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.UserRepositoryInterface
 import dagger.Module
@@ -36,10 +38,13 @@ class RepositoryModule {
     fun getChatRepository(retrofit: Retrofit): ChatRepositoryInterface = retrofit.create(ChatRepositoryInterface::class.java)
 
     @Provides
-    fun provideUser(user: User): MutableLiveData<User> {
-        val liveData = MutableLiveData<User>()
-        liveData.value = user
-        return liveData
+    @Singleton
+    fun getCommentsRepo(retrofit: Retrofit) = retrofit.create(CommentRepoInterface::class.java)
+
+
+    @Provides
+    fun provideUser(user: User) = liveData {
+        emit(user)
     }
 
 

@@ -13,10 +13,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
 import com.example.bookapp.databinding.LayoutFragmentAddPostBinding
 import com.example.bookapp.models.User
+import com.example.bookapp.toBase64
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.SerializeImage
@@ -54,8 +54,8 @@ class FragmentAddPost : Fragment() {
         binding.submitPostButton.setOnClickListener {
             if (areFieldsValid()) {
 
-                    toggleUi()
-                    uploadPost(viewModelUser.user)
+                toggleUi()
+                uploadPost(viewModelUser.user)
             } else {
                 displayError()
             }
@@ -113,13 +113,10 @@ class FragmentAddPost : Fragment() {
         val drawable = binding.postImageAdd.drawable
 
         if (drawable != null) {
-            lifecycleScope.launch(Dispatchers.IO) {
-                val imageData = AppUtilities.getBase64ImageFromDrawable(drawable)
-
 
                 lifecycleScope.launch(Dispatchers.Main) {
 
-                    pushImage(imageData).observe(viewLifecycleOwner, Observer {
+                    pushImage(drawable.toBase64()).observe(viewLifecycleOwner, Observer {
                         if (!it.isNullOrEmpty()) {
                             val post = SerializePost(
                                     title = binding.postTitleAdd.text.toString(),
@@ -132,7 +129,6 @@ class FragmentAddPost : Fragment() {
                     })
                 }
 
-            }
         }
     }
 
