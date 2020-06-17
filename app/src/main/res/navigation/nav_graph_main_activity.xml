@@ -53,9 +53,6 @@
             android:name="chatID"
             app:argType="integer" />
         <action
-            android:id="@+id/action_messagesFragment_to_friends"
-            app:destination="@id/friends" />
-        <action
             android:id="@+id/action_messagesFragment_to_imageZoomFragment"
             app:destination="@id/imageZoomFragment" />
     </fragment>
@@ -70,16 +67,14 @@
         <action
             android:id="@+id/action_home_to_fragmentAddPost"
             app:destination="@id/fragmentAddPost" />
+        <action
+            android:id="@+id/action_home_to_settingFragment"
+            app:destination="@id/settingFragment" />
     </fragment>
     <fragment
         android:id="@+id/friends"
         android:name="com.example.bookapp.fragments.FriendsFragment"
-        android:label="FriendsFragment">
-        <action
-            android:id="@+id/action_friends_to_messagesFragment"
-            app:destination="@id/messagesFragment"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim" />
-    </fragment>
+        android:label="FriendsFragment"/>
     <fragment
         android:id="@+id/imageZoomFragment"
         android:name="com.example.bookapp.fragments.ImageZoomFragment"
@@ -88,5 +83,23 @@
         <argument
             android:name="imageURl"
             app:argType="string" />
+        <argument
+            android:name="localImage"
+            app:argType="boolean" />
     </fragment>
+    <action android:id="@+id/action_global_messagesFragment" app:destination="@id/messagesFragment" />
+    <fragment
+        android:id="@+id/settingFragment"
+        android:name="com.example.bookapp.fragments.SettingsFragment"
+        android:label="SettingsFragment" />
+    <fragment
+        android:id="@+id/noInternetFragment"
+        android:name="com.example.bookapp.fragments.NoInternetFragment"
+        android:label="fragment_no_internet"
+        tools:layout="@layout/fragment_no_internet" />
+    <action
+        android:id="@+id/action_global_noInternetFragment"
+        app:destination="@id/noInternetFragment"
+        app:enterAnim="@anim/nav_default_pop_enter_anim"
+        app:exitAnim="@anim/nav_default_pop_exit_anim" />
 </navigation>

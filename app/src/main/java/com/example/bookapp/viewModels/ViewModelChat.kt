@@ -2,45 +2,77 @@ package com.example.bookapp.viewModels
 
 import androidx.lifecycle.*
 import com.example.bookapp.models.Chat
-import com.example.bookapp.models.MessageDTO
+import com.example.bookapp.models.Message
 import com.example.bookapp.models.User
-import com.example.dataLayer.interfaces.ChatLink
+import com.example.dataLayer.models.ChatNotificationDTO
+import com.example.dataLayer.models.deserialization.FriendRequest
+import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.repositories.ChatRepository
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 class ViewModelChat : ViewModel() {
-    private val chatRepository: ChatRepository = ChatRepository(viewModelScope)
 
-    val chatID: MutableLiveData<Int> = MutableLiveData()
+    @Inject
+    lateinit var chatRepository: ChatRepository
+
+    val currentChatId: MutableLiveData<Int> = MutableLiveData()
+
+    @Inject
+    lateinit var user: User
 
 
-    private var userChats: LiveData<List<Chat>>? = null
+    val fetchChatNotifications = MutableLiveData<Boolean>()
+
+    val lastMessageChats: LiveData<List<Int>> by lazy {
+        chatRepository.lastChatsMessage
+    }
 
 
-    val recentMessages: LiveData<List<MessageDTO>> = Transformations.switchMap(chatID) {
-        chatID.value?.let {
+    val userChats: LiveData<List<Chat>> by lazy {
+        chatRepository.userChats
+    }
+
+
+    val friendRequests: LiveData<ArrayList<FriendRequest>> by lazy {
+        liveData {
+            emit(ArrayList(chatRepository.fetchFriendRequests(user)))
+        }
+    }
+
+    val recentMessages: LiveData<List<Message>> = Transformations.switchMap(currentChatId) {
+        currentChatId.value?.let {
             chatRepository.getChatMessages(it)
         }
     }
-    val chatLink: LiveData<ChatLink> = Transformations.switchMap(chatID) {
-        chatID.value?.let {
-            chatRepository.getChatLink(it)
-        }
+
+
+    val chatLink: LiveData<String?> by lazy {
+        chatRepository.chatLink
     }
 
 
-    fun getUserChats(user: User): LiveData<List<Chat>> {
-        val temp = userChats
-        if (temp != null) {
-            return temp
+    fun sendMessage(serializeMessage: SerializeMessage) {
+        viewModelScope.launch {
+            chatRepository.pushMessage(serializeMessage)
         }
-        return chatRepository.fetchUserChats(user)
     }
 
+    fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
+        viewModelScope.launch {
+            chatRepository.sendFriendRequest(friendRequest)
+        }
+    }
 
-    fun sendMessage(serializeMessage: SerializeMessage)  = chatRepository.pushMessage(serializeMessage)
+    fun acceptFriendRequest(request: FriendRequest) {
+        friendRequests.value?.remove(request)
+        viewModelScope.launch {
+            chatRepository.acceptFriendRequest(request)
+        }
+    }
 
-
+    fun markMessageAsSeen(message: Message, user: User) = viewModelScope.launch { chatRepository.markMessageAsSeen(message, user) }
 
 
 }

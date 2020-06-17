@@ -10,7 +10,7 @@ class MessageSystemTest {
 
     @Test
     fun shouldReturnChatLink() = runBlocking {
-        val link = chatRepo.fetchChatLink(3)
+        val link = chatRepo.fetchChatURL(3)
         Assert.assertNotNull(link)
     }
 

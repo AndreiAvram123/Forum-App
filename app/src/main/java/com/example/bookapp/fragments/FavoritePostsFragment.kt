@@ -38,13 +38,10 @@ class FavoritePostsFragment : Fragment() {
 
     private fun attachObserver() {
 
-        val user = viewModelUser.user.value
-        if (user != null) {
             viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, Observer {
                 recyclerViewAdapterPosts.setData(ArrayList(it.posts))
                 binding.numberResults.text = getString(R.string.number_saved_posts, it.posts.size)
             })
-        }
     }
 
 

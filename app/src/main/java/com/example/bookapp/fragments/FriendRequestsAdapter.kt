@@ -4,15 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookapp.databinding.RequestItemBinding
-import com.example.dataLayer.models.deserialization.DeserializeFriendRequest
+import com.example.dataLayer.models.deserialization.FriendRequest
 
-class FriendRequestsAdapter(val acceptRequest: (request: DeserializeFriendRequest) -> Unit)
+class FriendRequestsAdapter(val acceptRequest: (request: FriendRequest) -> Unit)
     : RecyclerView.Adapter<FriendRequestsAdapter.ViewHolder>() {
 
-    private var data: ArrayList<DeserializeFriendRequest> = ArrayList()
+    private var data: ArrayList<FriendRequest> = ArrayList()
 
 
-    fun setData(newData: List<DeserializeFriendRequest>) {
+    fun setData(newData: List<FriendRequest>) {
         data.clear()
         data.addAll(newData)
         notifyDataSetChanged()
@@ -34,7 +34,7 @@ class FriendRequestsAdapter(val acceptRequest: (request: DeserializeFriendReques
     override fun getItemCount(): Int = data.size
 
     inner class ViewHolder(val binding: RequestItemBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: DeserializeFriendRequest) {
+        fun bind(item: FriendRequest) {
             binding.request = item
             binding.acceptRequestButton.setOnClickListener {
                 acceptRequest(item)

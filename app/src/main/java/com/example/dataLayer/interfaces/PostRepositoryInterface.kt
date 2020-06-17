@@ -9,8 +9,12 @@ import retrofit2.http.*
 
 interface PostRepositoryInterface {
 
-    @GET("/posts/page/{page}")
-    suspend fun fetchNextPage(@Path("page") page: Int): ArrayList<PostDTO>
+    @GET("/recentPosts")
+    suspend fun fetchRecentPosts(): ArrayList<PostDTO>
+
+    @GET("/posts/page/{lastPostID}")
+    suspend fun fetchNextPagePosts(@Path("lastPostID")lastPostID: Int): List<PostDTO>
+
 
     @GET("/post/{id}")
     suspend fun fetchPostByID(@Path("id") postID: Int): PostDTO
@@ -22,10 +26,7 @@ interface PostRepositoryInterface {
     @GET("/user/{id}/posts")
     suspend fun fetchMyPosts(@Path("id") userID: Int): ArrayList<PostDTO>
 
-    @GET("/posts/autocomplete/{query}")
-    suspend fun fetchSearchSuggestions(@Path("query") query: String): List<LowDataPost>
-
-    @DELETE("/user/{userID}/removePost/{postID}")
+    @DELETE("/user/{userID}/removeFromFavorites/{postID}")
     suspend fun removePostFromFavorites(@Path("userID") userID: Int, @Path("postID") postID: Int): ServerResponse
 
     @POST("/user/{userID}/addToFavorites/{postID}")

@@ -17,7 +17,7 @@
             android:layout_marginEnd="24dp"
             android:background="@drawable/search_background"
             android:elevation="10px"
-            android:queryHint="What are you cooking next?"
+            android:queryHint="Search for a friend..."
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

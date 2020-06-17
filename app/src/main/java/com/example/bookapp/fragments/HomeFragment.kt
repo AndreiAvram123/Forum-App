@@ -16,29 +16,24 @@ import com.example.bookapp.viewModels.ViewModelPost
 import kotlinx.coroutines.InternalCoroutinesApi
 
 @InternalCoroutinesApi
-class HomeFragment : Fragment(), HomeAdapter.Callback {
+class HomeFragment : Fragment() {
     lateinit var binding: LayoutHomeFragmentBinding
     private val viewModelPost: ViewModelPost by activityViewModels()
-    private val homeAdapter: HomeAdapter = HomeAdapter(this)
+    private val homeAdapter: HomeAdapter by lazy {
+        HomeAdapter()
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_home_fragment, container, false);
-        attachObserver()
         initializeUI()
-        val layoutManager: LinearLayoutManager = binding.recyclerViewHome.layoutManager as LinearLayoutManager
-        layoutManager.scrollToPosition(viewModelPost.lastSeenPostPosition)
+        attachObserver()
         return binding.root
     }
 
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        val layoutManager: LinearLayoutManager = binding.recyclerViewHome.layoutManager as LinearLayoutManager
-        viewModelPost.lastSeenPostPosition = layoutManager.findFirstVisibleItemPosition()
-    }
-
     private fun initializeUI() {
         binding.homeSwipeRefreshLayout.setOnRefreshListener {
+            viewModelPost.fetchNewPosts()
             binding.homeSwipeRefreshLayout.isRefreshing = false
         }
         initializeRecyclerView()
@@ -57,13 +52,11 @@ class HomeFragment : Fragment(), HomeAdapter.Callback {
     }
 
     private fun attachObserver() {
-        viewModelPost.getRecentPosts().observe(viewLifecycleOwner, Observer { posts ->
-            homeAdapter.setData(posts)
+        viewModelPost.recentPosts.observe(viewLifecycleOwner, Observer {
+            homeAdapter.submitList(it)
         })
 
     }
 
-    override fun requestMoreData() {
-        viewModelPost.fetchNextPagePosts()
-    }
+
 }

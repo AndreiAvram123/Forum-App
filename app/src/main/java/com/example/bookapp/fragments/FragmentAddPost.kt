@@ -53,10 +53,9 @@ class FragmentAddPost : Fragment() {
         }
         binding.submitPostButton.setOnClickListener {
             if (areFieldsValid()) {
-                viewModelUser.user.value?.let {
+
                     toggleUi()
-                    uploadPost(it)
-                }
+                    uploadPost(viewModelUser.user)
             } else {
                 displayError()
             }

@@ -45,12 +45,8 @@ class ExpandedPostFragment : Fragment() {
                               savedInstanceState: Bundle?): View? { // Inflate the layout for this fragment
 
         binding = PostExpandedFragmentBinding.inflate(layoutInflater, container, false)
-
+        user = viewModelUser.user
         attachObservers()
-        viewModelUser.user.value?.let {
-            user = it
-        }
-
         return binding.root
     }
 
@@ -58,16 +54,17 @@ class ExpandedPostFragment : Fragment() {
 
         viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, Observer {
             favoritePosts = it.posts
+
         })
 
         viewModelPost.getPostByID(args.postID).observe(viewLifecycleOwner, Observer {
             if (it != null) {
-                if(favoritePosts.contains(it)){
+                if (this::favoritePosts.isInitialized && favoritePosts.contains(it)) {
                     it.isFavorite = true
                 }
                 post = it
                 configureViews()
-                getComments();
+                getComments()
             }
         })
 

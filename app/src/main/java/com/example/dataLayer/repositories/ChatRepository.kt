@@ -1,62 +1,162 @@
 package com.example.dataLayer.repositories
 
+import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.bookapp.AppUtilities
+import androidx.lifecycle.liveData
 import com.example.bookapp.models.Chat
-import com.example.bookapp.models.MessageDTO
+import com.example.bookapp.models.Message
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.ChatMapper
+import com.example.dataLayer.dataMappers.MessageMapper
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
-import com.example.dataLayer.interfaces.ChatLink
+import com.example.dataLayer.interfaces.dao.ChatDao
+import com.example.dataLayer.interfaces.dao.MessageDao
+import com.example.dataLayer.models.ChatNotificationDTO
+import com.example.dataLayer.models.deserialization.FriendRequest
+import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class ChatRepository @Inject constructor(private val coroutineScope: CoroutineScope) {
+@Suppress("MemberVisibilityCanBePrivate")
+@Singleton
+class ChatRepository @Inject constructor(
+        private val repo: ChatRepositoryInterface,
+        private val messageDao: MessageDao,
+        private val chatDao: ChatDao,
+        private val connectivityManager: ConnectivityManager,
+        private val user: User,
+        private val requestExecutor: RequestExecutor
+) {
 
-    val userChats: MutableLiveData<List<Chat>> by lazy {
-        MutableLiveData<List<Chat>>()
+    private lateinit var notificationHandler: NotificationHandler
+
+
+    private val chatNotifications by lazy {
+        MutableLiveData<ArrayList<ChatNotificationDTO>>()
     }
-    private val chatMessages: MutableLiveData<List<MessageDTO>> = MutableLiveData()
 
-    private val repositoryRepositoryInterface: ChatRepositoryInterface = AppUtilities.getRetrofit().create(ChatRepositoryInterface::class.java)
-
-    fun fetchUserChats(user: User): LiveData<List<Chat>> {
-        userChats.value = ArrayList()
-        coroutineScope.launch {
-            val fetchedData = repositoryRepositoryInterface.fetchUserChats(user.userID)
-            userChats.postValue(ChatMapper.mapDTOObjectsToDomainObjects(fetchedData, user))
+    val userChats: LiveData<List<Chat>> by lazy {
+        liveData {
+            emitSource(chatDao.getChats())
+            requestExecutor.add(this@ChatRepository::fetchUserChats, null)
         }
-        return userChats;
+    }
+    val chatLink by lazy {
+        MutableLiveData<String?>()
+    }.also {
+        requestExecutor.add(this::fetchChatsLink, null)
+        requestExecutor.add(this::fetchNotificationLink, null)
+
     }
 
-    fun pushMessage(serializeMessage: SerializeMessage) {
-        coroutineScope.launch {
-            try {
-                repositoryRepositoryInterface.pushMessage(serializeMessage)
-            } catch (e: Exception) {
-                e.printStackTrace()
+    val lastChatsMessage: LiveData<List<Int>> by lazy {
+        chatDao.getLastChatsMessage()
+    }.also {
+        requestExecutor.add(this::fetchLastChatsMessage, null)
+    }
+
+    internal suspend fun fetchLastChatsMessage() {
+        val data = repo.fetchLastChatsMessage(user.userID)
+        val messages = data.map { MessageMapper.mapToDomainObject(it) }
+        messageDao.insertMessages(messages)
+    }
+
+    internal suspend fun fetchUserChats() {
+        val fetchedData = repo.fetchUserChats(user.userID)
+        val chats = ChatMapper.mapToDomainObjects(fetchedData, user.userID)
+        chatDao.insert(chats)
+    }
+
+
+    suspend fun pushMessage(serializeMessage: SerializeMessage) {
+        try {
+            repo.pushMessage(serializeMessage)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+
+    fun getChatMessages(chatID: Int): LiveData<List<Message>> =
+            liveData {
+                emitSource(messageDao.getRecentChatMessages(chatID))
+                requestExecutor.add(this@ChatRepository::fetchChatMessages, chatID)
+            }
+
+    internal suspend fun fetchChatMessages(chatID: Int) {
+        val fetchedData = repo.fetchRecentMessages(chatID)
+        val messages = fetchedData.map { MessageMapper.mapToDomainObject(it) }
+        messageDao.insertMessages(messages)
+    }
+
+
+    internal suspend fun fetchChatsLink() {
+        val link = repo.fetchChatURL(user.userID).message
+        chatLink.postValue(link)
+    }
+
+    internal suspend fun fetchNotificationLink() {
+        try {
+            val link = repo.fetchNotificationLink(user.userID).message
+            notificationHandler = NotificationHandler(connectivityManager, this::addNotification, link)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun addNotification(notificationDTO: ChatNotificationDTO) {
+        chatNotifications.value?.let {
+            it.add(notificationDTO)
+            chatNotifications.notifyObserver()
+        }
+
+    }
+
+    suspend fun acceptFriendRequest(request: FriendRequest) {
+        val data = repo.acceptFriendRequest(request.id)
+        val chat = ChatMapper.mapDtoObjectToDomainObject(data, request.receiver.userID)
+        chatDao.insert(chat)
+    }
+
+
+    suspend fun fetchFriendRequests(user: User): List<FriendRequest> {
+        if (connectivityManager.activeNetwork != null) {
+            return repo.fetchFriendRequests(user.userID)
+        }
+        return ArrayList()
+    }
+
+    suspend fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
+        if (connectivityManager.activeNetwork != null) {
+            repo.pushFriendRequest(friendRequest)
+        }
+    }
+
+    suspend fun markMessageAsSeen(message: Message, user: User) {
+        if (connectivityManager.activeNetwork != null) {
+            repo.markMessageAsSeen(messageID = message.id,
+                    userID = user.userID)
+            message.seenByCurrentUser = true
+            messageDao.update(message)
+        }
+        removeLocalNotification(message)
+    }
+
+    private fun removeLocalNotification(message: Message) {
+        chatNotifications.value?.find { it.chatID == message.chatID }.also {
+            if (it != null) {
+                chatNotifications.value?.remove(it)
+                chatNotifications.notifyObserver()
             }
         }
     }
 
-    fun getChatMessages(chatID: Int): MutableLiveData<List<MessageDTO>> {
-        chatMessages.value = ArrayList()
-        coroutineScope.launch {
-            val fetchedData: List<MessageDTO> = repositoryRepositoryInterface.fetchRecentMessages(chatID)
-            chatMessages.postValue(fetchedData)
-        }
-        return chatMessages
+    fun <T> MutableLiveData<T>.notifyObserver() {
+        this.value = this.value
     }
 
-    fun getChatLink(chatID: Int): LiveData<ChatLink> {
-        val liveDataLink = MutableLiveData<ChatLink>()
-        coroutineScope.launch {
-            val chatLink: ChatLink = repositoryRepositoryInterface.fetchChatLink(chatID)
-            liveDataLink.postValue(chatLink)
-        }
-        return liveDataLink;
-    }
+
 }

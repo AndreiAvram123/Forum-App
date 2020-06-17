@@ -1,8 +1,8 @@
 package com.example.bookapp.Adapters
 
 import android.app.Activity
-import android.util.DisplayMetrics
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookapp.AppUtilities
@@ -11,14 +11,17 @@ import com.example.bookapp.databinding.MessageImageSentBinding
 import com.example.bookapp.databinding.MessageReceivedBinding
 import com.example.bookapp.databinding.MessageSentBinding
 import com.example.bookapp.models.LocalImageMessage
+import com.example.bookapp.models.Message
 import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.dataLayer.repositories.UploadProgress
 import com.example.dataLayer.serverConstants.MessageTypes
 
 
-class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: String) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    private val messages: ArrayList<MessageDTO> = ArrayList()
+class MessageAdapter(private val currentUser: User,
+                     val expand: (imageURL: String, local: Boolean) -> Unit) : RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
+    private val messages: ArrayList<Message> = ArrayList()
+
     private var adapterRecyclerView: RecyclerView? = null
 
 
@@ -26,53 +29,63 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
         LOADING(0), MESSAGE_RECEIVED_TEXT(1), MESSAGE_SENT_TEXT(2), MESSAGE_SENT_IMAGE(3), MESSAGE_RECEIVED_IMAGE(4),
     }
 
-    inner class MessageReceivedViewHolder(val binding: MessageReceivedBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(messageDTO: MessageDTO) {
-            binding.message = messageDTO
+    inner class MessageReceivedViewHolder(val binding: MessageReceivedBinding) : ViewHolder(binding.root) {
+        override fun bind(message: Message) {
+            binding.message = message
         }
     }
 
-    inner class MessageSentViewHolder(val binding: MessageSentBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(messageDTO: MessageDTO) {
-            binding.message = messageDTO
+    inner class MessageSentViewHolder(val binding: MessageSentBinding) : ViewHolder(binding.root) {
+        override fun bind(message: Message) {
+            binding.message = message
         }
     }
 
+    inner class MessageImageSentViewHolder(val binding: MessageImageSentBinding) : ViewHolder(binding.root) {
 
-    inner class MessageImageSentViewHolder(val binding: MessageImageSentBinding) : RecyclerView.ViewHolder(binding.root) {
+        override fun bind(message: Message) {
+            binding.message = message
+            if (message is LocalImageMessage) {
+                val drawable = AppUtilities.convertFromUriToDrawable(message.resourcePath, binding.root.context)
+                binding.messageImage.setImageDrawable(drawable)
 
-        fun bind(messageDTO: MessageDTO) {
-            binding.message = messageDTO
-            if (messageDTO is LocalImageMessage) {
-                binding.messageImage.setImageDrawable(messageDTO.drawable)
-
-                if (messageDTO.currentStatus == UploadProgress.UPLOADING) {
+                if (message.currentStatus == UploadProgress.UPLOADING) {
                     binding.messageImage.alpha = 0.5f
                 }
             }
             binding.halfScreenWidth = AppUtilities.getScreenWidth(binding.root.context as Activity)
 
             binding.messageImage.setOnClickListener {
-                expandImage(messageDTO.content)
+                expandImage(message)
             }
         }
     }
 
-    inner class MessageImageReceivedViewHolder(val binding: MessageImageReceivedBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(messageDTO: MessageDTO) {
-            binding.message = messageDTO
+    inner class MessageImageReceivedViewHolder(val binding: MessageImageReceivedBinding) : ViewHolder(binding.root) {
+        override fun bind(message: Message) {
+            binding.message = message
             binding.halfScreenWidth = AppUtilities.getScreenWidth(binding.root.context as Activity)
 
             binding.messageImage.setOnClickListener {
-                expandImage(messageDTO.content)
+                expandImage(message)
             }
-
         }
+    }
 
+    abstract inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        abstract fun bind(message: Message)
+    }
+
+    fun expandImage(message: Message) {
+        if (message is LocalImageMessage) {
+            expand(message.resourcePath.toString(), true)
+        } else {
+            expand(message.content, false)
+        }
     }
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageAdapter.ViewHolder {
         val inflator: LayoutInflater = LayoutInflater.from(parent.context)
         when (viewType) {
             ViewTypes.MESSAGE_RECEIVED_TEXT.id -> {
@@ -91,12 +104,9 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
                 val binding = MessageImageReceivedBinding.inflate(inflator, parent, false)
                 return MessageImageReceivedViewHolder(binding)
             }
-
             else -> {
-                //todo
-                //modify
-                val binding = MessageSentBinding.inflate(inflator, parent, false)
-                return MessageSentViewHolder(binding)
+                val binding = MessageImageReceivedBinding.inflate(inflator, parent, false)
+                return MessageImageReceivedViewHolder(binding)
             }
         }
     }
@@ -111,22 +121,10 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
         return messages.size
     }
 
-    override fun onBindViewHolder(viewHolder: RecyclerView.ViewHolder, position: Int) {
-        if (viewHolder is MessageSentViewHolder) {
-            viewHolder.bind(messages[position])
-        }
-        if (viewHolder is MessageReceivedViewHolder) {
-            viewHolder.bind(messages[position])
-        }
-        if (viewHolder is MessageImageSentViewHolder) {
-            viewHolder.bind(messages[position])
-        }
-        if (viewHolder is MessageImageReceivedViewHolder) {
-            viewHolder.bind(messages[position])
-        }
-    }
+    override fun onBindViewHolder(viewHolder: MessageAdapter.ViewHolder, position: Int) = viewHolder.bind(messages[position])
 
-    fun add(message: MessageDTO) {
+
+    fun add(message: Message) {
         messages.find {
             it is LocalImageMessage
                     && it.localID == message.localID
@@ -149,12 +147,19 @@ class MessageAdapter(private val currentUser: User, val expandImage: (imageURL: 
         adapterRecyclerView?.scrollToPosition(messages.size - 1)
     }
 
-    fun addNewMessages(newMessages: List<MessageDTO>) {
-        val oldIndex = messages.size - 1
-        messages.addAll(newMessages)
-        notifyItemRangeInserted(oldIndex, messages.size)
-        scrollToLast()
+
+    fun setData(newMessages: List<Message>) {
+        newMessages.forEach {
+            if(!messages.contains(it)){
+                add(it)
+            }
+        }
     }
+    fun clear(){
+        messages.clear()
+        notifyDataSetChanged()
+    }
+
 
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]

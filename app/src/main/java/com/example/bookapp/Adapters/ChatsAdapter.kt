@@ -7,9 +7,10 @@ import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bookapp.R
-import com.example.bookapp.databinding.ItemFriendsBinding
+import com.example.bookapp.databinding.ItemChatBinding
 import com.example.bookapp.fragments.FriendsFragmentDirections
 import com.example.bookapp.models.Chat
+import com.example.dataLayer.models.ChatNotificationDTO
 
 class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
     private var chats: ArrayList<Chat> = ArrayList()
@@ -21,7 +22,7 @@ class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding: ItemFriendsBinding = DataBindingUtil.inflate(LayoutInflater.from(parent.context), R.layout.item_friends, parent, false)
+        val binding: ItemChatBinding = ItemChatBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding)
     }
 
@@ -33,12 +34,32 @@ class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
         return chats.size
     }
 
-    inner class ViewHolder(private val binding: ItemFriendsBinding) : RecyclerView.ViewHolder(binding.root) {
+    fun showNotifications(chatIDs: List<Int>) {
+
+        chatIDs.forEach { chatID ->
+            chats.find { it.chatID == chatID }.also {
+                if (it != null) {
+                    it.newMessage = true
+                    notifyItemChanged(chats.indexOf(it))
+                }
+            }
+        }
+
+    }
+
+    inner class ViewHolder(private val binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(chat: Chat) {
             binding.chat = chat
 
             binding.root.setOnClickListener {
-                val action: NavDirections = FriendsFragmentDirections.actionFriendsToMessagesFragment(chat.chatID)
+                //remove notification,as the user clicked on the chat
+                chats.find { it.chatID == chat.chatID }.also {
+                    if (it != null) {
+                        it.newMessage = false
+                        notifyItemChanged(chats.indexOf(it))
+                    }
+                }
+                val action: NavDirections = FriendsFragmentDirections.actionGlobalMessagesFragment(chat.chatID)
                 Navigation.findNavController(binding.root).navigate(action)
             }
         }

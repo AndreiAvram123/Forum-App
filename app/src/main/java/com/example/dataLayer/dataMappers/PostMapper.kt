@@ -9,26 +9,21 @@ object PostMapper {
      * This method is used to convert the dto network objects to
      * domain specific objects
      */
-    fun mapDTONetworkToDomainObjects(dboPosts: ArrayList<PostDTO>) = dboPosts.map { mapDtoObjectToDomainObject(it) }
+    fun mapToDomainObjects(dboPosts: List<PostDTO>) = dboPosts.map { mapDtoObjectToDomainObject(it) }
 
 
-    fun mapDtoObjectToDomainObject(postDTO: PostDTO?): Post {
-        postDTO?.let {
-            val user = UserMapper.mapNetworkToDomainObject(postDTO.author)
+    fun mapDtoObjectToDomainObject(postDTO: PostDTO ): Post {
 
-            val post = Post(id = postDTO.id,
+            val user = UserMapper.mapToDomainObject(postDTO.author)
+
+            return Post(id = postDTO.id,
                     title = postDTO.title,
                     image = postDTO.image,
                     date = postDTO.date,
                     authorID = user.userID,
                     content = postDTO.content
 
-            )
-            post.author = user
-            return post;
-        }
-
-        return Post.buildTestPost()
+            ).apply { author = user }
 
     }
 

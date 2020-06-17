@@ -1,8 +1,19 @@
 package com.example.bookapp.models
 
+import androidx.room.*
+import com.example.dataLayer.models.ChatNotificationDTO
+
+@Entity(tableName = "chat")
 data class Chat(
+        @PrimaryKey
+        @ColumnInfo(name = "chatID")
         val chatID: Int,
-        val users: List<User>,
+        @ColumnInfo(name = "name")
         val name: String,
-        val image: String
-)
+        @ColumnInfo(name = "image")
+        val image: String,
+        @Embedded
+        val user2: User
+) {
+    var newMessage: Boolean = false
+}

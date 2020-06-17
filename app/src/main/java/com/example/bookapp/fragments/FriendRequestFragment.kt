@@ -10,16 +10,19 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.databinding.FragmentFriendRequestBinding
+import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
-import com.example.dataLayer.models.deserialization.DeserializeFriendRequest
+import com.example.dataLayer.models.deserialization.FriendRequest
 
 
 class FriendRequestFragment : Fragment() {
 
-    private val viewModelUser: ViewModelUser by activityViewModels()
+    private val viewModelChat: ViewModelChat by activityViewModels()
+
     private val requestAdapter = FriendRequestsAdapter(::acceptRequest)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+
         val binding = FragmentFriendRequestBinding.inflate(inflater, container, false)
 
         with(binding.friendRequestsList) {
@@ -27,16 +30,14 @@ class FriendRequestFragment : Fragment() {
             layoutManager = LinearLayoutManager(requireContext())
             addItemDecoration(CustomDivider(20))
         }
-        val user = viewModelUser.user.value;
-        if (user != null) {
-            viewModelUser.friendRequests.observe(viewLifecycleOwner, Observer {
-                requestAdapter.setData(it)
-            })
-        }
+
+        viewModelChat.friendRequests.observe(viewLifecycleOwner, Observer {
+            requestAdapter.setData(it)
+        })
         return binding.root
     }
 
-    private fun acceptRequest(request: DeserializeFriendRequest) {
-       viewModelUser.acceptFriendRequest(request)
+    private fun acceptRequest(request: FriendRequest) {
+        viewModelChat.acceptFriendRequest(request)
     }
 }

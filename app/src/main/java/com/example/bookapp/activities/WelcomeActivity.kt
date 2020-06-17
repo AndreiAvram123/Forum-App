@@ -7,51 +7,54 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import com.example.bookapp.R
+import com.example.bookapp.dagger.AppComponent
+import com.example.bookapp.dagger.DaggerAppComponent
+import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.fragments.AuthenticationFragment
 import com.example.bookapp.models.User
+import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelUser
+import com.example.dataLayer.interfaces.dao.UserDao
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InternalCoroutinesApi
 class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCallback {
+
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()
 
-    //todo
-    //errors present wtf???
     private val requestCodeGoogleSignIn = 1
 
-    //use share preferences to share data across activities
-    private lateinit var sharedPreferences: SharedPreferences
+
+    @Inject
+    lateinit var userDao: UserDao
+
+    @Inject
+    lateinit var userAccountManager: UserAccountManager
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
-        sharedPreferences = getSharedPreferences(getString(R.string.key_preferences), Context.MODE_PRIVATE)
+        val appComponent: AppComponent = DaggerAppComponent.factory().create(applicationContext, viewModelUser.viewModelScope)
+        (application as MyApplication).appComponent = appComponent
 
-        viewModelUser.user.observe(this, Observer {
-            it?.let {
-                saveUserInMemory(it)
-            }
-        })
+        appComponent.inject(this)
+        appComponent.inject(viewModelUser)
 
-    }
-
-
-    private fun SharedPreferences.edit(commit: Boolean = true,
-                                       action: SharedPreferences.Editor.() -> Unit) {
-        val editor = edit()
-        action(editor)
-        if (commit) {
-            editor.commit()
-        } else {
-            editor.apply()
+        val user = userAccountManager.getCurrentUser()
+        if (user.userID > 0) {
+            startMainActivity()
         }
     }
 
@@ -66,7 +69,14 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
                 // Google Sign In was successful, authenticate with Firebase
                 googleSignInAccount = task.getResult(ApiException::class.java)
                 googleSignInAccount?.let {
-                    viewModelUser.loginWithGoogle(it.id!!, it.displayName!!, it.email!!)
+                    viewModelUser.loginWithGoogle(it.id!!, it.displayName!!, it.email!!).observe(this, Observer { user ->
+                        if (user != null) {
+                            lifecycleScope.launch {
+                                userAccountManager.saveUserInMemory(user)
+                                runOnUiThread { startMainActivity() }
+                            }
+                        }
+                    })
                 }
 
             } catch (e: ApiException) {
@@ -87,13 +97,9 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
 
 
     private fun saveUserInMemory(user: User) {
-        sharedPreferences.edit {
-            putInt(getString(R.string.key_user_id), user.userID)
-            putString(getString(R.string.key_username), user.username)
-            putString(getString(R.string.key_email), user.email)
-            putString(getString(R.string.key_profile_picture), user.profilePicture)
-        }
+
         startMainActivity()
+
     }
 
 
