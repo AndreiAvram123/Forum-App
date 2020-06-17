@@ -1,35 +1,16 @@
 package com.example.bookapp.fragments
 
-import android.content.Context
-import android.os.Build
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.platform.app.InstrumentationRegistry
-import com.example.bookapp.AppUtilities
-import com.example.bookapp.activities.WelcomeActivity
-import com.example.dataLayer.PostDatabase
+import com.example.TestUtilities
 import com.example.dataLayer.interfaces.PostRepositoryInterface
-import com.example.dataLayer.interfaces.dao.RoomPostDao
-import com.example.dataLayer.models.UserWithFavoritePostsCrossRef
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.robolectric.Robolectric
-import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
-import java.util.concurrent.Executors
 
 
 @InternalCoroutinesApi
 class FavoritePostsFragmentTest {
-    private val postRepo = AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
+    private val postRepo = TestUtilities.retrofit.create(PostRepositoryInterface::class.java)
     private val userID = 109
 
 

@@ -1,10 +1,9 @@
 package com.example.bookapp
 
+import com.example.TestUtilities
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
-import com.example.dataLayer.interfaces.UserRepositoryInterface
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
-import com.google.android.gms.common.UserRecoverableException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
@@ -16,7 +15,7 @@ class ChatRepositoryTest {
 
     @Before
     fun setUp() {
-        repo = AppUtilities.getRetrofit().create(ChatRepositoryInterface::class.java)
+        repo = TestUtilities.retrofit.create(ChatRepositoryInterface::class.java)
     }
 
 

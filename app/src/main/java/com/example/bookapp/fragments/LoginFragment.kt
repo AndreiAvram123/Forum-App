@@ -4,9 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.example.bookapp.databinding.FragmentLoginBinding
 import com.example.bookapp.isEmail
@@ -24,9 +21,9 @@ class LoginFragment : AuthenticationFragmentTemplate() {
 
 
     private fun attemptLogin() {
-        val email = binding.emailFieldLogin.text.trim().toString()
+        val username = binding.usernamelFieldLogin.text.trim().toString()
         val password = binding.passwordFieldLogin.text.trim().toString()
-        if (areLoginDetailsValid(email, password)) {
+        if (areLoginDetailsValid(username, password)) {
             //todo
             //login
             toggleLoadingBar()
@@ -34,7 +31,7 @@ class LoginFragment : AuthenticationFragmentTemplate() {
     }
 
     override fun clearFields() {
-        binding.emailFieldLogin.text.clear()
+        binding.usernamelFieldLogin.text.clear()
         binding.passwordFieldLogin.text.clear()
     }
 
@@ -44,8 +41,7 @@ class LoginFragment : AuthenticationFragmentTemplate() {
     }
 
     public override fun customiseFields() {
-        customiseField(binding.emailFieldLogin, binding.emailFieldLogin)
-        customiseField(binding.passwordFieldLogin, binding.passwordHintLogin)
+
     }
 
     public override fun configureButtons() {

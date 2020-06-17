@@ -7,9 +7,7 @@ import androidx.lifecycle.liveData
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.interfaces.UserRepositoryInterface
-import com.example.dataLayer.models.deserialization.FriendRequest
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(private val coroutineScope: CoroutineScope,
@@ -17,19 +15,18 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
                                          private val connectivityManager: ConnectivityManager) {
 
 
-
     fun loginWithGoogle(idToken: String, displayName: String, email: String) = liveData {
 
-            try {
-                val fetchedUser = repo.fetchGoogleUser(idToken, displayName, email)
-                if (fetchedUser.userID == 0) {
-                    createGoogleAccount(idToken, displayName, email)
-                } else {
-                    emit(UserMapper.mapToDomainObject(fetchedUser))
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+        try {
+            val fetchedUser = repo.fetchGoogleUser(idToken, displayName, email)
+            if (fetchedUser.userID == 0) {
+                createGoogleAccount(idToken, displayName, email)
+            } else {
+                emit(UserMapper.mapToDomainObject(fetchedUser))
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private suspend fun createGoogleAccount(idToken: String, displayName: String, email: String): LiveData<User> {
@@ -54,4 +51,6 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
             }
         }
     }
+
+    suspend fun login(username: String, password: String) = repo.login(username, password)
 }

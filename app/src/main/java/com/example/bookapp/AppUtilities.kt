@@ -9,8 +9,6 @@ import android.net.ConnectivityManager
 import android.net.Uri
 import android.util.Base64
 import android.util.DisplayMetrics
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -55,10 +53,4 @@ fun Drawable.toBase64(): String {
     val byteArray = byteArrayOutputStream.toByteArray()
     return Base64.encodeToString(byteArray, Base64.DEFAULT);
 }
-//
-//fun getRetrofit(): Retrofit {
-//    return Retrofit.Builder()
-//            .baseUrl("http://www.andreiram.co.uk/")
-//            .addConverterFactory(GsonConverterFactory.create())
-//            .build()
-//}
+

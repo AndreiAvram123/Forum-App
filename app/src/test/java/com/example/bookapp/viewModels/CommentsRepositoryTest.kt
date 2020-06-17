@@ -1,15 +1,15 @@
 package com.example.bookapp.viewModels
 
-import com.example.bookapp.AppUtilities
+import com.example.TestUtilities
 import com.example.dataLayer.interfaces.CommentRepoInterface
 import com.example.dataLayer.models.serialization.SerializeComment
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
+import org.junit.Assert.assertNotNull
 import org.junit.Test
 
 class CommentsRepositoryTest {
 
-    private val repo: CommentRepoInterface = AppUtilities.getRetrofit()
+    private val repo: CommentRepoInterface = TestUtilities.retrofit
             .create(CommentRepoInterface::class.java)
 
     @Test

@@ -22,6 +22,11 @@ interface UserRepositoryInterface {
                                     @Field("email")
                                     email: String): UserDTO
 
+    @FormUrlEncoded
+    @POST("/api/login")
+    suspend fun login(@Field("username") username: String, @Field("password") password: String): UserDTO?
+
+
     @GET("/user/autocomplete/{query}")
     suspend fun fetchSuggestions(@Path("query") query: String): List<UserDTO>
 

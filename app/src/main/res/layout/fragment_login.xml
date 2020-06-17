@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#252525"
@@ -22,7 +22,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/email_field_login" />
+            app:layout_constraintTop_toBottomOf="@+id/usernamel_field_login" />
 
         <TextView
             android:id="@+id/login_label"
@@ -46,7 +46,7 @@
             android:layout_marginTop="92dp"
             android:layout_marginEnd="16dp"
             android:gravity="left"
-            android:text="EMAIL"
+            android:text="Username"
             android:textColor="#ffffff"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -54,7 +54,7 @@
             app:layout_constraintTop_toBottomOf="@+id/login_label" />
 
         <EditText
-            android:id="@+id/email_field_login"
+            android:id="@+id/usernamel_field_login"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -64,8 +64,8 @@
             android:ems="10"
             android:imeOptions="actionDone"
             android:inputType="textEmailAddress"
-            android:nextFocusLeft="@id/email_field_login"
-            android:nextFocusUp="@id/email_field_login"
+            android:nextFocusLeft="@id/usernamel_field_login"
+            android:nextFocusUp="@id/usernamel_field_login"
             android:textColor="#ffffff"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
