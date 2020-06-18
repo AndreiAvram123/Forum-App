@@ -2,16 +2,8 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph_welcome_activity"
-    app:startDestination="@id/authenticationFragment">
+    app:startDestination="@id/loginFragment">
 
-    <fragment
-        android:id="@+id/authenticationFragment"
-        android:name="com.example.bookapp.fragments.AuthenticationFragment"
-        android:label="AuthenticationFragment">
-        <action
-            android:id="@+id/action_authenticationFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-    </fragment>
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.example.bookapp.fragments.LoginFragment"
@@ -22,10 +14,12 @@
     </fragment>
     <fragment
         android:id="@+id/signUpFragment"
-        android:name="com.example.bookapp.fragments.SignUpFragment"
+        android:name="com.example.bookapp.fragments.RegisterFragment"
         android:label="SignUpFragment">
         <action
-            android:id="@+id/action_signUpFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
+            android:id="@+id/action_signUpFragment_to_loginFragment2"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

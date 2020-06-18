@@ -1,26 +1,18 @@
 package com.example.bookapp.Adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.R
-import com.example.bookapp.databinding.LoadingItemListBinding
 import com.example.bookapp.databinding.PostItemHomePageBinding
 import com.example.bookapp.fragments.ExpandedPostFragmentDirections
+import com.example.bookapp.getConnectivityManager
 import com.example.bookapp.models.Post
-import com.example.bookapp.viewModels.ViewModelPost
 import com.google.android.material.snackbar.Snackbar
-import java.util.*
-import java.util.zip.Inflater
-import kotlin.collections.ArrayList
 
 class HomeAdapter : PagedListAdapter<Post, HomeAdapter.ViewHolder>(DIFF_CALLBACK) {
 
@@ -41,9 +33,8 @@ class HomeAdapter : PagedListAdapter<Post, HomeAdapter.ViewHolder>(DIFF_CALLBACK
 
         fun bind(post: Post) {
             binding.post = post
-
             binding.root.setOnClickListener {
-                if (AppUtilities.isNetworkAvailable(binding.root.context)) {
+                if (binding.root.context.getConnectivityManager().activeNetwork != null) {
                     val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(post.id)
                     Navigation.findNavController(binding.root).navigate(action)
                 } else {

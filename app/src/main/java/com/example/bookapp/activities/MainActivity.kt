@@ -7,7 +7,6 @@ import android.content.*
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -19,11 +18,14 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.bookapp.R
-import com.example.bookapp.dagger.*
+import com.example.bookapp.dagger.DaggerAppComponent
+import com.example.bookapp.dagger.MyApplication
+import com.example.bookapp.databinding.DrawerHeaderBinding
 import com.example.bookapp.databinding.LayoutMainActivityBinding
 import com.example.bookapp.services.MessengerService
 import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelChat
+import com.example.bookapp.viewModels.ViewModelComments
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -40,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private val viewModelPost: ViewModelPost by viewModels()
     private val viewModelUser: ViewModelUser by viewModels()
     private val viewModelChat: ViewModelChat by viewModels()
+    private val viewModelComment: ViewModelComments by viewModels()
     private var mBound: Boolean = false
     private lateinit var mService: MessengerService
     private lateinit var binding: LayoutMainActivityBinding
@@ -90,6 +93,7 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         mBound = false
+
         if (this::mService.isInitialized) {
             mService.shouldPlayNotification = true
         }
@@ -118,7 +122,6 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         //fetch new notifications every time on start is called
-        viewModelChat.fetchChatNotifications.value = true
         createMessageNotificationChannel()
         startMessengerService()
         bindToMessengerService()
@@ -135,6 +138,7 @@ class MainActivity : AppCompatActivity() {
         appComponent.inject(viewModelPost)
         appComponent.inject(viewModelUser)
         appComponent.inject(viewModelChat)
+        appComponent.inject(viewModelComment)
 
 
     }
@@ -162,6 +166,10 @@ class MainActivity : AppCompatActivity() {
         val appBarConfiguration = AppBarConfiguration(navController.graph, drawer)
         binding.navView.setupWithNavController(navController)
 
+
+        val headerBinding = DrawerHeaderBinding.bind(binding.navView.getHeaderView(0))
+        headerBinding.user = userAccountManager.user.value
+
     }
 
     private fun showNotifications() {
@@ -176,7 +184,6 @@ class MainActivity : AppCompatActivity() {
                 chatBadge.isVisible = false
             }
         })
-        viewModelChat.fetchChatNotifications.value = true
     }
 
 

@@ -1,8 +1,6 @@
 package com.example.bookapp.activities
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -13,8 +11,7 @@ import com.example.bookapp.R
 import com.example.bookapp.dagger.AppComponent
 import com.example.bookapp.dagger.DaggerAppComponent
 import com.example.bookapp.dagger.MyApplication
-import com.example.bookapp.fragments.AuthenticationFragment
-import com.example.bookapp.models.User
+import com.example.bookapp.fragments.LoginFragment
 import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.interfaces.dao.UserDao
@@ -28,7 +25,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InternalCoroutinesApi
-class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCallback {
+class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()
@@ -52,10 +49,11 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
         appComponent.inject(this)
         appComponent.inject(viewModelUser)
 
-        val user = userAccountManager.getCurrentUser()
-        if (user.userID > 0) {
-            startMainActivity()
-        }
+        userAccountManager.user.observe(this, Observer {
+            if (it.userID != 0) {
+                startMainActivity()
+            }
+        })
     }
 
 
@@ -93,13 +91,6 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
-    }
-
-
-    private fun saveUserInMemory(user: User) {
-
-        startMainActivity()
-
     }
 
 

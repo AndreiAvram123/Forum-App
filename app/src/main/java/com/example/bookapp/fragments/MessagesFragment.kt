@@ -15,10 +15,11 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.MessageAdapter
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.databinding.MessagesFragmentBinding
 import com.example.bookapp.models.LocalImageMessage
 import com.example.bookapp.models.User
+import com.example.bookapp.toBase64
+import com.example.bookapp.toDrawable
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.dataMappers.UserMapper
@@ -75,11 +76,10 @@ class MessagesFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         messageAdapter.clear()
-        viewModelChat.currentChatId.value = 0
     }
 
     private fun expandImage(imageURL: String, localImage: Boolean) {
-        val action = MessagesFragmentDirections.actionMessagesFragmentToImageZoomFragment(imageURL, localImage)
+        val action = MessagesFragmentDirections.actionGlobalImageZoomFragment(imageURL, localImage)
         binding.root.findNavController().navigate(action)
     }
 
@@ -137,10 +137,9 @@ class MessagesFragment : Fragment() {
     }
 
     private fun pushImage(path: Uri) {
-        val drawable = AppUtilities.convertFromUriToDrawable(path, requireContext())
+        val drawable = path.toDrawable(requireContext())
 
         lifecycleScope.launch(Dispatchers.IO) {
-            val data = AppUtilities.getBase64ImageFromDrawable(drawable)
 
             val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
             lifecycleScope.launch(Dispatchers.Main) {
@@ -148,7 +147,7 @@ class MessagesFragment : Fragment() {
                         type = MessageTypes.imageMessageType,
                         chatID = args.chatID,
                         senderID = user.userID,
-                        content = data,
+                        content = drawable.toBase64(),
                         localIdentifier = uniqueID
 
                 )

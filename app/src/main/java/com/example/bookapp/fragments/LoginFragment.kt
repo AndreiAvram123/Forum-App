@@ -4,111 +4,80 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.example.bookapp.AppUtilities
-import com.example.bookapp.databinding.FragmentLoginBinding
+import com.example.bookapp.R
+import com.example.bookapp.databinding.LayoutLoginBinding
+import com.example.bookapp.viewModels.ViewModelUser
+import com.example.dataLayer.repositories.OperationStatus
+import com.google.android.gms.common.SignInButton
 
-class LoginFragment : AuthenticationFragmentTemplate() {
+class LoginFragment : Fragment() {
 
-    private var errorMessage: TextView? = null
-    private var emailField: EditText? = null
-    private var passwordField: EditText? = null
-    private var signInButton: Button? = null
-    private var signUpButton: Button? = null
-    private lateinit var binding: FragmentLoginBinding
-
-
+    private lateinit var binding: LayoutLoginBinding
+    private val viewModelUser: ViewModelUser by activityViewModels()
+    private lateinit var fragmentCallback: FragmentCallback
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentLoginBinding.inflate(inflater, container, false)
+        binding = LayoutLoginBinding.inflate(inflater, container, false)
+
+        fragmentCallback = requireActivity() as FragmentCallback
         initializeUI()
+        viewModelUser.loginResult.observe(viewLifecycleOwner, Observer {
+
+            if (it == OperationStatus.FAILED) {
+
+                displayErrorMessage("Invalid credentials")
+            }
+        })
         return binding.root
+
     }
 
 
     private fun attemptLogin() {
-        val email = emailField!!.text.toString().trim { it <= ' ' }
-        val password = passwordField!!.text.toString().trim { it <= ' ' }
-        if (areLoginDetailsValid(email, password)) {
-            //todo
-            //login
-            toggleLoadingBar()
+        val username = binding.username.text.trim().toString()
+        val password = binding.password.text.trim().toString()
+        if (areLoginDetailsValid(username, password)) {
+            viewModelUser.login(username, password)
         }
     }
 
-    public override fun clearFields() {
-        emailField!!.setText("")
-        passwordField!!.setText("")
-    }
 
-    public override fun initializeUI() {
-        customiseFields()
-        configureButtons()
-    }
-
-    public override fun customiseFields() {
-        customiseField(binding.emailFieldLogin, binding.emailFieldLogin)
-        customiseField(binding.passwordFieldLogin, binding.passwordHintLogin)
-    }
-
-    public override fun configureButtons() {
-        binding.signUpButton.setOnClickListener {
+    private fun initializeUI() {
+        binding.registerButton.setOnClickListener {
             val action = LoginFragmentDirections.actionLoginFragmentToSignUpFragment();
             findNavController().navigate(action)
 
         }
-        binding.signIn.setOnClickListener { attemptLogin() }
-    }
-
-
-    override fun toggleLoadingBar() {
-        val signInButton = binding.signIn
-        val signUpButton = binding.signUpButton
-        val loadingBar = binding.loggingProgressBar
-
-        if (signInButton.visibility == View.VISIBLE) {
-            signInButton.visibility = View.INVISIBLE
-            loadingBar.visibility = View.VISIBLE
-            signUpButton.isClickable = false
-        } else {
-            signUpButton.isClickable = true
-            signInButton.visibility = View.VISIBLE
-            loadingBar.visibility = View.INVISIBLE
+        binding.loginButton.setOnClickListener { attemptLogin() }
+        binding.signInGoogle.setSize(SignInButton.SIZE_WIDE)
+        binding.signInGoogle.setOnClickListener {
+            fragmentCallback.loginWithGoogle()
         }
     }
 
-    /**
-     * This method is used to check if the pushLoginViaEmailRequest
-     * details are valid or not.We need to check the following:
-     *
-     *
-     * If the email is valid using the method from the Utilities class
-     * (the email should have the following format [a-zA-Z0-9]+@[a-z]+\.[a-z]+)
-     *
-     *
-     * If the password field is not empty and the length of the password is AT LEST 6
-     * characters( Firebase does not allow password that have less that 6 characters)
-     *
-     * @return
-     */
+
     private fun areLoginDetailsValid(email: String, password: String): Boolean {
-        if (!AppUtilities.isEmailValid(email)) {
-            displayErrorMessage("Please enter a valid email")
+        if (email.isEmpty()) {
+            displayErrorMessage(getString(R.string.fields_not_completed))
             return false
         }
-        if (password.isEmpty() || password.length < 6) {
-            displayErrorMessage("Please enter a password")
+        if (password.isEmpty()) {
+            displayErrorMessage(getString(R.string.fields_not_completed))
             return false
         }
         return true
     }
 
-    override fun displayErrorMessage(message: String) {
-        errorMessage!!.visibility = View.VISIBLE
-        errorMessage!!.text = message
+    private fun displayErrorMessage(message: String) {
+        binding.errorMessageLogin.visibility = View.VISIBLE
+        binding.errorMessageLogin.text = message
     }
 
+    interface FragmentCallback {
+        fun loginWithGoogle()
+    }
 
 }

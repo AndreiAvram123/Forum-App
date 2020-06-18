@@ -1,6 +1,7 @@
 package com.example.bookapp
 
 import android.os.Build
+import com.example.TestUtilities
 import com.example.bookapp.activities.WelcomeActivity
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.models.SerializeImage
@@ -23,7 +24,7 @@ import org.robolectric.annotation.Config
 class AddPostTest {
 
 
-    private val repo = AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
+    private val repo = TestUtilities.retrofit.create(PostRepositoryInterface::class.java)
     private lateinit var activity: WelcomeActivity
 
     @Before
@@ -40,8 +41,7 @@ class AddPostTest {
         runBlocking {
             val drawable = activity.applicationContext.getDrawable(R.drawable.placeholder)
             drawable?.let {
-                val base64 = AppUtilities.getBase64ImageFromDrawable(it)
-                val image = SerializeImage(imageData = base64, extension = null)
+                val image = SerializeImage(imageData = it.toBase64(), extension = null)
                 repo.uploadImage(image)
             }
 
@@ -49,15 +49,13 @@ class AddPostTest {
     }
 
 
-
     @Test
     fun uploadedPostShouldBeFoundOnServer() {
         runBlocking {
             val drawable = activity.applicationContext.getDrawable(R.drawable.placeholder)
             drawable?.let {
-                val base64 = AppUtilities.getBase64ImageFromDrawable(it)
 
-                val image = SerializeImage(imageData = base64, extension = null)
+                val image = SerializeImage(imageData = it.toBase64(), extension = null)
 
                 val response = repo.uploadImage(image)
 

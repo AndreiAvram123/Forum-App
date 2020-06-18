@@ -32,7 +32,7 @@ class PostRepository @Inject constructor(private val user: User,
             //if network is active remove old data and
             //perform a fresh fetch
             fetchInitialPosts()
-            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl,null)
+            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl, null)
 
         }
     }
@@ -56,26 +56,22 @@ class PostRepository @Inject constructor(private val user: User,
     val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
         liveData(Dispatchers.IO) {
             emitSource(postDao.getFavoritePosts(user.userID))
-            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl,null)
+            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl, null)
         }
     }
 
-    val myPosts: LiveData<UserWithPosts> = liveData {
-        emitSource(postDao.getAllUserPosts(user.userID))
-        fetchMyPosts()
-    }
 
     fun fetchPostByID(id: Int): LiveData<Post> = liveData {
         val postDTO = repo.fetchPostByID(id)
-        val post = PostMapper.mapDtoObjectToDomainObject(postDTO)
+        val post = PostMapper.mapToDomainObject(postDTO)
         postDao.insertPost(post)
         emit(post)
     }
 
 
     internal suspend fun fetchFavoritePostsImpl() {
-        val data = PostMapper.mapToDomainObjects(
-                repo.fetchUserFavoritePosts(user.userID))
+        val data =
+                repo.fetchUserFavoritePosts(user.userID).map { PostMapper.mapToDomainObject(it) }
 
         postDao.insertAllFavoritePosts(data.map {
             UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID)
@@ -83,10 +79,11 @@ class PostRepository @Inject constructor(private val user: User,
     }
 
 
-    suspend fun fetchMyPosts() {
+    fun fetchMyPosts() = liveData {
+        emitSource(postDao.getAllUserPosts(user.userID))
         try {
             val fetchedPosts = repo.fetchMyPosts(user.userID)
-            postDao.insertPosts(PostMapper.mapToDomainObjects(fetchedPosts))
+            postDao.insertPosts(fetchedPosts.map { PostMapper.mapToDomainObject(it) })
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
         }
@@ -108,13 +105,13 @@ class PostRepository @Inject constructor(private val user: User,
 
     suspend fun fetchInitialPosts() =
             requestExecutor.add(
-                    this::fetchInitialPostsImpl,null)
+                    this::fetchInitialPostsImpl, null)
 
 
     internal suspend fun fetchInitialPostsImpl() {
         postDao.removeCachedData()
         val fetchedData: ArrayList<PostDTO> = repo.fetchRecentPosts()
-        postDao.insertPosts(PostMapper.mapToDomainObjects(fetchedData))
+        postDao.insertPosts(fetchedData.map { PostMapper.mapToDomainObject(it) })
 
     }
 
@@ -122,8 +119,7 @@ class PostRepository @Inject constructor(private val user: User,
     internal suspend fun fetchNextPosts(lastPostID: Int) {
         try {
             val fetchedData = repo.fetchNextPagePosts(lastPostID)
-            val posts = PostMapper.mapToDomainObjects(fetchedData)
-            postDao.insertPosts(posts)
+            postDao.insertPosts(fetchedData.map { PostMapper.mapToDomainObject(it) })
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
@@ -136,16 +132,16 @@ class PostRepository @Inject constructor(private val user: User,
                 emit(imagePath)
             }
 
-    fun uploadPost(post: SerializePost): LiveData<UploadProgress> {
+    fun uploadPost(post: SerializePost): LiveData<OperationStatus> {
         return liveData {
-            emit(UploadProgress.UPLOADING)
+            emit(OperationStatus.ONGOING)
 
             val serverResponse = repo.uploadPost(post)
 
             val fetchedPost = repo.fetchPostByID(serverResponse.message.toInt())
 
-            val postDomain = PostMapper.mapDtoObjectToDomainObject(fetchedPost)
-            emit(UploadProgress.UPLOADED)
+            val postDomain = PostMapper.mapToDomainObject(fetchedPost)
+            emit(OperationStatus.FINISHED)
             postDao.insertPost(postDomain)
         }
     }

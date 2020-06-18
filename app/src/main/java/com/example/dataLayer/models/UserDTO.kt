@@ -13,9 +13,4 @@ data class UserDTO(
         val profilePicture: String,
         @SerializedName("token")
         val token: String?
-) {
-
-    companion object {
-        fun buildNullUserDTO() = UserDTO(userID = 0, username = "Unknown", email = "Unknown", profilePicture = "sdfsd", token = null)
-    }
-}
+)

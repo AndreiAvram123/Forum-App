@@ -3,13 +3,16 @@ package com.example.bookapp
 import android.os.Build
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
+import com.example.TestUtilities
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
 import com.example.dataLayer.PostDatabase
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.dao.RoomPostDao
 import com.example.dataLayer.models.UserWithFavoritePostsCrossRef
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -25,7 +28,7 @@ class PostRepositoryTest {
 
 
     private val userRepoInterface: PostRepositoryInterface =
-            AppUtilities.getRetrofit().create(PostRepositoryInterface::class.java)
+            TestUtilities.retrofit.create(PostRepositoryInterface::class.java)
 
 
     private lateinit var postDao: RoomPostDao

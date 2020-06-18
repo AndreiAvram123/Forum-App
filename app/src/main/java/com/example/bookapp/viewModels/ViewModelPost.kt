@@ -1,15 +1,16 @@
 package com.example.bookapp.viewModels
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.example.bookapp.models.Post
 import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.UserWithFavoritePosts
-import com.example.dataLayer.models.UserWithPosts
 import com.example.dataLayer.models.serialization.SerializePost
+import com.example.dataLayer.repositories.OperationStatus
 import com.example.dataLayer.repositories.PostRepository
-import com.example.dataLayer.repositories.UploadProgress
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,8 +25,8 @@ class ViewModelPost : ViewModel() {
     fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts
 
 
-    fun getUserPosts(): LiveData<UserWithPosts> = Transformations.map(postRepository.myPosts) {
-        it
+    val userPosts by lazy {
+        postRepository.fetchMyPosts()
     }
 
 
@@ -61,7 +62,7 @@ class ViewModelPost : ViewModel() {
 
     fun uploadImage(serializeImage: SerializeImage) = postRepository.uploadImage(serializeImage)
 
-    fun uploadPost(post: SerializePost): LiveData<UploadProgress> = postRepository.uploadPost(post)
+    fun uploadPost(post: SerializePost): LiveData<OperationStatus> = postRepository.uploadPost(post)
 
 
 }

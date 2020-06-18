@@ -23,8 +23,6 @@ class ViewModelChat : ViewModel() {
     lateinit var user: User
 
 
-    val fetchChatNotifications = MutableLiveData<Boolean>()
-
     val lastMessageChats: LiveData<List<Int>> by lazy {
         chatRepository.lastChatsMessage
     }

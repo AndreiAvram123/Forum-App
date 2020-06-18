@@ -5,16 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookapp.AppUtilities
 import com.example.bookapp.databinding.MessageImageReceivedBinding
 import com.example.bookapp.databinding.MessageImageSentBinding
 import com.example.bookapp.databinding.MessageReceivedBinding
 import com.example.bookapp.databinding.MessageSentBinding
+import com.example.bookapp.getScreenWidth
 import com.example.bookapp.models.LocalImageMessage
 import com.example.bookapp.models.Message
-import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
-import com.example.dataLayer.repositories.UploadProgress
+import com.example.bookapp.toDrawable
+import com.example.dataLayer.repositories.OperationStatus
 import com.example.dataLayer.serverConstants.MessageTypes
 
 
@@ -46,14 +46,14 @@ class MessageAdapter(private val currentUser: User,
         override fun bind(message: Message) {
             binding.message = message
             if (message is LocalImageMessage) {
-                val drawable = AppUtilities.convertFromUriToDrawable(message.resourcePath, binding.root.context)
+                val drawable = message.resourcePath.toDrawable(binding.root.context)
                 binding.messageImage.setImageDrawable(drawable)
 
-                if (message.currentStatus == UploadProgress.UPLOADING) {
+                if (message.currentStatus == OperationStatus.ONGOING) {
                     binding.messageImage.alpha = 0.5f
                 }
             }
-            binding.halfScreenWidth = AppUtilities.getScreenWidth(binding.root.context as Activity)
+            binding.halfScreenWidth = (binding.root.context as Activity).getScreenWidth()
 
             binding.messageImage.setOnClickListener {
                 expandImage(message)
@@ -64,7 +64,7 @@ class MessageAdapter(private val currentUser: User,
     inner class MessageImageReceivedViewHolder(val binding: MessageImageReceivedBinding) : ViewHolder(binding.root) {
         override fun bind(message: Message) {
             binding.message = message
-            binding.halfScreenWidth = AppUtilities.getScreenWidth(binding.root.context as Activity)
+            binding.halfScreenWidth = (binding.root.context as Activity).getScreenWidth()
 
             binding.messageImage.setOnClickListener {
                 expandImage(message)
@@ -135,7 +135,7 @@ class MessageAdapter(private val currentUser: User,
                 scrollToLast()
             } else {
                 if (it is LocalImageMessage) {
-                    it.currentStatus = UploadProgress.UPLOADED
+                    it.currentStatus = OperationStatus.FINISHED
                     notifyItemChanged(messages.indexOf(it))
                 }
             }
@@ -150,14 +150,14 @@ class MessageAdapter(private val currentUser: User,
 
     fun setData(newMessages: List<Message>) {
         newMessages.forEach {
-            if(!messages.contains(it)){
+            if (!messages.contains(it)) {
                 add(it)
             }
         }
     }
-    fun clear(){
+
+    fun clear() {
         messages.clear()
-        notifyDataSetChanged()
     }
 
 

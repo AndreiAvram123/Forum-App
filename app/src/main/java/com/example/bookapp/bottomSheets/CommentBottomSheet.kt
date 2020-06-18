@@ -21,8 +21,8 @@ class CommentBottomSheet(val callback: (commentContent: String) -> Unit) : Botto
             if (commentContent.trim().isNotEmpty()) {
                 binding.progressBar.visibility = View.VISIBLE
                 binding.submitCommentButton.visibility = View.INVISIBLE
-                binding.commentContent.text.clear()
                 callback(commentContent)
+                binding.commentContent.text.clear()
             }
         }
     }

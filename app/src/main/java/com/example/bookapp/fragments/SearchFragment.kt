@@ -75,10 +75,8 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
                 }
 
                 override fun onQueryTextChange(newQuery: String): Boolean {
-                    if (newQuery.trim { it <= ' ' } != "") {
-                        if (newQuery.trim { it <= ' ' } != "" && newQuery.length > 1) {
-                            viewModelUser.searchQuery.value = newQuery
-                        }
+                    if (newQuery.trim().isNotEmpty()) {
+                        viewModelUser.searchQuery.value = newQuery
                     } else {
                         suggestionsAdapter.data = ArrayList()
                     }

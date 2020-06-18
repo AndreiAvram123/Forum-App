@@ -21,21 +21,17 @@ class RequestExecutor @Inject constructor(
     inner class NetworkRequest(val function: KFunction<Any>, val parameter: Any?)
 
     private val uncompletedNetworkRequests: Queue<NetworkRequest> = LinkedList()
+    private val onNetworkAvailableQueue: Queue<NetworkRequest> = LinkedList()
 
     init {
         connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 coroutineScope.launch {
-                    //execute requests that are not finished
                     while (uncompletedNetworkRequests.peek() != null) {
-                        val request = uncompletedNetworkRequests.poll()
-                        val param = request.parameter
-                        if (param != null) {
-                            request.function.callSuspend(param)
-                        } else {
-                            request.function.callSuspend()
-                        }
+                        executeRequest(uncompletedNetworkRequests.poll())
                     }
+                    onNetworkAvailableQueue.iterator().forEachRemaining { executeRequest(it) }
+
                 }
             }
 
@@ -53,6 +49,10 @@ class RequestExecutor @Inject constructor(
             uncompletedNetworkRequests.add(request)
         }
     }
+
+    internal fun addOnNetworkAvailable(function: KFunction<Any>, parameter: Any?) =
+            onNetworkAvailableQueue.add(NetworkRequest(function, parameter))
+
 
     private fun executeRequest(networkRequest: NetworkRequest) {
         coroutineScope.launch {

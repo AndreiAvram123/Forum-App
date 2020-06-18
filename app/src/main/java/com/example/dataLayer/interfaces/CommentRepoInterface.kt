@@ -7,7 +7,7 @@ import com.example.dataLayer.models.serialization.SerializeComment
 import retrofit2.http.*
 import java.util.*
 
-interface CommentsInterface {
+interface CommentRepoInterface {
     @GET("/post/{postID}/comments")
     suspend fun fetchCommentsForPost(@Path("postID") postID: Int): ArrayList<CommentDTO>
 

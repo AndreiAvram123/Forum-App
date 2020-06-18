@@ -6,5 +6,7 @@ data class ServerResponse(
         @SerializedName("RequestCompleted")
         val successful: Boolean,
         @SerializedName("Message")
-        val message: String
+        val message: String,
+        @SerializedName("errors")
+        val errors: List<String>?
 )

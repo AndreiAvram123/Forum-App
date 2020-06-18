@@ -5,14 +5,8 @@ import com.example.dataLayer.models.PostDTO
 
 object PostMapper {
 
-    /**
-     * This method is used to convert the dto network objects to
-     * domain specific objects
-     */
-    fun mapToDomainObjects(dboPosts: List<PostDTO>) = dboPosts.map { mapDtoObjectToDomainObject(it) }
 
-
-    fun mapDtoObjectToDomainObject(postDTO: PostDTO ): Post {
+    fun mapToDomainObject(postDTO: PostDTO ): Post {
 
             val user = UserMapper.mapToDomainObject(postDTO.author)
 

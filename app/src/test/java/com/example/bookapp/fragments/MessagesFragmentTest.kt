@@ -1,9 +1,10 @@
 package com.example.bookapp.fragments
 
 import android.os.Build
-import com.example.bookapp.AppUtilities
+import com.example.TestUtilities
 import com.example.bookapp.R
 import com.example.bookapp.activities.WelcomeActivity
+import com.example.bookapp.toBase64
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.serverConstants.MessageTypes
@@ -23,7 +24,7 @@ import java.util.*
 @RunWith(RobolectricTestRunner::class)
 class MessagesFragmentTest {
 
-    private val repo = AppUtilities.getRetrofit().create(ChatRepositoryInterface::class.java)
+    private val repo = TestUtilities.retrofit.create(ChatRepositoryInterface::class.java)
     private lateinit var activity: WelcomeActivity
 
     @Before
@@ -40,12 +41,11 @@ class MessagesFragmentTest {
         runBlocking {
             val drawable = activity.applicationContext.getDrawable(R.drawable.placeholder)
             drawable?.let {
-                val base64Image = AppUtilities.getBase64ImageFromDrawable(it)
                 val localID: Int = Calendar.getInstance().timeInMillis.hashCode()
                 val message = SerializeMessage(type = MessageTypes.imageMessageType,
                         chatID = 12,
                         senderID = 109,
-                        content = base64Image,
+                        content = it.toBase64(),
                         localIdentifier = localID.toString())
                 val serverResponse = repo.pushMessage(message)
                 Assert.assertTrue(serverResponse.successful)

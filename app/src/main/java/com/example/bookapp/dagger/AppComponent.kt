@@ -10,6 +10,7 @@ import com.example.bookapp.fragments.SettingsFragment
 import com.example.bookapp.models.User
 import com.example.bookapp.services.MessengerService
 import com.example.bookapp.viewModels.ViewModelChat
+import com.example.bookapp.viewModels.ViewModelComments
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import dagger.BindsInstance
@@ -36,6 +37,7 @@ interface AppComponent {
     fun inject(welcomeActivity: WelcomeActivity)
 
     fun inject(settingsFragment: SettingsFragment)
+    fun inject(viewModelComment: ViewModelComments)
 
 
     @Component.Factory

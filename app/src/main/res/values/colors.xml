@@ -3,4 +3,13 @@
     <color name="colorPrimary">#0932BE</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#4285F4</color>
+
+
+    <!--colors for modern ui-->
+    <color name="whiteTextColor">#fff</color>
+    <color name="primaryTextColor">#00a5ff</color>
+    <color name="loginBkColor">#f0f0f0</color>
+
+    <!--colros for card-->
+    <color name="whiteCardColor">#fff</color>
 </resources>

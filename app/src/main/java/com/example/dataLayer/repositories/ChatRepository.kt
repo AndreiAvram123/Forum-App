@@ -16,7 +16,6 @@ import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
-import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,7 +30,9 @@ class ChatRepository @Inject constructor(
         private val requestExecutor: RequestExecutor
 ) {
 
-    private lateinit var notificationHandler: NotificationHandler
+    init {
+        requestExecutor.addOnNetworkAvailable(this::fetchLastChatsMessage, null)
+    }
 
 
     private val chatNotifications by lazy {
@@ -101,7 +102,7 @@ class ChatRepository @Inject constructor(
     internal suspend fun fetchNotificationLink() {
         try {
             val link = repo.fetchNotificationLink(user.userID).message
-            notificationHandler = NotificationHandler(connectivityManager, this::addNotification, link)
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
