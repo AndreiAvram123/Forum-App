@@ -9,21 +9,21 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.bookapp.R
-import com.example.bookapp.databinding.FragmentSignUpBinding
+import com.example.bookapp.databinding.LayoutSignUpBinding
 import com.example.bookapp.isEmail
 import com.example.bookapp.viewModels.ViewModelUser
 import com.google.android.material.snackbar.Snackbar
 
 class RegisterFragment : Fragment() {
 
-    private lateinit var binding: FragmentSignUpBinding
+    private lateinit var binding: LayoutSignUpBinding
     private val viewModelUser: ViewModelUser by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentSignUpBinding.inflate(inflater, container, false)
+        binding = LayoutSignUpBinding.inflate(inflater, container, false)
         initializeUI()
         viewModelUser.registrationMessage.observe(viewLifecycleOwner, Observer {
-            hideProgressBar()
+            hideButton()
             if (it == "Success") {
                 Snackbar.make(binding.root, getString(R.string.account_created), Snackbar.LENGTH_LONG).show()
                 hideErrors()
@@ -40,8 +40,8 @@ class RegisterFragment : Fragment() {
 
     private fun configureButtons() {
         binding.finishSignUp.setOnClickListener { getCredentials() }
-        binding.backImageSignUp.setOnClickListener {
-            val action = RegisterFragmentDirections.actionSignUpFragmentToLoginFragment()
+        binding.backButton.setOnClickListener {
+            val action = RegisterFragmentDirections.actionSignUpFragmentToLoginFragment2()
             findNavController().navigate(action)
         }
     }
@@ -52,14 +52,12 @@ class RegisterFragment : Fragment() {
     }
 
 
-    private fun hideProgressBar() {
+    private fun hideButton() {
         binding.finishSignUp.visibility = View.VISIBLE
-        binding.loadingProgressBar.visibility = View.INVISIBLE
     }
 
-    private fun showProgressbar() {
+    private fun showButton() {
         binding.finishSignUp.visibility = View.INVISIBLE
-        binding.loadingProgressBar.visibility = View.VISIBLE
     }
 
 
@@ -84,23 +82,23 @@ class RegisterFragment : Fragment() {
     }
 
     private fun getCredentials() {
-        val email = binding.emailField.text.toString().trim()
-        val password = binding.passwordField.text.toString().trim()
-        val reenteredPassword = binding.reenterePasswordField.text.toString().trim()
-        val nickname = binding.nicknameField.text.toString().trim()
+        val email = binding.email.text.toString().trim()
+        val password = binding.password.text.toString().trim()
+        val reenteredPassword = binding.reenterPassword.text.toString().trim()
+        val username = binding.username.text.toString().trim()
 
-        if (areCredentialsValid(email, password, reenteredPassword, nickname)) {
-            viewModelUser.register(nickname, email, password)
-            showProgressbar()
+        if (areCredentialsValid(email, password, reenteredPassword, username)) {
+            viewModelUser.register(username, email, password)
+            showButton()
             clearFields()
         }
     }
 
     private fun clearFields() {
-        binding.emailField.text.clear()
-        binding.passwordField.text.clear()
-        binding.reenterePasswordField.text.clear()
-        binding.nicknameField.text.clear()
+        binding.email.text.clear()
+        binding.password.text.clear()
+        binding.reenterPassword.text.clear()
+        binding.username.text.clear()
     }
 
     private fun initializeUI() {
@@ -108,15 +106,5 @@ class RegisterFragment : Fragment() {
         configureButtons()
     }
 
-    public fun customiseFields() {
-        //   customiseField(binding.emailField, binding.hintEmail)
-        //customiseField(binding.passwordField, binding.hintPassword)
-        //customiseField(binding.reenterePasswordField, binding.hintReenterPassword)
-        //customiseField(binding.re, hintNickname)
-    }
-
-    interface SignUpFragmentCallback {
-        fun signUp(email: String?, password: String?, nickname: String?)
-    }
 
 }

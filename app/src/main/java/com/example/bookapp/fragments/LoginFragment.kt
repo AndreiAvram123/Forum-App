@@ -9,24 +9,25 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.bookapp.R
-import com.example.bookapp.databinding.FragmentLoginBinding
+import com.example.bookapp.databinding.LayoutLoginBinding
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.repositories.OperationStatus
+import com.google.android.gms.common.SignInButton
 
 class LoginFragment : Fragment() {
 
-    private lateinit var binding: FragmentLoginBinding
+    private lateinit var binding: LayoutLoginBinding
     private val viewModelUser: ViewModelUser by activityViewModels()
-
+    private lateinit var fragmentCallback: FragmentCallback
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentLoginBinding.inflate(inflater, container, false)
+        binding = LayoutLoginBinding.inflate(inflater, container, false)
+
+        fragmentCallback = requireActivity() as FragmentCallback
         initializeUI()
         viewModelUser.loginResult.observe(viewLifecycleOwner, Observer {
-            if (it == OperationStatus.ONGOING) {
-                showProgressIndicator()
-            }
+
             if (it == OperationStatus.FAILED) {
-                hideProgressIndicator()
+
                 displayErrorMessage("Invalid credentials")
             }
         })
@@ -36,8 +37,8 @@ class LoginFragment : Fragment() {
 
 
     private fun attemptLogin() {
-        val username = binding.usernamelFieldLogin.text.trim().toString()
-        val password = binding.passwordFieldLogin.text.trim().toString()
+        val username = binding.username.text.trim().toString()
+        val password = binding.password.text.trim().toString()
         if (areLoginDetailsValid(username, password)) {
             viewModelUser.login(username, password)
         }
@@ -45,32 +46,17 @@ class LoginFragment : Fragment() {
 
 
     private fun initializeUI() {
-        configureButtons()
-    }
-
-
-    private fun configureButtons() {
-        binding.signUpButton.setOnClickListener {
+        binding.registerButton.setOnClickListener {
             val action = LoginFragmentDirections.actionLoginFragmentToSignUpFragment();
             findNavController().navigate(action)
 
         }
-        binding.signIn.setOnClickListener { attemptLogin() }
+        binding.loginButton.setOnClickListener { attemptLogin() }
+        binding.signInGoogle.setSize(SignInButton.SIZE_WIDE)
+        binding.signInGoogle.setOnClickListener {
+            fragmentCallback.loginWithGoogle()
+        }
     }
-
-
-    private fun showProgressIndicator() {
-        binding.signIn.visibility = View.INVISIBLE
-        binding.loggingProgressBar.visibility = View.VISIBLE
-        binding.signUpButton.isClickable = false
-    }
-
-    private fun hideProgressIndicator() {
-        binding.signIn.visibility = View.VISIBLE
-        binding.loggingProgressBar.visibility = View.INVISIBLE
-        binding.signUpButton.isClickable = true
-    }
-
 
 
     private fun areLoginDetailsValid(email: String, password: String): Boolean {
@@ -86,9 +72,12 @@ class LoginFragment : Fragment() {
     }
 
     private fun displayErrorMessage(message: String) {
-        binding.errorMessage.visibility = View.VISIBLE
-        binding.errorMessage.text = message
+        binding.errorMessageLogin.visibility = View.VISIBLE
+        binding.errorMessageLogin.text = message
     }
 
+    interface FragmentCallback {
+        fun loginWithGoogle()
+    }
 
 }

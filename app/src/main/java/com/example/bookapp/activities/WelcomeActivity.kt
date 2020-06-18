@@ -11,7 +11,7 @@ import com.example.bookapp.R
 import com.example.bookapp.dagger.AppComponent
 import com.example.bookapp.dagger.DaggerAppComponent
 import com.example.bookapp.dagger.MyApplication
-import com.example.bookapp.fragments.AuthenticationFragment
+import com.example.bookapp.fragments.LoginFragment
 import com.example.bookapp.models.User
 import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelUser
@@ -26,7 +26,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InternalCoroutinesApi
-class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCallback {
+class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()
