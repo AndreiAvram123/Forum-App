@@ -7,6 +7,7 @@ import androidx.lifecycle.liveData
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.interfaces.UserRepositoryInterface
+import com.example.dataLayer.models.UserDTO
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
@@ -52,5 +53,7 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
         }
     }
 
-    suspend fun login(username: String, password: String) = repo.login(username, password)
+    suspend fun login(username: String, password: String): UserDTO = repo.login(username, password)
+
+    suspend fun register(username: String, email: String, password: String) = repo.register(username, email, password)
 }

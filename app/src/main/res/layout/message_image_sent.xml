@@ -6,7 +6,7 @@
     <data>
 
         <import type="com.example.bookapp.models.LocalImageMessage" />
-        <import type="com.example.dataLayer.repositories.UploadProgress"/>
+        <import type="com.example.dataLayer.repositories.OperationStatus"/>
         <variable
             name="message"
             type="com.example.bookapp.models.Message" />

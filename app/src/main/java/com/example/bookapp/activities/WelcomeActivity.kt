@@ -1,8 +1,6 @@
 package com.example.bookapp.activities
 
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -52,10 +50,11 @@ class WelcomeActivity : AppCompatActivity(), AuthenticationFragment.FragmentCall
         appComponent.inject(this)
         appComponent.inject(viewModelUser)
 
-        val user = userAccountManager.getCurrentUser()
-        if (user.userID > 0) {
-            startMainActivity()
-        }
+        userAccountManager.user.observe(this, Observer {
+            if (it.userID != 0) {
+                startMainActivity()
+            }
+        })
     }
 
 

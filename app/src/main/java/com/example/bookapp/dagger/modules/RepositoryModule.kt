@@ -2,9 +2,6 @@ package com.example.bookapp.dagger.modules
 
 import android.content.Context
 import android.net.ConnectivityManager
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.liveData
-import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
 import com.example.dataLayer.interfaces.CommentRepoInterface
 import com.example.dataLayer.interfaces.PostRepositoryInterface
@@ -42,10 +39,6 @@ class RepositoryModule {
     fun getCommentsRepo(retrofit: Retrofit) = retrofit.create(CommentRepoInterface::class.java)
 
 
-    @Provides
-    fun provideUser(user: User) = liveData {
-        emit(user)
-    }
 
 
     @Provides

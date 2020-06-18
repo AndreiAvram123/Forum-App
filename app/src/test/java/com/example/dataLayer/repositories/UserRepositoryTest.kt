@@ -18,10 +18,10 @@ class UserRepositoryTest {
 
     @Test
     fun shouldReturnUserOnSuccessfulLogin() = runBlocking {
-        val username = "lalaband"
-        val password = "lalala"
-        val user = repo.login(username,password)
-        assertNotNull(user)
+        val username = "lala"
+        val password = "cactus"
+        val user = repo.login(username, password)
+        assert(user.userID != 0)
 
     }
 }

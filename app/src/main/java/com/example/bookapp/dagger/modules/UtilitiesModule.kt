@@ -2,6 +2,7 @@ package com.example.bookapp.dagger.modules
 
 import android.content.Context
 import com.example.bookapp.R
+import com.example.bookapp.models.User
 import com.example.bookapp.user.UserAccountManager
 import dagger.Module
 import dagger.Provides
@@ -13,5 +14,7 @@ class UtilitiesModule {
     fun preferences(context: Context) = context.getSharedPreferences(context.getString(R.string.key_preferences), Context.MODE_PRIVATE)
 
     @Provides
-    fun user(userAccountManager: UserAccountManager) = userAccountManager.getCurrentUser()
+    fun user(userAccountManager: UserAccountManager): User {
+        return userAccountManager.user.value!!
+    }
 }

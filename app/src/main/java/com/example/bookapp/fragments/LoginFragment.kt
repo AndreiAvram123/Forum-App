@@ -4,19 +4,34 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.example.bookapp.R
 import com.example.bookapp.databinding.FragmentLoginBinding
-import com.example.bookapp.isEmail
+import com.example.bookapp.viewModels.ViewModelUser
+import com.example.dataLayer.repositories.OperationStatus
 
-class LoginFragment : AuthenticationFragmentTemplate() {
+class LoginFragment : Fragment() {
 
     private lateinit var binding: FragmentLoginBinding
-
+    private val viewModelUser: ViewModelUser by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentLoginBinding.inflate(inflater, container, false)
         initializeUI()
+        viewModelUser.loginResult.observe(viewLifecycleOwner, Observer {
+            if (it == OperationStatus.ONGOING) {
+                showProgressIndicator()
+            }
+            if (it == OperationStatus.FAILED) {
+                hideProgressIndicator()
+                displayErrorMessage("Invalid credentials")
+            }
+        })
         return binding.root
+
     }
 
 
@@ -24,27 +39,17 @@ class LoginFragment : AuthenticationFragmentTemplate() {
         val username = binding.usernamelFieldLogin.text.trim().toString()
         val password = binding.passwordFieldLogin.text.trim().toString()
         if (areLoginDetailsValid(username, password)) {
-            //todo
-            //login
-            toggleLoadingBar()
+            viewModelUser.login(username, password)
         }
     }
 
-    override fun clearFields() {
-        binding.usernamelFieldLogin.text.clear()
-        binding.passwordFieldLogin.text.clear()
-    }
 
-    public override fun initializeUI() {
-        customiseFields()
+    private fun initializeUI() {
         configureButtons()
     }
 
-    public override fun customiseFields() {
 
-    }
-
-    public override fun configureButtons() {
+    private fun configureButtons() {
         binding.signUpButton.setOnClickListener {
             val action = LoginFragmentDirections.actionLoginFragmentToSignUpFragment();
             findNavController().navigate(action)
@@ -54,49 +59,33 @@ class LoginFragment : AuthenticationFragmentTemplate() {
     }
 
 
-    override fun toggleLoadingBar() {
-        val signInButton = binding.signIn
-        val signUpButton = binding.signUpButton
-        val loadingBar = binding.loggingProgressBar
-
-        if (signInButton.visibility == View.VISIBLE) {
-            signInButton.visibility = View.INVISIBLE
-            loadingBar.visibility = View.VISIBLE
-            signUpButton.isClickable = false
-        } else {
-            signUpButton.isClickable = true
-            signInButton.visibility = View.VISIBLE
-            loadingBar.visibility = View.INVISIBLE
-        }
+    private fun showProgressIndicator() {
+        binding.signIn.visibility = View.INVISIBLE
+        binding.loggingProgressBar.visibility = View.VISIBLE
+        binding.signUpButton.isClickable = false
     }
 
-    /**
-     * This method is used to check if the pushLoginViaEmailRequest
-     * details are valid or not.We need to check the following:
-     *
-     *
-     * If the email is valid using the method from the Utilities class
-     * (the email should have the following format [a-zA-Z0-9]+@[a-z]+\.[a-z]+)
-     *
-     *
-     * If the password field is not empty and the length of the password is AT LEST 6
-     * characters( Firebase does not allow password that have less that 6 characters)
-     *
-     * @return
-     */
+    private fun hideProgressIndicator() {
+        binding.signIn.visibility = View.VISIBLE
+        binding.loggingProgressBar.visibility = View.INVISIBLE
+        binding.signUpButton.isClickable = true
+    }
+
+
+
     private fun areLoginDetailsValid(email: String, password: String): Boolean {
-        if (email.isEmail()) {
-            displayErrorMessage("Please enter a valid email")
+        if (email.isEmpty()) {
+            displayErrorMessage(getString(R.string.fields_not_completed))
             return false
         }
-        if (password.isEmpty() || password.length < 6) {
-            displayErrorMessage("Please enter a password")
+        if (password.isEmpty()) {
+            displayErrorMessage(getString(R.string.fields_not_completed))
             return false
         }
         return true
     }
 
-    override fun displayErrorMessage(message: String) {
+    private fun displayErrorMessage(message: String) {
         binding.errorMessage.visibility = View.VISIBLE
         binding.errorMessage.text = message
     }

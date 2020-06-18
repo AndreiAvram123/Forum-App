@@ -12,10 +12,9 @@ import com.example.bookapp.databinding.MessageSentBinding
 import com.example.bookapp.getScreenWidth
 import com.example.bookapp.models.LocalImageMessage
 import com.example.bookapp.models.Message
-import com.example.bookapp.models.MessageDTO
 import com.example.bookapp.models.User
 import com.example.bookapp.toDrawable
-import com.example.dataLayer.repositories.UploadProgress
+import com.example.dataLayer.repositories.OperationStatus
 import com.example.dataLayer.serverConstants.MessageTypes
 
 
@@ -50,7 +49,7 @@ class MessageAdapter(private val currentUser: User,
                 val drawable = message.resourcePath.toDrawable(binding.root.context)
                 binding.messageImage.setImageDrawable(drawable)
 
-                if (message.currentStatus == UploadProgress.UPLOADING) {
+                if (message.currentStatus == OperationStatus.ONGOING) {
                     binding.messageImage.alpha = 0.5f
                 }
             }
@@ -136,7 +135,7 @@ class MessageAdapter(private val currentUser: User,
                 scrollToLast()
             } else {
                 if (it is LocalImageMessage) {
-                    it.currentStatus = UploadProgress.UPLOADED
+                    it.currentStatus = OperationStatus.FINISHED
                     notifyItemChanged(messages.indexOf(it))
                 }
             }

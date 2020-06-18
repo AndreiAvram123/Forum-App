@@ -132,16 +132,16 @@ class PostRepository @Inject constructor(private val user: User,
                 emit(imagePath)
             }
 
-    fun uploadPost(post: SerializePost): LiveData<UploadProgress> {
+    fun uploadPost(post: SerializePost): LiveData<OperationStatus> {
         return liveData {
-            emit(UploadProgress.UPLOADING)
+            emit(OperationStatus.ONGOING)
 
             val serverResponse = repo.uploadPost(post)
 
             val fetchedPost = repo.fetchPostByID(serverResponse.message.toInt())
 
             val postDomain = PostMapper.mapToDomainObject(fetchedPost)
-            emit(UploadProgress.UPLOADED)
+            emit(OperationStatus.FINISHED)
             postDao.insertPost(postDomain)
         }
     }

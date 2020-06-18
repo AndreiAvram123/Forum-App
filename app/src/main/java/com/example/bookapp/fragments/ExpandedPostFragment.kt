@@ -23,7 +23,7 @@ import com.example.bookapp.viewModels.ViewModelComments
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.serialization.SerializeComment
-import com.example.dataLayer.repositories.UploadProgress
+import com.example.dataLayer.repositories.OperationStatus
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.InternalCoroutinesApi
 
@@ -119,7 +119,7 @@ class ExpandedPostFragment : Fragment() {
                 userID = user.userID)
 
         viewModelComments.uploadComment(commentToUpload).observe(viewLifecycleOwner, Observer {
-            if (it == UploadProgress.UPLOADED) {
+            if (it == OperationStatus.FINISHED) {
                 commentDialog.dismiss()
             }
         })

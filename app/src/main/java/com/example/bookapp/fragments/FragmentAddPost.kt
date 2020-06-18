@@ -1,7 +1,6 @@
 package com.example.bookapp.fragments
 
 import android.content.Intent
-import android.opengl.Visibility
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,13 +20,10 @@ import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.serialization.SerializePost
-import com.example.dataLayer.repositories.UploadProgress
-import com.google.android.material.snackbar.Snackbar
+import com.example.dataLayer.repositories.OperationStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import java.io.File
-import java.net.URI
 
 @InternalCoroutinesApi
 class FragmentAddPost : Fragment() {
@@ -102,7 +98,7 @@ class FragmentAddPost : Fragment() {
 
     private fun pushPost(post: SerializePost) {
         viewModelPost.uploadPost(post).observe(viewLifecycleOwner, Observer {
-            if (it == UploadProgress.UPLOADED) {
+            if (it == OperationStatus.FINISHED) {
                 findNavController().popBackStack()
             }
         })

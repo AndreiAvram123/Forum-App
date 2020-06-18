@@ -41,10 +41,6 @@ fun Uri.toDrawable(context: Context): Drawable {
     return Drawable.createFromStream(inputStream, path.toString())
 }
 
-fun Drawable.fromUri(uri: Uri, context: Context): Drawable {
-    val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-    return Drawable.createFromStream(inputStream, uri.toString())
-}
 
 fun Drawable.toBase64(): String {
     val bitmap = (this as BitmapDrawable).bitmap

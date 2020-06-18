@@ -4,13 +4,12 @@ import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.example.bookapp.models.Post
-import com.example.dataLayer.PostDatabase
 import com.example.dataLayer.dataMappers.CommentMapper
 import com.example.dataLayer.interfaces.CommentRepoInterface
 import com.example.dataLayer.interfaces.dao.RoomCommentDao
 import com.example.dataLayer.models.PostWithComments
 import com.example.dataLayer.models.serialization.SerializeComment
-import com.example.dataLayer.repositories.UploadProgress
+import com.example.dataLayer.repositories.OperationStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -38,19 +37,19 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
 
 
     fun uploadComment(comment: SerializeComment) = liveData {
-        emit(UploadProgress.UPLOADING)
+        emit(OperationStatus.ONGOING)
         try {
             val serverResponse = repo.uploadComment(comment)
             val commentID = serverResponse.message.toIntOrNull()
             commentID?.let {
                 val fetchedComment = repo.fetchCommentById(it)
                 commentDao.insertComment(CommentMapper.mapToDomainObject(fetchedComment))
-                emit(UploadProgress.UPLOADED)
+                emit(OperationStatus.FINISHED)
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
-            emit(UploadProgress.FAILED)
+            emit(OperationStatus.FAILED)
         }
     }
 
