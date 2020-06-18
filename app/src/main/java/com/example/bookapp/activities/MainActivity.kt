@@ -7,7 +7,6 @@ import android.content.*
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -19,7 +18,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.bookapp.R
-import com.example.bookapp.dagger.*
+import com.example.bookapp.dagger.DaggerAppComponent
+import com.example.bookapp.dagger.MyApplication
+import com.example.bookapp.databinding.DrawerHeaderBinding
 import com.example.bookapp.databinding.LayoutMainActivityBinding
 import com.example.bookapp.services.MessengerService
 import com.example.bookapp.user.UserAccountManager
@@ -164,6 +165,10 @@ class MainActivity : AppCompatActivity() {
         val drawer = binding.drawerLayout
         val appBarConfiguration = AppBarConfiguration(navController.graph, drawer)
         binding.navView.setupWithNavController(navController)
+
+
+        val headerBinding = DrawerHeaderBinding.bind(binding.navView.getHeaderView(0))
+        headerBinding.user = userAccountManager.user.value
 
     }
 

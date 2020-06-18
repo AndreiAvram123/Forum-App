@@ -12,7 +12,6 @@ import com.example.bookapp.dagger.AppComponent
 import com.example.bookapp.dagger.DaggerAppComponent
 import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.fragments.LoginFragment
-import com.example.bookapp.models.User
 import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.interfaces.dao.UserDao
@@ -92,13 +91,6 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()
-    }
-
-
-    private fun saveUserInMemory(user: User) {
-
-        startMainActivity()
-
     }
 
 

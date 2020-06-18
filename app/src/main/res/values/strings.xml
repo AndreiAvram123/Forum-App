@@ -46,7 +46,7 @@
     <string name="write_comment_text">Write a commentDTO</string>
     <string name="submit_comment">Submit</string>
     <string name="key_user_id">key_user_id</string>
-    <string name="key_email">key_username</string>
+    <string name="key_email">key_email</string>
 
     <string name="number_saved_posts">Saved posts : %1$d </string>
     <string name="my_posts_label">My posts</string>
