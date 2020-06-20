@@ -8,18 +8,22 @@ import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.PostMapper
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.dao.RoomPostDao
-import com.example.dataLayer.models.*
+import com.example.dataLayer.models.PostDTO
+import com.example.dataLayer.models.SerializeImage
+import com.example.dataLayer.models.UserWithFavoritePosts
+import com.example.dataLayer.models.UserWithFavoritePostsCrossRef
 import com.example.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Singleton
 
 
 @Suppress("MemberVisibilityCanBePrivate")
 @InternalCoroutinesApi
-
+@Singleton
 class PostRepository @Inject constructor(private val user: User,
                                          private val requestExecutor: RequestExecutor,
                                          private val coroutineScope: CoroutineScope,

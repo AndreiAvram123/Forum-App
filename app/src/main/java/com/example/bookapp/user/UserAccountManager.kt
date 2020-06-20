@@ -10,7 +10,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class UserAccountManager @Inject constructor(val sharedPreferences: SharedPreferences,
+class UserAccountManager @Inject constructor(private val sharedPreferences: SharedPreferences,
                                              val context: Context,
                                              val userDao: UserDao) {
 
