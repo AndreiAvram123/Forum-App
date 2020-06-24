@@ -1,7 +1,7 @@
 package com.example.bookapp.dagger.modules
 
 import android.content.Context
-import com.example.bookapp.R
+import com.example.bookapp.dagger.MyApplication
 import com.example.dataLayer.PostDatabase
 import com.example.dataLayer.interfaces.dao.*
 import dagger.Module
@@ -11,19 +11,19 @@ import javax.inject.Singleton
 
 @InternalCoroutinesApi
 @Module
-class DaoModule() {
+class DaoModule {
 
     @Provides
     @Singleton
-    fun postDao(context: Context): RoomPostDao = PostDatabase.getDatabase(context).postDao()
+    fun postDao(context:Context): RoomPostDao = PostDatabase.getDatabase(context).postDao()
 
     @Provides
     @Singleton
-    fun userDao(context: Context): UserDao = PostDatabase.getDatabase(context).userDao()
+    fun userDao(context:Context): UserDao = PostDatabase.getDatabase(context).userDao()
 
     @Provides
     @Singleton
-    fun messageDao(context: Context): MessageDao = PostDatabase.getDatabase(context).messageDao()
+    fun messageDao(context:Context): MessageDao = PostDatabase.getDatabase(context).messageDao()
 
     @Provides
     @Singleton

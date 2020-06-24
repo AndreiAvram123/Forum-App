@@ -2,16 +2,19 @@ package com.example.bookapp.dagger.modules
 
 import android.content.Context
 import android.net.ConnectivityManager
+import com.example.bookapp.dagger.MyApplication
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
 import com.example.dataLayer.interfaces.CommentRepoInterface
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.UserRepositoryInterface
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.InternalCoroutinesApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
+@InternalCoroutinesApi
 @Module
 class RepositoryModule {
 
@@ -37,8 +40,6 @@ class RepositoryModule {
     @Provides
     @Singleton
     fun getCommentsRepo(retrofit: Retrofit) = retrofit.create(CommentRepoInterface::class.java)
-
-
 
 
     @Provides

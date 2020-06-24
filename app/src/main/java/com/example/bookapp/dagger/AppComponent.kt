@@ -33,7 +33,6 @@ interface AppComponent {
 
     fun inject(mainActivity: MainActivity)
 
-    fun inject(messengerService: MessengerService)
     fun inject(welcomeActivity: WelcomeActivity)
 
     fun inject(settingsFragment: SettingsFragment)

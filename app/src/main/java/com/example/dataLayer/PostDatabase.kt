@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.models.*
 import com.example.dataLayer.interfaces.dao.*
 import com.example.dataLayer.models.UserWithFavoritePostsCrossRef
@@ -23,15 +24,17 @@ abstract class PostDatabase : RoomDatabase() {
         private var INSTANCE: PostDatabase? = null
 
         @InternalCoroutinesApi
-        fun getDatabase(context: Context): PostDatabase {
+        fun getDatabase(application: Context): PostDatabase {
             val tempInstance = INSTANCE;
             if (tempInstance != null) {
                 return tempInstance
             }
             synchronized(this) {
-                val instance = Room.databaseBuilder(context.applicationContext,
+                val instance = Room.databaseBuilder(application,
                         PostDatabase::class.java,
-                        "database").fallbackToDestructiveMigration().build()
+                        "database").fallbackToDestructiveMigration()
+                        .enableMultiInstanceInvalidation()
+                        .build()
                 INSTANCE = instance
                 return instance
             }

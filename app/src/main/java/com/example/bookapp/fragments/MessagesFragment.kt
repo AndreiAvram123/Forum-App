@@ -142,6 +142,7 @@ class MessagesFragment : Fragment() {
         lifecycleScope.launch(Dispatchers.IO) {
 
             val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
+
             lifecycleScope.launch(Dispatchers.Main) {
                 val message = SerializeMessage(
                         type = MessageTypes.imageMessageType,

@@ -43,7 +43,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
-        val appComponent: AppComponent = DaggerAppComponent.factory().create(applicationContext, viewModelUser.viewModelScope)
+        val appComponent: AppComponent = DaggerAppComponent.factory().create(application.applicationContext, viewModelUser.viewModelScope)
         (application as MyApplication).appComponent = appComponent
 
         appComponent.inject(this)
