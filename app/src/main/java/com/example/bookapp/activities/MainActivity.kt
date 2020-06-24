@@ -95,15 +95,17 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        playNotificationOnNewMessage()
-        mBound = false
+        if (mBound) {
+            playNotificationOnNewMessage()
+            unbindService(connection)
+            mBound = false
+        }
     }
 
     private fun playNotificationOnNewMessage() {
-        if (mBound) {
-            val playNotification = Message.obtain(null, play_notification_message, 0, 0)
-            serviceMessenger.send(playNotification)
-        }
+        val playNotification = Message.obtain(null, play_notification_message, 0, 0)
+        serviceMessenger.send(playNotification)
+
     }
 
     private fun stopNotificationSound() {
