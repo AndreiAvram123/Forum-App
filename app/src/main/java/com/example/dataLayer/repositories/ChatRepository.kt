@@ -8,7 +8,7 @@ import com.example.bookapp.models.Chat
 import com.example.bookapp.models.Message
 import com.example.bookapp.models.User
 import com.example.dataLayer.dataMappers.ChatMapper
-import com.example.dataLayer.dataMappers.MessageMapper
+import com.example.dataLayer.dataMappers.toMessage
 import com.example.dataLayer.interfaces.ChatRepositoryInterface
 import com.example.dataLayer.interfaces.dao.ChatDao
 import com.example.dataLayer.interfaces.dao.MessageDao
@@ -16,11 +16,12 @@ import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Suppress("MemberVisibilityCanBePrivate")
-@Singleton
+
 class ChatRepository @Inject constructor(
         private val repo: ChatRepositoryInterface,
         private val messageDao: MessageDao,
@@ -61,7 +62,7 @@ class ChatRepository @Inject constructor(
 
     internal suspend fun fetchLastChatsMessage() {
         val data = repo.fetchLastChatsMessage(user.userID)
-        val messages = data.map { MessageMapper.mapToDomainObject(it) }
+        val messages = data.map { it.toMessage() }
         messageDao.insertMessages(messages)
     }
 
@@ -89,7 +90,7 @@ class ChatRepository @Inject constructor(
 
     internal suspend fun fetchChatMessages(chatID: Int) {
         val fetchedData = repo.fetchRecentMessages(chatID)
-        val messages = fetchedData.map { MessageMapper.mapToDomainObject(it) }
+        val messages = fetchedData.map { it.toMessage() }
         messageDao.insertMessages(messages)
     }
 

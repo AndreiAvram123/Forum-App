@@ -25,19 +25,25 @@ import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.serialization.SerializeComment
 import com.example.dataLayer.repositories.OperationStatus
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
+import javax.inject.Inject
 
 
 @InternalCoroutinesApi
+@AndroidEntryPoint
 class ExpandedPostFragment : Fragment() {
     lateinit var binding: PostExpandedFragmentBinding
 
     private val viewModelPost: ViewModelPost by activityViewModels()
-    private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelComments: ViewModelComments by activityViewModels()
-    private lateinit var user: User
-    private lateinit var post: Post
+
+    @Inject
+    lateinit var user: User
+
+    lateinit var post: Post
     private val commentDialog = CommentBottomSheet(::submitComment)
+
     private lateinit var favoritePosts: List<Post>
     private val args: ExpandedPostFragmentArgs by navArgs()
 
@@ -45,7 +51,6 @@ class ExpandedPostFragment : Fragment() {
                               savedInstanceState: Bundle?): View? { // Inflate the layout for this fragment
 
         binding = PostExpandedFragmentBinding.inflate(layoutInflater, container, false)
-        user = viewModelUser.user
         attachObservers()
         return binding.root
     }
@@ -78,11 +83,13 @@ class ExpandedPostFragment : Fragment() {
 
     private fun insertComments(comments: ArrayList<Comment>) {
         val adapterComments = AdapterComments(comments)
-        val recyclerView = binding.recyclerComments;
-        recyclerView.adapter = adapterComments
-        recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+
+        binding.recyclerComments.apply {
+            adapter = adapterComments
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
     }
 
 

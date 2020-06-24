@@ -1,12 +1,13 @@
 package com.example.bookapp.services
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
 import android.os.Handler
 import android.os.IBinder
 import android.os.Messenger
-import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.bookapp.R
@@ -14,15 +15,14 @@ import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.getConnectivityManager
 import com.example.bookapp.models.Message
 import com.example.bookapp.models.MessageDTO
-import com.example.dataLayer.PostDatabase
-import com.example.dataLayer.dataMappers.MessageMapper
+import com.example.dataLayer.LocalDatabase
+import com.example.dataLayer.dataMappers.toMessage
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.launchdarkly.eventsource.EventHandler
 import com.launchdarkly.eventsource.EventSource
 import com.launchdarkly.eventsource.MessageEvent
-import kotlinx.coroutines.InternalCoroutinesApi
-import okhttp3.internal.closeQuietly
+import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.net.URI
 import java.time.Duration
@@ -43,9 +43,23 @@ class MessengerService : Service() {
     private var userID: Int = 0
 
     var shouldPlayNotification = false
+    private lateinit var connectivityManager: ConnectivityManager
+
+
+    private val networkCallback = object : ConnectivityManager.NetworkCallback() {
+        override fun onAvailable(network: Network) {
+            startServerSideEvent()
+        }
+
+
+        override fun onLost(network: Network) {
+            eventSource?.close()
+        }
+    }
+
 
     private val messageDao by lazy {
-        PostDatabase.getDatabase(application as MyApplication).messageDao()
+        LocalDatabase.getDatabase(application as MyApplication).messageDao()
     }
 
     private var chatLinks: String? = null
@@ -55,7 +69,11 @@ class MessengerService : Service() {
         }
 
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int = START_STICKY
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.registerDefaultNetworkCallback(networkCallback)
+        return START_STICKY
+    }
 
 
     /**
@@ -71,14 +89,9 @@ class MessengerService : Service() {
     inner class ServiceHandler : Handler() {
         override fun handleMessage(msg: android.os.Message) {
             when (msg.what) {
-                new_chat_link_message -> {
-                    chatLinks = msg.data.getString(key_chats_link)
-                }
-                new_user_id_message -> {
-                    userID = msg.arg1
-                }
+                new_chat_link_message -> chatLinks = msg.data.getString(key_chats_link)
+                new_user_id_message -> userID = msg.arg1
                 play_notification_message -> shouldPlayNotification = true
-
                 stop_notification_message -> shouldPlayNotification = false
             }
         }
@@ -86,7 +99,7 @@ class MessengerService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        eventSource?.closeQuietly()
+        eventSource?.close()
 
     }
 
@@ -110,12 +123,13 @@ class MessengerService : Service() {
                     "message" -> {
                         val messageDTO = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
 
-                        val message = MessageMapper.mapToDomainObject(messageDTO)
+                        val message = messageDTO.toMessage()
                         if (message.sender.userID == userID) {
                             message.seenByCurrentUser = true
                         }
-                        messageDao.insertMessageCurrentThread(message)
-
+                        CoroutineScope(Dispatchers.IO).launch {
+                            messageDao.insertMessage(message)
+                        }
                         if (shouldPlayNotification) {
                             playNotification(message)
                         }
@@ -132,7 +146,7 @@ class MessengerService : Service() {
             val event: EventSource.Builder = EventSource.Builder(
                     getEventHandler(),
                     URI.create(it)
-            ).reconnectTime(Duration.ofMillis(10))
+            ).reconnectTime(Duration.ofMillis(100))
             eventSource = event.build()
             startEvent()
         }
@@ -163,6 +177,6 @@ class MessengerService : Service() {
             notify(message.id, builder.build())
         }
     }
-
 }
+
 

@@ -1,20 +1,20 @@
 package com.example.dataLayer.repositories
 
+import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
-import android.util.Log
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.callSuspend
 
-@Singleton
 class RequestExecutor @Inject constructor(
-        private val connectivityManager: ConnectivityManager,
-        private val coroutineScope: CoroutineScope
+        private val connectivityManager: ConnectivityManager
+
 ) {
 
 
@@ -24,9 +24,10 @@ class RequestExecutor @Inject constructor(
     private val onNetworkAvailableQueue: Queue<NetworkRequest> = LinkedList()
 
     init {
+
         connectivityManager.registerDefaultNetworkCallback(object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
-                coroutineScope.launch {
+                CoroutineScope(Dispatchers.IO).launch {
                     while (uncompletedNetworkRequests.peek() != null) {
                         executeRequest(uncompletedNetworkRequests.poll())
                     }
@@ -55,7 +56,7 @@ class RequestExecutor @Inject constructor(
 
 
     private fun executeRequest(networkRequest: NetworkRequest) {
-        coroutineScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             val param = networkRequest.parameter
             if (param != null) {
                 networkRequest.function.callSuspend(param)

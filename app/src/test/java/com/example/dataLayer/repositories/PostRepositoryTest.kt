@@ -5,7 +5,7 @@ import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
-import com.example.dataLayer.PostDatabase
+import com.example.dataLayer.LocalDatabase
 import com.example.dataLayer.interfaces.dao.RoomPostDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -36,7 +36,7 @@ class PostRepositoryTest {
         //use a cache version of the database
         val db = Room.inMemoryDatabaseBuilder(
                 InstrumentationRegistry.getInstrumentation().targetContext,
-                PostDatabase::class.java
+                LocalDatabase::class.java
         ).build()
 
         postDao = db.postDao()

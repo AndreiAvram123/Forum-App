@@ -6,12 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import com.example.bookapp.R
 import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.dao.UserDao
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class UserAccountManager @Inject constructor(val sharedPreferences: SharedPreferences,
-                                             val context: Context,
+                                             @ApplicationContext private val context: Context,
                                              val userDao: UserDao) {
 
     val user: MutableLiveData<User> by lazy {

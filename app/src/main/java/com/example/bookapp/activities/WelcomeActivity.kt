@@ -8,8 +8,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.example.bookapp.R
-import com.example.bookapp.dagger.AppComponent
-import com.example.bookapp.dagger.DaggerAppComponent
 import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.fragments.LoginFragment
 import com.example.bookapp.user.UserAccountManager
@@ -20,10 +18,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@AndroidEntryPoint
 @InternalCoroutinesApi
 class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
@@ -43,11 +43,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
-        val appComponent: AppComponent = DaggerAppComponent.factory().create(application.applicationContext, viewModelUser.viewModelScope)
-        (application as MyApplication).appComponent = appComponent
 
-        appComponent.inject(this)
-        appComponent.inject(viewModelUser)
 
         userAccountManager.user.observe(this, Observer {
             if (it.userID != 0) {

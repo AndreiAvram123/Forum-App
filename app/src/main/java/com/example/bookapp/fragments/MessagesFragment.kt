@@ -25,27 +25,31 @@ import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.serverConstants.MessageTypes
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
 
 @InternalCoroutinesApi
+@AndroidEntryPoint
 class MessagesFragment : Fragment() {
     private lateinit var binding: MessagesFragmentBinding
     private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
 
+    @Inject
+    lateinit var user: User
+
     private lateinit var messageAdapter: MessageAdapter
     private val args: MessagesFragmentArgs by navArgs()
     private val codeFileExplorer = 10
-    private lateinit var user: User
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = MessagesFragmentBinding.inflate(inflater, container, false)
-        user = viewModelUser.user
 
 
         messageAdapter = MessageAdapter(user, ::expandImage)

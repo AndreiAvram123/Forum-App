@@ -1,5 +1,6 @@
 package com.example.bookapp.viewModels
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,12 +17,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InternalCoroutinesApi
-class ViewModelPost : ViewModel() {
+class ViewModelPost @ViewModelInject constructor(
+        private val postRepository: PostRepository
+) : ViewModel() {
 
-
-    @Inject
-    lateinit var postRepository: PostRepository
-
+    
     fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts
 
 

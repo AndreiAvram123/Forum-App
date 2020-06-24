@@ -1,5 +1,6 @@
 package com.example.bookapp.viewModels
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.bookapp.models.User
 import com.example.bookapp.user.UserAccountManager
@@ -9,17 +10,11 @@ import com.example.dataLayer.repositories.UserRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ViewModelUser : ViewModel() {
+class ViewModelUser @ViewModelInject constructor(
+        private val userAccountManager: UserAccountManager,
+        private val userRepository: UserRepository) : ViewModel() {
 
 
-    @Inject
-    lateinit var userRepository: UserRepository
-
-    @Inject
-    lateinit var user: User
-
-    @Inject
-    lateinit var userAccountManager: UserAccountManager
 
     val searchQuery = MutableLiveData<String>()
 

@@ -1,5 +1,6 @@
 package com.example.bookapp.viewModels
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.bookapp.models.Chat
 import com.example.bookapp.models.Message
@@ -12,10 +13,10 @@ import com.example.dataLayer.repositories.ChatRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class ViewModelChat : ViewModel() {
 
-    @Inject
-    lateinit var chatRepository: ChatRepository
+class ViewModelChat @ViewModelInject constructor(
+        private val chatRepository: ChatRepository
+) : ViewModel() {
 
     val currentChatId: MutableLiveData<Int> = MutableLiveData()
 

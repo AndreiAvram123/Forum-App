@@ -17,7 +17,6 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.bookapp.R
-import com.example.bookapp.dagger.DaggerAppComponent
 import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.databinding.DrawerHeaderBinding
 import com.example.bookapp.databinding.LayoutMainActivityBinding
@@ -27,11 +26,14 @@ import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelComments
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
 @InternalCoroutinesApi
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
@@ -39,10 +41,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var userAccountManager: UserAccountManager
 
 
-    private val viewModelPost: ViewModelPost by viewModels()
-    private val viewModelUser: ViewModelUser by viewModels()
     private val viewModelChat: ViewModelChat by viewModels()
-    private val viewModelComment: ViewModelComments by viewModels()
     private var mBound: Boolean = false
     private lateinit var serviceMessenger: Messenger
     private lateinit var binding: LayoutMainActivityBinding
@@ -145,19 +144,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startDagger() {
-        (application as MyApplication).appComponent = DaggerAppComponent.factory().create((application as MyApplication)
-                , viewModelPost.viewModelScope)
-
-        val appComponent = (application as MyApplication).appComponent
-
-
-        appComponent.inject(this)
+//        (application as MyApplication).appComponent = DaggerAppComponent.factory().create((application as MyApplication)
+//                , viewModelPost.viewModelScope)
+//
+//        val appComponent = (application as MyApplication).appComponent
 
 
-        appComponent.inject(viewModelPost)
-        appComponent.inject(viewModelUser)
-        appComponent.inject(viewModelChat)
-        appComponent.inject(viewModelComment)
+
+//        appComponent.inject(viewModelPost)
+//        appComponent.inject(viewModelUser)
+//        appComponent.inject(viewModelChat)
+//        appComponent.inject(viewModelComment)
 
 
     }

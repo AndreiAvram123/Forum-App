@@ -8,10 +8,12 @@ import com.example.bookapp.R
 import com.example.bookapp.activities.WelcomeActivity
 import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.user.UserAccountManager
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
 @InternalCoroutinesApi
+@AndroidEntryPoint
 class SettingsFragment : PreferenceFragmentCompat() {
 
     @Inject
@@ -33,8 +35,4 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        (requireActivity().application as MyApplication).appComponent.inject(this)
-    }
 }
