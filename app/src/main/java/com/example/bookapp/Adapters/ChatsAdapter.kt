@@ -2,15 +2,12 @@ package com.example.bookapp.Adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bookapp.R
 import com.example.bookapp.databinding.ItemChatBinding
-import com.example.bookapp.fragments.FriendsFragmentDirections
+import com.example.bookapp.fragments.SocialFragmentDirections
 import com.example.bookapp.models.Chat
-import com.example.dataLayer.models.ChatNotificationDTO
 
 class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
     private var chats: ArrayList<Chat> = ArrayList()
@@ -59,7 +56,7 @@ class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
                         notifyItemChanged(chats.indexOf(it))
                     }
                 }
-                val action: NavDirections = FriendsFragmentDirections.actionGlobalMessagesFragment(chat.chatID)
+                val action: NavDirections = SocialFragmentDirections.actionGlobalMessagesFragment(chat.chatID)
                 Navigation.findNavController(binding.root).navigate(action)
             }
         }

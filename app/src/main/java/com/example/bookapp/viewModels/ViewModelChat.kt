@@ -5,24 +5,19 @@ import androidx.lifecycle.*
 import com.example.bookapp.models.Chat
 import com.example.bookapp.models.Message
 import com.example.bookapp.models.User
-import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.repositories.ChatRepository
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 
 class ViewModelChat @ViewModelInject constructor(
-        private val chatRepository: ChatRepository
-) : ViewModel() {
+        private val chatRepository: ChatRepository,
+        private val user: User
+        ) : ViewModel() {
 
     val currentChatId: MutableLiveData<Int> = MutableLiveData()
-
-    @Inject
-    lateinit var user: User
-
 
     val lastMessageChats: LiveData<List<Int>> by lazy {
         chatRepository.lastChatsMessage
