@@ -4,9 +4,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.*
-import android.os.Build
-import android.os.Bundle
-import android.os.IBinder
+import android.os.*
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -18,33 +17,33 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.bookapp.R
-import com.example.bookapp.dagger.DaggerAppComponent
 import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.databinding.DrawerHeaderBinding
 import com.example.bookapp.databinding.LayoutMainActivityBinding
-import com.example.bookapp.services.MessengerService
+import com.example.bookapp.services.*
 import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelComments
 import com.example.bookapp.viewModels.ViewModelPost
 import com.example.bookapp.viewModels.ViewModelUser
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
 @InternalCoroutinesApi
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
+
     @Inject
     lateinit var sharedPreferences: SharedPreferences
 
     @Inject
     lateinit var userAccountManager: UserAccountManager
 
-    private val viewModelPost: ViewModelPost by viewModels()
-    private val viewModelUser: ViewModelUser by viewModels()
+
     private val viewModelChat: ViewModelChat by viewModels()
-    private val viewModelComment: ViewModelComments by viewModels()
     private var mBound: Boolean = false
-    private lateinit var mService: MessengerService
+    private lateinit var serviceMessenger: Messenger
     private lateinit var binding: LayoutMainActivityBinding
 
     /** Defines callbacks for service binding, passed to bindService()  */
@@ -52,16 +51,19 @@ class MainActivity : AppCompatActivity() {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            val binder = service as MessengerService.LocalBinder
-            mService = binder.getService()
-            (application as MyApplication).appComponent.inject(mService)
             mBound = true
-            mService.pendingIntent = getPendingIntent()
-            mService.shouldPlayNotification = false
+            serviceMessenger = Messenger(service)
+            stopNotificationSound()
 
+            userAccountManager.user.value?.let {
+                val userIDMessage = Message.obtain(null, new_user_id_message, it.userID, 0)
+                serviceMessenger.send(userIDMessage)
+            }
             viewModelChat.chatLink.observe(this@MainActivity, Observer {
-                it?.let {
-                    mService.chatLinks = it
+                it?.let { link ->
+                    val message = Message.obtain(null, new_chat_link_message)
+                    Bundle().apply { putString(key_chats_link, link) }.also { bundle -> message.data = bundle }
+                    serviceMessenger.send(message)
                 }
             })
         }
@@ -92,10 +94,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        mBound = false
+        if (mBound) {
+            playNotificationOnNewMessage()
+            unbindService(connection)
+            mBound = false
+        }
+    }
 
-        if (this::mService.isInitialized) {
-            mService.shouldPlayNotification = true
+    private fun playNotificationOnNewMessage() {
+        val playNotification = Message.obtain(null, play_notification_message, 0, 0)
+        serviceMessenger.send(playNotification)
+
+    }
+
+    private fun stopNotificationSound() {
+        if (mBound) {
+            val stopNotification = Message.obtain(null, stop_notification_message, 0, 0)
+            serviceMessenger.send(stopNotification)
         }
     }
 
@@ -125,20 +140,21 @@ class MainActivity : AppCompatActivity() {
         createMessageNotificationChannel()
         startMessengerService()
         bindToMessengerService()
+        stopNotificationSound()
     }
 
     private fun startDagger() {
-        (application as MyApplication).appComponent = DaggerAppComponent.factory().create(applicationContext, viewModelPost.viewModelScope)
-        val appComponent = (application as MyApplication).appComponent
+//        (application as MyApplication).appComponent = DaggerAppComponent.factory().create((application as MyApplication)
+//                , viewModelPost.viewModelScope)
+//
+//        val appComponent = (application as MyApplication).appComponent
 
 
-        appComponent.inject(this)
 
-
-        appComponent.inject(viewModelPost)
-        appComponent.inject(viewModelUser)
-        appComponent.inject(viewModelChat)
-        appComponent.inject(viewModelComment)
+//        appComponent.inject(viewModelPost)
+//        appComponent.inject(viewModelUser)
+//        appComponent.inject(viewModelChat)
+//        appComponent.inject(viewModelComment)
 
 
     }

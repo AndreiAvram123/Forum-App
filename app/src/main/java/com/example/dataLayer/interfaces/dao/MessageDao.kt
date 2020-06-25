@@ -16,9 +16,6 @@ interface MessageDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMessage(message: Message)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertMessageCurrentThread(message: Message)
-
     @Query("SELECT * FROM message WHERE chatID = :chatID ORDER BY date DESC LIMIT 1")
     fun getLastMessage(chatID: Int): LiveData<Message>
 

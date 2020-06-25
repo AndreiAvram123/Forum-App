@@ -12,10 +12,8 @@ import android.util.DisplayMetrics
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
-fun Activity.getScreenWidth(): Int {
-    val displayMetrics = DisplayMetrics()
-    this.windowManager.defaultDisplay.getMetrics(displayMetrics)
-    return displayMetrics.widthPixels
+fun Context.getScreenWidth(): Int {
+    return this.resources.displayMetrics.widthPixels
 }
 
 

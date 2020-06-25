@@ -24,6 +24,7 @@ import com.example.dataLayer.repositories.OperationStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @InternalCoroutinesApi
 class FragmentAddPost : Fragment() {
@@ -31,6 +32,9 @@ class FragmentAddPost : Fragment() {
     private val CODE_FILE_EXPLORER = 10
     private val viewModelPost: ViewModelPost by activityViewModels()
     private val viewModelUser: ViewModelUser by activityViewModels()
+
+    @Inject
+    lateinit var user: User
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -51,7 +55,7 @@ class FragmentAddPost : Fragment() {
             if (areFieldsValid()) {
 
                 toggleUi()
-                uploadPost(viewModelUser.user)
+                uploadPost(user)
             } else {
                 displayError()
             }
@@ -110,20 +114,20 @@ class FragmentAddPost : Fragment() {
 
         if (drawable != null) {
 
-                lifecycleScope.launch(Dispatchers.Main) {
+            lifecycleScope.launch(Dispatchers.Main) {
 
-                    pushImage(drawable.toBase64()).observe(viewLifecycleOwner, Observer {
-                        if (!it.isNullOrEmpty()) {
-                            val post = SerializePost(
-                                    title = binding.postTitleAdd.text.toString(),
-                                    content = binding.postContentAdd.text.toString(),
-                                    userID = user.userID,
-                                    image = it
-                            )
-                            pushPost(post)
-                        }
-                    })
-                }
+                pushImage(drawable.toBase64()).observe(viewLifecycleOwner, Observer {
+                    if (!it.isNullOrEmpty()) {
+                        val post = SerializePost(
+                                title = binding.postTitleAdd.text.toString(),
+                                content = binding.postContentAdd.text.toString(),
+                                userID = user.userID,
+                                image = it
+                        )
+                        pushPost(post)
+                    }
+                })
+            }
 
         }
     }

@@ -19,7 +19,8 @@
         tools:ignore="GoogleAppIndexingWarning">
 
 
-        <service android:name=".services.MessengerService" />
+        <service android:name=".services.MessengerService"
+                 android:process=":messengerProcess"/>
 
         <activity android:name=".activities.WelcomeActivity">
             <intent-filter>

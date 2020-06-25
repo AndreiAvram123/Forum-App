@@ -18,21 +18,14 @@ import javax.inject.Inject
 @InternalCoroutinesApi
 class CommentsRepository @Inject constructor(private val connectivityManager: ConnectivityManager,
                                              private val commentDao: RoomCommentDao,
-                                             private val coroutineScope: CoroutineScope,
                                              private val repo: CommentRepoInterface) {
 
 
-    //maybe have a dictionary
-    private val currentlyFetchedComments: HashMap<Post, LiveData<PostWithComments>> = HashMap()
-
-    fun getCommentsForPost(post: Post): LiveData<PostWithComments> {
-        currentlyFetchedComments[post] = commentDao.getAllPostComments(post.id)
+    fun getCommentsForPost(post: Post): LiveData<PostWithComments> = liveData {
+        emitSource(commentDao.getAllPostComments(post.id))
         if (connectivityManager.activeNetwork != null) {
-            coroutineScope.launch {
-                fetchCommentsForPost(post)
-            }
+            fetchCommentsForPost(post)
         }
-        return currentlyFetchedComments[post]!!
     }
 
 

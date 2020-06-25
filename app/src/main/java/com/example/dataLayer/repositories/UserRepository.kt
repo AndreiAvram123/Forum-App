@@ -21,7 +21,7 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
         try {
             val fetchedUser = repo.fetchGoogleUser(idToken, displayName, email)
             if (fetchedUser.userID == 0) {
-                createGoogleAccount(idToken, displayName, email)
+                emit(createGoogleAccount(idToken, displayName, email))
             } else {
                 emit(UserMapper.mapToDomainObject(fetchedUser))
             }
@@ -30,16 +30,14 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
         }
     }
 
-    private suspend fun createGoogleAccount(idToken: String, displayName: String, email: String): LiveData<User> {
-        val liveData = MutableLiveData<User>()
-        try {
+    private suspend fun createGoogleAccount(idToken: String, displayName: String, email: String): User {
+        return try {
             val newUser = repo.createGoogleAccount(idToken, displayName, email)
-            liveData.postValue(UserMapper.mapToDomainObject(newUser))
-
+            UserMapper.mapToDomainObject(newUser)
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
+            createGoogleAccount(idToken,displayName,email)
         }
-        return liveData
     }
 
     fun fetchSearchSuggestions(query: String) = liveData {

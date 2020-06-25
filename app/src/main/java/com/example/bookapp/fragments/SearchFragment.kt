@@ -20,14 +20,20 @@ import com.example.bookapp.models.User
 import com.example.bookapp.viewModels.ViewModelChat
 import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
+import javax.inject.Inject
 
 @InternalCoroutinesApi
+@AndroidEntryPoint
 class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
     private val suggestionsAdapter: SuggestionsAdapter = SuggestionsAdapter(this)
     private lateinit var binding: FragmentSearchBinding;
     private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
+
+    @Inject
+    lateinit var user: User
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -87,7 +93,7 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
     }
 
     override fun sendFriendRequest(receiver: User) {
-        val friendRequest = SerializeFriendRequest(senderID = viewModelUser.user.userID, receiverID = receiver.userID)
+        val friendRequest = SerializeFriendRequest(senderID = user.userID, receiverID = receiver.userID)
         viewModelChat.sendFriendRequest(friendRequest)
     }
 }

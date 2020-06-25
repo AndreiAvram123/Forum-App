@@ -11,7 +11,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 
 @Database(entities = [Post::class, Comment::class, User::class, UserWithFavoritePostsCrossRef::class, Message::class, Chat::class], version = 16, exportSchema = false)
-abstract class PostDatabase : RoomDatabase() {
+abstract class LocalDatabase : RoomDatabase() {
     abstract fun postDao(): RoomPostDao
     abstract fun commentDao(): RoomCommentDao
     abstract fun userDao(): UserDao
@@ -20,18 +20,20 @@ abstract class PostDatabase : RoomDatabase() {
 
     companion object {
         @Volatile
-        private var INSTANCE: PostDatabase? = null
+        private var INSTANCE: LocalDatabase? = null
 
         @InternalCoroutinesApi
-        fun getDatabase(context: Context): PostDatabase {
+        fun getDatabase(application: Context): LocalDatabase {
             val tempInstance = INSTANCE;
             if (tempInstance != null) {
                 return tempInstance
             }
             synchronized(this) {
-                val instance = Room.databaseBuilder(context.applicationContext,
-                        PostDatabase::class.java,
-                        "database").fallbackToDestructiveMigration().build()
+                val instance = Room.databaseBuilder(application,
+                        LocalDatabase::class.java,
+                        "database").fallbackToDestructiveMigration()
+                        .enableMultiInstanceInvalidation()
+                        .build()
                 INSTANCE = instance
                 return instance
             }

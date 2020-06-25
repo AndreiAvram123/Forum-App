@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import com.example.bookapp.databinding.FragmentFriendsBinding
 import com.google.android.material.tabs.TabLayoutMediator
 
-class FriendsFragment : Fragment() {
+class SocialFragment : Fragment() {
 
     private lateinit var binding: FragmentFriendsBinding
 

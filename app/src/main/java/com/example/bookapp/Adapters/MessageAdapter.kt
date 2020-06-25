@@ -53,7 +53,7 @@ class MessageAdapter(private val currentUser: User,
                     binding.messageImage.alpha = 0.5f
                 }
             }
-            binding.halfScreenWidth = (binding.root.context as Activity).getScreenWidth()
+            binding.halfScreenWidth = binding.root.context.getScreenWidth()/2
 
             binding.messageImage.setOnClickListener {
                 expandImage(message)
@@ -64,7 +64,7 @@ class MessageAdapter(private val currentUser: User,
     inner class MessageImageReceivedViewHolder(val binding: MessageImageReceivedBinding) : ViewHolder(binding.root) {
         override fun bind(message: Message) {
             binding.message = message
-            binding.halfScreenWidth = (binding.root.context as Activity).getScreenWidth()
+            binding.halfScreenWidth = binding.root.context.getScreenWidth()
 
             binding.messageImage.setOnClickListener {
                 expandImage(message)

@@ -1,8 +1,10 @@
 package com.example.bookapp.viewModels
 
 import android.app.Application
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import com.example.bookapp.models.Post
 import com.example.dataLayer.models.PostWithComments
 import com.example.dataLayer.models.serialization.SerializeComment
@@ -11,10 +13,10 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
 @InternalCoroutinesApi
-class ViewModelComments(application: Application) : AndroidViewModel(application) {
+class ViewModelComments @ViewModelInject constructor(
+        private val commentsRepository: CommentsRepository
+) : ViewModel() {
 
-    @Inject
-    lateinit var commentsRepository: CommentsRepository
 
 
     fun uploadComment(comment: SerializeComment): LiveData<OperationStatus> = commentsRepository.uploadComment(comment)
