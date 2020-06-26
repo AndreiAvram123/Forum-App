@@ -5,10 +5,7 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewModelScope
 import com.example.bookapp.R
-import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.fragments.LoginFragment
 import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelUser
@@ -20,8 +17,9 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+const val requestCodeGoogleSignIn = 1
 
 @AndroidEntryPoint
 @InternalCoroutinesApi
@@ -29,8 +27,6 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
     private var googleSignInAccount: GoogleSignInAccount? = null
     private val viewModelUser: ViewModelUser by viewModels()
-
-    private val requestCodeGoogleSignIn = 1
 
 
     @Inject
@@ -63,14 +59,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
                 // Google Sign In was successful, authenticate with Firebase
                 googleSignInAccount = task.getResult(ApiException::class.java)
                 googleSignInAccount?.let {
-                    viewModelUser.loginWithGoogle(it.id!!, it.displayName!!, it.email!!).observe(this, Observer { user ->
-                        if (user != null) {
-                            lifecycleScope.launch {
-                                userAccountManager.saveUserInMemory(user)
-                                runOnUiThread { startMainActivity() }
-                            }
-                        }
-                    })
+                    viewModelUser.loginWithGoogle(it.id!!, it.displayName!!, it.email!!)
                 }
 
             } catch (e: ApiException) {

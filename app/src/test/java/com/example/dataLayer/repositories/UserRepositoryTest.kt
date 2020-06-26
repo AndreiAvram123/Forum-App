@@ -17,11 +17,16 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun shouldReturnUserOnSuccessfulLogin() = runBlocking {
-        val username = "lala"
-        val password = "cactus"
-        val user = repo.login(username, password)
-        assert(user.userID != 0)
+    fun shouldLoginWithGoogleToken() = runBlocking {
+        val token = "104971103964321040701"
+        val response = repo.fetchGoogleUser(token)
+        assert(response.userDTO !=null)
 
+    }
+    @Test
+    fun shouldReturnNotNullSearchSuggestions()= runBlocking {
+        val query = "av"
+        val fetchedData = repo.fetchSuggestions(query)
+        assertNotNull(fetchedData)
     }
 }

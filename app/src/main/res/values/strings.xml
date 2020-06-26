@@ -81,8 +81,7 @@
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="account_header">Account</string>
     <string name="account_created">We have created your account, go to login screen now</string>
-
-
+    <string name="key_token">KEY_TOKEN</string>
 
 
 </resources>

@@ -43,7 +43,7 @@ class FavoritePostsFragmentTest {
     fun shouldFavoritePostsNotIncludeRemovedPost() {
         runBlocking {
             //add a post to favorites that we know it exists
-            val postID = 2236
+            val postID = 1108
             postRepo.addPostToFavorites(postID, userID)
             //remove the post
             val serverResponse = postRepo.removePostFromFavorites(postID = postID, userID = userID)

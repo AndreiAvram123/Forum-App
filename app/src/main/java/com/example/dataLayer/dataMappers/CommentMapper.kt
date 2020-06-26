@@ -1,7 +1,7 @@
 package com.example.dataLayer.dataMappers
 
 import com.example.bookapp.models.Comment
-import com.example.dataLayer.dataObjectsToSerialize.CommentDTO
+import com.example.dataLayer.models.serialization.CommentDTO
 
 object CommentMapper {
 

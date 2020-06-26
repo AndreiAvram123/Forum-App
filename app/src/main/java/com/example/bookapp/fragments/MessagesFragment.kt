@@ -21,7 +21,6 @@ import com.example.bookapp.models.User
 import com.example.bookapp.toBase64
 import com.example.bookapp.toDrawable
 import com.example.bookapp.viewModels.ViewModelChat
-import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.serverConstants.MessageTypes
@@ -37,7 +36,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MessagesFragment : Fragment() {
     private lateinit var binding: MessagesFragmentBinding
-    private val viewModelUser: ViewModelUser by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
 
     @Inject
@@ -134,7 +132,6 @@ class MessagesFragment : Fragment() {
                 val path = it.data
                 if (path != null) {
                     pushImage(path)
-
                 }
             }
         }

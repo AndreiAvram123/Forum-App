@@ -19,18 +19,12 @@ class LoginFragment : Fragment() {
     private lateinit var binding: LayoutLoginBinding
     private val viewModelUser: ViewModelUser by activityViewModels()
     private lateinit var fragmentCallback: FragmentCallback
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = LayoutLoginBinding.inflate(inflater, container, false)
 
         fragmentCallback = requireActivity() as FragmentCallback
         initializeUI()
-        viewModelUser.loginResult.observe(viewLifecycleOwner, Observer {
-
-            if (it == OperationStatus.FAILED) {
-
-                displayErrorMessage("Invalid credentials")
-            }
-        })
         return binding.root
 
     }
@@ -40,7 +34,12 @@ class LoginFragment : Fragment() {
         val username = binding.username.text.trim().toString()
         val password = binding.password.text.trim().toString()
         if (areLoginDetailsValid(username, password)) {
-            viewModelUser.login(username, password)
+            viewModelUser.login(username, password).observe(viewLifecycleOwner, Observer {
+                if (it == OperationStatus.FAILED) {
+
+                    displayErrorMessage("Invalid credentials")
+                }
+            })
         }
     }
 
@@ -57,7 +56,6 @@ class LoginFragment : Fragment() {
             fragmentCallback.loginWithGoogle()
         }
     }
-
 
     private fun areLoginDetailsValid(email: String, password: String): Boolean {
         if (email.isEmpty()) {
