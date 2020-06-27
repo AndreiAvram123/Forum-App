@@ -1,10 +1,7 @@
 package com.example.bookapp.bindingAdapters
 
-import android.graphics.Color
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.github.chrisbanes.photoview.PhotoView

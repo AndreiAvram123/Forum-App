@@ -16,9 +16,7 @@ import com.example.dataLayer.models.ChatNotificationDTO
 import com.example.dataLayer.models.deserialization.FriendRequest
 import com.example.dataLayer.models.serialization.SerializeFriendRequest
 import com.example.dataLayer.models.serialization.SerializeMessage
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @Suppress("MemberVisibilityCanBePrivate")
 
@@ -50,12 +48,10 @@ class ChatRepository @Inject constructor(
         MutableLiveData<String?>()
     }.also {
         requestExecutor.add(this::fetchChatsLink, null)
-        requestExecutor.add(this::fetchNotificationLink, null)
-
     }
 
-    val lastChatsMessage: LiveData<List<Int>> by lazy {
-        chatDao.getLastChatsMessage()
+    val unseenMessages: LiveData<List<Int>> by lazy {
+        chatDao.getLastChatsMessage(user.userID)
     }.also {
         requestExecutor.add(this::fetchLastChatsMessage, null)
     }

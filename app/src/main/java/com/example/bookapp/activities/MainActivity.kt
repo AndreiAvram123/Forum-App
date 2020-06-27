@@ -5,27 +5,21 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.*
 import android.os.*
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.example.bookapp.R
-import com.example.bookapp.dagger.MyApplication
 import com.example.bookapp.databinding.DrawerHeaderBinding
 import com.example.bookapp.databinding.LayoutMainActivityBinding
 import com.example.bookapp.services.*
 import com.example.bookapp.user.UserAccountManager
 import com.example.bookapp.viewModels.ViewModelChat
-import com.example.bookapp.viewModels.ViewModelComments
-import com.example.bookapp.viewModels.ViewModelPost
-import com.example.bookapp.viewModels.ViewModelUser
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
@@ -192,7 +186,7 @@ class MainActivity : AppCompatActivity() {
         val chatBadge = binding.bottomNavigation.getOrCreateBadge(
                 R.id.friends
         )
-        viewModelChat.lastMessageChats.observe(this, Observer {
+        viewModelChat.unseenMessages.observe(this, Observer {
             if (it.isNotEmpty()) {
                 chatBadge.number = it.size
                 chatBadge.isVisible = true

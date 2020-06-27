@@ -1,12 +1,12 @@
 package com.example.bookapp.models
 
-import androidx.room.ColumnInfo
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import android.net.Uri
+import androidx.room.*
+import com.example.dataLayer.repositories.OperationStatus
+import java.util.*
 
 @Entity(tableName = "message")
-open class Message(
+data class Message(
         @PrimaryKey
         @ColumnInfo(name = "id")
         val id: Int,
@@ -24,35 +24,19 @@ open class Message(
         var seenByCurrentUser: Boolean = false,
         @ColumnInfo(name = "localID")
         val localID: String?
-){
-        //todo
-        //have local path here
-        //todo
-        //nopeeeeeeeeeeeeeeeeeee
-        override fun equals(other: Any?): Boolean {
-                if (this === other) return true
-                if (javaClass != other?.javaClass) return false
+) {
+    @Ignore
+    var resourcePath: Uri? = null
 
-                other as Message
+    @Ignore
+    var operationStatus: OperationStatus = OperationStatus.FINISHED
 
-                if (id != other.id) return false
-                if (content != other.content) return false
-                if (date != other.date) return false
-                if (sender != other.sender) return false
-                if (type != other.type) return false
-                if (chatID != other.chatID) return false
 
-                return true
+    companion object {
+        fun getMediaMessage(sender: User, type: String, chatID: Int, localId: String, path: Uri) = Message(id = -1, content = "", date = Calendar.getInstance().timeInMillis / 1000,
+                sender = sender, type = type, chatID = chatID, seenByCurrentUser = true, localID = localId).apply {
+            operationStatus = OperationStatus.ONGOING
+            resourcePath = path
         }
-
-        override fun hashCode(): Int {
-                var result = id
-                result = 31 * result + content.hashCode()
-                result = 31 * result + date.hashCode()
-                result = 31 * result + sender.hashCode()
-                result = 31 * result + type.hashCode()
-                result = 31 * result + chatID
-                result = 31 * result + (localID?.hashCode() ?: 0)
-                return result
-        }
+    }
 }

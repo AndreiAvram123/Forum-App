@@ -9,7 +9,6 @@ import com.example.bookapp.databinding.MessageImageSentBinding
 import com.example.bookapp.databinding.MessageReceivedBinding
 import com.example.bookapp.databinding.MessageSentBinding
 import com.example.bookapp.getScreenWidth
-import com.example.bookapp.models.LocalImageMessage
 import com.example.bookapp.models.Message
 import com.example.bookapp.models.User
 import com.example.dataLayer.repositories.OperationStatus
@@ -43,14 +42,12 @@ class MessageAdapter(private val currentUser: User,
 
         override fun bind(message: Message) {
             binding.message = message
-            if (message is LocalImageMessage) {
-                binding.messageImage.setImageURI(message.resourcePath)
 
-                if (message.currentStatus == OperationStatus.ONGOING) {
-                    binding.messageImage.alpha = 0.5f
-                }
+            if (message.operationStatus == OperationStatus.ONGOING) {
+                binding.messageImage.setImageURI(message.resourcePath)
+                binding.messageImage.alpha = 0.5f
             }
-            binding.halfScreenWidth = binding.root.context.getScreenWidth()/2
+            binding.halfScreenWidth = binding.root.context.getScreenWidth() / 2
 
             binding.messageImage.setOnClickListener {
                 expandImage(message)
@@ -74,11 +71,11 @@ class MessageAdapter(private val currentUser: User,
     }
 
     fun expandImage(message: Message) {
-        if (message is LocalImageMessage) {
-            expand(message.resourcePath.toString(), true)
-        } else {
-            expand(message.content, false)
-        }
+//        if (message is LocalImageMessage) {
+//            expand(message.resourcePath.toString(), true)
+//        } else {
+//            expand(message.content, false)
+//        }
     }
 
 
@@ -123,18 +120,17 @@ class MessageAdapter(private val currentUser: User,
 
     fun add(message: Message) {
         messages.find {
-            it is LocalImageMessage
-                    && it.localID == message.localID
+            it.localID != null && it.localID == message.localID
         }.also {
             if (it == null) {
                 messages.add(message)
                 notifyItemInserted(messages.size - 1)
                 scrollToLast()
             } else {
-                if (it is LocalImageMessage) {
-                    it.currentStatus = OperationStatus.FINISHED
-                    notifyItemChanged(messages.indexOf(it))
-                }
+                val index = messages.indexOf(it)
+                messages[index] = message
+                notifyItemChanged(index)
+
             }
         }
 

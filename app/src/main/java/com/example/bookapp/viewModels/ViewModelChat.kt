@@ -19,8 +19,8 @@ class ViewModelChat @ViewModelInject constructor(
 
     val currentChatId: MutableLiveData<Int> = MutableLiveData()
 
-    val lastMessageChats: LiveData<List<Int>> by lazy {
-        chatRepository.lastChatsMessage
+    val unseenMessages: LiveData<List<Int>> by lazy {
+        chatRepository.unseenMessages
     }
 
 

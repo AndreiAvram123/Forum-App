@@ -4,18 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.ChatsAdapter
-import com.example.bookapp.R
 import com.example.bookapp.databinding.LayoutFragmentChatsBinding
 import com.example.bookapp.viewModels.ViewModelChat
-import com.example.bookapp.viewModels.ViewModelUser
-import kotlinx.coroutines.InternalCoroutinesApi
 
 class ChatsFragment : Fragment() {
     private val viewModelChat: ViewModelChat by activityViewModels()
@@ -33,11 +29,11 @@ class ChatsFragment : Fragment() {
         configureRecyclerView()
         viewModelChat.userChats.observe(viewLifecycleOwner, Observer {
             chatsAdapter.setData(it)
-            viewModelChat.lastMessageChats.value?.let {ids->
+            viewModelChat.unseenMessages.value?.let { ids->
                 chatsAdapter.showNotifications(ids)
             }
         })
-        viewModelChat.lastMessageChats.observe(viewLifecycleOwner, Observer {
+        viewModelChat.unseenMessages.observe(viewLifecycleOwner, Observer {
             chatsAdapter.showNotifications(it)
         })
 

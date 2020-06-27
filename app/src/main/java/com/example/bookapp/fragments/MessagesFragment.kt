@@ -1,6 +1,7 @@
 package com.example.bookapp.fragments
 
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -15,15 +16,16 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bookapp.Adapters.CustomDivider
 import com.example.bookapp.Adapters.MessageAdapter
+import com.example.bookapp.R
 import com.example.bookapp.databinding.MessagesFragmentBinding
-import com.example.bookapp.models.LocalImageMessage
+import com.example.bookapp.models.Message
 import com.example.bookapp.models.User
 import com.example.bookapp.toBase64
 import com.example.bookapp.toDrawable
 import com.example.bookapp.viewModels.ViewModelChat
-import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.serverConstants.MessageTypes
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -40,6 +42,9 @@ class MessagesFragment : Fragment() {
 
     @Inject
     lateinit var user: User
+
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
 
     private lateinit var messageAdapter: MessageAdapter
     private val args: MessagesFragmentArgs by navArgs()
@@ -62,6 +67,7 @@ class MessagesFragment : Fragment() {
             if (it.isNotEmpty() && it.first().chatID == args.chatID) {
                 val ordered = it.reversed()
                 messageAdapter.setData(ordered)
+
                 if (!ordered.last().seenByCurrentUser) {
                     viewModelChat.markMessageAsSeen(ordered.last(), user)
                 }
@@ -89,10 +95,18 @@ class MessagesFragment : Fragment() {
     private fun configureViews() {
         configureRecyclerView()
         binding.sendButton.setOnClickListener {
-            sendTextMessage()
+            if(connectivityManager.activeNetwork!=null) {
+                sendTextMessage()
+            }else{
+                Snackbar.make(binding.root,getString(R.string.no_internet_connection),Snackbar.LENGTH_LONG)
+            }
         }
         binding.sendImageButton.setOnClickListener {
-            startFileExplorer()
+            if(connectivityManager.activeNetwork!=null) {
+                startFileExplorer()
+            }else{
+                Snackbar.make(binding.root,getString(R.string.no_internet_connection),Snackbar.LENGTH_LONG)
+            }
         }
     }
 
@@ -154,13 +168,10 @@ class MessagesFragment : Fragment() {
                 )
                 viewModelChat.sendMessage(message)
 
-                val localImageMessage = LocalImageMessage(
-                        sender = UserMapper.mapDomainToNetworkObject(user),
-                        type = MessageTypes.imageMessageType,
-                        localID = uniqueID,
-                        resourcePath = path
-                )
-                messageAdapter.add(localImageMessage)
+                val mediaMessage = Message.getMediaMessage(
+                        sender = user, type = MessageTypes.imageMessageType, chatID = args.chatID, localId = uniqueID,path = path)
+
+                messageAdapter.add(mediaMessage)
             }
         }
     }

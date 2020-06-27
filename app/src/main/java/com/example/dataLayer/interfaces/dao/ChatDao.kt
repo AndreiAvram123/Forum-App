@@ -19,7 +19,7 @@ interface ChatDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(chat: Chat)
 
-    @Query("SELECT DISTINCT chatID FROM message GROUP BY chatID HAVING seenBy = 0 ORDER BY id DESC ")
-    fun getLastChatsMessage(): LiveData<List<Int>>
+    @Query("SELECT DISTINCT chatID FROM message WHERE userId != :userID  GROUP BY chatID HAVING seenBy = 0 ORDER BY id DESC ")
+    fun getLastChatsMessage(userID: Int): LiveData<List<Int>>
 
 }

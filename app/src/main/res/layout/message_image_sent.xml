@@ -5,8 +5,8 @@
 
     <data>
 
-        <import type="com.example.bookapp.models.LocalImageMessage" />
-        <import type="com.example.dataLayer.repositories.OperationStatus"/>
+        <import type="com.example.dataLayer.repositories.OperationStatus" />
+
         <variable
             name="message"
             type="com.example.bookapp.models.Message" />
@@ -30,7 +30,7 @@
             android:layout_marginBottom="8dp"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
-            app:imageFromURL="@{message instanceof LocalImageMessage ? `` : (message.content + `?width=` + halfScreenWidth) }"
+            app:imageFromURL="@{message.operationStatus == OperationStatus.FINISHED ? (message.content + `?width=` + halfScreenWidth): `` }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
