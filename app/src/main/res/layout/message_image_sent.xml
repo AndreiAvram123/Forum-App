@@ -30,7 +30,6 @@
             android:layout_marginBottom="8dp"
             android:adjustViewBounds="true"
             android:cropToPadding="true"
-            android:scaleType="centerInside"
             app:imageFromURL="@{message instanceof LocalImageMessage ? `` : (message.content + `?width=` + halfScreenWidth) }"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

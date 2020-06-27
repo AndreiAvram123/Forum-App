@@ -1,6 +1,5 @@
 package com.example.bookapp.Adapters
 
-import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +12,6 @@ import com.example.bookapp.getScreenWidth
 import com.example.bookapp.models.LocalImageMessage
 import com.example.bookapp.models.Message
 import com.example.bookapp.models.User
-import com.example.bookapp.toDrawable
 import com.example.dataLayer.repositories.OperationStatus
 import com.example.dataLayer.serverConstants.MessageTypes
 
@@ -46,8 +44,7 @@ class MessageAdapter(private val currentUser: User,
         override fun bind(message: Message) {
             binding.message = message
             if (message is LocalImageMessage) {
-                val drawable = message.resourcePath.toDrawable(binding.root.context)
-                binding.messageImage.setImageDrawable(drawable)
+                binding.messageImage.setImageURI(message.resourcePath)
 
                 if (message.currentStatus == OperationStatus.ONGOING) {
                     binding.messageImage.alpha = 0.5f
