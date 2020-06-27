@@ -9,26 +9,35 @@ import com.example.bookapp.models.User
 import com.example.dataLayer.LocalDatabase
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.dao.RoomPostDao
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import javax.inject.Inject
 
 
 @InternalCoroutinesApi
-@Config(sdk = [Build.VERSION_CODES.O_MR1])
+@Config(sdk = [Build.VERSION_CODES.O_MR1], application = HiltTestApplication::class)
 @RunWith(RobolectricTestRunner::class)
-
-
+@HiltAndroidTest
 class PostRepositoryTest {
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
 
     private lateinit var postDao: RoomPostDao
 
-    private val repo: PostRepositoryInterface = TestUtilities.retrofit.create(PostRepositoryInterface::class.java)
+    @Inject
+    private val repo: PostRepositoryInterface
+            = TestUtilities.retrofit.create(PostRepositoryInterface::class.java)
 
     private val user = User(userID = 109, username = "andrei", email = "andrei@yahoo.com", profilePicture = "sdfs")
     private val testPost = Post.buildTestPost()

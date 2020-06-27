@@ -7,7 +7,9 @@ apply plugin: 'dagger.hilt.android.plugin'
 
 android {
 
-
+    hilt {
+        enableTransformForLocalTests = true
+    }
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
 
@@ -25,7 +27,7 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.example.bookapp.CustomTestRunner"
     }
     testOptions {
         unitTests {
@@ -56,9 +58,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    hilt {
-        enableTransformForLocalTests = true
-    }
+
 }
 
 

@@ -1,4 +1,4 @@
-package com.example.bookapp.viewModels
+package com.example.bookapp
 
 import com.example.TestUtilities
 import com.example.dataLayer.interfaces.CommentRepoInterface

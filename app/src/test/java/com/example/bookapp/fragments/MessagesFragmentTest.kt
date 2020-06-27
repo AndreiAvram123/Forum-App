@@ -21,6 +21,7 @@ import java.util.*
 @InternalCoroutinesApi
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
+
 class MessagesFragmentTest {
 
     private val repo = TestUtilities.retrofit.create(ChatRepositoryInterface::class.java)

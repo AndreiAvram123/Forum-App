@@ -22,7 +22,10 @@ import com.google.gson.GsonBuilder
 import com.launchdarkly.eventsource.EventHandler
 import com.launchdarkly.eventsource.EventSource
 import com.launchdarkly.eventsource.MessageEvent
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.net.URI
 import java.time.Duration
@@ -167,11 +170,7 @@ class MessengerService : Service() {
                 .setAutoCancel(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
-        //todo
-        //shuld open activity
-//        pendingIntent?.let {
-//            builder.setContentIntent(it)
-//        }
+
 
         with(NotificationManagerCompat.from(this@MessengerService)) {
             notify(message.id, builder.build())

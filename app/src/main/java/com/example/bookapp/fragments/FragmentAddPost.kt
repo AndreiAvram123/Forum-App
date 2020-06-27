@@ -53,7 +53,6 @@ class FragmentAddPost : Fragment() {
         }
         binding.submitPostButton.setOnClickListener {
             if (areFieldsValid()) {
-
                 toggleUi()
                 uploadPost(user)
             } else {

@@ -71,11 +71,12 @@ class MessageAdapter(private val currentUser: User,
     }
 
     fun expandImage(message: Message) {
-//        if (message is LocalImageMessage) {
-//            expand(message.resourcePath.toString(), true)
-//        } else {
-//            expand(message.content, false)
-//        }
+        if(message.operationStatus == OperationStatus.ONGOING){
+            expand(message.resourcePath.toString(),true)
+        } else {
+            expand(message.content, false)
+        }
+
     }
 
 
