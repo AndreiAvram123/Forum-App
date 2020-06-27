@@ -1,8 +1,9 @@
 package com.example.bookapp
 
+import android.content.Context
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import com.example.TestUtilities
-import com.example.bookapp.activities.WelcomeActivity
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.serialization.SerializePost
@@ -10,10 +11,8 @@ import junit.framework.Assert.fail
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
@@ -23,23 +22,13 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 class AddPostTest {
 
-
     private val repo = TestUtilities.retrofit.create(PostRepositoryInterface::class.java)
-    private lateinit var activity: WelcomeActivity
-
-    @Before
-    @Throws(Exception::class)
-    fun setUp() {
-        activity = Robolectric.buildActivity(WelcomeActivity::class.java)
-                .create()
-                .resume()
-                .get()
-    }
+    private val context = ApplicationProvider.getApplicationContext<Context>()
 
     @Test
     fun shouldUploadImageToServer() {
         runBlocking {
-            val drawable = activity.applicationContext.getDrawable(R.drawable.placeholder)
+            val drawable = context.getDrawable(R.drawable.placeholder)
             drawable?.let {
                 val image = SerializeImage(imageData = it.toBase64(), extension = null)
                 repo.uploadImage(image)
@@ -52,7 +41,7 @@ class AddPostTest {
     @Test
     fun uploadedPostShouldBeFoundOnServer() {
         runBlocking {
-            val drawable = activity.applicationContext.getDrawable(R.drawable.placeholder)
+            val drawable = context.applicationContext.getDrawable(R.drawable.placeholder)
             drawable?.let {
 
                 val image = SerializeImage(imageData = it.toBase64(), extension = null)

@@ -17,21 +17,21 @@ import com.example.bookapp.databinding.LayoutFragmentAddPostBinding
 import com.example.bookapp.models.User
 import com.example.bookapp.toBase64
 import com.example.bookapp.viewModels.ViewModelPost
-import com.example.bookapp.viewModels.ViewModelUser
 import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.serialization.SerializePost
 import com.example.dataLayer.repositories.OperationStatus
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @InternalCoroutinesApi
+@AndroidEntryPoint
 class FragmentAddPost : Fragment() {
     private lateinit var binding: LayoutFragmentAddPostBinding
     private val CODE_FILE_EXPLORER = 10
     private val viewModelPost: ViewModelPost by activityViewModels()
-    private val viewModelUser: ViewModelUser by activityViewModels()
 
     @Inject
     lateinit var user: User

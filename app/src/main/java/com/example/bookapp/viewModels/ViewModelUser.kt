@@ -3,17 +3,11 @@ package com.example.bookapp.viewModels
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.example.bookapp.models.User
-import com.example.bookapp.user.UserAccountManager
-import com.example.dataLayer.dataMappers.UserMapper
-import com.example.dataLayer.repositories.OperationStatus
 import com.example.dataLayer.repositories.UserRepository
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class ViewModelUser @ViewModelInject constructor(
-        private val userAccountManager: UserAccountManager,
         private val userRepository: UserRepository) : ViewModel() {
-
 
 
     val searchQuery = MutableLiveData<String>()
@@ -30,7 +24,7 @@ class ViewModelUser @ViewModelInject constructor(
     }
 
 
-    fun loginWithGoogle(idToken: String, displayName: String, email: String) = userRepository.loginWithGoogle(idToken, displayName, email)
+    fun loginWithGoogle(idToken: String, displayName: String, email: String) = viewModelScope.launch { userRepository.loginWithGoogle(idToken, displayName, email) }
 
 
     fun register(username: String, email: String, password: String) {
@@ -45,19 +39,7 @@ class ViewModelUser @ViewModelInject constructor(
     }
 
 
-    val loginResult = MutableLiveData(OperationStatus.NOT_STARTED)
+    fun login(username: String, password: String) = userRepository.login(username, password)
 
-    fun login(username: String, password: String) {
-        loginResult.value = OperationStatus.ONGOING
-        viewModelScope.launch {
-            val user = userRepository.login(username, password)
-            if (user.userID != 0) {
-                userAccountManager.saveUserInMemory(UserMapper.mapToDomainObject(user))
-            } else {
-                loginResult.postValue(OperationStatus.FAILED)
-            }
-
-        }
-    }
 
 }

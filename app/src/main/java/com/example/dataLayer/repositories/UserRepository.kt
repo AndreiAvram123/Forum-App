@@ -1,42 +1,41 @@
 package com.example.dataLayer.repositories
 
 import android.net.ConnectivityManager
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
-import com.example.bookapp.models.User
+import com.example.bookapp.user.UserAccountManager
 import com.example.dataLayer.dataMappers.UserMapper
 import com.example.dataLayer.interfaces.UserRepositoryInterface
-import com.example.dataLayer.models.UserDTO
-import kotlinx.coroutines.CoroutineScope
+import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
-class UserRepository @Inject constructor(private val coroutineScope: CoroutineScope,
-                                         private val repo: UserRepositoryInterface,
-                                         private val connectivityManager: ConnectivityManager) {
+@ActivityScoped
+class UserRepository @Inject constructor(private val repo: UserRepositoryInterface,
+                                         private val connectivityManager: ConnectivityManager,
+                                         private val userAccountManager: UserAccountManager) {
 
 
-    fun loginWithGoogle(idToken: String, displayName: String, email: String) = liveData {
-
+    suspend fun loginWithGoogle(idToken: String, displayName: String, email: String) {
         try {
-            val fetchedUser = repo.fetchGoogleUser(idToken, displayName, email)
-            if (fetchedUser.userID == 0) {
-                emit(createGoogleAccount(idToken, displayName, email))
+            val serverResponse = repo.fetchGoogleUser(idToken)
+            if (serverResponse.userDTO != null && serverResponse.token != null) {
+                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(serverResponse.userDTO), serverResponse.token)
             } else {
-                emit(UserMapper.mapToDomainObject(fetchedUser))
+                createGoogleAccount(idToken, displayName, email)
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
     }
 
-    private suspend fun createGoogleAccount(idToken: String, displayName: String, email: String): User {
-        return try {
-            val newUser = repo.createGoogleAccount(idToken, displayName, email)
-            UserMapper.mapToDomainObject(newUser)
+    private suspend fun createGoogleAccount(idToken: String, displayName: String, email: String) {
+        try {
+            val response = repo.createGoogleAccount(idToken, displayName, email)
+            if (response.userDTO != null && response.token != null) {
+                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO), response.token)
+            }
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
-            createGoogleAccount(idToken,displayName,email)
+            createGoogleAccount(idToken, displayName, email)
         }
     }
 
@@ -51,7 +50,22 @@ class UserRepository @Inject constructor(private val coroutineScope: CoroutineSc
         }
     }
 
-    suspend fun login(username: String, password: String): UserDTO = repo.login(username, password)
+    fun login(username: String, password: String) = liveData {
+        emit(OperationStatus.ONGOING)
+        try {
+            val response = repo.login(username, password)
+            if (response.userDTO != null && response.token != null) {
+                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO)
+                        , response.token)
+                emit(OperationStatus.FINISHED)
+            } else {
+                emit(OperationStatus.FAILED)
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+        emit(OperationStatus.FAILED)
+    }
 
     suspend fun register(username: String, email: String, password: String) = repo.register(username, email, password)
 }

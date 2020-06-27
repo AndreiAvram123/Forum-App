@@ -4,7 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "message")
 open class Message(
@@ -26,6 +25,8 @@ open class Message(
         @ColumnInfo(name = "localID")
         val localID: String?
 ){
+        //todo
+        //have local path here
         //todo
         //nopeeeeeeeeeeeeeeeeeee
         override fun equals(other: Any?): Boolean {

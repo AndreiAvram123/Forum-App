@@ -1,21 +1,15 @@
 package com.example.dataLayer.interfaces
 
-import androidx.annotation.Nullable
 import com.example.dataLayer.models.ServerResponse
 import com.example.dataLayer.models.UserDTO
-import retrofit2.Call
+import com.example.dataLayer.models.serialization.AuthenticationResponse
 import retrofit2.http.*
 
 interface UserRepositoryInterface {
 
 
-    @FormUrlEncoded
-    @POST("/api/login/google")
-    suspend fun fetchGoogleUser(@Field("token") idToken: String,
-                                @Field("username")
-                                displayName: String,
-                                @Field("email")
-                                email: String): UserDTO
+    @GET("/api/login/google/{token}")
+    suspend fun fetchGoogleUser(@Path("token") token: String): AuthenticationResponse
 
     @FormUrlEncoded
     @POST("/api/register/google")
@@ -23,14 +17,14 @@ interface UserRepositoryInterface {
                                     @Field("username")
                                     displayName: String,
                                     @Field("email")
-                                    email: String): UserDTO
+                                    email: String): AuthenticationResponse
 
     @FormUrlEncoded
     @POST("/api/login")
-    suspend fun login(@Field("username") username: String, @Field("password") password: String): UserDTO
+    suspend fun login(@Field("username") username: String, @Field("password") password: String): AuthenticationResponse
 
 
-    @GET("/user/autocomplete/{query}")
+    @GET("/api/user/autocomplete/{query}")
     suspend fun fetchSuggestions(@Path("query") query: String): List<UserDTO>
 
     @POST("/api/register")

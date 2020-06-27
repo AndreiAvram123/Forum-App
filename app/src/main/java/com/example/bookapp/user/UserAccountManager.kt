@@ -7,40 +7,56 @@ import com.example.bookapp.R
 import com.example.bookapp.models.User
 import com.example.dataLayer.interfaces.dao.UserDao
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
-import javax.inject.Singleton
 
-class UserAccountManager @Inject constructor(val sharedPreferences: SharedPreferences,
+@ActivityScoped
+class UserAccountManager @Inject constructor(private val sharedPreferences: SharedPreferences,
                                              @ApplicationContext private val context: Context,
-                                             val userDao: UserDao) {
+                                             private val userDao: UserDao) {
 
     val user: MutableLiveData<User> by lazy {
-        val user = User(userID = sharedPreferences.getInt(R.string.key_user_id),
+        val user = User(userID = sharedPreferences.getInt(context.getString(R.string.key_user_id), 0),
                 username = sharedPreferences.getStringNotNull(R.string.key_username),
                 email = sharedPreferences.getStringNotNull(R.string.key_email),
                 profilePicture = sharedPreferences.getStringNotNull(R.string.key_profile_picture))
         MutableLiveData<User>(user)
     }
 
+    fun getToken() = sharedPreferences.getStringNotNull(R.string.key_token)
 
-    suspend fun saveUserInMemory(user: User) {
+    suspend fun saveUserAndToken(user: User, token: String) {
         persistUser(user)
+        persistToken(token)
         userDao.insertUser(user)
+    }
+
+    private fun persistToken(token: String) {
+        sharedPreferences.edit {
+            context.apply {
+                putString(getString(R.string.key_token), token)
+            }
+        }
     }
 
     private fun persistUser(user: User) {
         sharedPreferences.edit {
-            putInt(getString(R.string.key_user_id), user.userID)
-            putString(getString(R.string.key_username), user.username)
-            putString(getString(R.string.key_email), user.email)
-            putString(getString(R.string.key_profile_picture), user.profilePicture)
+            context.apply {
+                putInt(getString(R.string.key_user_id), user.userID)
+                putString(getString(R.string.key_username), user.username)
+                putString(getString(R.string.key_email), user.email)
+                putString(getString(R.string.key_profile_picture), user.profilePicture)
+            }
         }
         this.user.postValue(user)
     }
 
     fun deleteUserFromMemory() {
         sharedPreferences.edit {
-            putInt(getString(R.string.key_user_id), 0)
+            context.apply {
+                putInt(getString(R.string.key_user_id), 0)
+                putString(getString(R.string.key_token), "")
+            }
         }
     }
 
@@ -50,12 +66,6 @@ class UserAccountManager @Inject constructor(val sharedPreferences: SharedPrefer
         val value = getString(context.getString(keyID), "unknown")
         value?.let { return it }
         return "Unknown"
-    }
-
-    private fun SharedPreferences.getInt(keyID: Int
-    ): Int {
-        return getInt(context.getString(keyID), 0)
-
     }
 
 
@@ -70,7 +80,4 @@ class UserAccountManager @Inject constructor(val sharedPreferences: SharedPrefer
         }
     }
 
-    fun getString(key: Int): String {
-        return context.getString(key)
-    }
 }
