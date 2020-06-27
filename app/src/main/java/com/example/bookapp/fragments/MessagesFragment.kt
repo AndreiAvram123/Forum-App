@@ -56,6 +56,9 @@ class MessagesFragment : Fragment() {
         viewModelChat.currentChatId.value = args.chatID
 
         viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer {
+            //there is a small async problem once we start observing the recent
+            //messages, we need to make sure that the live data had enough time to change the
+            //messages from one chat id to another
             if (it.isNotEmpty() && it.first().chatID == args.chatID) {
                 val ordered = it.reversed()
                 messageAdapter.setData(ordered)
@@ -64,9 +67,6 @@ class MessagesFragment : Fragment() {
                 }
             }
         })
-
-
-
 
         binding.sendImageButton.setOnClickListener {
             startFileExplorer()
@@ -97,15 +97,14 @@ class MessagesFragment : Fragment() {
     }
 
     private fun sendTextMessage() {
-        val text = binding.messageArea.text;
-        if (text != null) {
+        binding.messageArea.text?.let {
             val messageContent = binding.messageArea.text.toString()
             if (messageContent.trim().isNotEmpty()) {
 
                 val message = SerializeMessage(type = MessageTypes.textMessage,
                         chatID = args.chatID, senderID = user.userID, content = messageContent, localIdentifier = null)
                 viewModelChat.sendMessage(message)
-                text.clear()
+                it.clear()
             }
         }
     }

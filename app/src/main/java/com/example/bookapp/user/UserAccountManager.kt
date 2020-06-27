@@ -16,7 +16,7 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
                                              private val userDao: UserDao) {
 
     val user: MutableLiveData<User> by lazy {
-        val user = User(userID = sharedPreferences.getInt(R.string.key_user_id),
+        val user = User(userID = sharedPreferences.getInt(context.getString(R.string.key_user_id), 0),
                 username = sharedPreferences.getStringNotNull(R.string.key_username),
                 email = sharedPreferences.getStringNotNull(R.string.key_email),
                 profilePicture = sharedPreferences.getStringNotNull(R.string.key_profile_picture))
@@ -55,6 +55,7 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
         sharedPreferences.edit {
             context.apply {
                 putInt(getString(R.string.key_user_id), 0)
+                putString(getString(R.string.key_token), "")
             }
         }
     }
@@ -65,12 +66,6 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
         val value = getString(context.getString(keyID), "unknown")
         value?.let { return it }
         return "Unknown"
-    }
-
-    private fun SharedPreferences.getInt(keyID: Int
-    ): Int {
-        return getInt(context.getString(keyID), 0)
-
     }
 
 
