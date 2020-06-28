@@ -6,7 +6,7 @@ data class SerializeComment(
         @SerializedName("content")
         val content: String,
         @SerializedName("postID")
-        val postID: Int,
+        val postID: String,
         @SerializedName("userID")
         val userID: Int
 )

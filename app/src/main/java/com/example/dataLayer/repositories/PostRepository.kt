@@ -5,7 +5,6 @@ import androidx.lifecycle.liveData
 import androidx.paging.PagedList
 import com.example.bookapp.models.Post
 import com.example.bookapp.models.User
-import com.example.dataLayer.dataMappers.PostMapper
 import com.example.dataLayer.dataMappers.toPost
 import com.example.dataLayer.interfaces.PostRepositoryInterface
 import com.example.dataLayer.interfaces.dao.RoomPostDao
@@ -21,7 +20,6 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 
-@Suppress("MemberVisibilityCanBePrivate")
 @InternalCoroutinesApi
 
 class PostRepository @Inject constructor(private val user: User,
@@ -56,7 +54,7 @@ class PostRepository @Inject constructor(private val user: User,
 
         override fun onItemAtEndLoaded(itemAtEnd: Post) {
             coroutineScope.launch {
-                fetchNextPosts(itemAtEnd.id)
+                //  fetchNextPosts(itemAtEnd.id)
             }
         }
     }
@@ -69,21 +67,23 @@ class PostRepository @Inject constructor(private val user: User,
     }
 
 
-    fun fetchPostByID(id: Int): LiveData<Post> = liveData {
-        val postDTO = repo.fetchPostByID(id)
-        val post = PostMapper.mapToDomainObject(postDTO)
-        postDao.insertPost(post)
-        emit(post)
+    fun fetchPostByID(id: String): LiveData<Post> = liveData {
+        val fetchedData = firebaseRepo.collection(postCollection).document(id).get().await().toObject(PostDTO::class.java)
+        fetchedData?.let {
+            val post = it.toPost()
+            postDao.insertPost(post)
+            emit(post)
+        }
     }
 
 
     internal suspend fun fetchFavoritePostsImpl() {
         val data =
-                repo.fetchUserFavoritePosts(user.userID).map { PostMapper.mapToDomainObject(it) }
+                repo.fetchUserFavoritePosts(user.userID).map { it.toPost() }
 
-        postDao.insertAllFavoritePosts(data.map {
-            UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID)
-        })
+//        postDao.insertAllFavoritePosts(data.map {
+//            UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID)
+//        })
     }
 
 
@@ -91,22 +91,22 @@ class PostRepository @Inject constructor(private val user: User,
         emitSource(postDao.getAllUserPosts(user.userID))
         try {
             val fetchedPosts = repo.fetchMyPosts(user.userID)
-            postDao.insertPosts(fetchedPosts.map { PostMapper.mapToDomainObject(it) })
+            postDao.insertPosts(fetchedPosts.map { it.toPost() })
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
         }
     }
 
     suspend fun addPostToFavorites(post: Post) {
-        postDao.addFavoritePost(UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID))
-        repo.addPostToFavorites(post.id, user.userID)
+        //     postDao.addFavoritePost(UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID))
+        //     repo.addPostToFavorites(post.id, user.userID)
     }
 
 
     suspend fun deletePostFromFavorites(post: Post) {
-        repo.removePostFromFavorites(postID = post.id, userID = user.userID)
-        val toRemove = UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID)
-        postDao.deletePostFromFavorites(toRemove)
+        // repo.removePostFromFavorites(postID = post.id, userID = user.userID)
+        //  val toRemove = UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID)
+        //  postDao.deletePostFromFavorites(toRemove)
 
     }
 
@@ -130,7 +130,7 @@ class PostRepository @Inject constructor(private val user: User,
     internal suspend fun fetchNextPosts(lastPostID: Int) {
         try {
             val fetchedData = repo.fetchNextPagePosts(lastPostID)
-            postDao.insertPosts(fetchedData.map { PostMapper.mapToDomainObject(it) })
+            postDao.insertPosts(fetchedData.map { it.toPost() })
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
@@ -149,9 +149,9 @@ class PostRepository @Inject constructor(private val user: User,
 
             val serverResponse = repo.uploadPost(post)
 
-            val fetchedPost = repo.fetchPostByID(serverResponse.message.toInt())
+            val fetchedData = repo.fetchPostByID(serverResponse.message.toInt())
 
-            val postDomain = PostMapper.mapToDomainObject(fetchedPost)
+            val postDomain = fetchedData.toPost()
             emit(OperationStatus.FINISHED)
             postDao.insertPost(postDomain)
         }

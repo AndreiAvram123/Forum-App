@@ -43,7 +43,7 @@ class PostRepositoryFirebaseTest {
     @Test
     fun shouldPushedDataBeReturned() {
         runBlocking {
-            val testPost = PostDTO(id = 1, title = "testTitle", image = "image",
+            val testPost = PostDTO(id = 1, title = "testTitle", image = "gs://freelanceproject-f7aef.appspot.com/testImage",
                     content = "test", date = Calendar.getInstance().timeInMillis / 1000,
                     author = UserDTO(userID = 109, username = "Andrei",
                             email = "cactus@gmail.com", profilePicture = ""))

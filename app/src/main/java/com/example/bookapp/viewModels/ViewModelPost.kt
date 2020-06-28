@@ -30,7 +30,7 @@ class ViewModelPost @ViewModelInject constructor(
     }
 
 
-    fun getPostByID(id: Int): LiveData<Post> {
+    fun getPostByID(id: String): LiveData<Post> {
         return postRepository.fetchPostByID(id)
     }
 

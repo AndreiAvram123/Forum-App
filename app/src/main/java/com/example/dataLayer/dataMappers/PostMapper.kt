@@ -15,23 +15,3 @@ fun PostDTO.toPost(): Post {
 
     ).apply { author = user }
 }
-
-object PostMapper {
-
-
-    fun mapToDomainObject(postDTO: PostDTO): Post {
-
-        val user = UserMapper.mapToDomainObject(postDTO.author)
-
-        return Post(id = postDTO.id,
-                title = postDTO.title,
-                image = postDTO.image,
-                date = postDTO.date,
-                authorID = user.userID,
-                content = postDTO.content
-
-        ).apply { author = user }
-
-    }
-
-}

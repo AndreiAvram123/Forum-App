@@ -22,7 +22,7 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
 
 
     fun getCommentsForPost(post: Post): LiveData<PostWithComments> = liveData {
-        emitSource(commentDao.getAllPostComments(post.id))
+     //   emitSource(commentDao.getAllPostComments(post.id))
         if (connectivityManager.activeNetwork != null) {
             fetchCommentsForPost(post)
         }
@@ -49,8 +49,8 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
 
     private suspend fun fetchCommentsForPost(post: Post) {
         try {
-            val fetchedComments = repo.fetchCommentsForPost(post.id)
-            commentDao.insertComments(fetchedComments.map { CommentMapper.mapToDomainObject(it) })
+           // val fetchedComments = repo.fetchCommentsForPost(post.id)
+           // commentDao.insertComments(fetchedComments.map { CommentMapper.mapToDomainObject(it) })
         } catch (e: Exception) {
             e.printStackTrace()
         }

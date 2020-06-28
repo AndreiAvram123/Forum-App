@@ -12,7 +12,7 @@
         tools:layout="@layout/post_expanded_fragment" >
         <argument
             android:name="postID"
-            app:argType="integer" />
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/favorite_posts"

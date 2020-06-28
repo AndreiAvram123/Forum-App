@@ -5,7 +5,7 @@ import androidx.room.*
 @Entity
 data class Post(
         @PrimaryKey
-        @ColumnInfo(name = "postID") var id: Int = 0,
+        @ColumnInfo(name = "postID") var id: String = "",
         @ColumnInfo(name = "postTitle") var title: String = "",
         @ColumnInfo(name = "postImage") var image: String = "",
         @ColumnInfo(name = "date") var date: Long = -10,
@@ -19,7 +19,7 @@ data class Post(
 
     companion object Empty {
         fun buildTestPost(): Post {
-            return Post(id = 0, content = "", date = 333, title = "", image = "dfd", authorID = 0)
+            return Post(id = "", content = "", date = 333, title = "", image = "dfd", authorID = 0)
         }
 
     }
