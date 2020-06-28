@@ -43,8 +43,6 @@ interface ChatRepositoryInterface {
     @PATCH("/api/messages/{messageID}/user/{userID}")
     suspend fun markMessageAsSeen(@Path("userID") userID: Int, @Path("messageID") messageID: Int)
 
-    @GET("/api/notifications/discover/{userID}")
-    suspend fun fetchNotificationLink(@Path("userID") userID: Int): ServerResponse
 
     @GET("/api/user/{userID}/chats/lastMessages")
     suspend fun fetchLastChatsMessage(@Path("userID") userID: Int): List<MessageDTO>
