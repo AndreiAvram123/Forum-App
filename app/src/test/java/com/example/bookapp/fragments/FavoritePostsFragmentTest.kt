@@ -25,7 +25,7 @@ class FavoritePostsFragmentTest {
     fun shouldPostBeAddedToFavorites() {
         runBlocking {
             //add a post to favorites that we know it exists
-            val postID = 2236
+            val postID = 1108
             postRepo.addPostToFavorites(postID, userID)
             //fetch the users favorite posts and check if this post belongs in the collection
             val favoritePosts = postRepo.fetchUserFavoritePosts(userID)

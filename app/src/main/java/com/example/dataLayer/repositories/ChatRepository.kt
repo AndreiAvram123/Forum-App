@@ -50,7 +50,6 @@ class ChatRepository @Inject constructor(
         MutableLiveData<String?>()
     }.also {
         requestExecutor.add(this::fetchChatsLink, null)
-        requestExecutor.add(this::fetchNotificationLink, null)
 
     }
 
@@ -100,14 +99,7 @@ class ChatRepository @Inject constructor(
         chatLink.postValue(link)
     }
 
-    internal suspend fun fetchNotificationLink() {
-        try {
-            val link = repo.fetchNotificationLink(user.userID).message
 
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
 
     fun addNotification(notificationDTO: ChatNotificationDTO) {
         chatNotifications.value?.let {

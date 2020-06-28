@@ -4,6 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs"
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: 'com.google.gms.google-services'
 
 android {
 
@@ -35,6 +36,7 @@ android {
             unitTests.returnDefaultValues = true
         }
 
+
     }
 
     compileOptions {
@@ -63,7 +65,9 @@ android {
 
 
 dependencies {
-
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
+    implementation 'com.google.firebase:firebase-firestore:21.4.3'
+    implementation 'com.google.firebase:firebase-storage:19.1.1'
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
 
@@ -92,8 +96,6 @@ dependencies {
     implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01'
     // When using Kotlin.
     kapt 'androidx.hilt:hilt-compiler:1.0.0-alpha01'
-
-
 
 
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'

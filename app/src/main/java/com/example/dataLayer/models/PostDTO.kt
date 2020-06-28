@@ -5,15 +5,15 @@ import com.google.gson.annotations.SerializedName
 
 data class PostDTO(
         @SerializedName("id")
-        val id: Int,
+        val id: Int = 0,
         @SerializedName("title")
-        val title: String,
+        val title: String = "",
         @SerializedName("image")
-        val image: String,
+        val image: String = "",
         @SerializedName("date")
-        val date: Long,
+        val date: Long = 0,
         @SerializedName("author")
-        val author: UserDTO,
+        val author: UserDTO = UserDTO(),
         @SerializedName("content")
-        val content: String
+        val content: String = ""
 )

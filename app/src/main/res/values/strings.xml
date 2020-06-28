@@ -1,12 +1,11 @@
 <resources>
+
     <string name="app_name">Forum app</string>
-    <string name="popular_recipes_title">Here are some popular recipes</string>
+
+
 
 
     <string name="search_history_key">SEARCH_HISTORY_KEY</string>
-    <string name="facebook_app_id">2569482526618357</string>
-    <string name="fb_login_protocol_scheme">fb2569482526618357</string>
-    <string name="welcome_activity_shown_key">welcome_activity_shown_key</string>
 
 
     <string name="action_share">Share</string>
@@ -54,7 +53,6 @@
     <string name="added_to_favorites">Post added to favorites</string>
     <string name="removed_from_favorites">Post removed from favorites</string>
     <string name="please_connect_to_internet">Please connect to the internet to use this feature</string>
-    <string name="default_web_client_id">674587033588-40h9617ir14bbcohahha8rhvgck9420q.apps.googleusercontent.com</string>
     <string name="key_username">key_username</string>
     <string name="key_preferences">key_preferences</string>
 

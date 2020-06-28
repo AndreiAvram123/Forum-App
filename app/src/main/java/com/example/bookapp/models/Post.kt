@@ -5,13 +5,13 @@ import androidx.room.*
 @Entity
 data class Post(
         @PrimaryKey
-        @ColumnInfo(name = "postID") val id: Int,
-        @ColumnInfo(name = "postTitle") val title: String,
-        @ColumnInfo(name = "postImage") val image: String,
-        @ColumnInfo(name = "date") val date: Long,
-        @ColumnInfo(name = "content") val content: String,
+        @ColumnInfo(name = "postID") var id: Int = 0,
+        @ColumnInfo(name = "postTitle") var title: String = "",
+        @ColumnInfo(name = "postImage") var image: String = "",
+        @ColumnInfo(name = "date") var date: Long = -10,
+        @ColumnInfo(name = "content") var content: String = "",
         @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false,
-        @ColumnInfo(name = "authorID") val authorID: Int
+        @ColumnInfo(name = "authorID") var authorID: Int = 0
 
 ) {
     @Ignore
