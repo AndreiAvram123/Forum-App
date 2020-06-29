@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.socialMedia.TestUtilities
-import com.socialMedia.dataLayer.interfaces.PostRepositoryInterface
 import com.socialMedia.dataLayer.models.SerializeImage
 import com.socialMedia.dataLayer.models.serialization.SerializePost
 import junit.framework.Assert.fail

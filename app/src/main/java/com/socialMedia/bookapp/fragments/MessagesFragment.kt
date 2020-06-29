@@ -22,7 +22,6 @@ import com.socialMedia.bookapp.toBase64
 import com.socialMedia.bookapp.toDrawable
 import com.socialMedia.bookapp.viewModels.ViewModelChat
 import com.socialMedia.dataLayer.dataMappers.toDomainObject
-import com.socialMedia.dataLayer.models.serialization.SerializeMessage
 import com.socialMedia.dataLayer.serverConstants.MessageTypes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -101,10 +100,12 @@ class MessagesFragment : Fragment() {
             val messageContent = binding.messageArea.text.toString()
             if (messageContent.trim().isNotEmpty()) {
 
-                val message = SerializeMessage(type = MessageTypes.textMessage,
-                        chatID = args.chatID, senderID = user.userID, content = messageContent, localIdentifier = null)
-                viewModelChat.sendMessage(message)
-                it.clear()
+                //todo
+                //send message
+//                val message = SerializeMessage(type = MessageTypes.textMessage,
+//                        chatID = args.chatID, senderID = user.userID, content = messageContent, localIdentifier = null)
+//                viewModelChat.sendMessage(message)
+//                it.clear()
             }
         }
     }
@@ -144,15 +145,17 @@ class MessagesFragment : Fragment() {
             val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
 
             lifecycleScope.launch(Dispatchers.Main) {
-                val message = SerializeMessage(
-                        type = MessageTypes.imageMessageType,
-                        chatID = args.chatID,
-                        senderID = user.userID,
-                        content = drawable.toBase64(),
-                        localIdentifier = uniqueID
-
-                )
-                viewModelChat.sendMessage(message)
+                //todo
+                //send message
+//                val message = SerializeMessage(
+//                        type = MessageTypes.imageMessageType,
+//                        chatID = args.chatID,
+//                        senderID = user.userID,
+//                        content = drawable.toBase64(),
+//                        localIdentifier = uniqueID
+//
+//                )
+//                viewModelChat.sendMessage(message)
 
                 val localImageMessage = LocalImageMessage(
                         sender = user.toDomainObject(),

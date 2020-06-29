@@ -21,8 +21,6 @@ import com.socialMedia.bookapp.models.Post
 import com.socialMedia.bookapp.models.User
 import com.socialMedia.bookapp.viewModels.ViewModelComments
 import com.socialMedia.bookapp.viewModels.ViewModelPost
-import com.socialMedia.dataLayer.models.serialization.SerializeComment
-import com.socialMedia.dataLayer.repositories.OperationStatus
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -44,6 +42,7 @@ class ExpandedPostFragment : Fragment() {
     private val commentDialog = CommentBottomSheet(::submitComment)
 
     private lateinit var favoritePosts: List<Post>
+
     private val args: ExpandedPostFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -59,6 +58,10 @@ class ExpandedPostFragment : Fragment() {
         viewModelPost.favoritePosts.observe(viewLifecycleOwner, Observer {
             if (it != null) {
                 favoritePosts = it.posts
+                if(this::post.isInitialized && favoritePosts.contains(post)){
+                    post.isFavorite = true
+                    binding.notifyChange()
+                }
             }
         })
 
@@ -68,7 +71,7 @@ class ExpandedPostFragment : Fragment() {
                     it.isFavorite = true
                 }
                 post = it
-                configureViews()
+                attachListeners()
                 getComments()
             }
         })
@@ -93,7 +96,7 @@ class ExpandedPostFragment : Fragment() {
     }
 
 
-    private fun configureViews() {
+    private fun attachListeners() {
         binding.post = post
         binding.saveButtonExpanded.setOnClickListener {
             if (post.isFavorite) {
@@ -121,15 +124,15 @@ class ExpandedPostFragment : Fragment() {
     }
 
     private fun submitComment(content: String) {
-        val commentToUpload = SerializeComment(content = content,
-                postID = post.id,
-                userID = user.userID)
 
-        viewModelComments.uploadComment(commentToUpload).observe(viewLifecycleOwner, Observer {
-            if (it == OperationStatus.FINISHED) {
-                commentDialog.dismiss()
-            }
-        })
+
+        //todo
+        //upload comment
+//        viewModelComments.uploadComment(commentToUpload).observe(viewLifecycleOwner, Observer {
+//            if (it == OperationStatus.FINISHED) {
+//                commentDialog.dismiss()
+//            }
+//        })
     }
 
     private fun informUserPostAddedToFavorites() {

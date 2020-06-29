@@ -1,7 +1,6 @@
 package com.socialMedia.bookapp
 
 import com.socialMedia.TestUtilities
-import com.socialMedia.dataLayer.interfaces.ChatRepositoryInterface
 import com.socialMedia.dataLayer.models.deserialization.FriendRequest
 import com.socialMedia.dataLayer.models.serialization.SerializeFriendRequest
 import kotlinx.coroutines.runBlocking

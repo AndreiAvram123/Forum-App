@@ -6,8 +6,6 @@ import androidx.test.core.app.ApplicationProvider
 import com.socialMedia.TestUtilities
 import com.socialMedia.bookapp.R
 import com.socialMedia.bookapp.toBase64
-import com.socialMedia.dataLayer.interfaces.ChatRepositoryInterface
-import com.socialMedia.dataLayer.models.serialization.SerializeMessage
 import com.socialMedia.dataLayer.serverConstants.MessageTypes
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking

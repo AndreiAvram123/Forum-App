@@ -4,10 +4,10 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.socialMedia.bookapp.models.Chat
 import com.socialMedia.bookapp.models.Message
+import com.socialMedia.bookapp.models.MessageDTO
 import com.socialMedia.bookapp.models.User
 import com.socialMedia.dataLayer.models.deserialization.FriendRequest
 import com.socialMedia.dataLayer.models.serialization.SerializeFriendRequest
-import com.socialMedia.dataLayer.models.serialization.SerializeMessage
 import com.socialMedia.dataLayer.repositories.ChatRepository
 import kotlinx.coroutines.launch
 
@@ -47,9 +47,9 @@ class ViewModelChat @ViewModelInject constructor(
     }
 
 
-    fun sendMessage(serializeMessage: SerializeMessage) {
+    fun sendMessage(serializeMessage: MessageDTO) {
         viewModelScope.launch {
-            chatRepository.pushMessage(serializeMessage)
+         //   chatRepository.pushMessage(serializeMessage)
         }
     }
 

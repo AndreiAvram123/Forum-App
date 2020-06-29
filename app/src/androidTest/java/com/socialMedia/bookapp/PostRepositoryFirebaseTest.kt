@@ -30,6 +30,7 @@ class PostRepositoryFirebaseTest {
     private val collectionName = "posts"
     private lateinit var context: Context
 
+
     @Before
     fun setUp() {
         db = FirebaseFirestore.getInstance()
@@ -38,13 +39,31 @@ class PostRepositoryFirebaseTest {
     }
 
     @Test
+    fun addMockData() = runBlocking<Unit> {
+        val testPost = PostDTO(title = "testTitle", image = "https://firebasestorage.googleapis.com/v0/b/freelanceproject-f7aef.appspot.com/o/background.png?alt=media&token=6a78ce1f-ca80-4108-a1f2-8e3ac07dcd7d",
+                content = "test", date = Calendar.getInstance().timeInMillis / 1000,
+                author = UserDTO(username = "Andrei",
+                        email = "cactus@gmail.com", profilePicture = ""))
+
+        try {
+
+            for (i in 1..40) {
+                db.collection(collectionName).add(testPost).await()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    @Test
     fun shouldPushedDataBeReturned() {
         runBlocking {
-            val testPost = PostDTO(title = "testTitle", image = "gs://freelanceproject-f7aef.appspot.com/testImage",
+            val testPost = PostDTO(title = "testTitle", image = "https://firebasestorage.googleapis.com/v0/b/freelanceproject-f7aef.appspot.com/o/background.png?alt=media&token=6a78ce1f-ca80-4108-a1f2-8e3ac07dcd7d",
                     content = "test", date = Calendar.getInstance().timeInMillis / 1000,
-                    author = UserDTO(userID = 109, username = "Andrei",
+                    author = UserDTO(username = "Andrei",
                             email = "cactus@gmail.com", profilePicture = ""))
             try {
+
                 db.collection(collectionName).add(testPost).await()
                 val data = db.collection(collectionName).whereEqualTo(PostDTO::date.name, testPost.date).get().await().documents
                 if (data.isEmpty()) {
@@ -162,10 +181,18 @@ class PostRepositoryFirebaseTest {
     }
 
     @Test
-    fun shouldFetchPostByUID() = runBlocking<Unit>{
+    fun shouldFetchPostByUID() = runBlocking<Unit> {
         val uid = "FFxaWf9XcaipO9OYfwYC"
         val post = db.collection(collectionName).document(uid).get().await().toObject(PostDTO::class.java)
         assertNotNull(post)
+    }
+
+    @Test
+    fun shouldFetchUserPosts() = runBlocking<Unit> {
+        val userEmail = ""
+        val fetchedData = db.collection(collectionName).whereEqualTo("${PostDTO::author.name}.${UserDTO::email.name}", "cactus@gmail.com").get().await()
+        val mappedData = fetchedData.mapNotNull { it.toObject(PostDTO::class.java) }
+        print(mappedData)
     }
 
 }

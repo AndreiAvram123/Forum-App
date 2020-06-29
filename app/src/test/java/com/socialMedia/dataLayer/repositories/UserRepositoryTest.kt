@@ -1,7 +1,6 @@
 package com.socialMedia.dataLayer.repositories
 
 import com.socialMedia.TestUtilities
-import com.socialMedia.dataLayer.interfaces.UserRepositoryInterface
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNotNull
 import org.junit.Before

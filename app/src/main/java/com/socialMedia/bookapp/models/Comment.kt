@@ -9,9 +9,9 @@ import androidx.room.PrimaryKey
 data class Comment(
         @PrimaryKey
         @ColumnInfo(name = "commentID")
-        val id: Int,
+        val id: String,
         @ColumnInfo(name = "commentPostID")
-        val postID: Int,
+        val postID: String,
         @ColumnInfo(name = "commentDate")
         val date: Long,
         @ColumnInfo(name = "commentContent")

@@ -93,8 +93,8 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
     }
 
     override fun sendFriendRequest(receiver: User) {
-        val friendRequest = SerializeFriendRequest(senderID = user.userID, receiverID = receiver.userID)
-        viewModelChat.sendFriendRequest(friendRequest)
+       // val friendRequest = SerializeFriendRequest(senderID = user.userID, receiverID = receiver.userID)
+       // viewModelChat.sendFriendRequest(friendRequest)
     }
 }
 

@@ -104,9 +104,7 @@ class MessengerService : Service() {
     }
 
     private fun getEventHandler(): EventHandler = object : EventHandler {
-        override fun onOpen() {
-        }
-
+        override fun onOpen() {}
         override fun onComment(comment: String?) {}
         override fun onClosed() {}
         override fun onError(t: Throwable?) {}
@@ -124,9 +122,11 @@ class MessengerService : Service() {
                         val messageDTO = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
 
                         val message = messageDTO.toMessage()
-                        if (message.sender.userID == userID) {
-                            message.seenByCurrentUser = true
-                        }
+                        //todo
+                        //fix
+//                        if (message.sender.userID == userID) {
+//                            message.seenByCurrentUser = true
+//                        }
                         CoroutineScope(Dispatchers.IO).launch {
                             messageDao.insertMessage(message)
                         }

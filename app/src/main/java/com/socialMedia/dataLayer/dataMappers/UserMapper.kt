@@ -5,9 +5,9 @@ import com.socialMedia.dataLayer.models.UserDTO
 import com.google.firebase.auth.FirebaseUser
 
 
-fun UserDTO.toUser() = User(userID = this.userID, username = this.username, email = this.email, profilePicture = this.profilePicture)
+fun UserDTO.toUser(id:String = "Unknown") = User(userID = id, username = this.username, email = this.email, profilePicture = this.profilePicture)
 
-fun User.toDomainObject() = UserDTO(userID = this.userID, username = this.username, email = this.email, profilePicture = this.profilePicture)
+fun User.toDomainObject() = UserDTO( username = this.username, email = this.email, profilePicture = this.profilePicture)
 
 //todo
 //change  the id to be string
@@ -25,7 +25,7 @@ fun FirebaseUser.toUser():User {
 
 
     return User(
-            userID = 0,
+            userID = "unknown",
             username = username,
             email = email,
             profilePicture = photoURL

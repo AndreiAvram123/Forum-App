@@ -17,7 +17,6 @@ import com.google.android.gms.common.SignInButton
 class LoginFragment : Fragment() {
 
     private lateinit var binding: LayoutLoginBinding
-    private val viewModelUser: ViewModelUser by activityViewModels()
     private lateinit var fragmentCallback: FragmentCallback
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -34,12 +33,7 @@ class LoginFragment : Fragment() {
         val username = binding.username.text.trim().toString()
         val password = binding.password.text.trim().toString()
         if (areLoginDetailsValid(username, password)) {
-            viewModelUser.login(username, password).observe(viewLifecycleOwner, Observer {
-                if (it == OperationStatus.FAILED) {
 
-                    displayErrorMessage("Invalid credentials")
-                }
-            })
         }
     }
 

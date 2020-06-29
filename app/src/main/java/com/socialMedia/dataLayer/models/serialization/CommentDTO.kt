@@ -2,17 +2,12 @@ package com.socialMedia.dataLayer.models.serialization
 
 import com.socialMedia.dataLayer.models.UserDTO
 import com.google.gson.annotations.SerializedName
+import java.util.*
 
 data class CommentDTO(
-        @SerializedName("id")
-        val id: Int,
-        @SerializedName("postID")
-        val postID: Int,
-        @SerializedName("date")
-        val date: Long,
-        @SerializedName("content")
-        val content: String,
-        @SerializedName("user")
-        val user: UserDTO
+        val postID: String = "",
+        val date: Long = Calendar.getInstance().timeInMillis / 1000,
+        val content: String = "",
+        val user: UserDTO = UserDTO()
 
 )

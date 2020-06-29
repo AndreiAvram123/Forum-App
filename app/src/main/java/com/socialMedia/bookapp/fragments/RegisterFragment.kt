@@ -88,7 +88,9 @@ class RegisterFragment : Fragment() {
         val username = binding.username.text.toString().trim()
 
         if (areCredentialsValid(email, password, reenteredPassword, username)) {
-            viewModelUser.register(username, email, password)
+
+            //todo
+            //register
             showButton()
             clearFields()
         }

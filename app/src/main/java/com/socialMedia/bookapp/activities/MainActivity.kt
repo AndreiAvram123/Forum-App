@@ -14,11 +14,11 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import com.google.firebase.firestore.auth.User
 import com.socialMedia.bookapp.R
 import com.socialMedia.bookapp.databinding.DrawerHeaderBinding
 import com.socialMedia.bookapp.databinding.LayoutMainActivityBinding
 import com.socialMedia.bookapp.services.*
-import com.socialMedia.bookapp.user.UserAccountManager
 import com.socialMedia.bookapp.viewModels.ViewModelChat
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -32,13 +32,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var sharedPreferences: SharedPreferences
 
     @Inject
-    lateinit var userAccountManager: UserAccountManager
-
+    lateinit var user: com.socialMedia.bookapp.models.User
 
     private val viewModelChat: ViewModelChat by viewModels()
     private var mBound: Boolean = false
     private lateinit var serviceMessenger: Messenger
     private lateinit var binding: LayoutMainActivityBinding
+
 
     /** Defines callbacks for service binding, passed to bindService()  */
     private val connection = object : ServiceConnection {
@@ -49,10 +49,12 @@ class MainActivity : AppCompatActivity() {
             serviceMessenger = Messenger(service)
             stopNotificationSound()
 
-            userAccountManager.user.value?.let {
-                val userIDMessage = Message.obtain(null, new_user_id_message, it.userID, 0)
-                serviceMessenger.send(userIDMessage)
-            }
+
+            //todo
+            //fix
+            // val userIDMessage = Message.obtain(null, new_user_id_message, it.userID, 0)
+            //  serviceMessenger.send(userIDMessage)
+
             viewModelChat.chatLink.observe(this@MainActivity, Observer {
                 it?.let { link ->
                     val message = Message.obtain(null, new_chat_link_message)
@@ -137,7 +139,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     private fun configureNavigation() {
 
         val navHostFragment = supportFragmentManager
@@ -162,7 +163,8 @@ class MainActivity : AppCompatActivity() {
 
 
         val headerBinding = DrawerHeaderBinding.bind(binding.navView.getHeaderView(0))
-        headerBinding.user = userAccountManager.user.value
+
+        headerBinding.user = user
 
     }
 

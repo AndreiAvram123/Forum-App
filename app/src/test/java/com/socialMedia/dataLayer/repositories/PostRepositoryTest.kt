@@ -7,7 +7,6 @@ import com.socialMedia.TestUtilities
 import com.socialMedia.bookapp.models.Post
 import com.socialMedia.bookapp.models.User
 import com.socialMedia.dataLayer.LocalDatabase
-import com.socialMedia.dataLayer.interfaces.PostRepositoryInterface
 import com.socialMedia.dataLayer.interfaces.dao.RoomPostDao
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking

@@ -1,7 +1,6 @@
 package com.socialMedia.bookapp.fragments
 
 import com.socialMedia.TestUtilities
-import com.socialMedia.dataLayer.interfaces.PostRepositoryInterface
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert

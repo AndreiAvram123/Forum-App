@@ -11,7 +11,7 @@ data class Post(
         @ColumnInfo(name = "date") var date: Long = -10,
         @ColumnInfo(name = "content") var content: String = "",
         @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false,
-        @ColumnInfo(name = "authorID") var authorID: Int = 0
+        @ColumnInfo(name = "authorID") var authorID: String = ""
 
 ) {
     @Ignore
@@ -19,7 +19,7 @@ data class Post(
 
     companion object Empty {
         fun buildTestPost(): Post {
-            return Post(id = "", content = "", date = 333, title = "", image = "dfd", authorID = 0)
+            return Post(id = "", content = "", date = 333, title = "", image = "dfd", authorID = "")
         }
 
     }

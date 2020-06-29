@@ -1,8 +1,6 @@
 package com.socialMedia.bookapp.viewModels
 
 import com.socialMedia.TestUtilities
-import com.socialMedia.dataLayer.interfaces.CommentRepoInterface
-import com.socialMedia.dataLayer.models.serialization.SerializeComment
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNotNull
 import org.junit.Test

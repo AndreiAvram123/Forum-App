@@ -8,7 +8,6 @@ import androidx.paging.PagedList
 import com.socialMedia.bookapp.models.Post
 import com.socialMedia.bookapp.models.User
 import com.socialMedia.dataLayer.dataMappers.toPost
-import com.socialMedia.dataLayer.interfaces.PostRepositoryInterface
 import com.socialMedia.dataLayer.interfaces.dao.RoomPostDao
 import com.socialMedia.dataLayer.models.*
 import com.google.firebase.firestore.FirebaseFirestore
@@ -25,9 +24,7 @@ import javax.inject.Inject
 @InternalCoroutinesApi
 
 class PostRepository @Inject constructor(private val user: User,
-                                         private val requestExecutor: RequestExecutor,
                                          private val coroutineScope: CoroutineScope,
-                                         private val repo: PostRepositoryInterface,
                                          private val firebaseRepo: FirebaseFirestore,
                                          private val firebaseStorage: FirebaseStorage,
                                          private val postDao: RoomPostDao
@@ -55,14 +52,14 @@ class PostRepository @Inject constructor(private val user: User,
 
         override fun onItemAtEndLoaded(itemAtEnd: Post) {
             coroutineScope.launch {
-                //  fetchNextPosts(itemAtEnd.id)
+                fetchNextPosts(itemAtEnd.date)
             }
         }
     }
 
     val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
         liveData(Dispatchers.IO) {
-            emitSource(postDao.getFavoritePosts(user.userID))
+           emitSource(postDao.getFavoritePosts(user.userID))
             fetchFavoritePosts()
         }
     }
@@ -80,8 +77,8 @@ class PostRepository @Inject constructor(private val user: User,
 
     private suspend fun fetchFavoritePosts() {
 
-        val data =
-                repo.fetchUserFavoritePosts(user.userID).map { it.toPost() }
+//        val data =
+//                repo.fetchUserFavoritePosts(user.userID).map { it.toPost() }
 
 //        postDao.insertAllFavoritePosts(data.map {
 //            UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID)
@@ -92,8 +89,8 @@ class PostRepository @Inject constructor(private val user: User,
     fun fetchMyPosts() = liveData {
         emitSource(postDao.getAllUserPosts(user.userID))
         try {
-            val fetchedPosts = repo.fetchMyPosts(user.userID)
-            postDao.insertPosts(fetchedPosts.map { it.toPost() })
+            val fetchedData = firebaseRepo.collection(postCollection).whereEqualTo("${PostDTO::author.name}.${UserDTO::email.name}", user.email).get().await()
+            postDao.insertPosts(fetchedData.mapNotNull { it.toObject(PostDTO::class.java).toPost(it.id) })
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
         }
@@ -131,10 +128,11 @@ class PostRepository @Inject constructor(private val user: User,
                 }
     }
 
-    internal suspend fun fetchNextPosts(lastPostID: Int) {
+    internal suspend fun fetchNextPosts(lastPostDate: Long) {
         try {
-            val fetchedData = repo.fetchNextPagePosts(lastPostID)
-            postDao.insertPosts(fetchedData.map { it.toPost() })
+            val fetchedData = firebaseRepo.collection(postCollection).whereLessThan(PostDTO::date.name, lastPostDate).get().await()
+            val posts = fetchedData.mapNotNull { it.toObject(PostDTO::class.java).toPost(it.id) }
+            postDao.insertPosts(posts)
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
@@ -143,8 +141,8 @@ class PostRepository @Inject constructor(private val user: User,
     fun uploadImage(serializeImage: SerializeImage): LiveData<String> =
             liveData {
                 emit(String())
-                val imagePath = repo.uploadImage(serializeImage).message
-                emit(imagePath)
+               // val imagePath = repo.uploadImage(serializeImage).message
+             //   emit(imagePath)
             }
 
     fun uploadPost(postDTO: PostDTO): LiveData<OperationStatus> {

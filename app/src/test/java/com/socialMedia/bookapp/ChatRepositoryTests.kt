@@ -1,7 +1,6 @@
 package com.socialMedia.bookapp
 
 import com.socialMedia.TestUtilities
-import com.socialMedia.dataLayer.interfaces.ChatRepositoryInterface
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test

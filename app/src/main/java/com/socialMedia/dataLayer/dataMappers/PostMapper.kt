@@ -4,7 +4,7 @@ import com.socialMedia.bookapp.models.Post
 import com.socialMedia.dataLayer.models.PostDTO
 
 fun PostDTO.toPost(id: String = "unknown"): Post {
-    val user = this.author.toUser()
+    val user = this.author.toUser(id)
 
     return Post(id = id,
             title = this.title,

@@ -9,8 +9,7 @@ import com.socialMedia.dataLayer.models.PostWithComments
 interface RoomCommentDao {
     @Transaction
     @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")
-    fun getAllPostComments(postID: Int): LiveData<PostWithComments>
-
+    fun getAllPostComments(postID: String): LiveData<PostWithComments>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
