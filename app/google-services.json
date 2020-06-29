@@ -8,12 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:255299349470:android:9fb52ba36fefbb44040b4f",
+        "mobilesdk_app_id": "1:255299349470:android:3448ddc21de11441040b4f",
         "android_client_info": {
-          "package_name": "com.example.bookapp"
+          "package_name": "com.socialMedia.bookapp"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "255299349470-mae702fr2o82b4l9ooc1dquikfts6tlj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.socialMedia.bookapp",
+            "certificate_hash": "f60089d85525dc17865e541ea6e008f828dbaae7"
+          }
+        },
         {
           "client_id": "255299349470-52per8289u4q9fue72sl2892e7pljuka.apps.googleusercontent.com",
           "client_type": 3

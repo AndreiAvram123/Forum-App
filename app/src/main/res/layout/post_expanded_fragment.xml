@@ -7,7 +7,7 @@
 
         <variable
             name="post"
-            type="com.example.bookapp.models.Post" />
+            type="com.socialMedia.bookapp.models.Post" />
     </data>
 
     <androidx.core.widget.NestedScrollView

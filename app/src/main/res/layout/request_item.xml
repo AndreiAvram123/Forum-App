@@ -7,7 +7,7 @@
 
         <variable
             name="request"
-            type="com.example.dataLayer.models.deserialization.FriendRequest" />
+            type="com.socialMedia.dataLayer.models.deserialization.FriendRequest" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

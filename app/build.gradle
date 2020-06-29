@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.example.bookapp"
+        applicationId "com.socialMedia.bookapp"
         minSdkVersion 26
         targetSdkVersion 29
         versionCode 1
@@ -66,6 +66,7 @@ android {
 
 dependencies {
     implementation 'com.github.bumptech.glide:glide:4.11.0'
+    implementation 'com.google.firebase:firebase-auth:19.3.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.1.1'
@@ -137,7 +138,6 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
     implementation 'com.google.android.gms:play-services-auth:18.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
