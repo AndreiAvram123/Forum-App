@@ -1,5 +1,7 @@
 package com.example.dataLayer.repositories
 
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.paging.PagedList
@@ -12,6 +14,7 @@ import com.example.dataLayer.models.*
 import com.example.dataLayer.models.serialization.SerializePost
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -27,6 +30,7 @@ class PostRepository @Inject constructor(private val user: User,
                                          private val coroutineScope: CoroutineScope,
                                          private val repo: PostRepositoryInterface,
                                          private val firebaseRepo: FirebaseFirestore,
+                                         private val firebaseStorage: FirebaseStorage,
                                          private val postDao: RoomPostDao
 ) {
 
@@ -120,7 +124,8 @@ class PostRepository @Inject constructor(private val user: User,
                     }
                     snapshots?.let {
                         val data = snapshots.mapNotNull {
-                            it.toObject(PostDTO::class.java).toPost()
+                            Log.d("test", it.id)
+                            it.toObject(PostDTO::class.java).toPost(it.id)
                         }
                         coroutineScope.launch { postDao.insertPosts(data) }
                     }
@@ -143,18 +148,29 @@ class PostRepository @Inject constructor(private val user: User,
                 emit(imagePath)
             }
 
-    fun uploadPost(post: SerializePost): LiveData<OperationStatus> {
+    fun uploadPost(postDTO: PostDTO): LiveData<OperationStatus> {
         return liveData {
+            //mark the operation ongoing
             emit(OperationStatus.ONGOING)
+            //upload the post
+            val id = firebaseRepo.collection(postCollection).add(postDTO).await().id
+            val fetchedData = firebaseRepo.collection(postCollection).document(id).get().await().toObject(PostDTO::class.java)
+            fetchedData?.let {
+                val post = it.toPost(id)
+                postDao.insertPost(post)
+                emit(OperationStatus.FINISHED)
+            }
 
-            val serverResponse = repo.uploadPost(post)
-
-            val fetchedData = repo.fetchPostByID(serverResponse.message.toInt())
-
-            val postDomain = fetchedData.toPost()
-            emit(OperationStatus.FINISHED)
-            postDao.insertPost(postDomain)
         }
+    }
+
+    fun uploadFirebaseImage(path: Uri): LiveData<String> = liveData {
+        emit("")
+        val filePath = "images/posts/${path.lastPathSegment}"
+        firebaseStorage.reference.child(filePath).putFile(path).await()
+        //fetch the full url
+        val fullUrl = firebaseStorage.getReference(filePath).downloadUrl.await().toString()
+        emit(fullUrl)
     }
 }
 

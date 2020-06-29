@@ -1,10 +1,7 @@
 package com.example.bookapp.bindingAdapters
 
-import android.graphics.Color
-import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.github.chrisbanes.photoview.PhotoView
@@ -16,12 +13,15 @@ import java.util.*
 fun bindImageFromURL(imageView: ImageView,
                      imageURl: String?) {
     if (!imageURl.isNullOrEmpty()) {
-        Glide.with(imageView).load(imageURl)
+        Glide.with(imageView)
+                .load(imageURl)
                 .centerInside()
                 .into(imageView)
-    }
-}
 
+
+    }
+
+}
 
 @BindingAdapter("photoViewImageFromURl")
 fun getImage(photoView: PhotoView, imageURl: String?) {
@@ -50,4 +50,5 @@ fun getDateFromUnix(textView: TextView, unixTime: Long) {
     }
 
 }
+
 

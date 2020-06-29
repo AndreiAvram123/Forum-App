@@ -21,7 +21,7 @@ import com.example.bookapp.models.User
 import com.example.bookapp.toBase64
 import com.example.bookapp.toDrawable
 import com.example.bookapp.viewModels.ViewModelChat
-import com.example.dataLayer.dataMappers.UserMapper
+import com.example.dataLayer.dataMappers.toDomainObject
 import com.example.dataLayer.models.serialization.SerializeMessage
 import com.example.dataLayer.serverConstants.MessageTypes
 import dagger.hilt.android.AndroidEntryPoint
@@ -155,7 +155,7 @@ class MessagesFragment : Fragment() {
                 viewModelChat.sendMessage(message)
 
                 val localImageMessage = LocalImageMessage(
-                        sender = UserMapper.mapDomainToNetworkObject(user),
+                        sender = user.toDomainObject(),
                         type = MessageTypes.imageMessageType,
                         localID = uniqueID,
                         resourcePath = path

@@ -43,20 +43,19 @@ class PostRepositoryFirebaseTest {
     @Test
     fun shouldPushedDataBeReturned() {
         runBlocking {
-            val testPost = PostDTO(id = 1, title = "testTitle", image = "gs://freelanceproject-f7aef.appspot.com/testImage",
+            val testPost = PostDTO(title = "testTitle", image = "gs://freelanceproject-f7aef.appspot.com/testImage",
                     content = "test", date = Calendar.getInstance().timeInMillis / 1000,
                     author = UserDTO(userID = 109, username = "Andrei",
                             email = "cactus@gmail.com", profilePicture = ""))
             try {
                 db.collection(collectionName).add(testPost).await()
-                val data = db.collection(collectionName).whereEqualTo(PostDTO::id.name, testPost.id).get().await().documents
-                data.map { it.toObject(PostDTO::class.java) }.find { it?.id == testPost.id }.also {
-                    if (it == null) {
-                        fail()
-                    } else {
-                        assert(true)
-                    }
+                val data = db.collection(collectionName).whereEqualTo(PostDTO::date.name, testPost.date).get().await().documents
+                if (data.isEmpty()) {
+                    fail()
+                } else {
+                    assert(true)
                 }
+
 
             } catch (e: Exception) {
                 Log.d("error", e.printStackTrace().toString())
@@ -68,8 +67,8 @@ class PostRepositoryFirebaseTest {
     @Test
     fun shouldRemoveAddedPost() {
         runBlocking {
-            val testPost = Post(id = Calendar.getInstance().timeInMillis.toInt(), title = "testTitle", image = "image",
-                    content = "test", date = Calendar.getInstance().timeInMillis / 1000, authorID = 109)
+            val testPost = PostDTO(title = "testTitle", image = "https://firebasestorage.googleapis.com/v0/b/freelanceproject-f7aef.appspot.com/o/background.png?alt=media&token=6a78ce1f-ca80-4108-a1f2-8e3ac07dcd7d",
+                    content = "test", date = Calendar.getInstance().timeInMillis / 1000, author = UserDTO())
             try {
                 //add post
                 val id = db.collection(collectionName).add(testPost).await().id
@@ -78,11 +77,11 @@ class PostRepositoryFirebaseTest {
                 db.collection(collectionName).document(id).delete().await()
 
                 //query the post
-                val data = db.collection(collectionName).whereEqualTo(Post::id.name, testPost.id).get().await().documents
-                data.map { it.toObject(Post::class.java) }.find { it?.id == testPost.id }.also {
-                    if (it == null) {
-                        assert(true)
-                    }
+                val data = db.collection(collectionName).whereEqualTo(Post::date.name, testPost.date).get().await().documents
+                if (data.isNullOrEmpty()) {
+                    fail()
+                } else {
+                    assert(true)
                 }
 
             } catch (e: Exception) {
@@ -122,10 +121,17 @@ class PostRepositoryFirebaseTest {
 
     @Test
     fun shouldUploadFile() = runBlocking<Unit> {
-        val localFile: File = File.createTempFile("images", "jpg")
+        //create temporary file
+        val localFilePath = Uri.fromFile(File.createTempFile("images", "jpg"))
+        //get a file from firebase
         val reference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://freelanceproject-f7aef.appspot.com/background.png")
-        reference.getFile(localFile).await()
-        storage.child("testImage").putFile(Uri.fromFile(localFile)).await()
+        reference.getFile(localFilePath).await()
+
+        //upload the same file
+        val uploadTask = storage.child("images/${localFilePath.lastPathSegment}").putFile(localFilePath).await()
+        //get a download url
+        val path = FirebaseStorage.getInstance().getReference("testImage").downloadUrl.await().toString()
+        print(path)
     }
 
     @Test
@@ -135,6 +141,34 @@ class PostRepositoryFirebaseTest {
         val reference = FirebaseStorage.getInstance().getReferenceFromUrl(url)
         reference.getFile(localFile).await()
         storage.child("testVideo").putFile(Uri.fromFile(localFile)).await()
+    }
+
+    @Test
+    fun shouldUploadFileAndDownloadViaURL() = runBlocking<Unit> {
+        //create temp file and download from known path in firebase
+        val localFilePath = Uri.fromFile(File.createTempFile("images", "jpg"))
+        //get a file from firebase
+        val reference = FirebaseStorage.getInstance().getReferenceFromUrl("gs://freelanceproject-f7aef.appspot.com/background.png")
+        reference.getFile(localFilePath).await()
+
+        //upload the file
+        //upload the same file
+        val uploadPath = "images/${localFilePath.lastPathSegment}"
+        val uploadTask = storage.child(uploadPath).putFile(localFilePath).await()
+
+        //get full url path
+        val path = FirebaseStorage.getInstance().getReference(uploadPath).downloadUrl.await()
+        //create a temp file and download via full url
+        val temp = Uri.fromFile(File.createTempFile("images", "jpg"))
+        val ref = FirebaseStorage.getInstance().getReferenceFromUrl(path.toString())
+        ref.getFile(temp).await()
+    }
+
+    @Test
+    fun shouldFetchPostByUID() = runBlocking<Unit>{
+        val uid = "FFxaWf9XcaipO9OYfwYC"
+        val post = db.collection(collectionName).document(uid).get().await().toObject(PostDTO::class.java)
+        assertNotNull(post)
     }
 
 }

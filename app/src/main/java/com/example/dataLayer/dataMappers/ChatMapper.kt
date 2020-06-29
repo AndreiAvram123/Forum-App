@@ -5,8 +5,8 @@ import com.example.dataLayer.models.ChatDTO
 
 object ChatMapper {
     fun mapDtoObjectToDomainObject(chatDTO: ChatDTO, userID: Int): Chat {
-        val firstUser = UserMapper.mapToDomainObject(chatDTO.users[0])
-        val secondUser = UserMapper.mapToDomainObject(chatDTO.users[1])
+        val firstUser = chatDTO.users[0].toUser()
+        val secondUser = chatDTO.users[1].toUser()
         return if (firstUser.userID == userID) {
             Chat(chatID = chatDTO.id,
                     user2 = secondUser,

@@ -3,7 +3,7 @@ package com.example.dataLayer.repositories
 import android.net.ConnectivityManager
 import androidx.lifecycle.liveData
 import com.example.bookapp.user.UserAccountManager
-import com.example.dataLayer.dataMappers.UserMapper
+import com.example.dataLayer.dataMappers.toUser
 import com.example.dataLayer.interfaces.UserRepositoryInterface
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -18,7 +18,7 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
         try {
             val serverResponse = repo.fetchGoogleUser(idToken)
             if (serverResponse.userDTO != null && serverResponse.token != null) {
-                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(serverResponse.userDTO), serverResponse.token)
+                userAccountManager.saveUserAndToken(serverResponse.userDTO.toUser(), serverResponse.token)
             } else {
                 createGoogleAccount(idToken, displayName, email)
             }
@@ -31,7 +31,7 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
         try {
             val response = repo.createGoogleAccount(idToken, displayName, email)
             if (response.userDTO != null && response.token != null) {
-                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO), response.token)
+                userAccountManager.saveUserAndToken(response.userDTO.toUser(), response.token)
             }
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
@@ -43,7 +43,7 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
         if (connectivityManager.activeNetwork != null) {
             try {
                 val fetchedSuggestions = repo.fetchSuggestions(query)
-                emit(fetchedSuggestions.map { UserMapper.mapToDomainObject(it) })
+                emit(fetchedSuggestions.map { it.toUser() })
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -55,7 +55,7 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
         try {
             val response = repo.login(username, password)
             if (response.userDTO != null && response.token != null) {
-                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO)
+                userAccountManager.saveUserAndToken(response.userDTO.toUser()
                         , response.token)
                 emit(OperationStatus.FINISHED)
             } else {

@@ -1,6 +1,7 @@
 package com.example.bookapp.fragments
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,13 +18,17 @@ import com.example.bookapp.databinding.LayoutFragmentAddPostBinding
 import com.example.bookapp.models.User
 import com.example.bookapp.toBase64
 import com.example.bookapp.viewModels.ViewModelPost
+import com.example.dataLayer.dataMappers.toDomainObject
+import com.example.dataLayer.models.PostDTO
 import com.example.dataLayer.models.SerializeImage
+import com.example.dataLayer.models.UserDTO
 import com.example.dataLayer.models.serialization.SerializePost
 import com.example.dataLayer.repositories.OperationStatus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @InternalCoroutinesApi
@@ -32,6 +37,7 @@ class FragmentAddPost : Fragment() {
     private lateinit var binding: LayoutFragmentAddPostBinding
     private val CODE_FILE_EXPLORER = 10
     private val viewModelPost: ViewModelPost by activityViewModels()
+    private var imagePath: Uri? = null
 
     @Inject
     lateinit var user: User
@@ -93,15 +99,9 @@ class FragmentAddPost : Fragment() {
         binding.submitPostButton.visibility = View.INVISIBLE
     }
 
-    private fun pushImage(data: String): LiveData<String> {
-        return viewModelPost.uploadImage(SerializeImage(
-                imageData = data,
-                extension = null
-        ))
-    }
 
-    private fun pushPost(post: SerializePost) {
-        viewModelPost.uploadPost(post).observe(viewLifecycleOwner, Observer {
+    private fun pushPost(postDTO: PostDTO) {
+        viewModelPost.uploadPost(postDTO).observe(viewLifecycleOwner, Observer {
             if (it == OperationStatus.FINISHED) {
                 findNavController().popBackStack()
             }
@@ -109,20 +109,18 @@ class FragmentAddPost : Fragment() {
     }
 
     private fun uploadPost(user: User) {
-        //get image data
-        val drawable = binding.postImageAdd.drawable
 
-        if (drawable != null) {
+        imagePath?.let {
 
             lifecycleScope.launch(Dispatchers.Main) {
-
-                pushImage(drawable.toBase64()).observe(viewLifecycleOwner, Observer {
-                    if (!it.isNullOrEmpty()) {
-                        val post = SerializePost(
+                viewModelPost.uploadFirebaseImage(it).observe(viewLifecycleOwner, Observer {
+                    if (it.isNotEmpty()) {
+                        val post = PostDTO(
                                 title = binding.postTitleAdd.text.toString(),
                                 content = binding.postContentAdd.text.toString(),
-                                userID = user.userID,
-                                image = it
+                                author = user.toDomainObject(),
+                                image = it,
+                                date = Calendar.getInstance().timeInMillis / 1000
                         )
                         pushPost(post)
                     }
@@ -139,6 +137,7 @@ class FragmentAddPost : Fragment() {
                 val path = it.data
                 if (path != null) {
                     binding.postImageAdd.setImageURI(path)
+                    imagePath = path
                 }
             }
         }

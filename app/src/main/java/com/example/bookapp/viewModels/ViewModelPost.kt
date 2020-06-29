@@ -1,5 +1,6 @@
 package com.example.bookapp.viewModels
 
+import android.net.Uri
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.example.bookapp.models.Post
+import com.example.dataLayer.models.PostDTO
 import com.example.dataLayer.models.SerializeImage
 import com.example.dataLayer.models.UserWithFavoritePosts
 import com.example.dataLayer.models.serialization.SerializePost
@@ -62,7 +64,9 @@ class ViewModelPost @ViewModelInject constructor(
 
     fun uploadImage(serializeImage: SerializeImage) = postRepository.uploadImage(serializeImage)
 
-    fun uploadPost(post: SerializePost): LiveData<OperationStatus> = postRepository.uploadPost(post)
+    fun uploadPost(postDTO: PostDTO): LiveData<OperationStatus> = postRepository.uploadPost(postDTO)
+
+    fun uploadFirebaseImage(path:Uri): LiveData<String>  = postRepository.uploadFirebaseImage(path)
 
 
 }

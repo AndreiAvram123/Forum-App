@@ -12,7 +12,7 @@ import com.example.dataLayer.models.UserWithPosts
 @Dao
 interface RoomPostDao {
 
-    @Query("SELECT * FROM post ORDER BY postID DESC")
+    @Query("SELECT * FROM post ORDER BY date DESC")
     fun getCachedPosts(): DataSource.Factory<Int, Post>
 
     @Query("SELECT * FROM user WHERE userID = :userID LIMIT 1")

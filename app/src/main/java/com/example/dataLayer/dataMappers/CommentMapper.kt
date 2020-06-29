@@ -10,7 +10,7 @@ object CommentMapper {
             id = commentDTO.id,
             date = commentDTO.date,
             content = commentDTO.content,
-            user = UserMapper.mapToDomainObject(commentDTO.user),
+            user = commentDTO.user.toUser(),
             postID = commentDTO.postID
 
     )
