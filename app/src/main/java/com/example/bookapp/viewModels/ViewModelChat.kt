@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class ViewModelChat @ViewModelInject constructor(
         private val chatRepository: ChatRepository,
         private val user: User
-        ) : ViewModel() {
+) : ViewModel() {
 
     val currentChatId: MutableLiveData<Int> = MutableLiveData()
 
@@ -29,11 +29,21 @@ class ViewModelChat @ViewModelInject constructor(
     }
 
 
-    val friendRequests: LiveData<ArrayList<FriendRequest>> by lazy {
-        liveData {
-            emit(ArrayList(chatRepository.fetchFriendRequests(user)))
+    fun refreshFriendRequests() {
+        viewModelScope.launch {
+            friendRequests.postValue(chatRepository.fetchFriendRequests(user))
         }
     }
+
+    val friendRequests: MutableLiveData<ArrayList<FriendRequest>> by lazy {
+        MutableLiveData<ArrayList<FriendRequest>>()
+    }.also {
+        viewModelScope.launch {
+            val data = chatRepository.fetchFriendRequests(user)
+            friendRequests.value = data
+        }
+    }
+
 
     val recentMessages: LiveData<List<Message>> = Transformations.switchMap(currentChatId) {
         currentChatId.value?.let {
@@ -67,6 +77,6 @@ class ViewModelChat @ViewModelInject constructor(
     }
 
     fun markMessageAsSeen(message: Message, user: User) = viewModelScope.launch { chatRepository.markMessageAsSeen(message, user) }
-
-
 }
+
+

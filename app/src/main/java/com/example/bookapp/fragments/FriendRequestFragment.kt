@@ -31,6 +31,7 @@ class FriendRequestFragment : Fragment() {
             addItemDecoration(CustomDivider(20))
         }
 
+        viewModelChat.refreshFriendRequests()
         viewModelChat.friendRequests.observe(viewLifecycleOwner, Observer {
             requestAdapter.setData(it)
         })

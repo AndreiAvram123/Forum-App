@@ -115,9 +115,9 @@ class ChatRepository @Inject constructor(
     }
 
 
-    suspend fun fetchFriendRequests(user: User): List<FriendRequest> {
+    suspend fun fetchFriendRequests(user: User): ArrayList<FriendRequest> {
         if (connectivityManager.activeNetwork != null) {
-            return repo.fetchFriendRequests(user.userID)
+            return ArrayList(repo.fetchFriendRequests(user.userID))
         }
         return ArrayList()
     }
