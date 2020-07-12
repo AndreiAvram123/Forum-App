@@ -36,11 +36,12 @@ class ViewModelChat @ViewModelInject constructor(
     }
 
     val friendRequests: MutableLiveData<ArrayList<FriendRequest>> by lazy {
-        MutableLiveData<ArrayList<FriendRequest>>()
-    }.also {
-        viewModelScope.launch {
-            val data = chatRepository.fetchFriendRequests(user)
-            friendRequests.value = data
+        MutableLiveData<ArrayList<FriendRequest>>().also {
+            viewModelScope.launch {
+                val data = chatRepository.fetchFriendRequests(user)
+                friendRequests.value = data
+            }
+
         }
     }
 
