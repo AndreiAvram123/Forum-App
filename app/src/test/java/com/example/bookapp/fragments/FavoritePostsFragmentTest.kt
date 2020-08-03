@@ -21,22 +21,6 @@ class FavoritePostsFragmentTest {
     }
 
 
-    @Test
-    fun shouldPostBeAddedToFavorites() {
-        runBlocking {
-            //add a post to favorites that we know it exists
-            val postID = 2236
-            postRepo.addPostToFavorites(postID, userID)
-            //fetch the users favorite posts and check if this post belongs in the collection
-            val favoritePosts = postRepo.fetchUserFavoritePosts(userID)
-            favoritePosts.find { it.id == postID }.also {
-                Assert.assertNotNull(it)
-            }
-
-            //remove it from favorites after the test
-            postRepo.removePostFromFavorites(userID = userID, postID = postID)
-        }
-    }
 
 
     @Test
