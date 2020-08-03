@@ -83,7 +83,8 @@ class PostRepository @Inject constructor(private val user: User,
         emitSource(postDao.getAllUserPosts(user.userID))
         try {
             val fetchedPosts = repo.fetchMyPosts(user.userID)
-            postDao.insertPosts(fetchedPosts.map { PostMapper.mapToDomainObject(it) })
+            postDao.insertPosts(fetchedPosts.map { PostMapper.mapToDomainObject(it)
+            })
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
         }
@@ -139,6 +140,7 @@ class PostRepository @Inject constructor(private val user: User,
             val serverResponse = repo.uploadPost(post)
 
             val fetchedPost = repo.fetchPostByID(serverResponse.message.toInt())
+
 
             val postDomain = PostMapper.mapToDomainObject(fetchedPost)
             emit(OperationStatus.FINISHED)

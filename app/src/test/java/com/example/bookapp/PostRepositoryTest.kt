@@ -1,6 +1,7 @@
 package com.example.bookapp
 
 import android.os.Build
+import android.util.Log
 import androidx.room.Room
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.TestUtilities
@@ -66,6 +67,8 @@ class PostRepositoryTest {
         Assert.assertNotNull(subject)
     }
 
+
+
     @Test
     fun shouldReturnUserFavoritePost() = runBlocking {
         val favoritePosts = userRepoInterface.fetchUserFavoritePosts(109)
@@ -84,6 +87,13 @@ class PostRepositoryTest {
             Assert.assertNotEquals(fetchedPosts.posts.size, 0)
         }
 
+    }
+    @Test
+    fun shouldReturnError(){
+        runBlocking {
+          val result = userRepoInterface.fetchPostByID(100)
+          print(result.toString())
+        }
     }
 }
 
