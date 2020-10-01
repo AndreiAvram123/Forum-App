@@ -65,6 +65,11 @@ android {
 
 
 dependencies {
+    //AWS
+    implementation 'com.amplifyframework:core:1.4.0'
+    implementation 'com.amplifyframework:aws-auth-cognito:1.4.0'
+
+
 
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
