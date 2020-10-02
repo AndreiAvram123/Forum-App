@@ -24,7 +24,7 @@ class ViewModelUser @ViewModelInject constructor(
     }
 
 
-    fun loginWithGoogle(idToken: String, displayName: String, email: String) = viewModelScope.launch { userRepository.loginWithGoogle(idToken, displayName, email) }
+    fun loginWithGoogle(idToken: String) = viewModelScope.launch { userRepository.loginWithGoogle(idToken) }
 
 
     fun register(username: String, email: String, password: String) {

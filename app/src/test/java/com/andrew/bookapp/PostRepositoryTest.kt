@@ -56,13 +56,13 @@ class PostRepositoryTest {
     @Test
     fun shouldReturn20Posts() =
             runBlocking {
-                val subject = userRepoInterface.fetchNextPagePosts(100000)
+                val subject = userRepoInterface.fetchNextPagePosts(TestUtilities.lastPostIDDB)
                 Assert.assertEquals(20, subject.size)
             }
 
     @Test
     fun shouldReturnPost() = runBlocking {
-        val subject = userRepoInterface.fetchPostByID(2236)
+        val subject = userRepoInterface.fetchPostByID(TestUtilities.testPostID)
         Assert.assertNotNull(subject)
     }
 

@@ -16,7 +16,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
-//stupid comment
 @InternalCoroutinesApi
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
@@ -54,7 +53,7 @@ class AddPostTest {
                         title = "Placeholder title",
                         content = "Placeholder content",
                         image = imageLink,
-                        userID = 3
+                        userID = TestUtilities.testUserID
 
                 )
                 val serverResponse = repo.uploadPost(uploadPost)

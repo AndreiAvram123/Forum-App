@@ -15,8 +15,8 @@ class CommentsRepositoryTest {
     @Test
     fun shouldUploadedPostReturnId() = runBlocking {
         val commentToUpload = SerializeComment(content = "test content",
-                postID = 1108,
-                userID = 4)
+                postID = TestUtilities.firstPostIDdb,
+                userID = TestUtilities.testUserID)
         val response = repo.uploadComment(commentToUpload)
         val id = response.message.toIntOrNull()
         assertNotNull(id)

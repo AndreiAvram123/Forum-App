@@ -33,8 +33,8 @@ class MessagesFragmentTest {
             drawable?.let {
                 val localID: Int = Calendar.getInstance().timeInMillis.hashCode()
                 val message = SerializeMessage(type = MessageTypes.imageMessageType,
-                        chatID = 16,
-                        senderID = 109,
+                        chatID = TestUtilities.testChatID,
+                        senderID = TestUtilities.testUserID,
                         content = it.toBase64(),
                         localIdentifier = localID.toString())
                 val serverResponse = repo.pushMessage(message)

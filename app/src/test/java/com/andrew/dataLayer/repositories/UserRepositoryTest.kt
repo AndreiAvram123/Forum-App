@@ -17,13 +17,6 @@ class UserRepositoryTest {
     }
 
     @Test
-    fun shouldLoginWithGoogleToken() = runBlocking {
-        val token = "104971103964321040701"
-        val response = repo.fetchGoogleUser(token)
-        assert(response.userDTO !=null)
-
-    }
-    @Test
     fun shouldReturnNotNullSearchSuggestions()= runBlocking {
         val query = "av"
         val fetchedData = repo.fetchSuggestions(query)

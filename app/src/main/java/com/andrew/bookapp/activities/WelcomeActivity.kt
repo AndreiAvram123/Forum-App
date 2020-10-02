@@ -2,6 +2,7 @@ package com.andrew.bookapp.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -15,6 +16,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
@@ -25,7 +28,8 @@ const val requestCodeGoogleSignIn = 1
 @InternalCoroutinesApi
 class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
-    private var googleSignInAccount: GoogleSignInAccount? = null
+
+    private val  TAG = WelcomeActivity::class.simpleName
     private val viewModelUser: ViewModelUser by viewModels()
 
 
@@ -57,10 +61,8 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 // Google Sign In was successful, authenticate with Firebase
-                googleSignInAccount = task.getResult(ApiException::class.java)
-                googleSignInAccount?.let {
-                    viewModelUser.loginWithGoogle(it.id!!, it.displayName!!, it.email!!)
-                }
+                 val googleSignInAccount = task.getResult(ApiException::class.java)!!
+                 viewModelUser.loginWithGoogle(googleSignInAccount.idToken!!)
 
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately
@@ -70,6 +72,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
             }
         }
     }
+
 
 
     private fun startMainActivity() {
