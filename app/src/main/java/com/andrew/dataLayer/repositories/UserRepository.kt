@@ -1,14 +1,15 @@
 package com.andrew.dataLayer.repositories
 
+import android.media.VolumeShaper
 import android.net.ConnectivityManager
-import android.util.Log
 import androidx.lifecycle.liveData
-import com.andrew.bookapp.models.User
 import com.andrew.bookapp.user.UserAccountManager
 import com.andrew.dataLayer.dataMappers.UserMapper
 import com.andrew.dataLayer.interfaces.UserRepositoryInterface
+import com.andrew.dataLayer.models.serialization.AuthenticationResponse
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthCredential
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.tasks.await
@@ -22,44 +23,38 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
     private val auth = FirebaseAuth.getInstance()
 
 
-    suspend fun loginWithGoogle(idToken: String) {
-        val credential = GoogleAuthProvider.getCredential(idToken,null)
-
+    suspend fun loginWithGoogle(googleSignInAccount: GoogleSignInAccount) {
+        val credential = GoogleAuthProvider.getCredential(googleSignInAccount.idToken,null)
         try {
            val userFirebase = auth.signInWithCredential(credential).await().user
-            userFirebase?.let{
-
-                val user = User(userID = it.hashCode(),username = it.displayName!!,email = it.email!!,profilePicture = it.photoUrl!!.toString())
-                userAccountManager.saveUserAndToken(user,"test")
-
+            if (userFirebase != null) {
+                    val response = repo.getUserFomUID(userFirebase.uid)
+                //todo
+                //use extension function
+                    if (response.userDTO !=null && response.token != null) {
+                        //todo
+                        //break this down
+                        userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO), response.token)
+                   }else{
+                        registerGoogleAccountToApi(uid = userFirebase.uid,displayName = userFirebase.displayName!!,email = userFirebase.email!!)
+                    }
             }
 
         }catch (e:Exception){
             e.printStackTrace()
         }
-//        try {
-//            val serverResponse = repo.fetchGoogleUser(idToken)
-//            if (serverResponse.userDTO != null && serverResponse.token != null) {
-//                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(serverResponse.userDTO), serverResponse.token)
-//            } else {
-//                createGoogleAccount(idToken, displayName, email)
-//            }
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
     }
 
-//    private suspend fun createGoogleAccount(idToken: String, displayName: String, email: String) {
-//        try {
-//            val response = repo.createGoogleAccount(idToken, displayName, email)
-//            if (response.userDTO != null && response.token != null) {
-//                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO), response.token)
-//            }
-//        } catch (e: java.lang.Exception) {
-//            e.printStackTrace()
-//            createGoogleAccount(idToken, displayName, email)
-//        }
-//    }
+    private suspend fun registerGoogleAccountToApi(uid: String, displayName: String, email: String) {
+        try {
+            val response = repo.createGoogleAccount(uid, displayName, email)
+            if (response.userDTO != null && response.token != null) {
+                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO), response.token)
+            }
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
 
     fun fetchSearchSuggestions(query: String) = liveData {
         if (connectivityManager.activeNetwork != null) {
@@ -72,22 +67,39 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
         }
     }
 
-    fun login(username: String, password: String) = liveData {
+    fun login(email: String, password: String) = liveData {
         emit(OperationStatus.ONGOING)
         try {
-            val response = repo.login(username, password)
-            if (response.userDTO != null && response.token != null) {
-                userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO)
-                        , response.token)
-                emit(OperationStatus.FINISHED)
-            } else {
+             val user = auth.signInWithEmailAndPassword(email, password).await().user
+              if(user !=null){
+                val response = repo.getUserFomUID(user.uid)
+                 if ( response.userDTO !=null && response.token !=null){
+                     userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO),response.token)
+                 }else{
+                     repo.register("display name :)", user.email!!,user.uid)
+                 }
+            }else{
                 emit(OperationStatus.FAILED)
             }
-        } catch (e: java.lang.Exception) {
+        }catch (e :Exception)
+        {
             e.printStackTrace()
+            emit(OperationStatus.FAILED)
         }
-        emit(OperationStatus.FAILED)
     }
 
-    suspend fun register(username: String, email: String, password: String) = repo.register(username, email, password)
+    suspend fun register(username: String, email: String, password: String)   = liveData{
+        emit(OperationStatus.ONGOING)
+      try {
+          val user = auth.createUserWithEmailAndPassword(email, password).await().user
+          user?.let{
+              repo.register(username, email,it.uid)
+              emit(OperationStatus.FINISHED)
+          }
+
+      }catch (e:Exception){
+          emit(OperationStatus.FAILED)
+          e.printStackTrace()
+      }
+    }
 }

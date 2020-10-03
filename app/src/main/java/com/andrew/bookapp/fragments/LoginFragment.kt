@@ -31,10 +31,10 @@ class LoginFragment : Fragment() {
 
 
     private fun attemptLogin() {
-        val username = binding.username.text.trim().toString()
+        val email = binding.username.text.trim().toString()
         val password = binding.password.text.trim().toString()
-        if (areLoginDetailsValid(username, password)) {
-            viewModelUser.login(username, password).observe(viewLifecycleOwner, Observer {
+        if (areLoginDetailsValid(email, password)) {
+            viewModelUser.login(email, password).observe(viewLifecycleOwner, Observer {
                 if (it == OperationStatus.FAILED) {
 
                     displayErrorMessage("Invalid credentials")

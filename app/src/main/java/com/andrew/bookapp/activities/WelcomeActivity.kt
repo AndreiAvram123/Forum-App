@@ -56,13 +56,12 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
         if (requestCode == 1) {
             val task = GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 // Google Sign In was successful, authenticate with Firebase
                  val googleSignInAccount = task.getResult(ApiException::class.java)!!
-                 viewModelUser.loginWithGoogle(googleSignInAccount.idToken!!)
+                 viewModelUser.loginWithGoogle(googleSignInAccount)
 
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately

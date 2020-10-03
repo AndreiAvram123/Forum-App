@@ -12,6 +12,7 @@ import com.andrew.bookapp.R
 import com.andrew.bookapp.databinding.LayoutSignUpBinding
 import com.andrew.bookapp.isEmail
 import com.andrew.bookapp.viewModels.ViewModelUser
+import com.andrew.dataLayer.repositories.OperationStatus
 import com.google.android.material.snackbar.Snackbar
 
 class RegisterFragment : Fragment() {
@@ -22,15 +23,6 @@ class RegisterFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = LayoutSignUpBinding.inflate(inflater, container, false)
         initializeUI()
-        viewModelUser.registrationMessage.observe(viewLifecycleOwner, Observer {
-            hideButton()
-            if (it == "Success") {
-                Snackbar.make(binding.root, getString(R.string.account_created), Snackbar.LENGTH_LONG).show()
-                hideErrors()
-            } else {
-                displayErrorMessage(it)
-            }
-        })
         return binding.root
     }
 
@@ -88,7 +80,14 @@ class RegisterFragment : Fragment() {
         val username = binding.username.text.toString().trim()
 
         if (areCredentialsValid(email, password, reenteredPassword, username)) {
-            viewModelUser.register(username, email, password)
+            viewModelUser.register(username, email, password).observe(viewLifecycleOwner,Observer{
+                if(it == OperationStatus.FINISHED){
+
+                    Snackbar.make(binding.root, getString(R.string.account_created), Snackbar.LENGTH_LONG).show()
+                }
+                //todo
+                //modify ui accordingly
+            })
             showButton()
             clearFields()
         }

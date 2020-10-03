@@ -7,13 +7,9 @@ import retrofit2.http.*
 
 interface UserRepositoryInterface {
 
-
-    @GET("/api/login/google/{token}")
-    suspend fun fetchGoogleUser(@Path("token") token: String): AuthenticationResponse
-
     @FormUrlEncoded
     @POST("/api/register/google")
-    suspend fun createGoogleAccount(@Field("token") idToken: String,
+    suspend fun createGoogleAccount(@Field("uid") uid: String,
                                     @Field("username")
                                     displayName: String,
                                     @Field("email")
@@ -31,7 +27,10 @@ interface UserRepositoryInterface {
     @FormUrlEncoded
     suspend fun register(@Field("username") username: String,
                          @Field("email") email: String,
-                         @Field("password") password: String): ServerResponse
+                         @Field("uid")uid:String)
+
+    @GET("/api/token/{uid}")
+    suspend fun getUserFomUID(@Path("uid") uid: String): AuthenticationResponse
 
 
 }

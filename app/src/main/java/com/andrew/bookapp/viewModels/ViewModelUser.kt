@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.andrew.bookapp.models.User
 import com.andrew.dataLayer.repositories.UserRepository
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import kotlinx.coroutines.launch
 
 class ViewModelUser @ViewModelInject constructor(
@@ -11,10 +12,6 @@ class ViewModelUser @ViewModelInject constructor(
 
 
     val searchQuery = MutableLiveData<String>()
-
-    val registrationMessage by lazy {
-        MutableLiveData<String>()
-    }
 
 
     val searchSuggestions: LiveData<List<User>> = Transformations.switchMap(searchQuery) {
@@ -24,22 +21,13 @@ class ViewModelUser @ViewModelInject constructor(
     }
 
 
-    fun loginWithGoogle(idToken: String) = viewModelScope.launch { userRepository.loginWithGoogle(idToken) }
+    fun loginWithGoogle(googleSignInAccount: GoogleSignInAccount) = viewModelScope.launch { userRepository.loginWithGoogle(googleSignInAccount) }
 
 
-    fun register(username: String, email: String, password: String) {
-        viewModelScope.launch {
-            val response = userRepository.register(username, email, password)
-            if (response.errors != null) {
-                registrationMessage.postValue(response.errors[0])
-            } else {
-                registrationMessage.postValue("Success")
-            }
-        }
-    }
+    fun register(username: String, email: String, password: String)  = liveData {  emitSource(userRepository.register(username,email,password)) }
 
 
-    fun login(username: String, password: String) = userRepository.login(username, password)
+    fun login(email: String, password: String) = userRepository.login(email, password)
 
 
 }
