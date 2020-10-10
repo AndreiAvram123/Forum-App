@@ -47,7 +47,7 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
 
     private suspend fun registerGoogleAccountToApi(uid: String, displayName: String, email: String) {
         try {
-            val response = repo.createGoogleAccount(uid, displayName, email)
+            val response = repo.register(uid, displayName, email)
             if (response.userDTO != null && response.token != null) {
                 userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO), response.token)
             }

@@ -28,8 +28,6 @@ const val requestCodeGoogleSignIn = 1
 @InternalCoroutinesApi
 class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
-
-    private val  TAG = WelcomeActivity::class.simpleName
     private val viewModelUser: ViewModelUser by viewModels()
 
 
@@ -83,6 +81,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
     override fun loginWithGoogle() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail()
                 .requestProfile()
                 .build()
