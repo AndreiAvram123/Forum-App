@@ -43,7 +43,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
         setContentView(R.layout.layout_activity_welcome)
 
 
-        userAccountManager.user.observe(this, Observer {
+        userAccountManager.user.observe(this, {
             if (it.userID != 0) {
                 startMainActivity()
             }
