@@ -7,7 +7,6 @@ import com.andrew.TestUtilities
 import com.andrew.dataLayer.interfaces.PostRepositoryInterface
 import com.andrew.dataLayer.models.SerializeImage
 import com.andrew.dataLayer.models.serialization.SerializePost
-import junit.framework.Assert.fail
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
@@ -60,7 +59,7 @@ class AddPostTest {
                 val postID = serverResponse.message.toIntOrNull()
 
                 if (postID == null) {
-                    fail()
+                    Assert.fail()
                 } else {
                     val fetchedPost = repo.fetchPostByID(postID)
                     Assert.assertNotNull(fetchedPost)
