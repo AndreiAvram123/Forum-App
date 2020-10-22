@@ -67,18 +67,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getPendingIntent(): PendingIntent {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        return PendingIntent.getActivity(this, 0, intent, 0)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.layout_main_activity)
 
-        startDagger()
         createMessageNotificationChannel()
         configureNavigation()
 
@@ -137,21 +130,6 @@ class MainActivity : AppCompatActivity() {
         stopNotificationSound()
     }
 
-    private fun startDagger() {
-//        (application as MyApplication).appComponent = DaggerAppComponent.factory().create((application as MyApplication)
-//                , viewModelPost.viewModelScope)
-//
-//        val appComponent = (application as MyApplication).appComponent
-
-
-
-//        appComponent.inject(viewModelPost)
-//        appComponent.inject(viewModelUser)
-//        appComponent.inject(viewModelChat)
-//        appComponent.inject(viewModelComment)
-
-
-    }
 
 
     private fun configureNavigation() {
@@ -173,7 +151,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun configureDrawer(navController: NavController) {
         val drawer = binding.drawerLayout
-        val appBarConfiguration = AppBarConfiguration(navController.graph, drawer)
+        AppBarConfiguration(navController.graph, drawer)
         binding.navView.setupWithNavController(navController)
 
 
