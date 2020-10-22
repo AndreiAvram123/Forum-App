@@ -1,6 +1,5 @@
 package com.andrew.dataLayer.repositories
 
-import android.media.VolumeShaper
 import android.net.ConnectivityManager
 import android.net.Uri
 import androidx.lifecycle.liveData
@@ -9,14 +8,12 @@ import com.andrew.bookapp.user.UserAccountManager
 import com.andrew.dataLayer.dataMappers.UserMapper
 import com.andrew.dataLayer.dataMappers.toUser
 import com.andrew.dataLayer.interfaces.UserRepositoryInterface
-import com.andrew.dataLayer.models.serialization.AuthenticationResponse
 import com.andrew.dataLayer.models.serialization.RegisterUserDTO
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.userProfileChangeRequest
-import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
