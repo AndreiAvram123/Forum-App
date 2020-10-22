@@ -24,9 +24,5 @@ class UserRepositoryTest {
         val fetchedData = repo.fetchSuggestions(query)
         assertNotNull(fetchedData)
     }
-    @Test
-    fun shouldRegisterWithFirebaseUID() = runBlocking {
-        val response = repo.register(TestUtilities.userToRegister)
-        assertNotNull(response.token)
-    }
+
 }
