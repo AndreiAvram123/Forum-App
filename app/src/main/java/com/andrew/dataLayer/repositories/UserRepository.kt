@@ -99,11 +99,7 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
                 val response = repo.getUserFomUID(user.uid)
                  if ( response.userDTO !=null && response.token !=null){
                      userAccountManager.saveUserAndToken(UserMapper.mapToDomainObject(response.userDTO),response.token)
-                 }else{
-                     val registerUserDTO = RegisterUserDTO(uid = user.uid,
-                             displayName = "displayName",
-                             email = email)
-                     repo.register(registerUserDTO)
+                     emit(OperationStatus.FINISHED)
                  }
             }else{
                 emit(OperationStatus.FAILED)
