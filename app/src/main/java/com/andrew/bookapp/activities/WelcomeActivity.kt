@@ -17,8 +17,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.layout_sign_up.*
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
@@ -42,14 +44,19 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
 
-
-        userAccountManager.user.observe(this, {
-            if (it.userID != 0) {
-                startMainActivity()
-            }
-        })
+        FirebaseAuth.getInstance().addAuthStateListener {
+          if( it.currentUser !=null){
+              startMainActivity()
+          }
+        }
     }
 
+    override fun onStart() {
+        super.onStart()
+        if(FirebaseAuth.getInstance().currentUser != null){
+            startMainActivity()
+        }
+    }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -72,11 +79,11 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
 
 
-    private fun startMainActivity() {
-        val intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
+    private fun startMainActivity() =
+       Intent(this, MainActivity::class.java).also {
+           startActivity(it)
+           finish()
+       }
 
 
     override fun loginWithGoogle() {

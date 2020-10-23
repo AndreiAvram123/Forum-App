@@ -97,7 +97,7 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-perf'
 
 
@@ -105,9 +105,6 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5'
     implementation 'com.google.android.gms:play-services-auth:18.1.0'
 
-
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
 
 
     implementation 'org.jetbrains.kotlin:kotlin-reflect:1.4.10'
@@ -186,17 +183,13 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 
-    debugImplementation 'androidx.test:core:' + rootProject.coreVersion
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
-    testImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
-    testAnnotationProcessor 'com.google.auto.service:auto-service:1.0-rc4'
-    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
-    androidTestImplementation 'androidx.test:runner:' + rootProject.runnerVersion
-    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
-    androidTestImplementation 'androidx.fragment:fragment-testing:' + rootProject.androidxFragmentVersion
-    androidTestImplementation 'com.google.truth:truth:' + rootProject.truthVersion
-    androidTestImplementation 'org.robolectric:annotations:' + rootProject.robolectricVersion
+    testImplementation 'androidx.test.ext:junit:1.1.2'
+
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    testImplementation "org.robolectric:robolectric:4.4"
+
+
 }
 
 repositories {

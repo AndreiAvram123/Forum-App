@@ -2,7 +2,9 @@ package com.andrew.dataLayer.repositories
 
 import com.andrew.TestUtilities
 import com.andrew.dataLayer.interfaces.UserRepositoryInterface
+import com.andrew.dataLayer.models.UserDTO
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
@@ -22,4 +24,5 @@ class UserRepositoryTest {
         val fetchedData = repo.fetchSuggestions(query)
         assertNotNull(fetchedData)
     }
+
 }

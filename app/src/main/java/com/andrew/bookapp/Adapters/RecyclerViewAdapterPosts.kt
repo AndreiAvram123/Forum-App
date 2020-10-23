@@ -39,7 +39,7 @@ class RecyclerViewAdapterPosts : RecyclerView.Adapter<RecyclerViewAdapterPosts.V
             binding.post = post
             binding.root.setOnClickListener {
                 if (binding.root.context.getConnectivityManager().activeNetwork != null) {
-                    val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(posts[position].id)
+                    val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(posts[adapterPosition].id)
                     Navigation.findNavController(binding.root).navigate(action)
 
                 }

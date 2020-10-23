@@ -26,7 +26,6 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
     fun getToken() = sharedPreferences.getStringNotNull(R.string.key_token)
 
     suspend fun saveUserAndToken(user: User, token: String) {
-        persistUser(user)
         persistToken(token)
         userDao.insertUser(user)
     }
@@ -37,18 +36,6 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
                 putString(getString(R.string.key_token), token)
             }
         }
-    }
-
-    private fun persistUser(user: User) {
-        sharedPreferences.edit {
-            context.apply {
-                putInt(getString(R.string.key_user_id), user.userID)
-                putString(getString(R.string.key_username), user.username)
-                putString(getString(R.string.key_email), user.email)
-                putString(getString(R.string.key_profile_picture), user.profilePicture)
-            }
-        }
-        this.user.postValue(user)
     }
 
     fun deleteUserFromMemory() {

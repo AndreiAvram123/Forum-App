@@ -7,7 +7,5 @@ data class AuthenticationResponse(
         @SerializedName("user")
         val userDTO: UserDTO?,
         @SerializedName("token")
-        val token: String?,
-        @SerializedName("ErrorMessage")
-        val errorMessage: String
+        val token: String?
 )

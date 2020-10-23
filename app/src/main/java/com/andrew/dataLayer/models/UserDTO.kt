@@ -10,7 +10,5 @@ data class UserDTO(
         @SerializedName("email")
         val email: String,
         @SerializedName("profilePicture")
-        val profilePicture: String,
-        @SerializedName("token")
-        val token: String?
+        val profilePicture: String
 )
