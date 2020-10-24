@@ -1,6 +1,8 @@
 package com.andrew
 
 import com.andrew.bookapp.AuthInterceptor
+import com.andrew.bookapp.models.Post
+import com.andrew.bookapp.models.User
 import com.andrew.dataLayer.models.serialization.RegisterUserDTO
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -9,20 +11,29 @@ import retrofit2.converter.gson.GsonConverterFactory
 class TestUtilities {
     companion object {
 
-        const val testUserID = 109
-        const val testPostID = 2
-        const val firstPostIDdb = 2
+        const val testUserID = "asfdsfsdsdfs"
+        const val testUserID2 = "aaaaaaa"
+
+        const val testPostID = 3
+
         const val lastPostIDDB = 1023
         const val testChatID = 1
 
+        val testPost = Post(id = testPostID,title = "testTitle",image = "testImage",date = System.currentTimeMillis(),
+        content = "testContent",isFavorite = false,authorID = testUserID)
 
-        private val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2MDE2MzU4MzcsImV4cCI6MTYzMzE3MTgzNywicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiYXZyYW1hbmRyZWl0aWJlcml1dXVAZ21haWwuY29tIn0.Mz_oamt_eIsJusYcLYu1TQFgsh8DoasymRFxA2YKA76Grdg-KvbGFKBlHzZpAw3TCfOEdb9kMARDwSOyWSPfaFWmPu4CJlceM3_dueHSNARTkr19Q1CNfq1zwnvxeK7JK1bOKKu4akJvq8UbqccZcRSGc95s64fP9I9AsIdhmSudo7udFwMHigtLLv0u94piOmAEU_Q64s6C2Wj7MZwFzn0Dak85hhMFpUqVHwAIJD1acYmUg8pen7SGQdSFQCqbsT1SGKWNiSGhK1fqJm56od39TD6G-eFYrZrShNDvtADxzbJml2ca_w7Ux-hdQQPcfpcMyIGxcaNWWaRKEkcSjRFAj6GzIAKPvniwlP2_BYfnP6RCY-iCNYqvQEiV5JUvSCUvVYQOJzlrCDd2T3evh9SgvEfzkEAXZDkxdKo_qre6OClcJFalAnvx0OcVPuNZhp37FuH905A-SlYsFrRYIfLxps97zb7OXwjk_un8xtLfJx4D0VkZo5Y8pQF7HiRCv1uKdGnXI6qcYG0sa2wUaoEa5NwyB0B8Ls4inhOnqQm2UDjUTnI09M8Yrp0c95k-kJjuG5aSuIDDOkxCnoVvCkNt2c-J8yHUo-YG3kj6CIaCb1XMhT3d4JlnrDVsBhCrOIOiWGE--VghqEgYPnUAR63AdSWEPaJ8EkP1RKnQK5M"
+        val testUser = User(userID = testUserID,username = "testUsername",email = "testEmail",profilePicture = "testProfilePicture")
+
+
+
+       private val token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2MDM0NTM3MTIsImV4cCI6MTYzNDk4OTcxMiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiYXZyYW1hbmRyZWlAeWFob28uY29tIn0.jzwxtOmXcgEbcQcWvIvR81nZc9KKtsrm6nDrQZFOFs0iCctzh4PqMfdLYdd0PcRCR32d_X8_bNAmZamAAiA_Eie4YMtu6Kga0itCzLTBUTWhvzL5r59QL-4BgFm6RUEwvtO5lK1xrlgiVXQHcldHmMXUvgy4IgQdNP1078OuPevNw4rCQDJPPSaMvkdVPJdpznBKNXc0vlrfYpcZNslAxIgBPm_RKXt6zDeurIlv5GAdp_O5DepR8qKHzsdwoYb6swmW4SHw__j9P9Sz8AdbKUfq6IZ04BNN9cMuJ6krWEWHbyMrT2LLLxzuVB4XZxJY4y6WFwWSgA5lMbJ4uv6g5QL72c5ygT5dZuhna-GXkH1XNYavpjfWXs4yYdFOJMzR3vtK1Azp42ZanB6zDrwBDSUMn5hCPuHP7hnGTRJdINY-q3fFvNpZXm6TMHnJxwCDXKPjDbjOGHGyLv8LlD_lpNaoiT8rx4XK2b2Hu6dEJauJBWtyCQyiCsFng_NqBVHX02IN6vXba7pHnbeRscd6ofQu4_32FarwdOn-5rcQ0n8RCa7UUfrIr8jCyIgb_c3S294RpUpaJcmH4_k1a4Iy3w3XzQLr2Yrz-THnPWNRF0nIII44zhzkH2ECcAg1Ijo8WFps2iAD0gUfnrqHRzvB4-lwJJhRwLlLrqLGTZb-qQk"
+
         private val retrofitClient = OkHttpClient.Builder()
                 .addInterceptor(AuthInterceptor(token)).build()
 
 
 
-        val retrofit = Retrofit.Builder()
+        val retrofit:Retrofit = Retrofit.Builder()
                 .baseUrl("http://www.andreiram.co.uk")
                 .client(retrofitClient)
                 .addConverterFactory(GsonConverterFactory.create())

@@ -4,7 +4,7 @@ import com.andrew.bookapp.models.Chat
 import com.andrew.dataLayer.models.ChatDTO
 
 object ChatMapper {
-    fun mapDtoObjectToDomainObject(chatDTO: ChatDTO, userID: Int): Chat {
+    fun mapDtoObjectToDomainObject(chatDTO: ChatDTO, userID: String): Chat {
         val firstUser = UserMapper.mapToDomainObject(chatDTO.users[0])
         val secondUser = UserMapper.mapToDomainObject(chatDTO.users[1])
         return if (firstUser.userID == userID) {
@@ -21,5 +21,5 @@ object ChatMapper {
         }
     }
 
-    fun mapToDomainObjects(chatsDTO: List<ChatDTO>, userID: Int): List<Chat> = chatsDTO.map { mapDtoObjectToDomainObject(it, userID) }
+    fun mapToDomainObjects(chatsDTO: List<ChatDTO>, userID: String): List<Chat> = chatsDTO.map { mapDtoObjectToDomainObject(it, userID) }
 }

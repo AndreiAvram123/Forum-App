@@ -8,7 +8,7 @@ data class SerializeMessage(
         @SerializedName("chatID")
         val chatID: Int,
         @SerializedName("senderID")
-        val senderID: Int,
+        val senderID: String,
         @SerializedName("content")
         val content: String,
         @SerializedName("localID")

@@ -4,6 +4,7 @@ import com.andrew.dataLayer.models.PostDTO
 import com.andrew.dataLayer.models.SerializeImage
 import com.andrew.dataLayer.models.ServerResponse
 import com.andrew.dataLayer.models.serialization.SerializePost
+import com.andrew.dataLayer.models.serialization.SerializeFavoritePostRequest
 import retrofit2.http.*
 
 interface PostRepositoryInterface {
@@ -19,17 +20,17 @@ interface PostRepositoryInterface {
     suspend fun fetchPostByID(@Path("id") postID: Int): PostDTO
 
     @GET("/api/user/{id}/favoritePosts")
-    suspend fun fetchUserFavoritePosts(@Path("id") userID: Int): ArrayList<PostDTO>
+    suspend fun fetchUserFavoritePosts(@Path("id") userID: String): ArrayList<PostDTO>
 
 
     @GET("/api/user/{id}/posts")
-    suspend fun fetchMyPosts(@Path("id") userID: Int): ArrayList<PostDTO>
+    suspend fun fetchMyPosts(@Path("id") userID: String): ArrayList<PostDTO>
 
     @DELETE("/api/user/{userID}/removeFromFavorites/{postID}")
-    suspend fun removePostFromFavorites(@Path("userID") userID: Int, @Path("postID") postID: Int): ServerResponse
+    suspend fun removePostFromFavorites(@Path("userID") userID: String, @Path("postID") postID: Int): ServerResponse
 
-    @POST("/api/user/{userID}/addToFavorites/{postID}")
-    suspend fun addPostToFavorites(@Path("postID") postID: Int, @Path("userID") userID: Int)
+    @POST("/api/posts/addToFavorites")
+    suspend fun addPostToFavorites(@Body serializeFavoritePostRequest: SerializeFavoritePostRequest) :ServerResponse
 
     @POST("/api/posts/uploadImage")
     suspend fun uploadImage(@Body serializeImage: SerializeImage): ServerResponse

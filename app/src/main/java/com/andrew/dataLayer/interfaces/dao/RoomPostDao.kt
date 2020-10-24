@@ -16,7 +16,7 @@ interface RoomPostDao {
     fun getCachedPosts(): DataSource.Factory<Int, Post>
 
     @Query("SELECT * FROM user WHERE userID = :userID LIMIT 1")
-    fun getFavoritePosts(userID: Int): LiveData<UserWithFavoritePosts>
+    fun getFavoritePosts(userID: String): LiveData<UserWithFavoritePosts>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -30,7 +30,7 @@ interface RoomPostDao {
 
 
     @Query("SELECT * FROM user WHERE userID = :userID")
-    fun getAllUserPosts(userID: Int): LiveData<UserWithPosts>
+    fun getAllUserPosts(userID: String): LiveData<UserWithPosts>
 
     @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")
     fun getPostByID(postID: Int): LiveData<Post>
@@ -46,7 +46,7 @@ interface RoomPostDao {
 
 
     @Query("SELECT * FROM user WHERE userID = :userID LIMIT 1")
-    suspend fun getFavoritePostsTest(userID: Int): UserWithFavoritePosts
+    suspend fun getFavoritePostsTest(userID: String): UserWithFavoritePosts
 
 
 }

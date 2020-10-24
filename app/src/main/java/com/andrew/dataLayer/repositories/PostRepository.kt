@@ -3,17 +3,20 @@ package com.andrew.dataLayer.repositories
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.paging.PagedList
+import com.andrew.bookapp.Resource
 import com.andrew.bookapp.models.Post
 import com.andrew.bookapp.models.User
 import com.andrew.dataLayer.dataMappers.PostMapper
 import com.andrew.dataLayer.interfaces.PostRepositoryInterface
 import com.andrew.dataLayer.interfaces.dao.RoomPostDao
 import com.andrew.dataLayer.models.*
+import com.andrew.dataLayer.models.serialization.SerializeFavoritePostRequest
 import com.andrew.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import javax.inject.Inject
 
 
@@ -91,12 +94,15 @@ class PostRepository @Inject constructor(private val user: User,
     }
 
     suspend fun addPostToFavorites(post: Post) {
+        val requestData = SerializeFavoritePostRequest(postID = post.id,
+        userID = user.userID)
         postDao.addFavoritePost(UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID))
-        repo.addPostToFavorites(post.id, user.userID)
+        repo.addPostToFavorites(requestData)
     }
 
 
     suspend fun deletePostFromFavorites(post: Post) {
+
         repo.removePostFromFavorites(postID = post.id, userID = user.userID)
         val toRemove = UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID)
         postDao.deletePostFromFavorites(toRemove)
@@ -113,7 +119,6 @@ class PostRepository @Inject constructor(private val user: User,
         postDao.removeCachedData()
         val fetchedData: ArrayList<PostDTO> = repo.fetchRecentPosts()
         postDao.insertPosts(fetchedData.map { PostMapper.mapToDomainObject(it) })
-
     }
 
 

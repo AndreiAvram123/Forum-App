@@ -2,6 +2,7 @@ package com.andrew.dataLayer.dataMappers
 
 import com.andrew.bookapp.models.User
 import com.andrew.dataLayer.models.UserDTO
+import com.google.firebase.auth.FirebaseUser
 
 object UserMapper {
 
@@ -12,3 +13,4 @@ object UserMapper {
 }
 
 fun UserDTO.toUser(): User = User(userID = this.userID, username = this.username, email = this.email, profilePicture = this.profilePicture)
+fun FirebaseUser.toUser():User  = User(userID = this.uid,username = this.displayName!!,email = this.email!!, profilePicture = this.photoUrl.toString())

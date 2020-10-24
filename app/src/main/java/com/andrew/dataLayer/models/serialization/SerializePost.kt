@@ -10,5 +10,5 @@ data class SerializePost(
         @SerializedName("image")
         val image: String,
         @SerializedName("userID")
-        val userID: Int
+        val userID: String
 )

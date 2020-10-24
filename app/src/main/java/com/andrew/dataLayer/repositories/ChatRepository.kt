@@ -122,7 +122,7 @@ class ChatRepository @Inject constructor(
 
     suspend fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
         if (connectivityManager.activeNetwork != null) {
-            repo.pushFriendRequest(friendRequest)
+            repo.sendFriendRequest(friendRequest)
         }
     }
 

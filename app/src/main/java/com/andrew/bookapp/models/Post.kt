@@ -11,17 +11,9 @@ data class Post(
         @ColumnInfo(name = "date") val date: Long,
         @ColumnInfo(name = "content") val content: String,
         @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false,
-        @ColumnInfo(name = "authorID") val authorID: Int
+        @ColumnInfo(name = "authorID") val authorID: String
 
 ) {
     @Ignore
     var author: User? = null
-
-    companion object Empty {
-        fun buildTestPost(): Post {
-            return Post(id = 0, content = "", date = 333, title = "", image = "dfd", authorID = 0)
-        }
-
-    }
-
 }

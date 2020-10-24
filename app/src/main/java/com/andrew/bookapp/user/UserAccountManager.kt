@@ -15,13 +15,6 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
                                              @ApplicationContext private val context: Context,
                                              private val userDao: UserDao) {
 
-    val user: MutableLiveData<User> by lazy {
-        val user = User(userID = sharedPreferences.getInt(context.getString(R.string.key_user_id), 0),
-                username = sharedPreferences.getStringNotNull(R.string.key_username),
-                email = sharedPreferences.getStringNotNull(R.string.key_email),
-                profilePicture = sharedPreferences.getStringNotNull(R.string.key_profile_picture))
-        MutableLiveData<User>(user)
-    }
 
     fun getToken() = sharedPreferences.getStringNotNull(R.string.key_token)
 

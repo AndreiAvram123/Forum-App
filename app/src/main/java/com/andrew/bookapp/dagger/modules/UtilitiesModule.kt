@@ -5,6 +5,8 @@ import android.content.SharedPreferences
 import com.andrew.bookapp.R
 import com.andrew.bookapp.models.User
 import com.andrew.bookapp.user.UserAccountManager
+import com.andrew.dataLayer.dataMappers.toUser
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,7 +26,7 @@ class UtilitiesModule {
 
 
     @Provides
-    fun user(userAccountManager: UserAccountManager): User = userAccountManager.user.value!!
+    fun user(userAccountManager: UserAccountManager): User = FirebaseAuth.getInstance().currentUser!!.toUser()
 
 
 }

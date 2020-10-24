@@ -2,11 +2,10 @@ package com.andrew.dataLayer.models.serialization
 
 import com.google.gson.annotations.SerializedName
 
-data class SerializeComment(
-        @SerializedName("content")
-        val content: String,
+data class SerializeFavoritePostRequest (
         @SerializedName("postID")
-        val postID: Int,
+        val postID : Int,
         @SerializedName("userID")
-        val userID: String
+        val userID :String
+
 )
