@@ -1,11 +1,13 @@
 package com.andrew.bookapp.viewModels
 
+import android.graphics.drawable.Drawable
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.andrew.dataLayer.engineUtils.Resource
 import com.andrew.bookapp.models.Post
 import com.andrew.dataLayer.models.SerializeImage
 import com.andrew.dataLayer.models.UserWithFavoritePosts
@@ -29,9 +31,8 @@ class ViewModelPost @ViewModelInject constructor(
     }
 
 
-    fun getPostByID(id: Int): LiveData<Post> {
-        return postRepository.fetchPostByID(id)
-    }
+    fun getPostByID(id: Int): LiveData<Resource<Post>> = postRepository.fetchPostByID(id)
+
 
     private val config = PagedList.Config.Builder()
             .setPageSize(10)
@@ -59,9 +60,9 @@ class ViewModelPost @ViewModelInject constructor(
 
     fun fetchNewPosts() = viewModelScope.launch { postRepository.fetchInitialPosts() }
 
-    fun uploadImage(serializeImage: SerializeImage) = postRepository.uploadImage(serializeImage)
+    fun uploadImage(drawable: Drawable) = postRepository.uploadImage(drawable)
 
-    fun uploadPost(post: SerializePost): LiveData<OperationStatus> = postRepository.uploadPost(post)
+    fun uploadPost(post: SerializePost) = postRepository.uploadPost(post)
 
 
 }

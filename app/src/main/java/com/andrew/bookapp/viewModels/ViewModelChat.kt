@@ -53,16 +53,10 @@ class ViewModelChat @ViewModelInject constructor(
     }
 
 
-    val chatLink: LiveData<String?> by lazy {
-        chatRepository.chatLink
-    }
+    val chatLink: LiveData<String> = chatRepository.chatLink
 
 
-    fun sendMessage(serializeMessage: SerializeMessage) {
-        viewModelScope.launch {
-            chatRepository.pushMessage(serializeMessage)
-        }
-    }
+    fun sendMessage(serializeMessage: SerializeMessage) = chatRepository.pushMessage(serializeMessage)
 
     fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
         viewModelScope.launch {

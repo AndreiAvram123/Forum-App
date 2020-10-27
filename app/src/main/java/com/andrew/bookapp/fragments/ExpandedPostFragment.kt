@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -14,6 +13,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.andrew.bookapp.Adapters.AdapterComments
 import com.andrew.bookapp.R
+import com.andrew.dataLayer.engineUtils.Status
 import com.andrew.bookapp.bottomSheets.CommentBottomSheet
 import com.andrew.bookapp.databinding.PostExpandedFragmentBinding
 import com.andrew.bookapp.models.Comment
@@ -61,21 +61,31 @@ class ExpandedPostFragment : Fragment() {
 
         })
 
-        viewModelPost.getPostByID(args.postID).observe(viewLifecycleOwner, Observer {
-            if (it != null) {
-                if (this::favoritePosts.isInitialized && favoritePosts.contains(it)) {
-                    it.isFavorite = true
+        viewModelPost.getPostByID(args.postID).observe(viewLifecycleOwner, {
+            when(it.status){
+                Status.SUCCESS ->{
+                    val data = it.data!!
+                    if (this::favoritePosts.isInitialized && favoritePosts.contains(data)) {
+                        data.isFavorite = true
+                    }
+                    post = data
+                    configureViews()
+                    getComments()
                 }
-                post = it
-                configureViews()
-                getComments()
+                Status.LOADING ->{
+
+                }
+                Status.ERROR ->{
+
+                }
             }
+
         })
 
     }
 
     private fun getComments() {
-        viewModelComments.getCommentsForPost(post).observe(viewLifecycleOwner, Observer {
+        viewModelComments.getCommentsForPost(post).observe(viewLifecycleOwner, {
             insertComments(ArrayList(it.comments))
         })
     }

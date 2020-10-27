@@ -22,6 +22,7 @@ import com.andrew.bookapp.toBase64
 import com.andrew.bookapp.toDrawable
 import com.andrew.bookapp.viewModels.ViewModelChat
 import com.andrew.dataLayer.dataMappers.UserMapper
+import com.andrew.dataLayer.engineUtils.Status
 import com.andrew.dataLayer.models.serialization.SerializeMessage
 import com.andrew.dataLayer.serverConstants.MessageTypes
 import dagger.hilt.android.AndroidEntryPoint
@@ -152,15 +153,26 @@ class MessagesFragment : Fragment() {
                         localIdentifier = uniqueID
 
                 )
-                viewModelChat.sendMessage(message)
+                viewModelChat.sendMessage(message).observe(viewLifecycleOwner,{
+                   when (it.status){
+                       Status.LOADING -> {
 
-                val localImageMessage = LocalImageMessage(
-                        sender = UserMapper.mapDomainToNetworkObject(user),
-                        type = MessageTypes.imageMessageType,
-                        localID = uniqueID,
-                        resourcePath = path
-                )
-                messageAdapter.add(localImageMessage)
+                       }
+                       Status.SUCCESS ->{
+                           val localImageMessage = LocalImageMessage(
+                                   sender = UserMapper.mapDomainToNetworkObject(user),
+                                   type = MessageTypes.imageMessageType,
+                                   localID = uniqueID,
+                                   resourcePath = path
+                           )
+                           messageAdapter.add(localImageMessage)
+                       }
+                       else -> {
+
+                       }
+                   }
+
+                })
             }
         }
     }

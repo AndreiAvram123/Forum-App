@@ -1,9 +1,8 @@
 package com.andrew
 
-import com.andrew.bookapp.AuthInterceptor
+import com.andrew.dataLayer.engineUtils.AuthInterceptor
 import com.andrew.bookapp.models.Post
 import com.andrew.bookapp.models.User
-import com.andrew.dataLayer.models.serialization.RegisterUserDTO
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory

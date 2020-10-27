@@ -2,7 +2,7 @@ package com.andrew.bookapp.dagger.modules
 
 import android.content.Context
 import android.net.ConnectivityManager
-import com.andrew.bookapp.AuthInterceptor
+import com.andrew.dataLayer.engineUtils.AuthInterceptor
 import com.andrew.bookapp.user.UserAccountManager
 import com.andrew.dataLayer.interfaces.ChatRepositoryInterface
 import com.andrew.dataLayer.interfaces.CommentRepoInterface
@@ -33,9 +33,10 @@ object RepositoryModule {
             .build()
 
     @Provides
-    fun httpClient(userAccountManager: UserAccountManager): OkHttpClient {
+    fun httpClient(userAccountManager: UserAccountManager,
+                   connectivityManager: ConnectivityManager): OkHttpClient {
         val token = userAccountManager.getToken()
-        val interceptor = AuthInterceptor(token)
+        val interceptor = AuthInterceptor(token,connectivityManager)
         return OkHttpClient.Builder().addInterceptor(interceptor).build()
     }
 
