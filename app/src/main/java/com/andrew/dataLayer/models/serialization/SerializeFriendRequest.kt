@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class SerializeFriendRequest(
         @SerializedName("senderID")
-        val senderID: Int,
+        val senderID: String,
         @SerializedName("receiverID")
-        val receiverID: Int
+        val receiverID: String
 )

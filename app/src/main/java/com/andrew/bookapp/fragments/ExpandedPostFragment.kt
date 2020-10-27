@@ -56,7 +56,7 @@ class ExpandedPostFragment : Fragment() {
 
     private fun attachObservers() {
 
-        viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, Observer {
+        viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, {
             favoritePosts = it.posts
 
         })
@@ -124,7 +124,7 @@ class ExpandedPostFragment : Fragment() {
                 postID = post.id,
                 userID = user.userID)
 
-        viewModelComments.uploadComment(commentToUpload).observe(viewLifecycleOwner, Observer {
+        viewModelComments.uploadComment(commentToUpload).observe(viewLifecycleOwner, {
             if (it == OperationStatus.FINISHED) {
                 commentDialog.dismiss()
             }

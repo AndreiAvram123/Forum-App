@@ -17,9 +17,14 @@ import androidx.navigation.ui.setupWithNavController
 import com.andrew.bookapp.R
 import com.andrew.bookapp.databinding.DrawerHeaderBinding
 import com.andrew.bookapp.databinding.LayoutMainActivityBinding
+import com.andrew.bookapp.models.User
 import com.andrew.bookapp.services.*
 import com.andrew.bookapp.user.UserAccountManager
 import com.andrew.bookapp.viewModels.ViewModelChat
+import com.andrew.dataLayer.dataMappers.toUser
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
@@ -30,9 +35,6 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var sharedPreferences: SharedPreferences
-
-    @Inject
-    lateinit var userAccountManager: UserAccountManager
 
 
     private val viewModelChat: ViewModelChat by viewModels()
@@ -48,12 +50,11 @@ class MainActivity : AppCompatActivity() {
             mBound = true
             serviceMessenger = Messenger(service)
             stopNotificationSound()
-
-            userAccountManager.user.value?.let {
-                val userIDMessage = Message.obtain(null, new_user_id_message, it.userID, 0)
-                serviceMessenger.send(userIDMessage)
+            FirebaseAuth.getInstance().currentUser?.let{
+              //  val userIDMessage = Message.obtain(null, new_user_id_message, it.userID, 0)
+              //  serviceMessenger.send(userIDMessage)
             }
-            viewModelChat.chatLink.observe(this@MainActivity, Observer {
+            viewModelChat.chatLink.observe(this@MainActivity, {
                 it?.let { link ->
                     val message = Message.obtain(null, new_chat_link_message)
                     Bundle().apply { putString(key_chats_link, link) }.also { bundle -> message.data = bundle }
@@ -156,7 +157,7 @@ class MainActivity : AppCompatActivity() {
 
 
         val headerBinding = DrawerHeaderBinding.bind(binding.navView.getHeaderView(0))
-        headerBinding.user = userAccountManager.user.value
+        headerBinding.user = FirebaseAuth.getInstance().currentUser!!.toUser()
 
     }
 

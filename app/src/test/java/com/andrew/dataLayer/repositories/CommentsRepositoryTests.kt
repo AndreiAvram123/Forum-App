@@ -1,6 +1,8 @@
-package com.andrew.bookapp.viewModels
+package com.andrew.dataLayer.repositories
 
 import com.andrew.TestUtilities
+import com.andrew.TestUtilities.Companion.testPostID
+import com.andrew.TestUtilities.Companion.testUserID
 import com.andrew.dataLayer.interfaces.CommentRepoInterface
 import com.andrew.dataLayer.models.serialization.SerializeComment
 import kotlinx.coroutines.runBlocking
@@ -15,8 +17,8 @@ class CommentsRepositoryTest {
     @Test
     fun shouldUploadedPostReturnId() = runBlocking {
         val commentToUpload = SerializeComment(content = "test content",
-                postID = TestUtilities.firstPostIDdb,
-                userID = TestUtilities.testUserID)
+                postID = testPostID,
+                userID = testUserID)
         val response = repo.uploadComment(commentToUpload)
         val id = response.message.toIntOrNull()
         assertNotNull(id)
