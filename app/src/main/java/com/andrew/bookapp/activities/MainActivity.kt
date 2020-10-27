@@ -29,12 +29,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
-@InternalCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var sharedPreferences: SharedPreferences
+    lateinit var userAccountManager: UserAccountManager
 
 
     private val viewModelChat: ViewModelChat by viewModels()
@@ -72,7 +71,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.layout_main_activity)
-
         createMessageNotificationChannel()
         configureNavigation()
 
