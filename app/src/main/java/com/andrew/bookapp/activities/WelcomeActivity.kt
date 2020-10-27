@@ -27,14 +27,12 @@ import javax.inject.Inject
 const val requestCodeGoogleSignIn = 1
 
 @AndroidEntryPoint
-@InternalCoroutinesApi
 class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
+    //todo
+
+    //modify this into two view models
     private val viewModelUser: ViewModelUser by viewModels()
-
-
-    @Inject
-    lateinit var userDao: UserDao
 
     @Inject
     lateinit var userAccountManager: UserAccountManager
@@ -44,11 +42,11 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
 
-        FirebaseAuth.getInstance().addAuthStateListener {
-          if( it.currentUser !=null){
-              startMainActivity()
-          }
-        }
+        userAccountManager.continueUserFlow.observe(this,{
+            if(it){
+                startMainActivity()
+            }
+        })
     }
 
     override fun onStart() {

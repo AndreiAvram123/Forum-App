@@ -27,7 +27,7 @@ object RepositoryModule {
 
     @Provides
     fun getRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
-            .baseUrl("http://www.andreiram.co.uk/api")
+            .baseUrl("http://www.andreiram.co.uk")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

@@ -2,6 +2,7 @@ package com.andrew.bookapp.user
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.andrew.bookapp.R
 import com.andrew.bookapp.models.User
@@ -18,25 +19,24 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
 
     fun getToken() = sharedPreferences.getStringNotNull(R.string.key_token)
 
+    val continueUserFlow = MutableLiveData(false)
+
+
     suspend fun saveUserAndToken(user: User, token: String) {
         persistToken(token)
         userDao.insertUser(user)
+        continueUserFlow.postValue(true)
     }
 
     private fun persistToken(token: String) {
         sharedPreferences.edit {
-            context.apply {
-                putString(getString(R.string.key_token), token)
-            }
+            putString(context.getString(R.string.key_token),token)
         }
     }
 
     fun deleteUserFromMemory() {
         sharedPreferences.edit {
-            context.apply {
-                putInt(getString(R.string.key_user_id), 0)
-                putString(getString(R.string.key_token), "")
-            }
+            putString(context.getString(R.string.key_token),"")
         }
     }
 
@@ -49,15 +49,10 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
     }
 
 
-    private fun SharedPreferences.edit(commit: Boolean = true,
-                                       action: SharedPreferences.Editor.() -> Unit) {
+    private fun SharedPreferences.edit(action: SharedPreferences.Editor.() -> Unit) {
         val editor = edit()
         action(editor)
-        if (commit) {
-            editor.commit()
-        } else {
-            editor.apply()
-        }
+        editor.apply()
     }
 
 }

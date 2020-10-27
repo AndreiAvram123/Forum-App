@@ -33,7 +33,6 @@ const val new_user_id_message = 2
 const val play_notification_message = 3
 const val stop_notification_message = 4
 
-@InternalCoroutinesApi
 class MessengerService : Service() {
 
 

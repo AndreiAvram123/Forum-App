@@ -22,7 +22,7 @@ abstract class LocalDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: LocalDatabase? = null
 
-        @InternalCoroutinesApi
+        @OptIn(InternalCoroutinesApi::class)
         fun getDatabase(application: Context): LocalDatabase {
             val tempInstance = INSTANCE;
             if (tempInstance != null) {
