@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -68,6 +69,16 @@ class MessagesFragment : Fragment() {
                 }
             }
         })
+        viewModelChat.fetchNewMessages().observe(viewLifecycleOwner,{
+            when (it.status){
+                Status.SUCCESS ->{
+
+                }
+                else -> {
+
+                }
+            }
+        })
 
         binding.sendImageButton.setOnClickListener {
             startFileExplorer()
@@ -111,9 +122,8 @@ class MessagesFragment : Fragment() {
     }
 
     private fun startFileExplorer() {
-        val fileIntent = Intent(Intent.ACTION_GET_CONTENT)
-        fileIntent.type = "image/*"
-        startActivityForResult(fileIntent, codeFileExplorer)
+         //todo
+        //use easy image
     }
 
 

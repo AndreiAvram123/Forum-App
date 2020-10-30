@@ -48,10 +48,15 @@ class ViewModelChat @ViewModelInject constructor(
 
     val recentMessages: LiveData<List<Message>> = Transformations.switchMap(currentChatId) {
         currentChatId.value?.let {
-            chatRepository.getChatMessages(it)
+            chatRepository.getCachedMessages(it)
         }
     }
 
+
+    //hmm
+    //todo
+    //maybe something differenct
+    fun fetchNewMessages () = chatRepository.fetchNewMessages(currentChatId.value!!)
 
     val chatLink: LiveData<String> = chatRepository.chatLink
 

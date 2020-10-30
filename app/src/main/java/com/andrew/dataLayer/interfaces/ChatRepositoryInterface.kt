@@ -9,6 +9,8 @@ import com.andrew.dataLayer.models.serialization.SerializeFriendRequest
 import com.andrew.dataLayer.models.serialization.SerializeMessage
 import retrofit2.http.*
 
+//todo
+//wrap in a response
 interface ChatRepositoryInterface {
 
     @GET("/api/user/{userID}/chats")
@@ -27,8 +29,6 @@ interface ChatRepositoryInterface {
     @PATCH("/api/friendRequests/acceptRequest/{requestID}")
     suspend fun acceptFriendRequest(@Path("requestID") requestID: Int): ChatDTO
 
-    @DELETE("/api/user/{userID}/removeFriend/{friendID}")
-    suspend fun removeFriend(@Path("userID") userID: String, @Path("friendID") friendID: String)
 
     @POST("/api/friendRequests/send")
     suspend fun sendFriendRequest(@Body friendRequest: SerializeFriendRequest):ServerResponse
@@ -44,7 +44,7 @@ interface ChatRepositoryInterface {
     suspend fun markMessageAsSeen(@Path("userID") userID: String, @Path("messageID") messageID: Int)
 
 
-    @GET("/api/user/{userID}/chats/lastMessages")
+    @GET("/api/user/{userID}/lastMessages")
     suspend fun fetchLastChatsMessage(@Path("userID") userID: String): List<MessageDTO>
 
 }

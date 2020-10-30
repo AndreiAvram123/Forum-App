@@ -79,10 +79,14 @@ class ChatRepository @Inject constructor(
     }
 
     private suspend fun fetchUserChats() {
-        val fetchedData = repo.fetchUserChats(user.userID)
-        val chats = ChatMapper.mapToDomainObjects(fetchedData, user.userID)
-        chatDao.insert(chats)
-    }
+        try {
+            val fetchedData = repo.fetchUserChats(user.userID)
+            val chats = ChatMapper.mapToDomainObjects(fetchedData, user.userID)
+            chatDao.insert(chats)
+        }catch(e:Exception){
+             responseHandler.handleException<Any>(e,Endpoint.USERS_CHAT.url)
+            }
+        }
 
 
      fun pushMessage(serializeMessage: SerializeMessage) = liveData{
@@ -96,17 +100,7 @@ class ChatRepository @Inject constructor(
     }
 
 
-    fun getChatMessages(chatID: Int): LiveData<List<Message>> =
-            liveData {
-                emitSource(messageDao.getRecentChatMessages(chatID))
-                fetchChatMessages(chatID)
-            }
-
-    private suspend fun fetchChatMessages(chatID: Int) {
-        val fetchedData = repo.fetchRecentMessages(chatID)
-        val messages = fetchedData.map { it.toMessage() }
-        messageDao.insertMessages(messages)
-    }
+    fun getCachedMessages(chatID: Int) = messageDao.getRecentChatMessages(chatID)
 
 
     private suspend fun fetchChatsLink() {
@@ -161,6 +155,18 @@ class ChatRepository @Inject constructor(
 
     fun <T> MutableLiveData<T>.notifyObserver() {
         this.value = this.value
+    }
+
+    fun fetchNewMessages(chatID: Int) = liveData {
+         try{
+             emit(Resource.loading<Any>())
+             val fetchedData = repo.fetchRecentMessages(chatID)
+             val messages = fetchedData.map { it.toMessage() }
+             messageDao.insertMessages(messages)
+             emit(Resource.success(fetchedData))
+         }catch (e:Exception){
+             emit(responseHandler.handleException<Any>(e,"/api/chat/{chatID}/recentMessages"))
+         }
     }
 
 
