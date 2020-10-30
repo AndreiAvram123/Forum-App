@@ -159,7 +159,6 @@ class ChatRepository @Inject constructor(
 
     fun fetchNewMessages(chatID: Int) = liveData {
          try{
-             emit(Resource.loading<Any>())
              val fetchedData = repo.fetchRecentMessages(chatID)
              val messages = fetchedData.map { it.toMessage() }
              messageDao.insertMessages(messages)

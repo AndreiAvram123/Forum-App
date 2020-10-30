@@ -6,10 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -19,22 +18,22 @@ import com.andrew.bookapp.Adapters.MessageAdapter
 import com.andrew.bookapp.databinding.MessagesFragmentBinding
 import com.andrew.bookapp.models.LocalImageMessage
 import com.andrew.bookapp.models.User
+import com.andrew.bookapp.observeRequest
 import com.andrew.bookapp.toBase64
 import com.andrew.bookapp.toDrawable
 import com.andrew.bookapp.viewModels.ViewModelChat
-import com.andrew.dataLayer.dataMappers.UserMapper
+import com.andrew.dataLayer.dataMappers.toNetworkObject
 import com.andrew.dataLayer.engineUtils.Status
 import com.andrew.dataLayer.models.serialization.SerializeMessage
 import com.andrew.dataLayer.serverConstants.MessageTypes
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import pl.aprilapps.easyphotopicker.*
 import java.util.*
 import javax.inject.Inject
 
 
-@InternalCoroutinesApi
 @AndroidEntryPoint
 class MessagesFragment : Fragment() {
     private lateinit var binding: MessagesFragmentBinding
@@ -45,7 +44,8 @@ class MessagesFragment : Fragment() {
 
     private lateinit var messageAdapter: MessageAdapter
     private val args: MessagesFragmentArgs by navArgs()
-    private val codeFileExplorer = 10
+    private var easyImage:EasyImage? = null
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -57,7 +57,7 @@ class MessagesFragment : Fragment() {
 
         viewModelChat.currentChatId.value = args.chatID
 
-        viewModelChat.recentMessages.observe(viewLifecycleOwner, Observer {
+        viewModelChat.recentMessages.observe(viewLifecycleOwner, {
             //there is a small async problem once we start observing the recent
             //messages, we need to make sure that the live data had enough time to change the
             //messages from one chat id to another
@@ -69,10 +69,13 @@ class MessagesFragment : Fragment() {
                 }
             }
         })
-        viewModelChat.fetchNewMessages().observe(viewLifecycleOwner,{
-            when (it.status){
-                Status.SUCCESS ->{
+        viewModelChat.fetchNewMessages().observeRequest(viewLifecycleOwner, {
+            when (it.status) {
+                Status.LOADING -> {
 
+                }
+
+                Status.SUCCESS -> {
                 }
                 else -> {
 
@@ -109,21 +112,46 @@ class MessagesFragment : Fragment() {
     }
 
     private fun sendTextMessage() {
-        binding.messageArea.text?.let {
-            val messageContent = binding.messageArea.text.toString()
+        val text = binding.messageArea.text
+        if( text != null)  {
+            val messageContent = text.toString()
             if (messageContent.trim().isNotEmpty()) {
 
                 val message = SerializeMessage(type = MessageTypes.textMessage,
                         chatID = args.chatID, senderID = user.userID, content = messageContent, localIdentifier = null)
-                viewModelChat.sendMessage(message)
-                it.clear()
+
+                viewModelChat.sendMessage(message).observeRequest(viewLifecycleOwner, {
+                    when (it.status) {
+                        Status.LOADING -> {
+
+                        }
+                        Status.SUCCESS -> {
+
+                        }
+                        Status.ERROR -> {
+
+                        }
+                    }
+                })
+                text.clear()
             }
         }
     }
 
     private fun startFileExplorer() {
-         //todo
-        //use easy image
+         easyImage = EasyImage.Builder(requireContext()) // Chooser only
+                // Will appear as a system chooser title, DEFAULT empty string
+                //.setChooserTitle("Pick media")
+                // Will tell chooser that it should show documents or gallery apps
+                //.setChooserType(ChooserType.CAMERA_AND_DOCUMENTS)  you can use this or the one below
+                //.setChooserType(ChooserType.CAMERA_AND_GALLERY)
+                // Setting to true will cause taken pictures to show up in the device gallery, DEFAULT false
+                .setChooserType(ChooserType.CAMERA_AND_GALLERY)
+                .setCopyImagesToPublicGalleryFolder(true) // Sets the name for images stored if setCopyImagesToPublicGalleryFolder = true
+                .setFolderName("EasyImage sample") // Allow multiple picking
+                .allowMultiple(true)
+                .build()
+        easyImage?.openGallery(this)
     }
 
 
@@ -135,16 +163,29 @@ class MessagesFragment : Fragment() {
         }
     }
 
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == codeFileExplorer) {
-            data?.let {
-                val path = it.data
-                if (path != null) {
-                    pushImage(path)
+
+        easyImage?.handleActivityResult(requestCode, resultCode, data, requireActivity(), object : DefaultCallback() {
+            override fun onMediaFilesPicked(imageFiles: Array<MediaFile>, source: MediaSource) {
+                data?.let {
+                    val path = it.data
+                    if (path != null) {
+                        pushImage(path)
+                    }
                 }
             }
-        }
+
+            override fun onImagePickerError(error: Throwable,  source: MediaSource) {
+                //Some error handling
+                error.printStackTrace()
+            }
+
+            override fun onCanceled(@NonNull source: MediaSource) {
+                //Not necessary to remove any files manually anymore
+            }
+        })
     }
 
     private fun pushImage(path: Uri) {
@@ -163,24 +204,24 @@ class MessagesFragment : Fragment() {
                         localIdentifier = uniqueID
 
                 )
-                viewModelChat.sendMessage(message).observe(viewLifecycleOwner,{
-                   when (it.status){
-                       Status.LOADING -> {
+                viewModelChat.sendMessage(message).observe(viewLifecycleOwner, {
+                    when (it.status) {
+                        Status.LOADING -> {
 
-                       }
-                       Status.SUCCESS ->{
-                           val localImageMessage = LocalImageMessage(
-                                   sender = UserMapper.mapDomainToNetworkObject(user),
-                                   type = MessageTypes.imageMessageType,
-                                   localID = uniqueID,
-                                   resourcePath = path
-                           )
-                           messageAdapter.add(localImageMessage)
-                       }
-                       else -> {
+                        }
+                        Status.SUCCESS -> {
+                            val localImageMessage = LocalImageMessage(
+                                    sender = user.toNetworkObject(),
+                                    type = MessageTypes.imageMessageType,
+                                    localID = uniqueID,
+                                    resourcePath = path
+                            )
+                            messageAdapter.add(localImageMessage)
+                        }
+                        else -> {
 
-                       }
-                   }
+                        }
+                    }
 
                 })
             }
