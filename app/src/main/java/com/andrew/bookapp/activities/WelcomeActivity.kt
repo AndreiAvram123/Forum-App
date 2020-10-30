@@ -30,8 +30,6 @@ const val requestCodeGoogleSignIn = 1
 class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
     //todo
-
-    //modify this into two view models
     private val viewModelUser: ViewModelUser by viewModels()
 
     @Inject

@@ -48,21 +48,20 @@ class ViewModelChat @ViewModelInject constructor(
 
     val recentMessages: LiveData<List<Message>> = Transformations.switchMap(currentChatId) {
         currentChatId.value?.let {
-            chatRepository.getChatMessages(it)
+            chatRepository.getCachedMessages(it)
         }
     }
 
 
-    val chatLink: LiveData<String?> by lazy {
-        chatRepository.chatLink
-    }
+    //hmm
+    //todo
+    //maybe something differenct
+    fun fetchNewMessages () = chatRepository.fetchNewMessages(currentChatId.value!!)
+
+    val chatLink: LiveData<String> = chatRepository.chatLink
 
 
-    fun sendMessage(serializeMessage: SerializeMessage) {
-        viewModelScope.launch {
-            chatRepository.pushMessage(serializeMessage)
-        }
-    }
+    fun sendMessage(serializeMessage: SerializeMessage) = chatRepository.pushMessage(serializeMessage)
 
     fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
         viewModelScope.launch {

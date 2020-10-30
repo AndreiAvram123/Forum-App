@@ -1,12 +1,16 @@
 package com.andrew.dataLayer.repositories
 
+import android.graphics.drawable.Drawable
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.paging.PagedList
-import com.andrew.bookapp.Resource
+import com.andrew.dataLayer.engineUtils.Resource
+import com.andrew.dataLayer.engineUtils.ResponseHandler
 import com.andrew.bookapp.models.Post
 import com.andrew.bookapp.models.User
-import com.andrew.dataLayer.dataMappers.PostMapper
+import com.andrew.bookapp.toBase64
+import com.andrew.dataLayer.dataMappers.toPost
 import com.andrew.dataLayer.interfaces.PostRepositoryInterface
 import com.andrew.dataLayer.interfaces.dao.RoomPostDao
 import com.andrew.dataLayer.models.*
@@ -14,28 +18,28 @@ import com.andrew.dataLayer.models.serialization.SerializeFavoritePostRequest
 import com.andrew.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
-import java.lang.Exception
 import javax.inject.Inject
+import kotlin.Exception
 
-
-@Suppress("MemberVisibilityCanBePrivate")
-@InternalCoroutinesApi
 
 class PostRepository @Inject constructor(private val user: User,
-                                         private val requestExecutor: RequestExecutor,
                                          private val coroutineScope: CoroutineScope,
                                          private val repo: PostRepositoryInterface,
                                          private val postDao: RoomPostDao
 ) {
+
+    private val responseHandler = ResponseHandler()
+
+
+    private  val TAG = PostRepository::class.java.simpleName
 
     fun getPosts() = postDao.getCachedPosts().also {
         coroutineScope.launch {
             //if network is active remove old data and
             //perform a fresh fetch
             fetchInitialPosts()
-            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl, null)
+            fetchFavoritePosts()
 
         }
     }
@@ -59,22 +63,26 @@ class PostRepository @Inject constructor(private val user: User,
     val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
         liveData(Dispatchers.IO) {
             emitSource(postDao.getFavoritePosts(user.userID))
-            requestExecutor.add(this@PostRepository::fetchFavoritePostsImpl, null)
+            fetchFavoritePosts()
         }
     }
 
 
-    fun fetchPostByID(id: Int): LiveData<Post> = liveData {
-        val postDTO = repo.fetchPostByID(id)
-        val post = PostMapper.mapToDomainObject(postDTO)
-        postDao.insertPost(post)
-        emit(post)
+    fun fetchPostByID(id: Int): LiveData<Resource<Post>>  = liveData {
+        try {
+            val post = repo.fetchPostByID(id).toPost()
+            val resourcePost = responseHandler.handleSuccess(post)
+            postDao.insertPost(post)
+            emit(resourcePost)
+        }catch(e:Exception){
+            emit(responseHandler.handleException<Post>(e,"fetch post by id"))
+        }
     }
 
 
-    internal suspend fun fetchFavoritePostsImpl() {
+    private suspend fun fetchFavoritePosts() {
         val data =
-                repo.fetchUserFavoritePosts(user.userID).map { PostMapper.mapToDomainObject(it) }
+                repo.fetchUserFavoritePosts(user.userID).map { it.toPost() }
 
         postDao.insertAllFavoritePosts(data.map {
             UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID)
@@ -86,10 +94,10 @@ class PostRepository @Inject constructor(private val user: User,
         emitSource(postDao.getAllUserPosts(user.userID))
         try {
             val fetchedPosts = repo.fetchMyPosts(user.userID)
-            postDao.insertPosts(fetchedPosts.map { PostMapper.mapToDomainObject(it)
-            })
+            postDao.insertPosts(fetchedPosts.map { it.toPost() })
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
+            Log.e(TAG,"Error while fetching my posts")
         }
     }
 
@@ -102,7 +110,6 @@ class PostRepository @Inject constructor(private val user: User,
 
 
     suspend fun deletePostFromFavorites(post: Post) {
-
         repo.removePostFromFavorites(postID = post.id, userID = user.userID)
         val toRemove = UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID)
         postDao.deletePostFromFavorites(toRemove)
@@ -110,49 +117,55 @@ class PostRepository @Inject constructor(private val user: User,
     }
 
 
-    suspend fun fetchInitialPosts() =
-            requestExecutor.add(
-                    this::fetchInitialPostsImpl, null)
-
-
-    internal suspend fun fetchInitialPostsImpl() {
-        postDao.removeCachedData()
-        val fetchedData: ArrayList<PostDTO> = repo.fetchRecentPosts()
-        postDao.insertPosts(fetchedData.map { PostMapper.mapToDomainObject(it) })
+    suspend fun fetchInitialPosts() {
+      try {
+          val fetchedData = repo.fetchRecentPosts()
+          postDao.removeCachedData()
+          postDao.insertPosts(fetchedData.map { it.toPost() })
+      }catch (e:Exception){
+        responseHandler.handleException<Any>(e,Endpoint.RECENT_POSTS.url)
+      }
     }
+
 
 
     internal suspend fun fetchNextPosts(lastPostID: Int) {
         try {
             val fetchedData = repo.fetchNextPagePosts(lastPostID)
-            postDao.insertPosts(fetchedData.map { PostMapper.mapToDomainObject(it) })
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+            postDao.insertPosts(fetchedData.map { it.toPost()})
+        } catch (e: Exception) {
+            responseHandler.handleException<Any>(e,Endpoint.RECENT_POSTS.url)
         }
     }
 
-    fun uploadImage(serializeImage: SerializeImage): LiveData<String> =
-            liveData {
-                emit(String())
-                val imagePath = repo.uploadImage(serializeImage).message
-                emit(imagePath)
+
+    fun uploadImage(drawable: Drawable) = liveData {
+                emit(Resource.loading<String>())
+                try{
+                    val serializeImage = SerializeImage(drawable.toBase64())
+                    val imagePath = responseHandler.handleSuccess(repo.uploadImage(serializeImage).message)
+                    emit(imagePath)
+                }catch (e:java.lang.Exception){
+                    emit(responseHandler.handleException<String>(e,"Upload image"))
+                }
             }
 
-    fun uploadPost(post: SerializePost): LiveData<OperationStatus> {
-        return liveData {
-            emit(OperationStatus.ONGOING)
+    fun uploadPost(post: SerializePost) =
+         liveData {
+            emit(Resource.loading<Post>())
+            try {
+                val serverResponse = repo.uploadPost(post)
+                val fetchedPost = repo.fetchPostByID(serverResponse.message.toInt())
+                val postDomain = fetchedPost.toPost()
+                postDao.insertPost(postDomain)
+                emit(responseHandler.handleSuccess(postDomain))
 
-            val serverResponse = repo.uploadPost(post)
-
-            val fetchedPost = repo.fetchPostByID(serverResponse.message.toInt())
-
-
-            val postDomain = PostMapper.mapToDomainObject(fetchedPost)
-            emit(OperationStatus.FINISHED)
-            postDao.insertPost(postDomain)
+            }catch (e:Exception) {
+                emit(responseHandler.handleException<Post>(e,"Upload post"))
+            }
         }
     }
-}
+
 
 
 

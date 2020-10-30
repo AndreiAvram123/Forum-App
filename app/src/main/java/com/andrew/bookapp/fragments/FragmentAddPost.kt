@@ -1,6 +1,7 @@
 package com.andrew.bookapp.fragments
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,8 @@ import com.andrew.bookapp.databinding.LayoutFragmentAddPostBinding
 import com.andrew.bookapp.models.User
 import com.andrew.bookapp.toBase64
 import com.andrew.bookapp.viewModels.ViewModelPost
+import com.andrew.dataLayer.engineUtils.Resource
+import com.andrew.dataLayer.engineUtils.Status
 import com.andrew.dataLayer.models.SerializeImage
 import com.andrew.dataLayer.models.serialization.SerializePost
 import com.andrew.dataLayer.repositories.OperationStatus
@@ -53,7 +56,6 @@ class FragmentAddPost : Fragment() {
         }
         binding.submitPostButton.setOnClickListener {
             if (areFieldsValid()) {
-
                 toggleUi()
                 uploadPost(user)
             } else {
@@ -93,17 +95,12 @@ class FragmentAddPost : Fragment() {
         binding.submitPostButton.visibility = View.INVISIBLE
     }
 
-    private fun pushImage(data: String): LiveData<String> {
-        return viewModelPost.uploadImage(SerializeImage(
-                imageData = data,
-                extension = null
-        ))
-    }
 
     private fun pushPost(post: SerializePost) {
-        viewModelPost.uploadPost(post).observe(viewLifecycleOwner, Observer {
-            if (it == OperationStatus.FINISHED) {
-                findNavController().popBackStack()
+        viewModelPost.uploadPost(post).observe(viewLifecycleOwner, {
+              when (it.status){
+                  Status.SUCCESS ->
+                 findNavController().popBackStack()
             }
         })
     }
@@ -116,15 +113,18 @@ class FragmentAddPost : Fragment() {
 
             lifecycleScope.launch(Dispatchers.Main) {
 
-                pushImage(drawable.toBase64()).observe(viewLifecycleOwner, Observer {
-                    if (!it.isNullOrEmpty()) {
-                        val post = SerializePost(
-                                title = binding.postTitleAdd.text.toString(),
-                                content = binding.postContentAdd.text.toString(),
-                                userID = user.userID,
-                                image = it
-                        )
-                        pushPost(post)
+                viewModelPost.uploadImage(drawable).observe(viewLifecycleOwner, {
+                    when (it.status){
+                        Status.SUCCESS -> {
+                            val post = SerializePost(
+                                    title = binding.postTitleAdd.text.toString(),
+                                    content = binding.postContentAdd.text.toString(),
+                                    userID = user.userID,
+                                    image = it.data!!
+                            )
+                            pushPost(post)
+                        }
+
                     }
                 })
             }

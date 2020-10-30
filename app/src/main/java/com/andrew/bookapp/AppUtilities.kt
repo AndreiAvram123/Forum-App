@@ -7,6 +7,10 @@ import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.util.Base64
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import com.andrew.dataLayer.engineUtils.Resource
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 
@@ -46,3 +50,14 @@ fun Drawable.toBase64(): String {
     return Base64.encodeToString(byteArray, Base64.DEFAULT);
 }
 
+fun <T> LiveData<T>.observeRequest(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+    observe(lifecycleOwner, object : Observer<T> {
+        var observed = 0
+        override fun onChanged(t: T?) {
+            observer.onChanged(t)
+            if(observed == 2 ){
+            removeObserver(this)
+            }
+        }
+    })
+}

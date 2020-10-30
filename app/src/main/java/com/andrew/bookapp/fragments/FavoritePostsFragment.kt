@@ -23,7 +23,6 @@ class FavoritePostsFragment : Fragment() {
         RecyclerViewAdapterPosts()
     }
     private val viewModelPost: ViewModelPost by activityViewModels()
-    private val viewModelUser: ViewModelUser by activityViewModels()
     private lateinit var binding: FragmentFavoritePostsBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
