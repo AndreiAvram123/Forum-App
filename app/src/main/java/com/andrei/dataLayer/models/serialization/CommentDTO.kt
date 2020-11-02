@@ -1,6 +1,6 @@
-package com.andrew.dataLayer.models.serialization
+package com.andrei.dataLayer.models.serialization
 
-import com.andrew.dataLayer.models.UserDTO
+import com.andrei.dataLayer.models.UserDTO
 import com.google.gson.annotations.SerializedName
 
 data class CommentDTO(

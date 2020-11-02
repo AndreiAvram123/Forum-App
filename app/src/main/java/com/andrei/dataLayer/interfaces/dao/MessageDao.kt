@@ -1,8 +1,8 @@
-package com.andrew.dataLayer.interfaces.dao
+package com.andrei.dataLayer.interfaces.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.andrew.bookapp.models.Message
+import com.andrei.bookapp.models.Message
 
 @Dao
 interface MessageDao {

@@ -1,13 +1,18 @@
-package com.andrew.dataLayer.repositories
+package com.andrei.dataLayer.repositories
 
-import com.andrew.TestUtilities
-import com.andrew.dataLayer.interfaces.UserRepositoryInterface
-import com.andrew.dataLayer.models.UserDTO
+import android.os.Build
+import com.andrei.TestUtilities
+import com.andrei.dataLayer.interfaces.UserRepositoryInterface
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
+
+@Config(sdk = [Build.VERSION_CODES.O_MR1])
+@RunWith(RobolectricTestRunner::class)
 
 class UserRepositoryTest {
     private lateinit var repo: UserRepositoryInterface

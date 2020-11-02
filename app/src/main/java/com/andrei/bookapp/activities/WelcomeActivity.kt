@@ -1,27 +1,19 @@
-package com.andrew.bookapp.activities
+package com.andrei.bookapp.activities
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
-import com.andrew.bookapp.R
-import com.andrew.bookapp.fragments.LoginFragment
-import com.andrew.bookapp.user.UserAccountManager
-import com.andrew.bookapp.viewModels.ViewModelUser
-import com.andrew.dataLayer.interfaces.dao.UserDao
+import com.andrei.bookapp.R
+import com.andrei.bookapp.fragments.LoginFragment
+import com.andrei.bookapp.user.UserAccountManager
+import com.andrei.bookapp.viewModels.ViewModelUser
 import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.layout_sign_up.*
-import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
 const val requestCodeGoogleSignIn = 1

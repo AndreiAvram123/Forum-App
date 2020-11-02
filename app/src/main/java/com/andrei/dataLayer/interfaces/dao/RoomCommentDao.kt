@@ -1,9 +1,9 @@
-package com.andrew.dataLayer.interfaces.dao
+package com.andrei.dataLayer.interfaces.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.andrew.bookapp.models.Comment
-import com.andrew.dataLayer.models.PostWithComments
+import com.andrei.bookapp.models.Comment
+import com.andrei.dataLayer.models.PostWithComments
 
 @Dao
 interface RoomCommentDao {

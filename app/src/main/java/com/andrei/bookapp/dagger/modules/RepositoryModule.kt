@@ -1,13 +1,13 @@
-package com.andrew.bookapp.dagger.modules
+package com.andrei.bookapp.dagger.modules
 
 import android.content.Context
 import android.net.ConnectivityManager
-import com.andrew.dataLayer.engineUtils.AuthInterceptor
-import com.andrew.bookapp.user.UserAccountManager
-import com.andrew.dataLayer.interfaces.ChatRepositoryInterface
-import com.andrew.dataLayer.interfaces.CommentRepoInterface
-import com.andrew.dataLayer.interfaces.PostRepositoryInterface
-import com.andrew.dataLayer.interfaces.UserRepositoryInterface
+import com.andrei.dataLayer.engineUtils.AuthInterceptor
+import com.andrei.bookapp.user.UserAccountManager
+import com.andrei.dataLayer.interfaces.ChatRepositoryInterface
+import com.andrei.dataLayer.interfaces.CommentRepoInterface
+import com.andrei.dataLayer.interfaces.PostRepositoryInterface
+import com.andrei.dataLayer.interfaces.UserRepositoryInterface
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

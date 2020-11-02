@@ -1,7 +1,7 @@
-package com.andrew.dataLayer.dataMappers
+package com.andrei.dataLayer.dataMappers
 
-import com.andrew.bookapp.models.Comment
-import com.andrew.dataLayer.models.serialization.CommentDTO
+import com.andrei.bookapp.models.Comment
+import com.andrei.dataLayer.models.serialization.CommentDTO
 
 object CommentMapper {
 

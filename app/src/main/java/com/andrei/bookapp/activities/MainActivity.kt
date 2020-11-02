@@ -1,8 +1,7 @@
-package com.andrew.bookapp.activities
+package com.andrei.bookapp.activities
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.*
 import android.os.*
 import androidx.activity.viewModels
@@ -14,19 +13,15 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
-import com.andrew.bookapp.R
-import com.andrew.bookapp.databinding.DrawerHeaderBinding
-import com.andrew.bookapp.databinding.LayoutMainActivityBinding
-import com.andrew.bookapp.models.User
-import com.andrew.bookapp.services.*
-import com.andrew.bookapp.user.UserAccountManager
-import com.andrew.bookapp.viewModels.ViewModelChat
-import com.andrew.dataLayer.dataMappers.toUser
+import com.andrei.bookapp.R
+import com.andrei.bookapp.databinding.DrawerHeaderBinding
+import com.andrei.bookapp.databinding.LayoutMainActivityBinding
+import com.andrei.bookapp.services.*
+import com.andrei.bookapp.user.UserAccountManager
+import com.andrei.bookapp.viewModels.ViewModelChat
+import com.andrei.dataLayer.dataMappers.toUser
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
 @AndroidEntryPoint

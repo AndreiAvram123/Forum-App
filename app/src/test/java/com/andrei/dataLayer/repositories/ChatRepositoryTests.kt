@@ -1,16 +1,21 @@
-package com.andrew.dataLayer.repositories
+package com.andrei.dataLayer.repositories
 
-import com.andrew.TestUtilities
-import com.andrew.TestUtilities.Companion.testUserID
-import com.andrew.TestUtilities.Companion.testUserID2
-import com.andrew.dataLayer.interfaces.ChatRepositoryInterface
-import com.andrew.dataLayer.models.deserialization.FriendRequest
-import com.andrew.dataLayer.models.serialization.SerializeFriendRequest
+import android.os.Build
+import com.andrei.TestUtilities
+import com.andrei.TestUtilities.Companion.testUserID
+import com.andrei.TestUtilities.Companion.testUserID2
+import com.andrei.dataLayer.interfaces.ChatRepositoryInterface
+import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@Config(sdk = [Build.VERSION_CODES.O_MR1])
+@RunWith(RobolectricTestRunner::class)
 class ChatRepositoryTest {
 
     private lateinit var repo: ChatRepositoryInterface

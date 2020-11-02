@@ -1,4 +1,4 @@
-package com.andrew.dataLayer.models.serialization
+package com.andrei.dataLayer.models.serialization
 
 import com.google.gson.annotations.SerializedName
 

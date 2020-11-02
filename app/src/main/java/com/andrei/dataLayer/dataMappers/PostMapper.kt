@@ -1,7 +1,7 @@
-package com.andrew.dataLayer.dataMappers
+package com.andrei.dataLayer.dataMappers
 
-import com.andrew.bookapp.models.Post
-import com.andrew.dataLayer.models.PostDTO
+import com.andrei.bookapp.models.Post
+import com.andrei.dataLayer.models.PostDTO
 
 
     fun PostDTO.toPost():Post {

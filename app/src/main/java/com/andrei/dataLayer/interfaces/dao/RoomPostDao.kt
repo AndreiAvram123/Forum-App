@@ -1,12 +1,12 @@
-package com.andrew.dataLayer.interfaces.dao
+package com.andrei.dataLayer.interfaces.dao
 
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
-import com.andrew.bookapp.models.Post
-import com.andrew.dataLayer.models.UserWithFavoritePosts
-import com.andrew.dataLayer.models.UserWithFavoritePostsCrossRef
-import com.andrew.dataLayer.models.UserWithPosts
+import com.andrei.bookapp.models.Post
+import com.andrei.dataLayer.models.UserWithFavoritePosts
+import com.andrei.dataLayer.models.UserWithFavoritePostsCrossRef
+import com.andrei.dataLayer.models.UserWithPosts
 
 
 @Dao

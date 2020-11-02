@@ -1,7 +1,7 @@
-package com.andrew.dataLayer.dataMappers
+package com.andrei.dataLayer.dataMappers
 
-import com.andrew.bookapp.models.Chat
-import com.andrew.dataLayer.models.ChatDTO
+import com.andrei.bookapp.models.Chat
+import com.andrei.dataLayer.models.ChatDTO
 
 object ChatMapper {
     fun mapDtoObjectToDomainObject(chatDTO: ChatDTO, userID: String): Chat {

@@ -1,10 +1,10 @@
-package com.andrew.dataLayer.interfaces
+package com.andrei.dataLayer.interfaces
 
-import com.andrew.dataLayer.models.PostDTO
-import com.andrew.dataLayer.models.SerializeImage
-import com.andrew.dataLayer.models.ServerResponse
-import com.andrew.dataLayer.models.serialization.SerializePost
-import com.andrew.dataLayer.models.serialization.SerializeFavoritePostRequest
+import com.andrei.dataLayer.models.PostDTO
+import com.andrei.dataLayer.models.SerializeImage
+import com.andrei.dataLayer.models.ServerResponse
+import com.andrei.dataLayer.models.serialization.SerializePost
+import com.andrei.dataLayer.models.serialization.SerializeFavoritePostRequest
 import retrofit2.http.*
 
 interface PostRepositoryInterface {

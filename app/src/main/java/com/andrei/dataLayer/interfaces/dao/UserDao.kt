@@ -1,9 +1,9 @@
-package com.andrew.dataLayer.interfaces.dao
+package com.andrei.dataLayer.interfaces.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import com.andrew.bookapp.models.User
+import com.andrei.bookapp.models.User
 
 @Dao
 interface UserDao {

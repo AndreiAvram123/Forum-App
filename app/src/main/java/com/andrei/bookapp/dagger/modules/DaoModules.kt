@@ -1,8 +1,8 @@
-package com.andrew.bookapp.dagger.modules
+package com.andrei.bookapp.dagger.modules
 
 import android.content.Context
-import com.andrew.dataLayer.LocalDatabase
-import com.andrew.dataLayer.interfaces.dao.*
+import com.andrei.dataLayer.LocalDatabase
+import com.andrei.dataLayer.interfaces.dao.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

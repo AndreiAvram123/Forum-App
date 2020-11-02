@@ -1,8 +1,8 @@
-package com.andrew.dataLayer.interfaces
+package com.andrei.dataLayer.interfaces
 
-import com.andrew.dataLayer.models.UserDTO
-import com.andrew.dataLayer.models.serialization.AuthenticationResponse
-import com.andrew.dataLayer.models.serialization.RegisterUserDTO
+import com.andrei.dataLayer.models.UserDTO
+import com.andrei.dataLayer.models.serialization.AuthenticationResponse
+import com.andrei.dataLayer.models.serialization.RegisterUserDTO
 import retrofit2.http.*
 
 interface UserRepositoryInterface {

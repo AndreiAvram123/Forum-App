@@ -1,7 +1,7 @@
-package com.andrew.dataLayer.dataMappers
+package com.andrei.dataLayer.dataMappers
 
-import com.andrew.bookapp.models.Message
-import com.andrew.bookapp.models.MessageDTO
+import com.andrei.bookapp.models.Message
+import com.andrei.bookapp.models.MessageDTO
 
 fun MessageDTO.toMessage() =
         Message(id = this.id,

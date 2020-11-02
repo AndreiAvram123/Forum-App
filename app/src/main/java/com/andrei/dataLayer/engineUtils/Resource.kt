@@ -1,4 +1,4 @@
-package com.andrew.dataLayer.engineUtils
+package com.andrei.dataLayer.engineUtils
 
 data class Resource<out T>(val status: Status, val data: T? = null, val message: String? = null) {
 

@@ -1,8 +1,8 @@
-package com.andrew.dataLayer.interfaces
+package com.andrei.dataLayer.interfaces
 
-import com.andrew.dataLayer.models.ServerResponse
-import com.andrew.dataLayer.models.serialization.CommentDTO
-import com.andrew.dataLayer.models.serialization.SerializeComment
+import com.andrei.dataLayer.models.ServerResponse
+import com.andrei.dataLayer.models.serialization.CommentDTO
+import com.andrei.dataLayer.models.serialization.SerializeComment
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST

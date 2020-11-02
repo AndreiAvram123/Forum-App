@@ -1,12 +1,12 @@
-package com.andrew.dataLayer.interfaces
+package com.andrei.dataLayer.interfaces
 
-import com.andrew.bookapp.models.MessageDTO
-import com.andrew.dataLayer.models.ChatDTO
-import com.andrew.dataLayer.models.ServerResponse
-import com.andrew.dataLayer.models.UserDTO
-import com.andrew.dataLayer.models.deserialization.FriendRequest
-import com.andrew.dataLayer.models.serialization.SerializeFriendRequest
-import com.andrew.dataLayer.models.serialization.SerializeMessage
+import com.andrei.bookapp.models.MessageDTO
+import com.andrei.dataLayer.models.ChatDTO
+import com.andrei.dataLayer.models.ServerResponse
+import com.andrei.dataLayer.models.UserDTO
+import com.andrei.dataLayer.models.deserialization.FriendRequest
+import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
+import com.andrei.dataLayer.models.serialization.SerializeMessage
 import retrofit2.http.*
 
 //todo
