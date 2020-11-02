@@ -4,8 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.R
 import com.andrei.kit.fragments.LoginFragment
+import com.andrei.kit.observeRequest
 import com.andrei.kit.user.UserAccountManager
 import com.andrei.kit.viewModels.ViewModelUser
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -54,7 +56,20 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                  val googleSignInAccount = task.getResult(ApiException::class.java)!!
-                 viewModelUser.loginWithGoogle(googleSignInAccount)
+                 viewModelUser.loginWithGoogle(googleSignInAccount).observeRequest(this,{
+                     when(it.status){
+                         Status.SUCCESS ->{
+
+                         }
+                         Status.LOADING ->{
+
+                         }
+                         Status.ERROR ->{
+
+                         }
+
+                     }
+                 })
 
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately
