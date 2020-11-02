@@ -22,6 +22,7 @@ import com.andrei.dataLayer.models.serialization.SerializeFavoritePostRequest
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
+import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -96,38 +97,23 @@ class PostRepositoryTest {
     }
 
     @Test
-    fun `given image should upload to server`() {
-        runBlocking {
-            val drawable = context.getDrawable(R.drawable.placeholder)
-            drawable?.let {
-                val image = SerializeImage(imageData = it.toBase64())
-                repo.uploadImage(image)
-            }
-
-        }
-    }
-
-    @Test
     fun `given post should upload to server`() {
         runBlocking {
             val drawable = context.applicationContext.getDrawable(R.drawable.placeholder)
             drawable?.let {
-
-                val image = SerializeImage(imageData = it.toBase64())
-
-                val response = repo.uploadImage(image)
-
-                val imageLink = response.message
-
                 val uploadPost = SerializePost(
                         title = "Placeholder title",
                         content = "Placeholder content",
-                        image = imageLink,
+                        imageData = it.toBase64(),
                         userID = testUserID
 
                 )
-                val serverResponse = repo.uploadPost(uploadPost)
-                Assert.assertTrue(serverResponse.successful)
+                try{
+                    val postResponse = repo.uploadPost(uploadPost)
+                    Assert.assertNotNull(postResponse)
+                }catch (e:Exception){
+                    fail()
+                }
             }
 
 

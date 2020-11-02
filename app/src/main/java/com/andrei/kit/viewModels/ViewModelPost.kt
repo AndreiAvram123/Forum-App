@@ -58,7 +58,6 @@ class ViewModelPost @ViewModelInject constructor(
 
     fun fetchNewPosts() = viewModelScope.launch { postRepository.fetchInitialPosts() }
 
-    fun uploadImage(drawable: Drawable) = postRepository.uploadImage(drawable)
 
     fun uploadPost(post: SerializePost) = postRepository.uploadPost(post)
 

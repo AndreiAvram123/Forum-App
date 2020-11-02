@@ -36,7 +36,7 @@ interface PostRepositoryInterface {
     suspend fun uploadImage(@Body serializeImage: SerializeImage): ServerResponse
 
     @POST("/api/posts/create")
-    suspend fun uploadPost(@Body uploadPost: SerializePost): ServerResponse
+    suspend fun uploadPost(@Body uploadPost: SerializePost): PostDTO
 
 
 }

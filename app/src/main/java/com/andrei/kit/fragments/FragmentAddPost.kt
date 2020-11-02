@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.NonNull
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -16,19 +18,26 @@ import com.andrei.kit.models.User
 import com.andrei.kit.viewModels.ViewModelPost
 import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.dataLayer.models.serialization.SerializePost
+import com.andrei.kit.observeRequest
+import com.andrei.kit.toBase64
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
+import pl.aprilapps.easyphotopicker.DefaultCallback
+import pl.aprilapps.easyphotopicker.EasyImage
+import pl.aprilapps.easyphotopicker.MediaFile
+import pl.aprilapps.easyphotopicker.MediaSource
 import javax.inject.Inject
 
 @InternalCoroutinesApi
 @AndroidEntryPoint
 class FragmentAddPost : Fragment() {
     private lateinit var binding: LayoutFragmentAddPostBinding
-    private val CODE_FILE_EXPLORER = 10
     private val viewModelPost: ViewModelPost by activityViewModels()
 
+    @Inject
+    lateinit var easyImage: EasyImage
     @Inject
     lateinit var user: User
 
@@ -43,9 +52,7 @@ class FragmentAddPost : Fragment() {
 
     private fun configureViews() {
         binding.postImageAdd.setOnClickListener {
-            val fileIntent = Intent(Intent.ACTION_GET_CONTENT)
-            fileIntent.type = "image/*"
-            startActivityForResult(fileIntent, CODE_FILE_EXPLORER)
+          easyImage.openChooser(this)
         }
         binding.submitPostButton.setOnClickListener {
             if (areFieldsValid()) {
@@ -89,33 +96,28 @@ class FragmentAddPost : Fragment() {
     }
 
 
-    private fun pushPost(post: SerializePost) {
-        viewModelPost.uploadPost(post).observe(viewLifecycleOwner, {
-              when (it.status){
-                  Status.SUCCESS ->
-                 findNavController().popBackStack()
-            }
-        })
-    }
+
 
     private fun uploadPost(user: User) {
-        //get image data
-        val drawable = binding.postImageAdd.drawable
-
-        if (drawable != null) {
+           val drawable = binding.postImageAdd.drawable
 
             lifecycleScope.launch(Dispatchers.Main) {
-
-                viewModelPost.uploadImage(drawable).observe(viewLifecycleOwner, {
+                val post = SerializePost(
+                        title = binding.postTitleAdd.text.toString(),
+                        content = binding.postContentAdd.text.toString(),
+                        userID = user.userID,
+                        imageData = drawable.toBase64()
+                )
+                viewModelPost.uploadPost(post).observeRequest(viewLifecycleOwner, {
                     when (it.status){
                         Status.SUCCESS -> {
-                            val post = SerializePost(
-                                    title = binding.postTitleAdd.text.toString(),
-                                    content = binding.postContentAdd.text.toString(),
-                                    userID = user.userID,
-                                    image = it.data!!
-                            )
-                            pushPost(post)
+                          findNavController().popBackStack()
+                        }
+                        Status.LOADING ->{
+
+                        }
+                        Status.ERROR ->{
+
                         }
 
                     }
@@ -123,18 +125,25 @@ class FragmentAddPost : Fragment() {
             }
 
         }
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CODE_FILE_EXPLORER) {
-            data?.let {
-                val path = it.data
-                if (path != null) {
-                    binding.postImageAdd.setImageURI(path)
-                }
+
+        easyImage.handleActivityResult(requestCode, resultCode, data, requireActivity(), object : DefaultCallback() {
+            override fun onMediaFilesPicked(imageFiles: Array<MediaFile>, source: MediaSource) {
+               val imageUri =  imageFiles.first().file.toUri()
+                binding.postImageAdd.setImageURI(imageUri)
             }
-        }
+
+            override fun onImagePickerError(error: Throwable, source: MediaSource) {
+                //Some error handling
+                error.printStackTrace()
+            }
+
+            override fun onCanceled(@NonNull source: MediaSource) {
+                //Not necessary to remove any files manually anymore
+            }
+        })
     }
 }
 

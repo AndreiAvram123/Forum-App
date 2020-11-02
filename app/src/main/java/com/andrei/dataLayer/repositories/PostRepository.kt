@@ -139,27 +139,13 @@ class PostRepository @Inject constructor(private val user: User,
     }
 
 
-    fun uploadImage(drawable: Drawable) = liveData {
-                emit(Resource.loading<String>())
-                try{
-                    val serializeImage = SerializeImage(drawable.toBase64())
-                    val imagePath = responseHandler.handleSuccess(repo.uploadImage(serializeImage).message)
-                    emit(imagePath)
-                }catch (e:java.lang.Exception){
-                    emit(responseHandler.handleException<String>(e,"Upload image"))
-                }
-            }
-
     fun uploadPost(post: SerializePost) =
          liveData {
             emit(Resource.loading<Post>())
             try {
-                val serverResponse = repo.uploadPost(post)
-                val fetchedPost = repo.fetchPostByID(serverResponse.message.toInt())
-                val postDomain = fetchedPost.toPost()
-                postDao.insertPost(postDomain)
-                emit(responseHandler.handleSuccess(postDomain))
-
+                val returnedPost = repo.uploadPost(post).toPost()
+                postDao.insertPost(returnedPost)
+                emit(responseHandler.handleSuccess(returnedPost))
             }catch (e:Exception) {
                 emit(responseHandler.handleException<Post>(e,"Upload post"))
             }

@@ -7,6 +7,8 @@ import com.andrei.kit.models.User
 import com.andrei.kit.user.UserAccountManager
 import com.andrei.dataLayer.dataMappers.UserMapper
 import com.andrei.dataLayer.dataMappers.toUser
+import com.andrei.dataLayer.engineUtils.Resource
+import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.dataLayer.interfaces.UserRepositoryInterface
 import com.andrei.dataLayer.models.serialization.RegisterUserDTO
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -15,6 +17,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -24,9 +27,11 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
                                          private val userAccountManager: UserAccountManager) {
 
     private val auth = FirebaseAuth.getInstance()
+    private val responseHandler = ResponseHandler()
 
 
-    suspend fun loginWithGoogle(googleSignInAccount: GoogleSignInAccount) {
+     fun loginWithGoogle(googleSignInAccount: GoogleSignInAccount) = liveData {
+         emit(Resource.loading())
         val credential = GoogleAuthProvider.getCredential(googleSignInAccount.idToken,null)
         try {
            val userFirebase = auth.signInWithCredential(credential).await().user
@@ -37,10 +42,11 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
                    }else{
                         registerUserToApi(it,null)
                     }
+               emit(Resource.success(Any()))
             }
 
         }catch (e:Exception){
-            e.printStackTrace()
+           responseHandler.handleException<Any>(e,"login google")
         }
     }
 
