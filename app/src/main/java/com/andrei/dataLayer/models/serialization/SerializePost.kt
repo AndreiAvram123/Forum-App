@@ -7,8 +7,9 @@ data class SerializePost(
         val title: String,
         @SerializedName("content")
         val content: String,
-        @SerializedName("image")
-        val image: String,
+        @SerializedName("imageData")
+        val imageData: String,
         @SerializedName("userID")
-        val userID: String
+        val userID: String,
+
 )

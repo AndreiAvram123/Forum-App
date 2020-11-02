@@ -1,12 +1,15 @@
 package com.andrei.kit.fragments
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.NonNull
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -15,17 +18,16 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.andrei.kit.Adapters.MessageAdapter
 import com.andrei.kit.databinding.MessagesFragmentBinding
-import com.andrei.kit.models.LocalImageMessage
 import com.andrei.kit.models.User
 import com.andrei.kit.observeRequest
 import com.andrei.kit.toBase64
 import com.andrei.kit.toDrawable
 import com.andrei.kit.viewModels.ViewModelChat
-import com.andrei.dataLayer.dataMappers.toNetworkObject
 import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.dataLayer.models.serialization.SerializeMessage
 import com.andrei.dataLayer.serverConstants.MessageTypes
 import com.andrei.kit.Adapters.CustomDivider
+import com.andrei.kit.models.Message
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -42,15 +44,18 @@ class MessagesFragment : Fragment() {
     @Inject
     lateinit var user: User
 
+    @Inject
+    lateinit var easyImage: EasyImage
+
     private lateinit var messageAdapter: MessageAdapter
     private val args: MessagesFragmentArgs by navArgs()
-    private var easyImage:EasyImage? = null
+
+    private val requestCodeCamera = 1
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = MessagesFragmentBinding.inflate(inflater, container, false)
-
 
         messageAdapter = MessageAdapter(user, ::expandImage)
         configureViews()
@@ -83,9 +88,6 @@ class MessagesFragment : Fragment() {
             }
         })
 
-        binding.sendImageButton.setOnClickListener {
-            startFileExplorer()
-        }
 
         return binding.root
     }
@@ -100,6 +102,9 @@ class MessagesFragment : Fragment() {
         binding.root.findNavController().navigate(action)
     }
 
+   private fun openCamera(){
+       easyImage.openCameraForImage(this)
+   }
 
     private fun configureViews() {
         configureRecyclerView()
@@ -107,13 +112,22 @@ class MessagesFragment : Fragment() {
             sendTextMessage()
         }
         binding.sendImageButton.setOnClickListener {
-            startFileExplorer()
+            easyImage.openGallery(this)
         }
+        binding.captureImageButton.setOnClickListener {
+            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+               openCamera()
+            } else {
+                val permissions = Array(1) { android.Manifest.permission.CAMERA }
+                requestPermissions(permissions, requestCodeCamera)
+            }
+        }
+
     }
 
     private fun sendTextMessage() {
         val text = binding.messageArea.text
-        if( text != null)  {
+        if (text != null) {
             val messageContent = text.toString()
             if (messageContent.trim().isNotEmpty()) {
 
@@ -138,22 +152,6 @@ class MessagesFragment : Fragment() {
         }
     }
 
-    private fun startFileExplorer() {
-         easyImage = EasyImage.Builder(requireContext()) // Chooser only
-                // Will appear as a system chooser title, DEFAULT empty string
-                //.setChooserTitle("Pick media")
-                // Will tell chooser that it should show documents or gallery apps
-                //.setChooserType(ChooserType.CAMERA_AND_DOCUMENTS)  you can use this or the one below
-                //.setChooserType(ChooserType.CAMERA_AND_GALLERY)
-                // Setting to true will cause taken pictures to show up in the device gallery, DEFAULT false
-                .setChooserType(ChooserType.CAMERA_AND_GALLERY)
-                .setCopyImagesToPublicGalleryFolder(true) // Sets the name for images stored if setCopyImagesToPublicGalleryFolder = true
-                .setFolderName("EasyImage sample") // Allow multiple picking
-                .allowMultiple(true)
-                .build()
-        easyImage?.openGallery(this)
-    }
-
 
     private fun configureRecyclerView() {
         with(binding.recyclerViewMessages) {
@@ -163,21 +161,25 @@ class MessagesFragment : Fragment() {
         }
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when(requestCode){
+            requestCodeCamera ->{
+                if(grantResults.isNotEmpty() && grantResults.first() == PackageManager.PERMISSION_GRANTED){
+                  openCamera()
+                }
+            }
+        }
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        easyImage?.handleActivityResult(requestCode, resultCode, data, requireActivity(), object : DefaultCallback() {
+        easyImage.handleActivityResult(requestCode, resultCode, data, requireActivity(), object : DefaultCallback() {
             override fun onMediaFilesPicked(imageFiles: Array<MediaFile>, source: MediaSource) {
-                data?.let {
-                    val path = it.data
-                    if (path != null) {
-                        pushImage(path)
-                    }
-                }
+                pushImages(imageFiles)
             }
 
-            override fun onImagePickerError(error: Throwable,  source: MediaSource) {
+            override fun onImagePickerError(error: Throwable, source: MediaSource) {
                 //Some error handling
                 error.printStackTrace()
             }
@@ -188,14 +190,11 @@ class MessagesFragment : Fragment() {
         })
     }
 
-    private fun pushImage(path: Uri) {
-        val drawable = path.toDrawable(requireContext())
-
-        lifecycleScope.launch(Dispatchers.IO) {
-
-            val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
-
-            lifecycleScope.launch(Dispatchers.Main) {
+    private fun pushImages(images: Array<MediaFile>) {
+        lifecycleScope.launch(Dispatchers.Main) {
+            images.forEach {
+                val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
+                val drawable = it.file.toUri().toDrawable(requireContext())
                 val message = SerializeMessage(
                         type = MessageTypes.imageMessageType,
                         chatID = args.chatID,
@@ -204,17 +203,21 @@ class MessagesFragment : Fragment() {
                         localIdentifier = uniqueID
 
                 )
-                viewModelChat.sendMessage(message).observe(viewLifecycleOwner, {
-                    when (it.status) {
+                viewModelChat.sendMessage(message).observeRequest(viewLifecycleOwner, { result ->
+                    when (result.status) {
                         Status.LOADING -> {
 
                         }
                         Status.SUCCESS -> {
-                            val localImageMessage = LocalImageMessage(
-                                    sender = user.toNetworkObject(),
+                            //todo
+                            //change id
+                            val localImageMessage = Message(
+                                    id = 2,
+                                    sender = user,
                                     type = MessageTypes.imageMessageType,
-                                    localID = uniqueID,
-                                    resourcePath = path
+                                    content = result.message!!,
+                                    date = 222,
+                                    chatID = args.chatID
                             )
                             messageAdapter.add(localImageMessage)
                         }
@@ -222,9 +225,9 @@ class MessagesFragment : Fragment() {
 
                         }
                     }
-
                 })
             }
+
         }
     }
 }

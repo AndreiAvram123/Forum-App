@@ -45,6 +45,14 @@
                 android:maxLines="6" />
 
             <ImageView
+                android:id="@+id/capture_image_button"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginRight="6dp"
+                android:layout_gravity="center"
+                app:srcCompat="@drawable/ic_photo_camera_32" />
+
+            <ImageView
                 android:id="@+id/send_image_button"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
@@ -54,6 +62,7 @@
 
             <Button
                 android:id="@+id/send_button"
+                android:textColor="#000000"
                 android:layout_width="76dp"
                 android:layout_height="48dp"
                 android:layout_gravity="bottom"

@@ -5,7 +5,6 @@ apply plugin: "androidx.navigation.safeargs"
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: 'com.google.gms.google-services'
-apply from: 'buildscripts/bitrise-keystore-properties.gradle'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.firebase.firebase-perf'
 
@@ -67,9 +66,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlin {
-        explicitApi()
-    }
     kotlinOptions {
         jvmTarget = "1.8"
     }
@@ -91,8 +87,6 @@ dependencies {
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5'
-    implementation 'com.google.android.gms:play-services-auth:18.1.0'
-
 
 
     implementation 'org.jetbrains.kotlin:kotlin-reflect:1.4.10'

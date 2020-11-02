@@ -8,7 +8,6 @@ import com.andrei.kit.databinding.MessageImageReceivedBinding
 import com.andrei.kit.databinding.MessageImageSentBinding
 import com.andrei.kit.databinding.MessageReceivedBinding
 import com.andrei.kit.databinding.MessageSentBinding
-import com.andrei.kit.models.LocalImageMessage
 import com.andrei.kit.models.Message
 import com.andrei.kit.models.User
 import com.andrei.dataLayer.repositories.OperationStatus
@@ -43,15 +42,7 @@ class MessageAdapter(private val currentUser: User,
 
         override fun bind(message: Message) {
             binding.message = message
-            if (message is LocalImageMessage) {
-                binding.messageImage.setImageURI(message.resourcePath)
-
-                if (message.currentStatus == OperationStatus.ONGOING) {
-                    binding.messageImage.alpha = 0.5f
-                }
-            }
             binding.halfScreenWidth = binding.root.context.getScreenWidth()/2
-
             binding.messageImage.setOnClickListener {
                 expandImage(message)
             }
@@ -74,11 +65,7 @@ class MessageAdapter(private val currentUser: User,
     }
 
     fun expandImage(message: Message) {
-        if (message is LocalImageMessage) {
-            expand(message.resourcePath.toString(), true)
-        } else {
-            expand(message.content, false)
-        }
+        expand(message.content, false)
     }
 
 
@@ -122,22 +109,9 @@ class MessageAdapter(private val currentUser: User,
 
 
     fun add(message: Message) {
-        messages.find {
-            it is LocalImageMessage
-                    && it.localID == message.localID
-        }.also {
-            if (it == null) {
                 messages.add(message)
                 notifyItemInserted(messages.size - 1)
                 scrollToLast()
-            } else {
-                if (it is LocalImageMessage) {
-                    it.currentStatus = OperationStatus.FINISHED
-                    notifyItemChanged(messages.indexOf(it))
-                }
-            }
-        }
-
     }
 
     private fun scrollToLast() {

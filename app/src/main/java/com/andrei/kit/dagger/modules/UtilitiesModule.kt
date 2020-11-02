@@ -12,6 +12,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.InternalCoroutinesApi
+import pl.aprilapps.easyphotopicker.ChooserType
+import pl.aprilapps.easyphotopicker.EasyImage
 
 @InternalCoroutinesApi
 @InstallIn(ActivityComponent::class)
@@ -28,4 +30,19 @@ class UtilitiesModule {
     fun user(): User = FirebaseAuth.getInstance().currentUser!!.toUser()
 
 
+    @Provides
+    fun getEasyImage (@ApplicationContext context: Context) : EasyImage {
+        return  EasyImage.Builder(context) // Chooser only
+                // Will appear as a system chooser title, DEFAULT empty string
+                //.setChooserTitle("Pick media")
+                // Will tell chooser that it should show documents or gallery apps
+                //.setChooserType(ChooserType.CAMERA_AND_DOCUMENTS)  you can use this or the one below
+                //.setChooserType(ChooserType.CAMERA_AND_GALLERY)
+                // Setting to true will cause taken pictures to show up in the device gallery, DEFAULT false
+                .setChooserType(ChooserType.CAMERA_AND_GALLERY)
+                .setCopyImagesToPublicGalleryFolder(true) // Sets the name for images stored if setCopyImagesToPublicGalleryFolder = true
+                .setFolderName("EasyImage sample") // Allow multiple picking
+                .allowMultiple(true)
+                .build()
+    }
 }

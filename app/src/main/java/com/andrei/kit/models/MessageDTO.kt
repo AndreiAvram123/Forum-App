@@ -17,7 +17,5 @@ open class MessageDTO(
         @SerializedName("chatID")
         val chatID: Int,
         @SerializedName("seenBy")
-        val seenByUser: Boolean,
-        @SerializedName("localID")
-        val localID: String?
+        val seenByUser: Boolean
 )
