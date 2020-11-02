@@ -6,7 +6,7 @@
 
         <variable
             name="message"
-            type="com.andrew.bookapp.models.Message" />
+            type="com.andrei.bookapp.models.Message" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

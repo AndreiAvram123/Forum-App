@@ -5,11 +5,11 @@
 
     <data>
 
-        <import type="com.andrew.bookapp.models.LocalImageMessage" />
-        <import type="com.andrew.dataLayer.repositories.OperationStatus"/>
+        <import type="com.andrei.bookapp.models.LocalImageMessage" />
+        <import type="com.andrei.dataLayer.repositories.OperationStatus"/>
         <variable
             name="message"
-            type="com.andrew.bookapp.models.Message" />
+            type="com.andrei.bookapp.models.Message" />
 
         <variable
             name="halfScreenWidth"

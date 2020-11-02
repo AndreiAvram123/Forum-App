@@ -90,12 +90,11 @@ android {
 dependencies {
 
     implementation "com.github.jkwiecien:EasyImage:3.0.4"
-    //Firebase
-    // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:25.12.0')
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
-    // Declare the dependencies for the Crashlytics and Analytics libraries
-    // When using the BoM, you don't specify versions in Firebase library dependencies
+
+
+    implementation platform('com.google.firebase:firebase-bom:25.12.0')
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth-ktx'
@@ -127,9 +126,6 @@ dependencies {
     // ...with Kotlin.
     kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.28-alpha'
 
-
-
-    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
     kapt "android.arch.persistence.room:compiler:1.1.1"
     def fragment_version = "1.2.5"
