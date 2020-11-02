@@ -8,38 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:255299349470:android:9a5c7db6013e50bc040b4f",
+        "mobilesdk_app_id": "1:255299349470:android:dbba680dedd9a6d1040b4f",
         "android_client_info": {
-          "package_name": "com.andrew.bookapp"
+          "package_name": "com.andrei.bookapp"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "255299349470-ktlst163ca31itd5ff5ljv0kh723plgk.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.andrew.bookapp",
-            "certificate_hash": "6bac8b86dc0f9d3ec77aa23e6999505b2ea97099"
-          }
-        },
-        {
-          "client_id": "255299349470-52per8289u4q9fue72sl2892e7pljuka.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC2zF7Be2b2CmYXcMkIFvFV9C0DVONCDeI"
+          "current_key": "AIzaSyBWisYFwLdPF-1aNX9lYSzlwe5dq_Rq01M"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "255299349470-52per8289u4q9fue72sl2892e7pljuka.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }
