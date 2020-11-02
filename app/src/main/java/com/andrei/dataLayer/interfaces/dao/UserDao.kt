@@ -3,7 +3,7 @@ package com.andrei.dataLayer.interfaces.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
-import com.andrei.bookapp.models.User
+import com.andrei.kit.models.User
 
 @Dao
 interface UserDao {

@@ -3,7 +3,7 @@ package com.andrei.dataLayer.interfaces.dao
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.*
-import com.andrei.bookapp.models.Post
+import com.andrei.kit.models.Post
 import com.andrei.dataLayer.models.UserWithFavoritePosts
 import com.andrei.dataLayer.models.UserWithFavoritePostsCrossRef
 import com.andrei.dataLayer.models.UserWithPosts

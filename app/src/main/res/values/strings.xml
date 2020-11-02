@@ -1,8 +1,7 @@
 <resources>
-    <string name="token_google">255299349470-2kk34khmmehv79m95ep99tons43v3u2j.apps.googleusercontent.com</string>
 
+    <string name="google_token">472239001224-h3s6n11ceu7a6n8rtq5k6rmvjvf47rot.apps.googleusercontent.com</string>
     <string name="app_name">KIT</string>
-    <string name="popular_recipes_title">Here are some popular recipes</string>
 
 
     <string name="search_history_key">SEARCH_HISTORY_KEY</string>

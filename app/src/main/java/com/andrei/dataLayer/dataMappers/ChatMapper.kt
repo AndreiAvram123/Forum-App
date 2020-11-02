@@ -1,6 +1,6 @@
 package com.andrei.dataLayer.dataMappers
 
-import com.andrei.bookapp.models.Chat
+import com.andrei.kit.models.Chat
 import com.andrei.dataLayer.models.ChatDTO
 
 object ChatMapper {

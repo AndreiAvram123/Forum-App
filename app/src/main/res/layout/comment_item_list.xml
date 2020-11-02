@@ -4,7 +4,7 @@
 
         <variable
             name="comment"
-            type="com.andrei.bookapp.models.Comment" />
+            type="com.andrei.kit.models.Comment" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"

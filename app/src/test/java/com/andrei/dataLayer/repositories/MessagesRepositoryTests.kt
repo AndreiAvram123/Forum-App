@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.andrei.TestUtilities
-import com.andrei.bookapp.R
-import com.andrei.bookapp.toBase64
+import com.andrei.kit.R
+import com.andrei.kit.toBase64
 import com.andrei.dataLayer.interfaces.ChatRepositoryInterface
 import com.andrei.dataLayer.models.serialization.SerializeMessage
 import com.andrei.dataLayer.serverConstants.MessageTypes

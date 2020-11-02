@@ -5,7 +5,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.andrei.bookapp.models.Chat
+import com.andrei.kit.models.Chat
 
 @Dao
 interface ChatDao {

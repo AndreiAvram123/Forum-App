@@ -10,8 +10,8 @@ import com.andrei.TestUtilities.Companion.testPost
 import com.andrei.TestUtilities.Companion.testPostID
 import com.andrei.TestUtilities.Companion.testUser
 import com.andrei.TestUtilities.Companion.testUserID
-import com.andrei.bookapp.R
-import com.andrei.bookapp.toBase64
+import com.andrei.kit.R
+import com.andrei.kit.toBase64
 import com.andrei.dataLayer.LocalDatabase
 import com.andrei.dataLayer.interfaces.PostRepositoryInterface
 import com.andrei.dataLayer.interfaces.dao.RoomPostDao

@@ -1,6 +1,6 @@
 package com.andrei.dataLayer.dataMappers
 
-import com.andrei.bookapp.models.User
+import com.andrei.kit.models.User
 import com.andrei.dataLayer.models.UserDTO
 import com.google.firebase.auth.FirebaseUser
 

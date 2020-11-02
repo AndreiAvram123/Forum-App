@@ -1,27 +1,37 @@
 {
   "project_info": {
-    "project_number": "255299349470",
-    "firebase_url": "https://freelanceproject-f7aef.firebaseio.com",
-    "project_id": "freelanceproject-f7aef",
-    "storage_bucket": "freelanceproject-f7aef.appspot.com"
+    "project_number": "472239001224",
+    "firebase_url": "https://kit--kitten-is-typing.firebaseio.com",
+    "project_id": "kit--kitten-is-typing",
+    "storage_bucket": "kit--kitten-is-typing.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:255299349470:android:dbba680dedd9a6d1040b4f",
+        "mobilesdk_app_id": "1:472239001224:android:629aaa2d2ad4bd5177593d",
         "android_client_info": {
-          "package_name": "com.andrei.bookapp"
+          "package_name": "com.andrei.kit"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "472239001224-3ucbi26g89mlgod8t5tdd4ltpqth4njd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyBWisYFwLdPF-1aNX9lYSzlwe5dq_Rq01M"
+          "current_key": "AIzaSyDIt9liZDWYoVBLnllZVPlcksEoqEqqCLg"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "472239001224-3ucbi26g89mlgod8t5tdd4ltpqth4njd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

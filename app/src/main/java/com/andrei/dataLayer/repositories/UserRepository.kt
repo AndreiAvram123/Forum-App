@@ -3,8 +3,8 @@ package com.andrei.dataLayer.repositories
 import android.net.ConnectivityManager
 import android.net.Uri
 import androidx.lifecycle.liveData
-import com.andrei.bookapp.models.User
-import com.andrei.bookapp.user.UserAccountManager
+import com.andrei.kit.models.User
+import com.andrei.kit.user.UserAccountManager
 import com.andrei.dataLayer.dataMappers.UserMapper
 import com.andrei.dataLayer.dataMappers.toUser
 import com.andrei.dataLayer.interfaces.UserRepositoryInterface

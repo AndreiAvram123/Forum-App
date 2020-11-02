@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.andrei.bookapp.models.*
+import com.andrei.kit.models.*
 import com.andrei.dataLayer.interfaces.dao.*
 import com.andrei.dataLayer.models.UserWithFavoritePostsCrossRef
 import kotlinx.coroutines.InternalCoroutinesApi

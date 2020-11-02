@@ -7,7 +7,7 @@
 
         <variable
             name="user"
-            type="com.andrei.bookapp.models.User" />
+            type="com.andrei.kit.models.User" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

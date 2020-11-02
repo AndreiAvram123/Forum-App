@@ -2,7 +2,7 @@ package com.andrei.dataLayer.interfaces.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.andrei.bookapp.models.Message
+import com.andrei.kit.models.Message
 
 @Dao
 interface MessageDao {

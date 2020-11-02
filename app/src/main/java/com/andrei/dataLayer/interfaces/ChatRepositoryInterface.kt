@@ -1,6 +1,6 @@
 package com.andrei.dataLayer.interfaces
 
-import com.andrei.bookapp.models.MessageDTO
+import com.andrei.kit.models.MessageDTO
 import com.andrei.dataLayer.models.ChatDTO
 import com.andrei.dataLayer.models.ServerResponse
 import com.andrei.dataLayer.models.UserDTO

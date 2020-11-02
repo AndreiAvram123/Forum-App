@@ -2,7 +2,7 @@ package com.andrei.dataLayer.interfaces.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.andrei.bookapp.models.Comment
+import com.andrei.kit.models.Comment
 import com.andrei.dataLayer.models.PostWithComments
 
 @Dao

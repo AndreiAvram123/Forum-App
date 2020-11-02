@@ -1,6 +1,6 @@
 package com.andrei.dataLayer.dataMappers
 
-import com.andrei.bookapp.models.Post
+import com.andrei.kit.models.Post
 import com.andrei.dataLayer.models.PostDTO
 
 

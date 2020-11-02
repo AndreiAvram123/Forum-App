@@ -5,7 +5,7 @@
     <data>
         <variable
             name="post"
-            type="com.andrei.bookapp.models.Post" />
+            type="com.andrei.kit.models.Post" />
     </data>
 
 

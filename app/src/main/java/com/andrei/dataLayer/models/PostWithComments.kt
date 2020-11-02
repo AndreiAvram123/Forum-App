@@ -2,8 +2,8 @@ package com.andrei.dataLayer.models
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.andrei.bookapp.models.Comment
-import com.andrei.bookapp.models.Post
+import com.andrei.kit.models.Comment
+import com.andrei.kit.models.Post
 
 data class PostWithComments(
         @Embedded

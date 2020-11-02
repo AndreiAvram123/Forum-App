@@ -7,9 +7,9 @@ import androidx.lifecycle.liveData
 import androidx.paging.PagedList
 import com.andrei.dataLayer.engineUtils.Resource
 import com.andrei.dataLayer.engineUtils.ResponseHandler
-import com.andrei.bookapp.models.Post
-import com.andrei.bookapp.models.User
-import com.andrei.bookapp.toBase64
+import com.andrei.kit.models.Post
+import com.andrei.kit.models.User
+import com.andrei.kit.toBase64
 import com.andrei.dataLayer.dataMappers.toPost
 import com.andrei.dataLayer.interfaces.PostRepositoryInterface
 import com.andrei.dataLayer.interfaces.dao.RoomPostDao

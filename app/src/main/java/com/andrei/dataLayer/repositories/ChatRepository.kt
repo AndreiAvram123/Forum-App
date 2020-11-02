@@ -4,9 +4,9 @@ import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
-import com.andrei.bookapp.models.Chat
-import com.andrei.bookapp.models.Message
-import com.andrei.bookapp.models.User
+import com.andrei.kit.models.Chat
+import com.andrei.kit.models.Message
+import com.andrei.kit.models.User
 import com.andrei.dataLayer.dataMappers.ChatMapper
 import com.andrei.dataLayer.dataMappers.toMessage
 import com.andrei.dataLayer.engineUtils.Resource

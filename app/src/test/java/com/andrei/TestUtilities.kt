@@ -4,8 +4,8 @@ import android.content.Context
 import android.net.ConnectivityManager
 import androidx.test.core.app.ApplicationProvider
 import com.andrei.dataLayer.engineUtils.AuthInterceptor
-import com.andrei.bookapp.models.Post
-import com.andrei.bookapp.models.User
+import com.andrei.kit.models.Post
+import com.andrei.kit.models.User
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
