@@ -7,7 +7,7 @@
 
         <variable
             name="message"
-            type="com.andrew.bookapp.models.Message" />
+            type="com.andrei.bookapp.models.Message" />
 
         <variable
             name="halfScreenWidth"
