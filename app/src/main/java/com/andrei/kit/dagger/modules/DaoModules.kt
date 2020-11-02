@@ -1,4 +1,4 @@
-package com.andrei.bookapp.dagger.modules
+package com.andrei.kit.dagger.modules
 
 import android.content.Context
 import com.andrei.dataLayer.LocalDatabase

@@ -1,4 +1,4 @@
-package com.andrei.bookapp.activities
+package com.andrei.kit.activities
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -13,12 +13,12 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
-import com.andrei.bookapp.R
-import com.andrei.bookapp.databinding.DrawerHeaderBinding
-import com.andrei.bookapp.databinding.LayoutMainActivityBinding
-import com.andrei.bookapp.services.*
-import com.andrei.bookapp.user.UserAccountManager
-import com.andrei.bookapp.viewModels.ViewModelChat
+import com.andrei.kit.R
+import com.andrei.kit.databinding.DrawerHeaderBinding
+import com.andrei.kit.databinding.LayoutMainActivityBinding
+import com.andrei.kit.services.*
+import com.andrei.kit.user.UserAccountManager
+import com.andrei.kit.viewModels.ViewModelChat
 import com.andrei.dataLayer.dataMappers.toUser
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint

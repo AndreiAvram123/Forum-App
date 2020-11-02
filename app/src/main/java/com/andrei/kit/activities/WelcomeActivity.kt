@@ -1,13 +1,13 @@
-package com.andrei.bookapp.activities
+package com.andrei.kit.activities
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.andrei.bookapp.R
-import com.andrei.bookapp.fragments.LoginFragment
-import com.andrei.bookapp.user.UserAccountManager
-import com.andrei.bookapp.viewModels.ViewModelUser
+import com.andrei.kit.R
+import com.andrei.kit.fragments.LoginFragment
+import com.andrei.kit.user.UserAccountManager
+import com.andrei.kit.viewModels.ViewModelUser
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -76,7 +76,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
     override fun loginWithGoogle() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.token_google))
+                .requestIdToken(getString(R.string.google_token))
                 .requestEmail()
                 .requestProfile()
                 .build()

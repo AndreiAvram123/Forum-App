@@ -1,9 +1,9 @@
-package com.andrei.bookapp.dagger.modules
+package com.andrei.kit.dagger.modules
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.andrei.bookapp.R
-import com.andrei.bookapp.models.User
+import com.andrei.kit.R
+import com.andrei.kit.models.User
 import com.andrei.dataLayer.dataMappers.toUser
 import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
