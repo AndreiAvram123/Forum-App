@@ -1,25 +1,28 @@
 package com.andrei.kit.activities
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.content.*
-import android.os.*
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
+import android.os.Bundle
+import android.os.IBinder
+import android.os.Message
+import android.os.Messenger
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
+import com.andrei.dataLayer.dataMappers.toUser
 import com.andrei.kit.R
 import com.andrei.kit.databinding.DrawerHeaderBinding
 import com.andrei.kit.databinding.LayoutMainActivityBinding
 import com.andrei.kit.services.*
 import com.andrei.kit.user.UserAccountManager
 import com.andrei.kit.viewModels.ViewModelChat
-import com.andrei.dataLayer.dataMappers.toUser
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -140,17 +143,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showNotifications() {
-        val chatBadge = binding.bottomNavigation.getOrCreateBadge(
-                R.id.friends
-        )
-        viewModelChat.lastMessageChats.observe(this, Observer {
-            if (it.isNotEmpty()) {
-                chatBadge.number = it.size
-                chatBadge.isVisible = true
-            } else {
-                chatBadge.isVisible = false
-            }
-        })
+//        val chatBadge = binding.bottomNavigation.getOrCreateBadge(
+//                R.id.friends
+//        )
+//        viewModelChat.lastMessageChats.observe(this, Observer {
+//            if (it.isNotEmpty()) {
+//                chatBadge.number = it.size
+//                chatBadge.isVisible = true
+//            } else {
+//                chatBadge.isVisible = false
+//            }
+//        })
     }
 
 }

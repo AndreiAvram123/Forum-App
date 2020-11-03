@@ -27,17 +27,9 @@ class ChatsFragment : Fragment() {
 
         binding = LayoutFragmentChatsBinding.inflate(inflater, container, false)
         configureRecyclerView()
-        viewModelChat.userChats.observe(viewLifecycleOwner, Observer {
+        viewModelChat.userChats.observe(viewLifecycleOwner, {
             chatsAdapter.setData(it)
-            viewModelChat.lastMessageChats.value?.let {ids->
-                chatsAdapter.showNotifications(ids)
-            }
         })
-        viewModelChat.lastMessageChats.observe(viewLifecycleOwner, Observer {
-            chatsAdapter.showNotifications(it)
-        })
-
-
         return binding.root
     }
 
