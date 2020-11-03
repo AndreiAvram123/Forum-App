@@ -132,7 +132,7 @@ class MessagesFragment : Fragment() {
             if (messageContent.trim().isNotEmpty()) {
 
                 val message = SerializeMessage(type = MessageTypes.textMessage,
-                        chatID = args.chatID, senderID = user.userID, content = messageContent, localIdentifier = null)
+                        chatID = args.chatID, senderID = user.userID, content = messageContent)
 
                 viewModelChat.sendMessage(message).observeRequest(viewLifecycleOwner, {
                     when (it.status) {
@@ -200,14 +200,12 @@ class MessagesFragment : Fragment() {
     private fun pushImageFromQueue() {
 
         cachedImages.poll()?.let{
-            val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
             val drawable = it.file.toUri().toDrawable(requireContext())
             val message = SerializeMessage(
                     type = MessageTypes.imageMessageType,
                     chatID = args.chatID,
                     senderID = user.userID,
-                    content = drawable.toBase64(),
-                    localIdentifier = uniqueID
+                    content = drawable.toBase64()
 
             )
             viewModelChat.sendMessage(message).observeRequest(viewLifecycleOwner, { result ->

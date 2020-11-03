@@ -62,13 +62,13 @@ class ChatRepositoryTest {
     fun `should return 200 response when fetching friend requests`() {
         runBlocking {
             val response = repo.fetchFriendRequests(testUserID)
-
         }
     }
 
     @Test
     fun `should fetch friends request return not empty friends array`() {
         runBlocking {
+
             val fetchedFriends = repo.fetchFriends(testUserID)
             assert(fetchedFriends.isNotEmpty())
         }

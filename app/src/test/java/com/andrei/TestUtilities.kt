@@ -13,13 +13,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 class TestUtilities {
     companion object {
 
-        const val testUserID = "asfdsfsdsdfs"
+        const val testUserID = "XdPbo623a2StgCOmyTREHzQOgFt1"
         const val testUserID2 = "aaaaaaa"
 
         const val testPostID = 3
 
         const val lastPostIDDB = 1023
-        const val testChatID = 1
+        const val testChatID = 8
 
         val testPost = Post(id = testPostID,title = "testTitle",image = "testImage",date = System.currentTimeMillis(),
         content = "testContent",isFavorite = false,authorID = testUserID)

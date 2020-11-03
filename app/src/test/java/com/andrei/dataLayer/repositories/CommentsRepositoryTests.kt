@@ -29,11 +29,5 @@ class CommentsRepositoryTest {
         val id = response.message.toIntOrNull()
         assertNotNull(id)
     }
-
-    @Test
-    fun shouldReturnCommentFromId() = runBlocking{
-
-        val fetchedPost = repo.fetchCommentById(11)
-        assertNotNull(fetchedPost)
-    }
+    
 }
