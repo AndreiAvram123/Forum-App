@@ -80,8 +80,6 @@ class ViewModelChat @ViewModelInject constructor(
             emit(response)
         }
     }
-
-    fun markMessageAsSeen(message: Message, user: User) = viewModelScope.launch { chatRepository.markMessageAsSeen(message, user) }
 }
 
 

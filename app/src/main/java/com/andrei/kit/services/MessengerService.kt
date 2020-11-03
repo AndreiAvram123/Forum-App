@@ -128,9 +128,6 @@ class MessengerService : Service() {
                  val messageDTO = gson.fromJson(jsonObject.toString(), MessageDTO::class.java)
 
                         val message = messageDTO.toMessage()
-                        if (message.sender.userID == userID) {
-                            message.seenByCurrentUser = true
-                        }
 
                         CoroutineScope(Dispatchers.IO).launch {
                             messageDao.insertMessage(message)

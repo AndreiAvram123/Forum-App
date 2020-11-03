@@ -19,7 +19,5 @@ data class Message(
         @ColumnInfo(name = "type")
         val type: String,
         @ColumnInfo(name = "chatID")
-        val chatID: Int,
-        @ColumnInfo(name = "seenBy")
-        var seenByCurrentUser: Boolean = false
+        val chatID: Int
 )

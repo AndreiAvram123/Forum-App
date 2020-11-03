@@ -71,9 +71,6 @@ class MessagesFragment : Fragment() {
             if (it.isNotEmpty() && it.first().chatID == args.chatID) {
                 val ordered = it.reversed()
                 messageAdapter.setData(ordered)
-                if (!ordered.last().seenByCurrentUser) {
-                    viewModelChat.markMessageAsSeen(ordered.last(), user)
-                }
             }
         })
         viewModelChat.fetchNewMessages(args.chatID).observeRequest(viewLifecycleOwner, {
@@ -218,17 +215,7 @@ class MessagesFragment : Fragment() {
 
                     }
                     Status.SUCCESS -> {
-                        //todo
-                        //change id
-                        val localImageMessage = Message(
-                                id = 2,
-                                sender = user,
-                                type = MessageTypes.imageMessageType,
-                                content = result.data!!.message,
-                                date = 222,
-                                chatID = args.chatID
-                        )
-                        messageAdapter.add(localImageMessage)
+
                     }
                     else -> {
 

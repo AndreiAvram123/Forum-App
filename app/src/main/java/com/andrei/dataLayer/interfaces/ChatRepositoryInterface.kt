@@ -17,7 +17,7 @@ interface ChatRepositoryInterface {
     suspend fun fetchUserChats(@Path("userID") userID: String): List<ChatDTO>
 
     @POST("/api/messages/push")
-    suspend fun pushMessage(@Body serializeMessage: SerializeMessage): ServerResponse
+    suspend fun pushMessage(@Body serializeMessage: SerializeMessage): MessageDTO
 
 
     @GET("/api/chat/{chatID}/recentMessages")
