@@ -2,17 +2,16 @@ package com.andrei.kit.fragments
 
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.NonNull
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,9 +27,8 @@ import com.andrei.dataLayer.models.serialization.SerializeMessage
 import com.andrei.dataLayer.serverConstants.MessageTypes
 import com.andrei.kit.Adapters.CustomDivider
 import com.andrei.kit.models.Message
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import pl.aprilapps.easyphotopicker.*
 import java.util.*
 import javax.inject.Inject
@@ -38,6 +36,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MessagesFragment : Fragment() {
+
     private lateinit var binding: MessagesFragmentBinding
     private val viewModelChat: ViewModelChat by activityViewModels()
 
@@ -53,11 +52,14 @@ class MessagesFragment : Fragment() {
     private val requestCodeCamera = 1
 
 
+    private val cachedImages = LinkedList<MediaFile>()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = MessagesFragmentBinding.inflate(inflater, container, false)
 
         messageAdapter = MessageAdapter(user, ::expandImage)
+
         configureViews()
 
         viewModelChat.currentChatId.value = args.chatID
@@ -74,16 +76,16 @@ class MessagesFragment : Fragment() {
                 }
             }
         })
-        viewModelChat.fetchNewMessages().observeRequest(viewLifecycleOwner, {
+        viewModelChat.fetchNewMessages(args.chatID).observeRequest(viewLifecycleOwner, {
             when (it.status) {
                 Status.LOADING -> {
-
                 }
 
                 Status.SUCCESS -> {
+                    Snackbar.make(binding.root, "New messages fetched" ,Snackbar.LENGTH_LONG).show()
                 }
                 else -> {
-
+                    Snackbar.make(binding.root, "Failed to get messages",Snackbar.LENGTH_LONG).show()
                 }
             }
         })
@@ -176,7 +178,7 @@ class MessagesFragment : Fragment() {
 
         easyImage.handleActivityResult(requestCode, resultCode, data, requireActivity(), object : DefaultCallback() {
             override fun onMediaFilesPicked(imageFiles: Array<MediaFile>, source: MediaSource) {
-                pushImages(imageFiles)
+                cachedImages.addAll(imageFiles)
             }
 
             override fun onImagePickerError(error: Throwable, source: MediaSource) {
@@ -190,44 +192,52 @@ class MessagesFragment : Fragment() {
         })
     }
 
-    private fun pushImages(images: Array<MediaFile>) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            images.forEach {
-                val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
-                val drawable = it.file.toUri().toDrawable(requireContext())
-                val message = SerializeMessage(
-                        type = MessageTypes.imageMessageType,
-                        chatID = args.chatID,
-                        senderID = user.userID,
-                        content = drawable.toBase64(),
-                        localIdentifier = uniqueID
+    override fun onResume() {
+        super.onResume()
+        pushImageFromQueue()
+    }
 
-                )
-                viewModelChat.sendMessage(message).observeRequest(viewLifecycleOwner, { result ->
-                    when (result.status) {
-                        Status.LOADING -> {
 
-                        }
-                        Status.SUCCESS -> {
-                            //todo
-                            //change id
-                            val localImageMessage = Message(
-                                    id = 2,
-                                    sender = user,
-                                    type = MessageTypes.imageMessageType,
-                                    content = result.message!!,
-                                    date = 222,
-                                    chatID = args.chatID
-                            )
-                            messageAdapter.add(localImageMessage)
-                        }
-                        else -> {
 
-                        }
+    private fun pushImageFromQueue() {
+
+        cachedImages.poll()?.let{
+            val uniqueID = Calendar.getInstance().timeInMillis.hashCode().toString()
+            val drawable = it.file.toUri().toDrawable(requireContext())
+            val message = SerializeMessage(
+                    type = MessageTypes.imageMessageType,
+                    chatID = args.chatID,
+                    senderID = user.userID,
+                    content = drawable.toBase64(),
+                    localIdentifier = uniqueID
+
+            )
+            viewModelChat.sendMessage(message).observeRequest(viewLifecycleOwner, { result ->
+                when (result.status) {
+                    Status.LOADING -> {
+
                     }
-                })
-            }
+                    Status.SUCCESS -> {
+                        //todo
+                        //change id
+                        val localImageMessage = Message(
+                                id = 2,
+                                sender = user,
+                                type = MessageTypes.imageMessageType,
+                                content = result.data!!.message,
+                                date = 222,
+                                chatID = args.chatID
+                        )
+                        messageAdapter.add(localImageMessage)
+                    }
+                    else -> {
 
+                    }
+                }
+            })
+            pushImageFromQueue()
         }
+
+
     }
 }

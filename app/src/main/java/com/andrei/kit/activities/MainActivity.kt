@@ -40,18 +40,19 @@ class MainActivity : AppCompatActivity() {
     private val connection = object : ServiceConnection {
 
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
             mBound = true
             serviceMessenger = Messenger(service)
-            stopNotificationSound()
             FirebaseAuth.getInstance().currentUser?.let{
-              //  val userIDMessage = Message.obtain(null, new_user_id_message, it.userID, 0)
-              //  serviceMessenger.send(userIDMessage)
+                val message = Message.obtain(null, new_user_id_message)
+               val bundle =  Bundle().apply { putString(key_user_id,it.uid) }
+                message.data = bundle
+                serviceMessenger.send(message)
             }
             viewModelChat.chatLink.observe(this@MainActivity, {
                 it?.let { link ->
                     val message = Message.obtain(null, new_chat_link_message)
-                    Bundle().apply { putString(key_chats_link, link) }.also { bundle -> message.data = bundle }
+                    val bundle = Bundle().apply { putString(key_chats_link, link) }
+                    message.data = bundle
                     serviceMessenger.send(message)
                 }
             })
@@ -66,7 +67,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.layout_main_activity)
-        createMessageNotificationChannel()
         configureNavigation()
 
 
@@ -76,24 +76,12 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         if (mBound) {
-            playNotificationOnNewMessage()
             unbindService(connection)
             mBound = false
         }
     }
 
-    private fun playNotificationOnNewMessage() {
-        val playNotification = Message.obtain(null, play_notification_message, 0, 0)
-        serviceMessenger.send(playNotification)
 
-    }
-
-    private fun stopNotificationSound() {
-        if (mBound) {
-            val stopNotification = Message.obtain(null, stop_notification_message, 0, 0)
-            serviceMessenger.send(stopNotification)
-        }
-    }
 
 
     private fun startMessengerService() {
@@ -117,11 +105,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        //fetch new notifications every time on start is called
-        createMessageNotificationChannel()
         startMessengerService()
         bindToMessengerService()
-        stopNotificationSound()
     }
 
 
@@ -168,22 +153,4 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-
-    private fun createMessageNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.message_channel)
-            val descriptionText = getString(R.string.channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(getString(R.string.message_channel_id), name, importance).apply {
-                description = descriptionText
-            }
-            // Register the channel with the system
-            val notificationManager: NotificationManager =
-                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-
-    }
 }

@@ -8,10 +8,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.databinding.FragmentFriendRequestBinding
 import com.andrei.kit.viewModels.ViewModelChat
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.kit.Adapters.CustomDivider
+import com.andrei.kit.observeRequest
 
 
 class FriendRequestFragment : Fragment() {
@@ -31,13 +33,24 @@ class FriendRequestFragment : Fragment() {
         }
 
         viewModelChat.refreshFriendRequests()
-        viewModelChat.friendRequests.observe(viewLifecycleOwner, Observer {
+        viewModelChat.friendRequests.observe(viewLifecycleOwner, {
             requestAdapter.setData(it)
         })
         return binding.root
     }
 
     private fun acceptRequest(request: FriendRequest) {
-        viewModelChat.acceptFriendRequest(request)
+        viewModelChat.acceptFriendRequest(request).observeRequest(viewLifecycleOwner,{
+            when(it.status){
+                Status.SUCCESS ->{
+
+                }
+                Status.ERROR->{
+
+                }
+                Status.LOADING ->{}
+
+            }
+        })
     }
 }

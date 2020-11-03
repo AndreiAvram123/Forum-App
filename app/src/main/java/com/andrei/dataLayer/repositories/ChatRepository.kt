@@ -114,11 +114,16 @@ class ChatRepository @Inject constructor(
 
 
 
-    suspend fun acceptFriendRequest(request: FriendRequest) {
-        val data = repo.acceptFriendRequest(request.id)
-        val chat = ChatMapper.mapDtoObjectToDomainObject(data, request.receiver.userID)
-        chatDao.insert(chat)
-    }
+    suspend fun acceptFriendRequest(request: FriendRequest):Resource<Any> {
+        return try {
+            val data = repo.acceptFriendRequest(request.id)
+            val chat = ChatMapper.mapDtoObjectToDomainObject(data, request.receiver.userID)
+            chatDao.insert(chat)
+            responseHandler.handleSuccess(Any())
+        }catch(e:Exception){
+            responseHandler.handleException(e,"Accept friend request")
+        }
+        }
 
 
     suspend fun fetchFriendRequests(user: User): ArrayList<FriendRequest> {

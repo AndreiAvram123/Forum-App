@@ -109,9 +109,9 @@ class MessageAdapter(private val currentUser: User,
 
 
     fun add(message: Message) {
-                messages.add(message)
-                notifyItemInserted(messages.size - 1)
-                scrollToLast()
+        messages.add(message)
+        notifyItemInserted(messages.size - 1)
+        scrollToLast()
     }
 
     private fun scrollToLast() {

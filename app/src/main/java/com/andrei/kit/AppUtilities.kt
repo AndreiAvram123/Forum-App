@@ -41,7 +41,7 @@ fun Uri.toDrawable(context: Context): Drawable {
 }
 
 
-suspend fun Drawable.toBase64(): String {
+ fun Drawable.toBase64(): String {
     val bitmap = (this as BitmapDrawable).bitmap
     val byteArrayOutputStream = ByteArrayOutputStream()
     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, byteArrayOutputStream)
