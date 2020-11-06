@@ -6,7 +6,7 @@ set -x
 
 gcloud firebase test android run \
   --type robo \
-  --app app-debug.apk \
+  --app "$BITRISE_APK_PATH" \
   --device model=walleye \
   --timeout 90s
 
