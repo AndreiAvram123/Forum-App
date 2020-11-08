@@ -52,7 +52,7 @@ class HomeAdapter : PagedListAdapter<Post, HomeAdapter.ViewHolder>(DIFF_CALLBACK
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val post = getItem(position)
-        // Note that "concert" is a placeholder if it's null
+
         post?.let {
             holder.bind(post)
         }

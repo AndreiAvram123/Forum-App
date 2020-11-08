@@ -12,13 +12,17 @@ import com.andrei.kit.Adapters.CustomDivider
 import com.andrei.kit.Adapters.HomeAdapter
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutHomeFragmentBinding
+import com.andrei.kit.models.User
 import com.andrei.kit.viewModels.ViewModelPost
-import kotlinx.coroutines.InternalCoroutinesApi
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-@InternalCoroutinesApi
+
 class HomeFragment : Fragment() {
     lateinit var binding: LayoutHomeFragmentBinding
     private val viewModelPost: ViewModelPost by activityViewModels()
+
+
     private val homeAdapter: HomeAdapter by lazy {
         HomeAdapter()
     }

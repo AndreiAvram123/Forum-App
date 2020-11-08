@@ -1,6 +1,5 @@
 package com.andrei.kit.viewModels
 
-import android.graphics.drawable.Drawable
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -8,19 +7,19 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.andrei.dataLayer.engineUtils.Resource
-import com.andrei.kit.models.Post
 import com.andrei.dataLayer.models.UserWithFavoritePosts
 import com.andrei.dataLayer.models.serialization.SerializePost
 import com.andrei.dataLayer.repositories.PostRepository
-import kotlinx.coroutines.InternalCoroutinesApi
+import com.andrei.kit.models.Post
+import com.andrei.kit.models.User
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-@InternalCoroutinesApi
 class ViewModelPost @ViewModelInject constructor(
         private val postRepository: PostRepository
 ) : ViewModel() {
 
-    
+
     fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts
 
 

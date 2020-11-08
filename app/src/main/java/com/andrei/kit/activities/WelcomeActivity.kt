@@ -34,7 +34,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
 
-        userAccountManager.continueLoginFlow.observe(this,{
+        userAccountManager.continueLoginFlow.reObserve(this,{
             if(it){
                 startMainActivity()
             }

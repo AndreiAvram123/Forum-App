@@ -28,11 +28,14 @@
                 style="@style/important_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:text="@{post.title}"
                 android:textSize="22sp"
+                app:layout_constraintBottom_toBottomOf="@+id/user_image_post_item"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/user_image_post_item"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Me every day" />
 
@@ -40,16 +43,26 @@
                 android:id="@+id/post_item_home_image"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
                 android:adjustViewBounds="true"
                 android:cropToPadding="false"
                 app:imageFromURL="@{post.image}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/post_title_home_item"
+                app:layout_constraintTop_toBottomOf="@+id/user_image_post_item"
                 tools:srcCompat="@drawable/placeholder" />
+
+            <ImageView
+                android:id="@+id/user_image_post_item"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                app:imageFromURL="@{post.author.profilePicture}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@tools:sample/avatars" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>

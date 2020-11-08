@@ -34,7 +34,7 @@ class ChatsFragment : Fragment() {
     }
 
     private fun configureRecyclerView() {
-        with(binding.recyclerViewFriends) {
+       binding.recyclerViewFriends.apply{
             adapter = chatsAdapter
             addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.HORIZONTAL))
             layoutManager = LinearLayoutManager(requireContext())
