@@ -10,7 +10,9 @@ import com.andrei.dataLayer.models.PostDTO
                 image = this.image,
                 date = this.date,
                 user = this.author.toUser(),
-                content = this.content
+                content = this.content,
+               bookmarkTimes = this.bookmarkTimes,
+               numberOfComments = this.numberOfComments
         )
 
     }

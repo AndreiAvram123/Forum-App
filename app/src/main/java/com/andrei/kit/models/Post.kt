@@ -1,6 +1,9 @@
 package com.andrei.kit.models
 
-import androidx.room.*
+import androidx.room.ColumnInfo
+import androidx.room.Embedded
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 @Entity
 data class Post(
@@ -11,7 +14,8 @@ data class Post(
         @ColumnInfo(name = "date") val date: Long,
         @ColumnInfo(name = "content") val content: String,
         @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false,
-
+        @ColumnInfo(name = "numberOfComments") val numberOfComments:Int,
+        @ColumnInfo(name = "bookmarkedTime") val bookmarkTimes:Int,
         @Embedded val user: User
 
 

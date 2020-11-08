@@ -51,13 +51,13 @@ class HomeFragment : Fragment() {
     private fun initializeRecyclerView() {
         with(binding.recyclerViewHome) {
             adapter = homeAdapter
-            addItemDecoration(CustomDivider(20))
+            addItemDecoration(CustomDivider(100))
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
     private fun attachObserver() {
-        viewModelPost.recentPosts.reObserve(viewLifecycleOwner, Observer {
+        viewModelPost.recentPosts.reObserve(viewLifecycleOwner, {
             homeAdapter.submitList(it)
         })
 
