@@ -13,8 +13,7 @@ open class ResponseHandler {
     }
 
     fun <T : Any> handleException(e: Exception,url:String): Resource<T> {
-        Log.e(TAG,"Error at $url")
-        e.printStackTrace()
+        Log.e(TAG,"Error at $url with error ${e.stackTraceToString()}")
 
         return when (e) {
             is HttpException -> Resource.error(getErrorMessage(e.code()))

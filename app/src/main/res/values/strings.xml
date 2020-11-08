@@ -4,12 +4,6 @@
     <string name="app_name">KIT</string>
 
 
-    <string name="search_history_key">SEARCH_HISTORY_KEY</string>
-    <string name="fb_login_protocol_scheme">fb2569482526618357</string>
-    <string name="welcome_activity_shown_key">welcome_activity_shown_key</string>
-
-
-    <string name="action_share">Share</string>
     <string name="action_upload">Upload</string>
     <string name="action_copy">Copy</string>
     <string name="action_print">Print</string>
@@ -32,16 +26,9 @@
     <string name="no_password">No password entered</string>
     <string name="password_match">The passwords do not match</string>
     <string name="error_no_nickname">You must enter a nickname</string>
-    <string name="sign_in_facebook">Continue with Facebook</string>
     <string name="sign_in_email">Continue with Email</string>
     <string name="other_options_sign_in">See other options</string>
 
-    <string-array name="sort_parameters">
-        <item>Default</item>
-        <item>Quickest</item>
-        <item>Servings</item>
-
-    </string-array>
 
     <string name="write_comment_text">Write a commentDTO</string>
     <string name="submit_comment">Submit</string>

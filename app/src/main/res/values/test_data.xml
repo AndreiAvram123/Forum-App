@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="testUserID">testUserID</string>
+<string name="testUserID2">testUserID2</string>
+<integer name="testPostID">1</integer>
+<integer name="testChatID">1</integer>
+<string name="token">eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2MDM0NTM3MTIsImV4cCI6MTYzNDk4OTcxMiwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiYXZyYW1hbmRyZWlAeWFob28uY29tIn0.jzwxtOmXcgEbcQcWvIvR81nZc9KKtsrm6nDrQZFOFs0iCctzh4PqMfdLYdd0PcRCR32d_X8_bNAmZamAAiA_Eie4YMtu6Kga0itCzLTBUTWhvzL5r59QL-4BgFm6RUEwvtO5lK1xrlgiVXQHcldHmMXUvgy4IgQdNP1078OuPevNw4rCQDJPPSaMvkdVPJdpznBKNXc0vlrfYpcZNslAxIgBPm_RKXt6zDeurIlv5GAdp_O5DepR8qKHzsdwoYb6swmW4SHw__j9P9Sz8AdbKUfq6IZ04BNN9cMuJ6krWEWHbyMrT2LLLxzuVB4XZxJY4y6WFwWSgA5lMbJ4uv6g5QL72c5ygT5dZuhna-GXkH1XNYavpjfWXs4yYdFOJMzR3vtK1Azp42ZanB6zDrwBDSUMn5hCPuHP7hnGTRJdINY-q3fFvNpZXm6TMHnJxwCDXKPjDbjOGHGyLv8LlD_lpNaoiT8rx4XK2b2Hu6dEJauJBWtyCQyiCsFng_NqBVHX02IN6vXba7pHnbeRscd6ofQu4_32FarwdOn-5rcQ0n8RCa7UUfrIr8jCyIgb_c3S294RpUpaJcmH4_k1a4Iy3w3XzQLr2Yrz-THnPWNRF0nIII44zhzkH2ECcAg1Ijo8WFps2iAD0gUfnrqHRzvB4-lwJJhRwLlLrqLGTZb-qQk</string>
+
+<string name="testPostTitle">tesPostTitle</string>
+<string name="testPostContent">tesPostContent</string>
+<string name="testPostImage">https://robohash.org/139.162.116.133.png</string>
+
+
+<string name="testUsername">AndreiAvram123</string>
+<string name="testEmail">avramandrei@yahoo.com</string>
+<string name="testProfilePicture">https://robohash.org/139.162.116.133.png</string>
+
+
+</resources>

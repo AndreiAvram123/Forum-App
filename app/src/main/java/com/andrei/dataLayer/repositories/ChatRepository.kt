@@ -90,12 +90,13 @@ class ChatRepository @Inject constructor(
 
 
      fun pushMessage(serializeMessage: SerializeMessage) = liveData{
-        emit(Resource.loading<ServerResponse>())
+        emit(Resource.loading<Any>())
          try {
-            val response  = repo.pushMessage(serializeMessage)
-            emit(Resource.success(response))
+            val messageDTO  = repo.pushMessage(serializeMessage)
+             messageDao.insertMessage(messageDTO.toMessage())
+            emit(Resource.success(Any()))
         } catch (e: Exception) {
-           responseHandler.handleException<ServerResponse>(e,Endpoint.PUSH_MESSAGE.url)
+           responseHandler.handleException<Any>(e,Endpoint.PUSH_MESSAGE.url)
         }
     }
 
@@ -114,11 +115,16 @@ class ChatRepository @Inject constructor(
 
 
 
-    suspend fun acceptFriendRequest(request: FriendRequest) {
-        val data = repo.acceptFriendRequest(request.id)
-        val chat = ChatMapper.mapDtoObjectToDomainObject(data, request.receiver.userID)
-        chatDao.insert(chat)
-    }
+    suspend fun acceptFriendRequest(request: FriendRequest):Resource<Any> {
+        return try {
+            val data = repo.acceptFriendRequest(request.id)
+            val chat = ChatMapper.mapDtoObjectToDomainObject(data, request.receiver.userID)
+            chatDao.insert(chat)
+            responseHandler.handleSuccess(Any())
+        }catch(e:Exception){
+            responseHandler.handleException(e,"Accept friend request")
+        }
+        }
 
 
     suspend fun fetchFriendRequests(user: User): ArrayList<FriendRequest> {
@@ -134,28 +140,7 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    suspend fun markMessageAsSeen(message: Message, user: User) {
-        if (connectivityManager.activeNetwork != null) {
-            repo.markMessageAsSeen(messageID = message.id,
-                    userID = user.userID)
-            message.seenByCurrentUser = true
-            messageDao.update(message)
-        }
-        removeLocalNotification(message)
-    }
 
-    private fun removeLocalNotification(message: Message) {
-        chatNotifications.value?.find { it.chatID == message.chatID }.also {
-            if (it != null) {
-                chatNotifications.value?.remove(it)
-                chatNotifications.notifyObserver()
-            }
-        }
-    }
-
-    fun <T> MutableLiveData<T>.notifyObserver() {
-        this.value = this.value
-    }
 
     fun fetchNewMessages(chatID: Int) = liveData {
          try{

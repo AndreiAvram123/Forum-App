@@ -6,4 +6,4 @@ import com.andrei.kit.models.MessageDTO
 fun MessageDTO.toMessage() =
         Message(id = this.id,
                 content = this.content, sender = UserMapper.mapToDomainObject(this.sender),
-                type = this.type, seenByCurrentUser = this.seenByUser,   chatID = this.chatID, date = this.date)
+                type = this.type,   chatID = this.chatID, date = this.date)

@@ -12,6 +12,7 @@ import com.andrei.dataLayer.serverConstants.MessageTypes
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
+import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -27,18 +28,20 @@ class MessagesFragmentTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
 
     @Test
-    fun uploadedImageShouldReturnImagePath() {
+    fun uploadedImageShouldReturnResult() {
         runBlocking {
             val drawable = context.getDrawable(R.drawable.placeholder)
             drawable?.let {
-                val localID: Int = Calendar.getInstance().timeInMillis.hashCode()
                 val message = SerializeMessage(type = MessageTypes.imageMessageType,
                         chatID = TestUtilities.testChatID,
                         senderID = TestUtilities.testUserID,
-                        content = it.toBase64(),
-                        localIdentifier = localID.toString())
-                val serverResponse = repo.pushMessage(message)
-                Assert.assertTrue(serverResponse.successful)
+                        content = it.toBase64())
+                try {
+                    val messageResponse = repo.pushMessage(message)
+                }catch (e:Exception){
+                    e.printStackTrace()
+                    fail()
+                }
             }
 
         }

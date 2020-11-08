@@ -17,18 +17,22 @@ import com.andrei.kit.models.Message
 import com.andrei.kit.models.MessageDTO
 import com.andrei.dataLayer.LocalDatabase
 import com.andrei.dataLayer.dataMappers.toMessage
+import com.andrei.kit.models.User
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.launchdarkly.eventsource.EventHandler
 import com.launchdarkly.eventsource.EventSource
 import com.launchdarkly.eventsource.MessageEvent
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.net.URI
 import java.time.Duration
+import javax.inject.Inject
 
 const val new_chat_link_message = 1
 const val key_chats_link = "KEY_CHAT_LINKS"
+const val key_user_id = "KEY_USER_ID"
 const val new_user_id_message = 2
 const val play_notification_message = 3
 const val stop_notification_message = 4
@@ -39,9 +43,12 @@ class MessengerService : Service() {
     private var eventSource: EventSource? = null
 
     private lateinit var messenger: Messenger
-    private var userID: Int = 0
+
 
     var shouldPlayNotification = false
+
+    private var userID :String? = null
+
     private lateinit var connectivityManager: ConnectivityManager
 
 
@@ -89,7 +96,7 @@ class MessengerService : Service() {
         override fun handleMessage(msg: android.os.Message) {
             when (msg.what) {
                 new_chat_link_message -> chatLinks = msg.data.getString(key_chats_link)
-                new_user_id_message -> userID = msg.arg1
+                new_user_id_message -> userID = msg.data.getString(key_user_id)
                 play_notification_message -> shouldPlayNotification = true
                 stop_notification_message -> shouldPlayNotification = false
             }
@@ -118,26 +125,17 @@ class MessengerService : Service() {
             if (data != null) {
                 val jsonObject = JSONObject(data)
 
-                when (jsonObject.get("type")) {
-                    "message" -> {
-                        val messageDTO = gson.fromJson(jsonObject.get("message").toString(), MessageDTO::class.java)
+                 val messageDTO = gson.fromJson(jsonObject.toString(), MessageDTO::class.java)
 
                         val message = messageDTO.toMessage()
-//                        if (message.sender.userID == userID) {
-//                            message.seenByCurrentUser = true
-//                        }
+
                         CoroutineScope(Dispatchers.IO).launch {
                             messageDao.insertMessage(message)
                         }
-                        if (shouldPlayNotification) {
-                            playNotification(message)
-                        }
-                    }
 
                 }
             }
         }
-    }
 
 
     private fun startServerSideEvent() {
@@ -152,30 +150,11 @@ class MessengerService : Service() {
     }
 
     private fun startEvent() {
-        if (applicationContext.getConnectivityManager().activeNetwork != null) {
+        if (connectivityManager.activeNetwork != null) {
             eventSource?.start()
         }
     }
 
-
-    private fun playNotification(message: Message) {
-        val builder = NotificationCompat.Builder(this@MessengerService, getString(R.string.message_channel_id))
-                .setSmallIcon(R.drawable.ic_notification)
-                .setContentTitle("New message")
-                .setContentText(message.content.take(10) + "...")
-                .setAutoCancel(true)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
-        //todo
-        //shuld open activity
-//        pendingIntent?.let {
-//            builder.setContentIntent(it)
-//        }
-
-        with(NotificationManagerCompat.from(this@MessengerService)) {
-            notify(message.id, builder.build())
-        }
-    }
 }
 
 

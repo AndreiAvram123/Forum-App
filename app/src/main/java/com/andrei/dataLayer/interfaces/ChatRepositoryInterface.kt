@@ -17,7 +17,7 @@ interface ChatRepositoryInterface {
     suspend fun fetchUserChats(@Path("userID") userID: String): List<ChatDTO>
 
     @POST("/api/messages/push")
-    suspend fun pushMessage(@Body serializeMessage: SerializeMessage): ServerResponse
+    suspend fun pushMessage(@Body serializeMessage: SerializeMessage): MessageDTO
 
 
     @GET("/api/chat/{chatID}/recentMessages")
@@ -39,10 +39,6 @@ interface ChatRepositoryInterface {
 
     @GET("/api/user/{userID}/friends")
     suspend fun fetchFriends(@Path("userID") userID: String): List<UserDTO>
-
-    @PATCH("/api/messages/{messageID}/user/{userID}")
-    suspend fun markMessageAsSeen(@Path("userID") userID: String, @Path("messageID") messageID: Int)
-
 
     @GET("/api/user/{userID}/lastMessages")
     suspend fun fetchLastChatsMessage(@Path("userID") userID: String): List<MessageDTO>

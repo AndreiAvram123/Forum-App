@@ -10,7 +10,5 @@ data class SerializeMessage(
         @SerializedName("senderID")
         val senderID: String,
         @SerializedName("content")
-        val content: String,
-        @SerializedName("localID")
-        val localIdentifier: String?
+        val content: String
 )

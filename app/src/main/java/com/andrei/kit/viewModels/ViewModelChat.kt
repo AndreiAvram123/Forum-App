@@ -2,6 +2,8 @@ package com.andrei.kit.viewModels
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.andrei.dataLayer.engineUtils.Resource
+import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.models.Chat
 import com.andrei.kit.models.Message
 import com.andrei.kit.models.User
@@ -18,10 +20,6 @@ class ViewModelChat @ViewModelInject constructor(
 ) : ViewModel() {
 
     val currentChatId: MutableLiveData<Int> = MutableLiveData()
-
-    val lastMessageChats: LiveData<List<Int>> by lazy {
-        chatRepository.lastChatsMessage
-    }
 
 
     val userChats: LiveData<List<Chat>> by lazy {
@@ -53,10 +51,9 @@ class ViewModelChat @ViewModelInject constructor(
     }
 
 
-    //hmm
-    //todo
-    //maybe something differenct
-    fun fetchNewMessages () = chatRepository.fetchNewMessages(currentChatId.value!!)
+
+
+    fun fetchNewMessages (chatID:Int) = chatRepository.fetchNewMessages(chatID)
 
     val chatLink: LiveData<String> = chatRepository.chatLink
 
@@ -69,14 +66,16 @@ class ViewModelChat @ViewModelInject constructor(
         }
     }
 
-    fun acceptFriendRequest(request: FriendRequest) {
-        friendRequests.value?.remove(request)
+    fun acceptFriendRequest(request: FriendRequest) = liveData{
+        emit(Resource.loading<Any>())
         viewModelScope.launch {
-            chatRepository.acceptFriendRequest(request)
+            val response  = chatRepository.acceptFriendRequest(request)
+            if(response.status == Status.SUCCESS) {
+                friendRequests.value?.remove(request)
+            }
+            emit(response)
         }
     }
-
-    fun markMessageAsSeen(message: Message, user: User) = viewModelScope.launch { chatRepository.markMessageAsSeen(message, user) }
 }
 
 
