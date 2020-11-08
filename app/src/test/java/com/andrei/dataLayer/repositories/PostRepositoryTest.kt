@@ -11,11 +11,10 @@ import com.andrei.TestUtilities.Companion.testPostID
 import com.andrei.TestUtilities.Companion.testUser
 import com.andrei.TestUtilities.Companion.testUserID
 import com.andrei.kit.R
-import com.andrei.kit.toBase64
+import com.andrei.kit.utils.toBase64
 import com.andrei.dataLayer.LocalDatabase
 import com.andrei.dataLayer.interfaces.PostRepositoryInterface
 import com.andrei.dataLayer.interfaces.dao.RoomPostDao
-import com.andrei.dataLayer.models.SerializeImage
 import com.andrei.dataLayer.models.UserWithFavoritePostsCrossRef
 import com.andrei.dataLayer.models.serialization.SerializePost
 import com.andrei.dataLayer.models.serialization.SerializeFavoritePostRequest

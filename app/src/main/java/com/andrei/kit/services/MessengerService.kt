@@ -8,27 +8,19 @@ import android.net.Network
 import android.os.Handler
 import android.os.IBinder
 import android.os.Messenger
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import com.andrei.kit.R
 import com.andrei.kit.dagger.MyApplication
-import com.andrei.kit.getConnectivityManager
-import com.andrei.kit.models.Message
 import com.andrei.kit.models.MessageDTO
 import com.andrei.dataLayer.LocalDatabase
 import com.andrei.dataLayer.dataMappers.toMessage
-import com.andrei.kit.models.User
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.launchdarkly.eventsource.EventHandler
 import com.launchdarkly.eventsource.EventSource
 import com.launchdarkly.eventsource.MessageEvent
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.net.URI
 import java.time.Duration
-import javax.inject.Inject
 
 const val new_chat_link_message = 1
 const val key_chats_link = "KEY_CHAT_LINKS"

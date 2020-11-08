@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.andrei.kit.R
 import com.andrei.kit.databinding.PostItemHomePageBinding
 import com.andrei.kit.fragments.ExpandedPostFragmentDirections
-import com.andrei.kit.getConnectivityManager
+import com.andrei.kit.utils.getConnectivityManager
 import com.andrei.kit.models.Post
 import com.google.android.material.snackbar.Snackbar
 

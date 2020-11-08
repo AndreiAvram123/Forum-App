@@ -5,19 +5,17 @@ import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.andrei.TestUtilities
 import com.andrei.kit.R
-import com.andrei.kit.toBase64
+import com.andrei.kit.utils.toBase64
 import com.andrei.dataLayer.interfaces.ChatRepositoryInterface
 import com.andrei.dataLayer.models.serialization.SerializeMessage
 import com.andrei.dataLayer.serverConstants.MessageTypes
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert
 import org.junit.Assert.fail
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import java.util.*
 
 @InternalCoroutinesApi
 @Config(sdk = [Build.VERSION_CODES.O_MR1])

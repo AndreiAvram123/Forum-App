@@ -22,7 +22,7 @@ import com.andrei.kit.models.User
 import com.andrei.kit.viewModels.ViewModelComments
 import com.andrei.kit.viewModels.ViewModelPost
 import com.andrei.dataLayer.models.serialization.SerializeComment
-import com.andrei.dataLayer.repositories.OperationStatus
+import com.andrei.kit.utils.reObserve
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -134,9 +134,18 @@ class ExpandedPostFragment : Fragment() {
                 postID = post.id,
                 userID = user.userID)
 
-        viewModelComments.uploadComment(commentToUpload).observe(viewLifecycleOwner, {
-            if (it == OperationStatus.FINISHED) {
-                commentDialog.dismiss()
+        viewModelComments.uploadComment(commentToUpload).reObserve(viewLifecycleOwner, {
+            when(it.status){
+                Status.LOADING->{
+
+                }
+                Status.SUCCESS->{
+
+                }
+                Status.ERROR ->{
+
+                }
+
             }
         })
     }

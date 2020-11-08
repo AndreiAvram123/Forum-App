@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.andrei.kit.databinding.FragmentImageZoomBinding
-import com.andrei.kit.toDrawable
+import com.andrei.kit.utils.toDrawable
 
 
 class ImageZoomFragment : Fragment() {

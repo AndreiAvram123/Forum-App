@@ -24,7 +24,7 @@ class ViewModelUser @ViewModelInject constructor(
     fun loginWithGoogle(googleSignInAccount: GoogleSignInAccount) = userRepository.loginWithGoogle(googleSignInAccount)
 
 
-    fun register(username: String, email: String, password: String)  = liveData {  emitSource(userRepository.registerWithUsernameAndPassword(username,email,password)) }
+    fun register(username: String, email: String, password: String)  =  userRepository.registerWithUsernameAndPassword(username,email,password)
 
 
     fun login(email: String, password: String) = userRepository.login(email, password)

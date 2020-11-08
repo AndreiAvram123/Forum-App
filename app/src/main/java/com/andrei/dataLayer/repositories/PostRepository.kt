@@ -1,6 +1,5 @@
 package com.andrei.dataLayer.repositories
 
-import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
@@ -9,7 +8,6 @@ import com.andrei.dataLayer.engineUtils.Resource
 import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.kit.models.Post
 import com.andrei.kit.models.User
-import com.andrei.kit.toBase64
 import com.andrei.dataLayer.dataMappers.toPost
 import com.andrei.dataLayer.interfaces.PostRepositoryInterface
 import com.andrei.dataLayer.interfaces.dao.RoomPostDao

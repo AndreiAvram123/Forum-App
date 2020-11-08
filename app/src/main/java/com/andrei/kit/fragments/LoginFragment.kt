@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutLoginBinding
 import com.andrei.kit.viewModels.ViewModelUser
-import com.andrei.dataLayer.repositories.OperationStatus
 import com.google.android.gms.common.SignInButton
 
 class LoginFragment : Fragment() {
@@ -34,11 +33,8 @@ class LoginFragment : Fragment() {
         val email = binding.username.text.trim().toString()
         val password = binding.password.text.trim().toString()
         if (areLoginDetailsValid(email, password)) {
-            viewModelUser.login(email, password).observe(viewLifecycleOwner, Observer {
-                if (it == OperationStatus.FAILED) {
+            viewModelUser.login(email, password).observe(viewLifecycleOwner, {
 
-                    displayErrorMessage("Invalid credentials")
-                }
             })
         }
     }

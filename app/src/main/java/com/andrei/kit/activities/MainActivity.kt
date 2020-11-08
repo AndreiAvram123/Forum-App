@@ -124,7 +124,6 @@ class MainActivity : AppCompatActivity() {
         NavigationUI.setupWithNavController(binding.bottomNavigation,
                 navController)
 
-        showNotifications()
 
         configureDrawer(navController)
 
@@ -142,18 +141,5 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun showNotifications() {
-//        val chatBadge = binding.bottomNavigation.getOrCreateBadge(
-//                R.id.friends
-//        )
-//        viewModelChat.lastMessageChats.observe(this, Observer {
-//            if (it.isNotEmpty()) {
-//                chatBadge.number = it.size
-//                chatBadge.isVisible = true
-//            } else {
-//                chatBadge.isVisible = false
-//            }
-//        })
-    }
 
 }

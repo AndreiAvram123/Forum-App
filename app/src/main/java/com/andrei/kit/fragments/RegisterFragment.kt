@@ -6,13 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutSignUpBinding
-import com.andrei.kit.isEmail
+import com.andrei.kit.utils.isEmail
 import com.andrei.kit.viewModels.ViewModelUser
-import com.andrei.dataLayer.repositories.OperationStatus
+import com.andrei.kit.utils.reObserve
 import com.google.android.material.snackbar.Snackbar
 
 class RegisterFragment : Fragment() {
@@ -80,18 +80,23 @@ class RegisterFragment : Fragment() {
         val username = binding.username.text.toString().trim()
 
         if (areCredentialsValid(email, password, reenteredPassword, username)) {
-            viewModelUser.register(username, email, password).observe(viewLifecycleOwner,Observer{
-                if(it == OperationStatus.FINISHED){
-
-                    Snackbar.make(binding.root, getString(R.string.account_created), Snackbar.LENGTH_LONG).show()
+            viewModelUser.register(username, email, password).reObserve(viewLifecycleOwner, {
+                when(it.status){
+                    Status.LOADING -> {
+                    }
+                    Status.SUCCESS ->{
+                        Snackbar.make(binding.root, getString(R.string.account_created), Snackbar.LENGTH_LONG).show()
+                    }
+                    Status.ERROR ->{
+                        Snackbar.make(binding.root,"error at creating account", Snackbar.LENGTH_LONG).show()
+                    }
                 }
-                //todo
-                //modify ui accordingly
             })
             showButton()
             clearFields()
         }
     }
+
 
     private fun clearFields() {
         binding.email.text.clear()
