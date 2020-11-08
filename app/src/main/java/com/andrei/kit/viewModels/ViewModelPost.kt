@@ -11,9 +11,7 @@ import com.andrei.dataLayer.models.UserWithFavoritePosts
 import com.andrei.dataLayer.models.serialization.SerializePost
 import com.andrei.dataLayer.repositories.PostRepository
 import com.andrei.kit.models.Post
-import com.andrei.kit.models.User
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 class ViewModelPost @ViewModelInject constructor(
         private val postRepository: PostRepository
@@ -40,7 +38,7 @@ class ViewModelPost @ViewModelInject constructor(
 
 
     val recentPosts by lazy {
-        LivePagedListBuilder(postRepository.getPosts(), config)
+        LivePagedListBuilder(postRepository.getCachedPosts(), config)
                 .setBoundaryCallback(postRepository.PostRepoBoundaryCallback())
                 .build()
     }

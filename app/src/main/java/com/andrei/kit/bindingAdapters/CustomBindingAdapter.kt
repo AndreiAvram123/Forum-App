@@ -47,14 +47,3 @@ fun getDateFromUnix(textView: TextView, unixTime: Long) {
     }
 
 }
-//
-//@BindingAdapter("backgroundNotification")
-//fun showNotificationBackground(view:View, shouldShow: Boolean) {
-//    if (shouldShow) {
-//        view.setBackgroundColor(Color.YELLOW)
-//    } else {
-//        view.setBackgroundColor(Color.WHITE)
-//    }
-//}
-
-

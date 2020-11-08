@@ -10,8 +10,9 @@ import com.andrei.dataLayer.models.UserWithFavoritePostsCrossRef
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 
-@Database(entities = [Post::class, Comment::class, User::class, UserWithFavoritePostsCrossRef::class, Message::class, Chat::class], version = 2, exportSchema = false)
+@Database(entities = [Post::class, Comment::class, User::class, UserWithFavoritePostsCrossRef::class, Message::class, Chat::class], version = 3, exportSchema = false)
 abstract class LocalDatabase : RoomDatabase() {
+
     abstract fun postDao(): RoomPostDao
     abstract fun commentDao(): RoomCommentDao
     abstract fun userDao(): UserDao

@@ -32,7 +32,7 @@ class PostRepository @Inject constructor(private val user: User,
 
     private  val TAG = PostRepository::class.java.simpleName
 
-    fun getPosts() = postDao.getCachedPosts().also {
+    fun getCachedPosts() = postDao.getCachedPosts().also {
         coroutineScope.launch {
             //if network is active remove old data and
             //perform a fresh fetch

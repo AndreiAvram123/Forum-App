@@ -59,7 +59,7 @@
                 android:layout_height="50dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
-                app:imageFromURL="@{post.author.profilePicture}"
+                app:imageFromURL="@{post.user.profilePicture}"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:srcCompat="@tools:sample/avatars" />

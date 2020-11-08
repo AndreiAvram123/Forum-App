@@ -16,6 +16,4 @@ data class User(
         @ColumnInfo(name = "profilePicture")
         val profilePicture: String
 
-) {
-
-}
+)

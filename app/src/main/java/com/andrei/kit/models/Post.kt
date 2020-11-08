@@ -11,9 +11,9 @@ data class Post(
         @ColumnInfo(name = "date") val date: Long,
         @ColumnInfo(name = "content") val content: String,
         @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false,
-        @ColumnInfo(name = "authorID") val authorID: String
 
-) {
-    @Ignore
-    var author: User? = null
-}
+        @Embedded val user: User
+
+
+
+)

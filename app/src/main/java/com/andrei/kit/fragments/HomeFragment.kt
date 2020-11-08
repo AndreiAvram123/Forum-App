@@ -13,6 +13,7 @@ import com.andrei.kit.Adapters.HomeAdapter
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutHomeFragmentBinding
 import com.andrei.kit.models.User
+import com.andrei.kit.utils.reObserve
 import com.andrei.kit.viewModels.ViewModelPost
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -56,7 +57,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun attachObserver() {
-        viewModelPost.recentPosts.observe(viewLifecycleOwner, Observer {
+        viewModelPost.recentPosts.reObserve(viewLifecycleOwner, Observer {
             homeAdapter.submitList(it)
         })
 
