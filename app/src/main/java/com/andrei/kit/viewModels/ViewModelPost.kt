@@ -47,7 +47,7 @@ class ViewModelPost @ViewModelInject constructor(
             postRepository.addPostToFavorites(post)
 
 
-    fun deletePostFromFavorites(post: Post) =
+    fun removeFromFavorites(post: Post) =
           postRepository.deletePostFromFavorites(post)
 
 

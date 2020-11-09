@@ -3,8 +3,8 @@ package com.andrei.dataLayer.dataMappers
 import com.andrei.kit.models.Post
 import com.andrei.dataLayer.models.PostDTO
 
-
     fun PostDTO.toPost():Post {
+
        return  Post(id = this.id,
                 title = this.title,
                 image = this.image,
@@ -12,7 +12,7 @@ import com.andrei.dataLayer.models.PostDTO
                 user = this.author.toUser(),
                 content = this.content,
                bookmarkTimes = this.bookmarkTimes,
-               numberOfComments = this.numberOfComments
-        )
+               numberOfComments =  this.numberOfComments
+       )
 
     }

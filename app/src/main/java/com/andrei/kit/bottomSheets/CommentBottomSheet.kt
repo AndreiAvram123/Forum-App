@@ -9,8 +9,10 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class CommentBottomSheet(val callback: (commentContent: String) -> Unit) : BottomSheetDialogFragment() {
 
+    private lateinit var binding:BottomSheetCommentBinding
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = BottomSheetCommentBinding.inflate(inflater, container, false)
+       binding = BottomSheetCommentBinding.inflate(inflater, container, false)
         attachListener(binding)
         return binding.root
     }
@@ -19,12 +21,15 @@ class CommentBottomSheet(val callback: (commentContent: String) -> Unit) : Botto
         binding.submitCommentButton.setOnClickListener {
             val commentContent = binding.commentContent.text.toString()
             if (commentContent.trim().isNotEmpty()) {
-                binding.progressBar.visibility = View.VISIBLE
-                binding.submitCommentButton.visibility = View.INVISIBLE
                 callback(commentContent)
-                binding.commentContent.text.clear()
             }
         }
     }
+     fun showLoading(){
+        binding.commentContent.text.clear()
+        binding.progressBar.visibility = View.VISIBLE
+        binding.submitCommentButton.visibility = View.INVISIBLE
+    }
+
 
 }

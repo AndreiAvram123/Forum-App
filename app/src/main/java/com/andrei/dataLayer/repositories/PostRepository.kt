@@ -3,7 +3,6 @@ package com.andrei.dataLayer.repositories
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
-import androidx.lifecycle.map
 import androidx.paging.PagedList
 import com.andrei.dataLayer.engineUtils.Resource
 import com.andrei.dataLayer.engineUtils.ResponseHandler
@@ -16,7 +15,6 @@ import com.andrei.dataLayer.models.*
 import com.andrei.dataLayer.models.serialization.SerializeFavoritePostRequest
 import com.andrei.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.Exception
@@ -78,7 +76,7 @@ class PostRepository @Inject constructor(private val user: User,
         emit(Resource.loading<LiveData<Post>>())
         try {
             val post = repo.fetchPostByID(id).toPost()
-            changePostToFavorite(post)
+            checkPostIsBookmarked(post)
             postDao.insertPost(post)
             val localDBPost  = postDao.getPostByID(post.id)
             emit(Resource.success(localDBPost))
@@ -128,7 +126,6 @@ class PostRepository @Inject constructor(private val user: User,
     }
 
 
-    /// TODO: 09/11/2020 catch here
      fun deletePostFromFavorites(post: Post) = liveData {
         emit(Resource.loading<Any>())
         try {
@@ -152,15 +149,15 @@ class PostRepository @Inject constructor(private val user: User,
       }
     }
 
-    private suspend fun changePostToFavorite(post: Post) {
+    private suspend fun checkPostIsBookmarked(post: Post) {
         val dbPost = postDao.getPostByIDSuspend(post.id)
-        dbPost?.let {
+         dbPost?.let {
          post.isFavorite = it.isFavorite
       }
     }
     private suspend fun mapDomainData(dtoPosts:List<PostDTO>):List<Post>{
         val mappedData =  dtoPosts.map { it.toPost() }
-        mappedData.forEach { changePostToFavorite(it) }
+        mappedData.forEach { checkPostIsBookmarked(it) }
         return mappedData;
     }
 

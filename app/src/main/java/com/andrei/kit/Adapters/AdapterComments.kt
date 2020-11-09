@@ -5,9 +5,17 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.andrei.kit.databinding.CommentItemListBinding
 import com.andrei.kit.models.Comment
+import com.andrei.kit.models.Post
 
-class AdapterComments(var comments: ArrayList<Comment>) : RecyclerView.Adapter<AdapterComments.ViewHolder>() {
+class AdapterComments : RecyclerView.Adapter<AdapterComments.ViewHolder>() {
 
+    private val data = ArrayList<Comment>()
+
+    fun setData(newData: MutableList<Comment>){
+        data.clear()
+        data.addAll(newData)
+        notifyDataSetChanged()
+    }
     inner class ViewHolder(var binding: CommentItemListBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindDataToView(comment: Comment) {
             binding.comment = comment;
@@ -15,7 +23,7 @@ class AdapterComments(var comments: ArrayList<Comment>) : RecyclerView.Adapter<A
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindDataToView(comments[position]);
+        holder.bindDataToView(data[position]);
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -25,6 +33,6 @@ class AdapterComments(var comments: ArrayList<Comment>) : RecyclerView.Adapter<A
     }
 
     override fun getItemCount(): Int {
-        return comments.size;
+        return data.size;
     }
 }

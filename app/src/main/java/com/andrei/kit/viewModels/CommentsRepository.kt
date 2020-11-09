@@ -14,7 +14,7 @@ import com.andrei.dataLayer.models.serialization.SerializeComment
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
-@InternalCoroutinesApi
+
 class CommentsRepository @Inject constructor(private val connectivityManager: ConnectivityManager,
                                              private val commentDao: RoomCommentDao,
                                              private val repo: CommentRepoInterface) {
@@ -35,6 +35,8 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
         try {
             val serverResponse = repo.uploadComment(comment)
             val commentID = serverResponse.message.toIntOrNull()
+            //todo
+            //fix this man
             commentID?.let {
                 val fetchedComment = repo.fetchCommentById(it)
                 commentDao.insertComment(CommentMapper.mapToDomainObject(fetchedComment))

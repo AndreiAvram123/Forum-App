@@ -10,13 +10,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.Adapters.CustomDivider
 import com.andrei.kit.Adapters.HomeAdapter
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutHomeFragmentBinding
+import com.andrei.kit.models.Post
+import com.andrei.kit.utils.observeRequest
 import com.andrei.kit.utils.reObserve
 import com.andrei.kit.viewModels.ViewModelPost
 import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.internal.notify
 import javax.inject.Inject
 
 
@@ -32,8 +36,42 @@ class HomeFragment : Fragment() {
     private val homeAdapter: HomeAdapter by lazy {
         HomeAdapter(
                 connectivityManager = connectivityManager,
-                viewModelPost = viewModelPost,
-        viewLifecycleOwner = viewLifecycleOwner)
+                removeFromFavorites = this::removeFromFavorites,
+                addToFavorites = this::addToFavorites
+        )
+    }
+
+    private fun removeFromFavorites(post:Post){
+       viewModelPost.removeFromFavorites(post).observeRequest(viewLifecycleOwner,{
+           when(it.status){
+               Status.SUCCESS->{
+                homeAdapter.notifyPostChanged(post)
+               }
+               Status.LOADING->{
+
+               }
+               Status.ERROR ->{
+
+               }
+
+           }
+       })
+    }
+    private fun addToFavorites(post:Post){
+    viewModelPost.addPostToFavorites(post).observeRequest(viewLifecycleOwner,{
+          when(it.status){
+              Status.SUCCESS->{
+                  homeAdapter.notifyPostChanged(post)
+              }
+              Status.LOADING->{
+
+              }
+              Status.ERROR ->{
+
+              }
+
+          }
+    })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {

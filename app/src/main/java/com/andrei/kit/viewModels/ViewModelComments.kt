@@ -9,7 +9,6 @@ import com.andrei.dataLayer.models.PostWithComments
 import com.andrei.dataLayer.models.serialization.SerializeComment
 import kotlinx.coroutines.InternalCoroutinesApi
 
-@InternalCoroutinesApi
 class ViewModelComments @ViewModelInject constructor(
         private val commentsRepository: CommentsRepository
 ) : ViewModel() {

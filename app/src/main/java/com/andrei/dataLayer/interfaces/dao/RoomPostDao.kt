@@ -18,10 +18,10 @@ interface RoomPostDao {
     @Query("SELECT * FROM post WHERE isFavorite = 1")
     fun getFavoritePosts(): LiveData<List<Post>>
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updatePosts(posts: List<Post>)
 
-    @Update
+    @Update(entity = Post::class)
     suspend fun updatePost (post:Post)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

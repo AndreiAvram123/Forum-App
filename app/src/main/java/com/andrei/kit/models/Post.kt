@@ -13,10 +13,8 @@ data class Post(
         @ColumnInfo(name = "postImage") val image: String,
         @ColumnInfo(name = "date") val date: Long,
         @ColumnInfo(name = "content") val content: String,
-        @ColumnInfo(name = "numberOfComments") val numberOfComments:Int,
-        @ColumnInfo(name = "bookmarkedTime") var bookmarkTimes:Int,
-        @Embedded val user: User
-
-){
-        @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false
-}
+        @Embedded val user: User,
+        @ColumnInfo(name = "numberOfComments") var numberOfComments:Int ,
+        @ColumnInfo(name = "isFavorite") var isFavorite: Boolean = false,
+        @ColumnInfo(name = "bookmarkedTime") var bookmarkTimes:Int = 0
+)
