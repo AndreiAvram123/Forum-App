@@ -14,7 +14,7 @@ data class Post(
         @ColumnInfo(name = "date") val date: Long,
         @ColumnInfo(name = "content") val content: String,
         @ColumnInfo(name = "numberOfComments") val numberOfComments:Int,
-        @ColumnInfo(name = "bookmarkedTime") val bookmarkTimes:Int,
+        @ColumnInfo(name = "bookmarkedTime") var bookmarkTimes:Int,
         @Embedded val user: User
 
 ){

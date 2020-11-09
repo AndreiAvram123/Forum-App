@@ -43,14 +43,12 @@ class ViewModelPost @ViewModelInject constructor(
                 .build()
     }
 
-    fun addPostToFavorites(post: Post) {
-        viewModelScope.launch {
+    fun addPostToFavorites(post: Post)  =
             postRepository.addPostToFavorites(post)
-        }
-    }
+
 
     fun deletePostFromFavorites(post: Post) =
-            viewModelScope.launch { postRepository.deletePostFromFavorites(post) }
+          postRepository.deletePostFromFavorites(post)
 
 
     fun refreshPostData() = viewModelScope.launch { postRepository.fetchInitialPosts() }

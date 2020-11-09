@@ -111,26 +111,35 @@ class PostRepository @Inject constructor(private val user: User,
         }
     }
 
-    suspend fun addPostToFavorites(post: Post) {
+     fun addPostToFavorites(post: Post) = liveData{
+        emit(Resource.loading<Any>())
         val requestData = SerializeFavoritePostRequest(postID = post.id,
         userID = user.userID)
         try {
             repo.addPostToFavorites(requestData)
+            post.bookmarkTimes ++
             post.isFavorite = true
             postDao.updatePost(post)
+            emit(Resource.success(Any()))
 
         }catch(e:Exception){
-            responseHandler.handleException<Any>(e,"Add post to Favorites")
+            emit(responseHandler.handleException<Any>(e,"Add post to Favorites"))
         }
     }
 
 
     /// TODO: 09/11/2020 catch here
-    suspend fun deletePostFromFavorites(post: Post) {
-        repo.removePostFromFavorites(postID = post.id, userID = user.userID)
-        post.isFavorite = false
-        postDao.updatePost(post)
-
+     fun deletePostFromFavorites(post: Post) = liveData {
+        emit(Resource.loading<Any>())
+        try {
+            repo.removePostFromFavorites(postID = post.id, userID = user.userID)
+            post.isFavorite = false
+            post.bookmarkTimes --
+            postDao.updatePost(post)
+            emit(Resource.success(Any()))
+        }catch (e:Exception){
+            emit(responseHandler.handleException<Any>(e,"Remove from favorites"))
+        }
     }
 
 
@@ -146,8 +155,8 @@ class PostRepository @Inject constructor(private val user: User,
     private suspend fun changePostToFavorite(post: Post) {
         val dbPost = postDao.getPostByIDSuspend(post.id)
         dbPost?.let {
-        post.isFavorite = it.isFavorite
-    }
+         post.isFavorite = it.isFavorite
+      }
     }
     private suspend fun mapDomainData(dtoPosts:List<PostDTO>):List<Post>{
         val mappedData =  dtoPosts.map { it.toPost() }

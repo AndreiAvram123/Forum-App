@@ -20,6 +20,7 @@ interface RoomPostDao {
 
     @Update
     suspend fun updatePosts(posts: List<Post>)
+
     @Update
     suspend fun updatePost (post:Post)
 

@@ -4,21 +4,25 @@ import android.net.ConnectivityManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.R
 import com.andrei.kit.databinding.PostItemHomePageBinding
 import com.andrei.kit.fragments.ExpandedPostFragmentDirections
 import com.andrei.kit.models.Post
+import com.andrei.kit.utils.observeRequest
 import com.andrei.kit.viewModels.ViewModelPost
 import com.google.android.material.snackbar.Snackbar
 
 class HomeAdapter(
         private val viewModelPost: ViewModelPost,
-        private val connectivityManager: ConnectivityManager
+        private val connectivityManager: ConnectivityManager,
+        private val viewLifecycleOwner: LifecycleOwner
 ) : PagedListAdapter<Post, HomeAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     companion object {
@@ -36,7 +40,8 @@ class HomeAdapter(
 
     inner class ViewHolder(val binding: PostItemHomePageBinding) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(post: Post) {
+        fun bind(position: Int) {
+            val post = getItem(position) ?: return
             binding.post = post
             binding.postItemHomeImage.setOnClickListener {
                 if (isInternetActive()) {
@@ -48,7 +53,30 @@ class HomeAdapter(
             }
             binding.bookmarkPostItem.setOnClickListener{
                 if(isInternetActive()){
-                    viewModelPost.addPostToFavorites(post)
+                    if(post.isFavorite){
+                        viewModelPost.deletePostFromFavorites(post).observeRequest(viewLifecycleOwner,{
+                            when(it.status){
+                                Status.SUCCESS->{
+                                    binding.post = post
+                                    Snackbar.make(binding.root, binding.root.context.getString(R.string.removed_from_favorites), Snackbar.LENGTH_SHORT)
+                                            .show()
+                                    binding.notifyChange()
+                                }
+                            }
+                        })
+                    }else{
+                        viewModelPost.addPostToFavorites(post).observeRequest(viewLifecycleOwner,{
+                            when(it.status){
+                                Status.SUCCESS ->{
+                                    binding.post = post
+                                    Snackbar.make(binding.root, binding.root.context.getString(R.string.added_to_favorites), Snackbar.LENGTH_SHORT)
+                                            .show()
+                                    binding.notifyChange()
+                                }
+
+                            }
+                        })
+                    }
                 }else{
                     displayInternetConnectionError(binding)
                 }
@@ -69,11 +97,8 @@ class HomeAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post = getItem(position)
+            holder.bind(position)
 
-        post?.let {
-            holder.bind(post)
-        }
     }
 
 }

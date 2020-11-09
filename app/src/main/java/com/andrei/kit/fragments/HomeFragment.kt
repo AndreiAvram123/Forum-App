@@ -32,7 +32,8 @@ class HomeFragment : Fragment() {
     private val homeAdapter: HomeAdapter by lazy {
         HomeAdapter(
                 connectivityManager = connectivityManager,
-                viewModelPost = viewModelPost)
+                viewModelPost = viewModelPost,
+        viewLifecycleOwner = viewLifecycleOwner)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
