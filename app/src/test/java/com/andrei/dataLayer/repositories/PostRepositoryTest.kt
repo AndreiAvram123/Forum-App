@@ -105,7 +105,6 @@ class PostRepositoryTest {
                         content = "Placeholder content",
                         imageData = it.toBase64(),
                         userID = testUserID
-
                 )
                 try{
                     val postResponse = repo.uploadPost(uploadPost)
