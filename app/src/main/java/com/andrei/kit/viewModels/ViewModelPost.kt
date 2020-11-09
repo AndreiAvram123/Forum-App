@@ -18,7 +18,7 @@ class ViewModelPost @ViewModelInject constructor(
 ) : ViewModel() {
 
 
-    fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts
+    fun getFavoritePosts(): LiveData<List<Post>> = postRepository.favoritePosts
 
 
     val userPosts by lazy {
@@ -26,7 +26,7 @@ class ViewModelPost @ViewModelInject constructor(
     }
 
 
-    fun getPostByID(id: Int): LiveData<Resource<Post>> = postRepository.fetchPostByID(id)
+    fun getPostByID(id: Int)  = postRepository.fetchPostByID(id)
 
 
     private val config = PagedList.Config.Builder()
@@ -53,7 +53,7 @@ class ViewModelPost @ViewModelInject constructor(
             viewModelScope.launch { postRepository.deletePostFromFavorites(post) }
 
 
-    fun fetchNewPosts() = viewModelScope.launch { postRepository.fetchInitialPosts() }
+    fun refreshPostData() = viewModelScope.launch { postRepository.fetchInitialPosts() }
 
 
     fun uploadPost(post: SerializePost) = postRepository.uploadPost(post)

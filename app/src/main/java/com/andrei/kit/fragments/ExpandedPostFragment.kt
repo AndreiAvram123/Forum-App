@@ -56,21 +56,16 @@ class ExpandedPostFragment : Fragment() {
 
     private fun attachObservers() {
 
-        viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, {
-            favoritePosts = it.posts
 
-        })
 
-        viewModelPost.getPostByID(args.postID).observe(viewLifecycleOwner, {
+        viewModelPost.getPostByID(args.postID).reObserve(viewLifecycleOwner, {
             when(it.status){
                 Status.SUCCESS ->{
-                    val data = it.data!!
-                    if (this::favoritePosts.isInitialized && favoritePosts.contains(data)) {
-                        data.isFavorite = true
-                    }
-                    post = data
-                    configureViews()
-                    getComments()
+                    it.data?.reObserve(viewLifecycleOwner,{newPost ->
+                        post = newPost
+                        configureViews()
+                        getComments()
+                    })
                 }
                 Status.LOADING ->{
 

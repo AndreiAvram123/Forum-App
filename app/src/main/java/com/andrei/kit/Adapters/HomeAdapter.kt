@@ -1,7 +1,9 @@
 package com.andrei.kit.Adapters
 
+import android.net.ConnectivityManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.paging.PagedListAdapter
@@ -10,11 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.andrei.kit.R
 import com.andrei.kit.databinding.PostItemHomePageBinding
 import com.andrei.kit.fragments.ExpandedPostFragmentDirections
-import com.andrei.kit.utils.getConnectivityManager
 import com.andrei.kit.models.Post
+import com.andrei.kit.viewModels.ViewModelPost
 import com.google.android.material.snackbar.Snackbar
 
-class HomeAdapter : PagedListAdapter<Post, HomeAdapter.ViewHolder>(DIFF_CALLBACK) {
+class HomeAdapter(
+        private val viewModelPost: ViewModelPost,
+        private val connectivityManager: ConnectivityManager
+) : PagedListAdapter<Post, HomeAdapter.ViewHolder>(DIFF_CALLBACK) {
 
     companion object {
         private val DIFF_CALLBACK = object :
@@ -33,16 +38,29 @@ class HomeAdapter : PagedListAdapter<Post, HomeAdapter.ViewHolder>(DIFF_CALLBACK
 
         fun bind(post: Post) {
             binding.post = post
-            binding.root.setOnClickListener {
-                if (binding.root.context.getConnectivityManager().activeNetwork != null) {
+            binding.postItemHomeImage.setOnClickListener {
+                if (isInternetActive()) {
                     val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(post.id)
                     Navigation.findNavController(binding.root).navigate(action)
                 } else {
-                    Snackbar.make(binding.root, binding.root.context.getString(R.string.no_internet_connection), Snackbar.LENGTH_SHORT)
-                            .show();
+                     displayInternetConnectionError(binding)
+                }
+            }
+            binding.bookmarkPostItem.setOnClickListener{
+                if(isInternetActive()){
+                    viewModelPost.addPostToFavorites(post)
+                }else{
+                    displayInternetConnectionError(binding)
                 }
             }
         }
+    }
+    private fun isInternetActive():Boolean{
+        return connectivityManager.activeNetwork !=null
+    }
+    private fun displayInternetConnectionError(binding: PostItemHomePageBinding){
+        Snackbar.make(binding.root, binding.root.context.getString(R.string.no_internet_connection), Snackbar.LENGTH_SHORT)
+                .show();
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

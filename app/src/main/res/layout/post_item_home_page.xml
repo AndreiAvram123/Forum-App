@@ -64,7 +64,7 @@
                 tools:srcCompat="@tools:sample/avatars" />
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/bookmark_post_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
@@ -73,7 +73,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/post_item_home_image"
-                app:srcCompat="@drawable/ic_baseline_star_border_32" />
+                android:src='@{post.favorite ? @drawable/ic_baseline_star_32 : @drawable/ic_baseline_star_border_32 }' />
 
             <TextView
                 android:id="@+id/textView"
@@ -82,9 +82,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="@{post.bookmarkTimes + ``}"
-                app:layout_constraintBottom_toBottomOf="@+id/imageView"
-                app:layout_constraintStart_toEndOf="@+id/imageView"
-                app:layout_constraintTop_toTopOf="@+id/imageView"
+                app:layout_constraintBottom_toBottomOf="@+id/bookmark_post_item"
+                app:layout_constraintStart_toEndOf="@+id/bookmark_post_item"
+                app:layout_constraintTop_toTopOf="@+id/bookmark_post_item"
                 tools:text="200" />
 
             <ImageView
@@ -92,9 +92,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="32dp"
-                app:layout_constraintBottom_toBottomOf="@+id/imageView"
+                app:layout_constraintBottom_toBottomOf="@+id/bookmark_post_item"
                 app:layout_constraintStart_toEndOf="@+id/textView"
-                app:layout_constraintTop_toTopOf="@+id/imageView"
+                app:layout_constraintTop_toTopOf="@+id/bookmark_post_item"
                 app:srcCompat="@drawable/ic_baseline_comment_32" />
 
             <TextView

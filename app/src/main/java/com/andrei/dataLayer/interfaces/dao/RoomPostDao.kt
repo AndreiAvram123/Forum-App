@@ -15,9 +15,13 @@ interface RoomPostDao {
     @Query("SELECT * FROM post ORDER BY postID DESC")
     fun getCachedPosts(): DataSource.Factory<Int, Post>
 
-    @Query("SELECT * FROM user WHERE userID = :userID LIMIT 1")
-    fun getFavoritePosts(userID: String): LiveData<UserWithFavoritePosts>
+    @Query("SELECT * FROM post WHERE isFavorite = 1")
+    fun getFavoritePosts(): LiveData<List<Post>>
 
+    @Update
+    suspend fun updatePosts(posts: List<Post>)
+    @Update
+    suspend fun updatePost (post:Post)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllFavoritePosts(usersWithFavoritePostsCrossRef: List<UserWithFavoritePostsCrossRef>)
@@ -35,14 +39,16 @@ interface RoomPostDao {
     @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")
     fun getPostByID(postID: Int): LiveData<Post>
 
+    @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")
+    suspend fun getPostByIDSuspend(postID: Int): Post?
+
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPost(post: Post)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPosts(posts: List<Post>)
 
-    @Query("DELETE FROM post")
-    suspend fun removeCachedData()
 
 
     @Query("SELECT * FROM user WHERE userID = :userID LIMIT 1")
