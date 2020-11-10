@@ -10,9 +10,7 @@ class AuthInterceptor(private val token: String,
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        if(connectivityManager.activeNetwork == null){
-            throw NoInternetException()
-        }
+
         val requestBuilder = chain.request().newBuilder()
 
         // If token has been saved, add it to the request
