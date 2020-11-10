@@ -38,14 +38,14 @@
                         android:id="@+id/username"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
+                        android:layout_marginStart="15dp"
                         android:background="#00000000"
                         android:hint="Username"
                         android:inputType="text"
                         android:letterSpacing="0.1"
                         android:textColor="#fff"
                         android:textColorHint="#d9e5f3"
-                        android:textSize="16dp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -69,7 +69,7 @@
                         android:id="@+id/password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
+                        android:layout_marginStart="15dp"
                         android:background="#00000000"
                         android:hint="Password"
                         android:inputType="textPassword"

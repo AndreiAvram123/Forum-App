@@ -1,3 +1,6 @@
+package com.andrei.kit.fragments
+
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -5,35 +8,85 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.Adapters.CustomDivider
 import com.andrei.kit.Adapters.HomeAdapter
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutHomeFragmentBinding
+import com.andrei.kit.models.Post
+import com.andrei.kit.utils.observeRequest
+import com.andrei.kit.utils.reObserve
 import com.andrei.kit.viewModels.ViewModelPost
-import kotlinx.coroutines.InternalCoroutinesApi
+import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.internal.notify
+import javax.inject.Inject
 
-@InternalCoroutinesApi
+
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
     lateinit var binding: LayoutHomeFragmentBinding
     private val viewModelPost: ViewModelPost by activityViewModels()
+
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
+
+
     private val homeAdapter: HomeAdapter by lazy {
-        HomeAdapter()
+        HomeAdapter(
+                connectivityManager = connectivityManager,
+                removeFromFavorites = this::removeFromFavorites,
+                addToFavorites = this::addToFavorites
+        )
+    }
+
+    private fun removeFromFavorites(post:Post){
+       viewModelPost.removeFromFavorites(post).observeRequest(viewLifecycleOwner,{
+           when(it.status){
+               Status.SUCCESS->{
+                homeAdapter.notifyPostChanged(post)
+               }
+               Status.LOADING->{
+
+               }
+               Status.ERROR ->{
+
+               }
+
+           }
+       })
+    }
+    private fun addToFavorites(post:Post){
+    viewModelPost.addPostToFavorites(post).observeRequest(viewLifecycleOwner,{
+          when(it.status){
+              Status.SUCCESS->{
+                  homeAdapter.notifyPostChanged(post)
+              }
+              Status.LOADING->{
+
+              }
+              Status.ERROR ->{
+
+              }
+
+          }
+    })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.layout_home_fragment, container, false);
         initializeUI()
-        attachObserver()
+        viewModelPost.recentPosts.reObserve(viewLifecycleOwner, {
+            homeAdapter.submitList(it)
+        })
         return binding.root
     }
 
 
     private fun initializeUI() {
         binding.homeSwipeRefreshLayout.setOnRefreshListener {
-            viewModelPost.fetchNewPosts()
+            viewModelPost.refreshPostData()
             binding.homeSwipeRefreshLayout.isRefreshing = false
         }
         initializeRecyclerView()
@@ -44,19 +97,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun initializeRecyclerView() {
-        with(binding.recyclerViewHome) {
+        binding.recyclerViewHome.apply {
             adapter = homeAdapter
-            addItemDecoration(CustomDivider(20))
+            addItemDecoration(CustomDivider(100))
             layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
-    private fun attachObserver() {
-        viewModelPost.recentPosts.observe(viewLifecycleOwner, Observer {
-            homeAdapter.submitList(it)
-        })
-
-    }
 
 
 }

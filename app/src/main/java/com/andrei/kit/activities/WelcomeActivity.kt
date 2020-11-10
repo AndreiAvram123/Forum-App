@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.R
 import com.andrei.kit.fragments.LoginFragment
-import com.andrei.kit.observeRequest
 import com.andrei.kit.user.UserAccountManager
+import com.andrei.kit.utils.reObserve
 import com.andrei.kit.viewModels.ViewModelUser
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -34,7 +34,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_activity_welcome)
 
-        userAccountManager.continueUserFlow.observe(this,{
+        userAccountManager.continueLoginFlow.reObserve(this,{
             if(it){
                 startMainActivity()
             }
@@ -56,7 +56,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                  val googleSignInAccount = task.getResult(ApiException::class.java)!!
-                 viewModelUser.loginWithGoogle(googleSignInAccount).observeRequest(this,{
+                 viewModelUser.loginWithGoogle(googleSignInAccount).reObserve(this,{
                      when(it.status){
                          Status.SUCCESS ->{
 

@@ -7,6 +7,8 @@ import androidx.preference.PreferenceFragmentCompat
 import com.andrei.kit.R
 import com.andrei.kit.activities.WelcomeActivity
 import com.andrei.kit.user.UserAccountManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
@@ -27,6 +29,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             }.also {
                 userAccountManager.deleteUserFromMemory()
+                FirebaseAuth.getInstance().signOut()
                 startActivity(it)
             }
             true

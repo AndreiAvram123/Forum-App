@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.andrei.kit.databinding.FragmentNoInternetBinding
-import com.andrei.kit.getConnectivityManager
+import com.andrei.kit.utils.getConnectivityManager
 
 class NoInternetFragment : Fragment() {
 

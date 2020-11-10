@@ -31,18 +31,6 @@ class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
         return chats.size
     }
 
-    fun showNotifications(chatIDs: List<Int>) {
-
-        chatIDs.forEach { chatID ->
-            chats.find { it.chatID == chatID }.also {
-                if (it != null) {
-                    it.newMessage = true
-                    notifyItemChanged(chats.indexOf(it))
-                }
-            }
-        }
-
-    }
 
     inner class ViewHolder(private val binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(chat: Chat) {

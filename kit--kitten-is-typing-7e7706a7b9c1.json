@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "kit--kitten-is-typing",
+  "private_key_id": "7e7706a7b9c1b007caef1113fc776ef2eca14427",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDTfd6xXgz9Aigc\n9uvJKXOds75w7keoB3E902raucqeiCt4Zyp22TA0M4nNW1OBC1l2pTTWnsSLVKE0\nwTQevlS83nCQxGI2NsfiuiJ1XtjP0XOWh51m0+nmHtMS0Qg+uhRAEGTwt3OGhWWz\ntdwz4T7yJ624et1lATpkPzcsXpWC+lkOAlHNZ/MyG35ej7pzBfQNZhCtZEJiK+ud\nykPtvNXr7ooIlClow4ac0CWl2vHW4hjwsGS+xmJjhnwZs89xUWWGsHcKmqRa7iyB\nhaMeityRG0sPrut1Rh/+AdqVinFSVgVJRJzzV6rlVNWEOA4cJIQkZBo1rQSreRW4\nZ81aXjUDAgMBAAECggEAZsdPtvCW7UnkBpd05LCxUB1u2mDiD+V2Ae7BigQqVLqm\nLYAtYc6Qn33AZT0Rqq/CTWdh8z77Ex8QrJuL4bjrY1HScHgPpnsezq9YWaO7R9tp\nCelj8/nePIgUWZueHyW8+5k8BMOSb/haAWjK16eKOJJR2UpUV2auYtNZ08UvcZOn\nzYmA/Oe5VIGs0Lakr6WOwFNP4MRaZIcruXsPmG1YKjFe07M1jxM10dzU5TvFWPww\nprI5BwoJumfZNqq8m4ewi1RsXjoJa9sAO3LsaHFE5ZIHWFEhH+JCvkIUOdiX0Cm4\nQ1darVnbFmSlU1N3xm4awelBGHaGm9EDut4cEcW4QQKBgQD0jCcsdqLFFeqyWXlM\nLM6HC5o7a9RdUBMaF/45hw9UddyPsnqkHtmOSoaBU/gbznaQ91TgFWNmXV4Qzh8v\n5GqyVybqoe6wd0hUKt59W6qQDl+hPobJxoQdOSOTn68z0ATxnnh9eE/Aw9LMoZT3\nxmfLI/J8UDqC38Q4fdwfSkH5owKBgQDdZWpWW+aXhpSiK9nSUe8Qry6Pr+vGbEtH\nTiLXc+iesum9ZnTivlIy3HA3xGGKkyRwR3aLQCttnMzUebXsE86wp1GbXsoxt8X+\n/0/Ak6wIlVuHyBoslwr5XlZ/IUlrPSFFlxuFgBcs0dBkBQJHlYkDXlfCOuCgRdZ7\ngSbu241NIQKBgFT54p7jtpnPjNdemfSrWTS6BmUBijDGo2ycy71Hvj72GadhOJaR\nFb4JDYYhHITlEHQ9TaP0Kq8mYIpsZY/pyl2gRSihDmUJffupTdi3oqQeKoLITGQO\n9FeHRGKGyYWykhU3oNzQkr4EDdsHhtE2g1imbBtgcYSKpw+ORJAm6JgLAoGATShi\n/uXYX0aP1lTh/OKBJpdm6rystuJW+erJSb0jfOtteoySf9NEYmVg1o6iT+En+dlt\n/unGONVErWgddsEQb5BgaH2Iifs6Dbx81uigM/2ZgKDEPnYFZRLzoiq/o5gSWGZp\nOQWDDiOxNKpqOPhsX7gpbY+HaVPtg+1m3Ce3/wECgYBMbMJp/sVw8q0yGMQXRfD6\nf0U1TMF+iKOUwcrbD3hlRp1598Pe/nm1L9IknBEBC3OKt1g7jY29ZYjQ+kKc4oey\nGI+SAP83yFCMBoQg/nCQaNbDi4yTuGEiK/BBVN+TAR1vlfnvrVsDUeEa75ypuWzS\nbL8PX7n3XCWMdE4d+cK/ZQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "bitrise-step@kit--kitten-is-typing.iam.gserviceaccount.com",
+  "client_id": "105201004544493197793",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bitrise-step%40kit--kitten-is-typing.iam.gserviceaccount.com"
+}

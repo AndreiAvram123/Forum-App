@@ -56,7 +56,7 @@
     <action android:id="@+id/action_global_expandedItemFragment" app:destination="@id/expandedItemFragment" />
     <fragment
         android:id="@+id/home"
-        android:name="HomeFragment"
+        android:name="com.andrei.kit.fragments.HomeFragment"
         android:label="HomeFragment">
         <action
             android:id="@+id/action_homeFragment2_to_searchFragment"

@@ -10,9 +10,8 @@ import com.andrei.kit.databinding.MessageReceivedBinding
 import com.andrei.kit.databinding.MessageSentBinding
 import com.andrei.kit.models.Message
 import com.andrei.kit.models.User
-import com.andrei.dataLayer.repositories.OperationStatus
 import com.andrei.dataLayer.serverConstants.MessageTypes
-import com.andrei.kit.getScreenWidth
+import com.andrei.kit.utils.getScreenWidth
 
 
 class MessageAdapter(private val currentUser: User,

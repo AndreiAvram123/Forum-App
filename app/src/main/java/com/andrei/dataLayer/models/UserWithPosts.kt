@@ -9,7 +9,7 @@ data class UserWithPosts(
         @Embedded val user: User,
         @Relation(
                 parentColumn = "userID",
-                entityColumn = "authorID"
+                entityColumn = "userID"
         )
         val posts: List<Post>
 )

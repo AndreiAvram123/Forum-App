@@ -26,8 +26,7 @@ class CommentsRepositoryTest {
                 postID = testPostID,
                 userID = testUserID)
         val response = repo.uploadComment(commentToUpload)
-        val id = response.message.toIntOrNull()
-        assertNotNull(id)
+        assertNotNull(response)
     }
     
 }

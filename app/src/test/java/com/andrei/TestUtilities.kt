@@ -39,17 +39,6 @@ class TestUtilities {
             }
 
             with(context){
-                testPost = Post(
-                        id = testPostID,
-                        authorID = testUserID,
-                        title = getString(R.string.testPostTitle),
-                        image = getString(R.string.testPostImage),
-                        content = getString(R.string.testPostContent),
-                        date = System.currentTimeMillis(),
-                        isFavorite = false
-                )
-            }
-            with(context){
                 testUser = User(
                         userID = testUserID,
                         username = getString(R.string.testUsername),
@@ -58,6 +47,19 @@ class TestUtilities {
 
             }
 
+            with(context){
+                testPost = Post(
+                        id = testPostID,
+                        user = testUser,
+                        title = getString(R.string.testPostTitle),
+                        image = getString(R.string.testPostImage),
+                        content = getString(R.string.testPostContent),
+                        date = System.currentTimeMillis(),
+                        isFavorite = false,
+                        numberOfComments = 0,
+                        bookmarkTimes = 0
+                )
+            }
 
             retrofitClient = OkHttpClient.Builder()
                     .addInterceptor(AuthInterceptor(token, context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)).build()

@@ -1,6 +1,5 @@
 package com.andrei.dataLayer.repositories
 
-import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
@@ -9,7 +8,6 @@ import com.andrei.dataLayer.engineUtils.Resource
 import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.kit.models.Post
 import com.andrei.kit.models.User
-import com.andrei.kit.toBase64
 import com.andrei.dataLayer.dataMappers.toPost
 import com.andrei.dataLayer.interfaces.PostRepositoryInterface
 import com.andrei.dataLayer.interfaces.dao.RoomPostDao
@@ -17,7 +15,6 @@ import com.andrei.dataLayer.models.*
 import com.andrei.dataLayer.models.serialization.SerializeFavoritePostRequest
 import com.andrei.dataLayer.models.serialization.SerializePost
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.Exception
@@ -31,10 +28,23 @@ class PostRepository @Inject constructor(private val user: User,
 
     private val responseHandler = ResponseHandler()
 
+    val favoritePosts: LiveData<List<Post>> by lazy {
+        postDao.getFavoritePosts().also {
+            coroutineScope.launch {
+                fetchFavoritePosts()
+            }
+        }
+    }
+    private val favoritePostsCache = mutableListOf<Post>()
+
+
+
+
+
 
     private  val TAG = PostRepository::class.java.simpleName
 
-    fun getPosts() = postDao.getCachedPosts().also {
+    fun getCachedPosts() = postDao.getCachedPosts().also {
         coroutineScope.launch {
             //if network is active remove old data and
             //perform a fresh fetch
@@ -60,71 +70,95 @@ class PostRepository @Inject constructor(private val user: User,
         }
     }
 
-    val favoritePosts: LiveData<UserWithFavoritePosts> by lazy {
-        liveData(Dispatchers.IO) {
-            emitSource(postDao.getFavoritePosts(user.userID))
-            fetchFavoritePosts()
-        }
-    }
 
 
-    fun fetchPostByID(id: Int): LiveData<Resource<Post>>  = liveData {
+    fun fetchPostByID(id: Int): LiveData<Resource<LiveData<Post>>> = liveData {
+        emit(Resource.loading<LiveData<Post>>())
         try {
             val post = repo.fetchPostByID(id).toPost()
-            val resourcePost = responseHandler.handleSuccess(post)
+            checkPostIsBookmarked(post)
             postDao.insertPost(post)
-            emit(resourcePost)
+            val localDBPost  = postDao.getPostByID(post.id)
+            emit(Resource.success(localDBPost))
         }catch(e:Exception){
-            emit(responseHandler.handleException<Post>(e,"fetch post by id"))
+            emit(responseHandler.handleException<LiveData<Post>>(e,"fetch post by id"))
         }
     }
 
 
     private suspend fun fetchFavoritePosts() {
-        val data =
-                repo.fetchUserFavoritePosts(user.userID).map { it.toPost() }
+        try {
+            val data = repo.fetchUserFavoritePosts(user.userID).map { it.toPost() }
+            data.forEach { it.isFavorite = true }
+            postDao.updatePosts(data)
 
-        postDao.insertAllFavoritePosts(data.map {
-            UserWithFavoritePostsCrossRef(postID = it.id, userID = user.userID)
-        })
+        }catch (e:Exception){
+            responseHandler.handleException<Any>(e,"Fetch favorite posts")
+        }
     }
-
 
     fun fetchMyPosts() = liveData {
         emitSource(postDao.getAllUserPosts(user.userID))
         try {
             val fetchedPosts = repo.fetchMyPosts(user.userID)
-            postDao.insertPosts(fetchedPosts.map { it.toPost() })
+            postDao.insertPosts(mapDomainData(fetchedPosts))
+
         } catch (e: java.lang.Exception) {
             e.printStackTrace();
             Log.e(TAG,"Error while fetching my posts")
         }
     }
 
-    suspend fun addPostToFavorites(post: Post) {
+     fun addPostToFavorites(post: Post) = liveData{
+        emit(Resource.loading<Any>())
         val requestData = SerializeFavoritePostRequest(postID = post.id,
         userID = user.userID)
-        postDao.addFavoritePost(UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID))
-        repo.addPostToFavorites(requestData)
+        try {
+            repo.addPostToFavorites(requestData)
+            post.bookmarkTimes ++
+            post.isFavorite = true
+            postDao.updatePost(post)
+            emit(Resource.success(Any()))
+
+        }catch(e:Exception){
+            emit(responseHandler.handleException<Any>(e,"Add post to Favorites"))
+        }
     }
 
 
-    suspend fun deletePostFromFavorites(post: Post) {
-        repo.removePostFromFavorites(postID = post.id, userID = user.userID)
-        val toRemove = UserWithFavoritePostsCrossRef(postID = post.id, userID = user.userID)
-        postDao.deletePostFromFavorites(toRemove)
-
+     fun deletePostFromFavorites(post: Post) = liveData {
+        emit(Resource.loading<Any>())
+        try {
+            repo.removePostFromFavorites(postID = post.id, userID = user.userID)
+            post.isFavorite = false
+            post.bookmarkTimes --
+            postDao.updatePost(post)
+            emit(Resource.success(Any()))
+        }catch (e:Exception){
+            emit(responseHandler.handleException<Any>(e,"Remove from favorites"))
+        }
     }
 
 
     suspend fun fetchInitialPosts() {
       try {
           val fetchedData = repo.fetchRecentPosts()
-          postDao.removeCachedData()
-          postDao.insertPosts(fetchedData.map { it.toPost() })
+          postDao.insertPosts(mapDomainData(fetchedData))
       }catch (e:Exception){
         responseHandler.handleException<Any>(e,Endpoint.RECENT_POSTS.url)
       }
+    }
+
+    private suspend fun checkPostIsBookmarked(post: Post) {
+        val dbPost = postDao.getPostByIDSuspend(post.id)
+         dbPost?.let {
+         post.isFavorite = it.isFavorite
+      }
+    }
+    private suspend fun mapDomainData(dtoPosts:List<PostDTO>):List<Post>{
+        val mappedData =  dtoPosts.map { it.toPost() }
+        mappedData.forEach { checkPostIsBookmarked(it) }
+        return mappedData;
     }
 
 
@@ -132,7 +166,7 @@ class PostRepository @Inject constructor(private val user: User,
     internal suspend fun fetchNextPosts(lastPostID: Int) {
         try {
             val fetchedData = repo.fetchNextPagePosts(lastPostID)
-            postDao.insertPosts(fetchedData.map { it.toPost()})
+            postDao.insertPosts(mapDomainData(fetchedData))
         } catch (e: Exception) {
             responseHandler.handleException<Any>(e,Endpoint.RECENT_POSTS.url)
         }

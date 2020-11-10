@@ -1,4 +1,4 @@
-package com.andrei.kit
+package com.andrei.kit.utils
 
 import android.content.Context
 import android.graphics.Bitmap

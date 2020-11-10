@@ -3,6 +3,7 @@ package com.andrei.kit.bindingAdapters
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.andrei.kit.R
 import com.bumptech.glide.Glide
 import com.github.chrisbanes.photoview.PhotoView
 import java.text.SimpleDateFormat
@@ -45,16 +46,4 @@ fun getDateFromUnix(textView: TextView, unixTime: Long) {
             textView.text = dateFormat.format(messageDate)
         }
     }
-
 }
-//
-//@BindingAdapter("backgroundNotification")
-//fun showNotificationBackground(view:View, shouldShow: Boolean) {
-//    if (shouldShow) {
-//        view.setBackgroundColor(Color.YELLOW)
-//    } else {
-//        view.setBackgroundColor(Color.WHITE)
-//    }
-//}
-
-

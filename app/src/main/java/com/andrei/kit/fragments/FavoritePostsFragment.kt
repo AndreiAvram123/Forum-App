@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.andrei.kit.Adapters.RecyclerViewAdapterPosts
 import com.andrei.kit.R
 import com.andrei.kit.databinding.FragmentFavoritePostsBinding
+import com.andrei.kit.utils.reObserve
 import com.andrei.kit.viewModels.ViewModelPost
 import kotlinx.coroutines.InternalCoroutinesApi
 import java.util.*
@@ -28,18 +29,13 @@ class FavoritePostsFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         binding = FragmentFavoritePostsBinding.inflate(inflater, container, false)
         initializeRecyclerView()
-        attachObserver()
+         viewModelPost.getFavoritePosts().reObserve(viewLifecycleOwner,{
+             recyclerViewAdapterPosts.setData(ArrayList(it))
+             binding.numberResults.text = getString(R.string.number_saved_posts, it.size)
+         })
         return binding.root
     }
 
-
-    private fun attachObserver() {
-
-            viewModelPost.getFavoritePosts().observe(viewLifecycleOwner, Observer {
-                recyclerViewAdapterPosts.setData(ArrayList(it.posts))
-                binding.numberResults.text = getString(R.string.number_saved_posts, it.posts.size)
-            })
-    }
 
 
     /**

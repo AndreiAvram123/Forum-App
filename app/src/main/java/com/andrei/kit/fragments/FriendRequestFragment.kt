@@ -6,14 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.databinding.FragmentFriendRequestBinding
 import com.andrei.kit.viewModels.ViewModelChat
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.kit.Adapters.CustomDivider
-import com.andrei.kit.observeRequest
+import com.andrei.kit.utils.observeRequest
 
 
 class FriendRequestFragment : Fragment() {

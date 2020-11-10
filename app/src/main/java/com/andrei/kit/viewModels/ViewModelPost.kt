@@ -1,6 +1,5 @@
 package com.andrei.kit.viewModels
 
-import android.graphics.drawable.Drawable
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -8,20 +7,18 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.andrei.dataLayer.engineUtils.Resource
-import com.andrei.kit.models.Post
 import com.andrei.dataLayer.models.UserWithFavoritePosts
 import com.andrei.dataLayer.models.serialization.SerializePost
 import com.andrei.dataLayer.repositories.PostRepository
-import kotlinx.coroutines.InternalCoroutinesApi
+import com.andrei.kit.models.Post
 import kotlinx.coroutines.launch
 
-@InternalCoroutinesApi
 class ViewModelPost @ViewModelInject constructor(
         private val postRepository: PostRepository
 ) : ViewModel() {
 
-    
-    fun getFavoritePosts(): LiveData<UserWithFavoritePosts> = postRepository.favoritePosts
+
+    fun getFavoritePosts(): LiveData<List<Post>> = postRepository.favoritePosts
 
 
     val userPosts by lazy {
@@ -29,7 +26,7 @@ class ViewModelPost @ViewModelInject constructor(
     }
 
 
-    fun getPostByID(id: Int): LiveData<Resource<Post>> = postRepository.fetchPostByID(id)
+    fun getPostByID(id: Int)  = postRepository.fetchPostByID(id)
 
 
     private val config = PagedList.Config.Builder()
@@ -41,22 +38,20 @@ class ViewModelPost @ViewModelInject constructor(
 
 
     val recentPosts by lazy {
-        LivePagedListBuilder(postRepository.getPosts(), config)
+        LivePagedListBuilder(postRepository.getCachedPosts(), config)
                 .setBoundaryCallback(postRepository.PostRepoBoundaryCallback())
                 .build()
     }
 
-    fun addPostToFavorites(post: Post) {
-        viewModelScope.launch {
+    fun addPostToFavorites(post: Post)  =
             postRepository.addPostToFavorites(post)
-        }
-    }
-
-    fun deletePostFromFavorites(post: Post) =
-            viewModelScope.launch { postRepository.deletePostFromFavorites(post) }
 
 
-    fun fetchNewPosts() = viewModelScope.launch { postRepository.fetchInitialPosts() }
+    fun removeFromFavorites(post: Post) =
+          postRepository.deletePostFromFavorites(post)
+
+
+    fun refreshPostData() = viewModelScope.launch { postRepository.fetchInitialPosts() }
 
 
     fun uploadPost(post: SerializePost) = postRepository.uploadPost(post)

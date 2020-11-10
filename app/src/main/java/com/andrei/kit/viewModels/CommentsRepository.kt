@@ -4,20 +4,23 @@ import android.net.ConnectivityManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.andrei.kit.models.Post
-import com.andrei.dataLayer.dataMappers.CommentMapper
+import com.andrei.dataLayer.dataMappers.toComment
+import com.andrei.dataLayer.engineUtils.Resource
+import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.dataLayer.interfaces.CommentRepoInterface
 import com.andrei.dataLayer.interfaces.dao.RoomCommentDao
 import com.andrei.dataLayer.models.PostWithComments
 import com.andrei.dataLayer.models.serialization.SerializeComment
-import com.andrei.dataLayer.repositories.OperationStatus
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
-@InternalCoroutinesApi
+
 class CommentsRepository @Inject constructor(private val connectivityManager: ConnectivityManager,
                                              private val commentDao: RoomCommentDao,
                                              private val repo: CommentRepoInterface) {
 
+
+    private val responseHandler = ResponseHandler()
 
     fun getCommentsForPost(post: Post): LiveData<PostWithComments> = liveData {
         emitSource(commentDao.getAllPostComments(post.id))
@@ -28,19 +31,15 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
 
 
     fun uploadComment(comment: SerializeComment) = liveData {
-        emit(OperationStatus.ONGOING)
+        emit(Resource.loading<Any>())
         try {
-            val serverResponse = repo.uploadComment(comment)
-            val commentID = serverResponse.message.toIntOrNull()
-            commentID?.let {
-                val fetchedComment = repo.fetchCommentById(it)
-                commentDao.insertComment(CommentMapper.mapToDomainObject(fetchedComment))
-                emit(OperationStatus.FINISHED)
-            }
+            val fetchedData  = repo.uploadComment(comment)
+
+                commentDao.insertComment(fetchedData.toComment())
+                emit(responseHandler.handleSuccess(Any()))
 
         } catch (e: Exception) {
-            e.printStackTrace()
-            emit(OperationStatus.FAILED)
+            emit(responseHandler.handleException<Any>(e, "Upload comment"))
         }
     }
 
@@ -48,7 +47,7 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
     private suspend fun fetchCommentsForPost(post: Post) {
         try {
             val fetchedComments = repo.fetchCommentsForPost(post.id)
-            commentDao.insertComments(fetchedComments.map { CommentMapper.mapToDomainObject(it) })
+            commentDao.insertComments(fetchedComments.map { it.toComment() })
         } catch (e: Exception) {
             e.printStackTrace()
         }

@@ -6,6 +6,8 @@ import androidx.lifecycle.MutableLiveData
 import com.andrei.kit.R
 import com.andrei.kit.models.User
 import com.andrei.dataLayer.interfaces.dao.UserDao
+import com.andrei.kit.utils.default
+import com.andrei.kit.utils.postAndReset
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -18,13 +20,14 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
 
     fun getToken() = sharedPreferences.getStringNotNull(R.string.key_token)
 
-    val continueUserFlow = MutableLiveData(false)
+    val continueLoginFlow = MutableLiveData(false)
+
 
 
     suspend fun saveUserAndToken(user: User, token: String) {
         persistToken(token)
         userDao.insertUser(user)
-        continueUserFlow.postValue(true)
+        continueLoginFlow.postAndReset(value = true, resetTo = false)
     }
 
     private fun persistToken(token: String) {

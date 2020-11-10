@@ -14,7 +14,7 @@ interface CommentRepoInterface {
     suspend fun fetchCommentsForPost(@Path("postID") postID: Int): ArrayList<CommentDTO>
 
     @POST("/api/comments/add")
-    suspend fun uploadComment(@Body comment: SerializeComment): ServerResponse
+    suspend fun uploadComment(@Body comment: SerializeComment): CommentDTO
 
     @GET("/api/comments/{commentID}")
     suspend fun fetchCommentById(@Path("commentID") id: Int): CommentDTO

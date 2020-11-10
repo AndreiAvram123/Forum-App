@@ -18,8 +18,8 @@ import com.andrei.kit.models.User
 import com.andrei.kit.viewModels.ViewModelPost
 import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.dataLayer.models.serialization.SerializePost
-import com.andrei.kit.observeRequest
-import com.andrei.kit.toBase64
+import com.andrei.kit.utils.observeRequest
+import com.andrei.kit.utils.toBase64
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi

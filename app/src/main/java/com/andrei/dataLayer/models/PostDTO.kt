@@ -15,5 +15,10 @@ data class PostDTO(
         @SerializedName("author")
         val author: UserDTO,
         @SerializedName("content")
-        val content: String
+        val content: String,
+
+        @SerializedName("numberOfComments")
+        val numberOfComments:Int,
+        @SerializedName("bookmarkedTime")
+        val bookmarkTimes:Int
 )
