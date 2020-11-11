@@ -6,8 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
-import com.andrei.dataLayer.engineUtils.Resource
-import com.andrei.dataLayer.models.UserWithFavoritePosts
 import com.andrei.dataLayer.models.serialization.SerializePost
 import com.andrei.dataLayer.repositories.PostRepository
 import com.andrei.kit.models.Post

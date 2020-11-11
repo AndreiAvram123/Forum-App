@@ -52,7 +52,6 @@
                     android:adjustViewBounds="true"
                     android:background="@drawable/round_image"
                     android:scaleType="centerInside"
-                    app:imageFromURL="@{post.image}"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"

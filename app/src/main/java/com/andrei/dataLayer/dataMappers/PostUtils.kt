@@ -7,7 +7,7 @@ import com.andrei.dataLayer.models.PostDTO
 
        return  Post(id = this.id,
                 title = this.title,
-                image = this.image,
+                images = this.images.joinToString (),
                 date = this.date,
                 user = this.author.toUser(),
                 content = this.content,

@@ -123,8 +123,9 @@ class ExpandedPostFragment : Fragment() {
                 }
             }
             binding.postImageExpanded.setOnClickListener {
-                val action = ExpandedPostFragmentDirections.actionGlobalImageZoomFragment(post.image, false)
-                findNavController().navigate(action)
+                // TODO: 11/11/2020
+                //val action = ExpandedPostFragmentDirections.actionGlobalImageZoomFragment(post.image, false)
+              //  findNavController().navigate(action)
             }
         }
 

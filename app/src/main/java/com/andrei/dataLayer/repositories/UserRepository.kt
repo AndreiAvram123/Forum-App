@@ -102,7 +102,7 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
     }
 
     private fun isAuthenticated (authenticationResponse: AuthenticationResponse):Boolean{
-        return authenticationResponse.errors.isNullOrEmpty()
+        return authenticationResponse.authenticationData !=null
     }
 
     private suspend fun updateProfilePicture(firebaseUser: FirebaseUser,profilePicture:String){

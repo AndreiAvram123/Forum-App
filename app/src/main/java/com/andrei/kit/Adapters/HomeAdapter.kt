@@ -66,13 +66,14 @@ class HomeAdapter(
                     displayInternetConnectionError(binding)
                 }
             }
+            val images = post.images.split(", ")
 
             binding.postCarousel.apply {
-                size= 2
+                size= images.size
                 indicatorAnimationType = IndicatorAnimationType.SLIDE
                 setCarouselViewListener { view, position ->
                     val bindingCarouselItem = LayoutCarouselBinding.bind(view)
-                    bindingCarouselItem.imageURL = post.image
+                    bindingCarouselItem.imageURL = images[position]
                 }
                 show()
             }

@@ -15,7 +15,6 @@ import com.andrei.kit.utils.toBase64
 import com.andrei.dataLayer.LocalDatabase
 import com.andrei.dataLayer.interfaces.PostRepositoryInterface
 import com.andrei.dataLayer.interfaces.dao.RoomPostDao
-import com.andrei.dataLayer.models.UserWithFavoritePostsCrossRef
 import com.andrei.dataLayer.models.serialization.SerializePost
 import com.andrei.dataLayer.models.serialization.SerializeFavoritePostRequest
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -82,18 +81,6 @@ class PostRepositoryTest {
         Assert.assertNotNull(favoritePosts)
     }
 
-    @Test
-    fun shouldDeletedFavoritePostNotBeReturnedLocalDB() {
-        runBlocking {
-            //insert a favorite post
-            val postToInsert = UserWithFavoritePostsCrossRef(testPost.id, userID = testUser.userID)
-            postDao.addFavoritePost(postToInsert)
-            //  retrieve all the user's favorite posts and check whether the post belongs there
-            val fetchedPosts = postDao.getFavoritePostsTest(testUser.userID)
-            Assert.assertNotEquals(fetchedPosts.posts.size, 0)
-        }
-
-    }
 
     @Test
     fun `given post should upload to server`() {
