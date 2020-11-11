@@ -41,26 +41,24 @@
 
             <com.jama.carouselview.CarouselView
                 android:id="@+id/post_carousel"
-                app:setAutoPlay="false"
-                app:indicatorAnimationType="drop"
-                app:carouselOffset="center"
-                app:indicatorRadius="7"
-                app:indicatorPadding="5"
-                app:indicatorSelectedColor="@color/highlight"
-                app:indicatorUnselectedColor="@color/colorPrimary"
-                app:size="10"
-                app:spacing="10"
                 android:layout_width="0dp"
-                android:layout_height="400dp"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:cropToPadding="false"
+                app:carouselOffset="center"
+                app:enableSnapping="true"
+                app:indicatorAnimationType="slide"
+                app:indicatorPadding="5"
+                app:indicatorRadius="7"
+                app:indicatorSelectedColor="@color/highlight"
+                app:indicatorUnselectedColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/user_image_post_item"
                 app:resource="@layout/layout_carousel"
-                tools:srcCompat="@drawable/placeholder"
-
-                />
+                app:setAutoPlay="false"
+                app:size="10"
+                tools:srcCompat="@drawable/placeholder" />
 
             <ImageView
                 android:id="@+id/user_image_post_item"

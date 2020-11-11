@@ -74,7 +74,6 @@ class HomeAdapter(
                 setCarouselViewListener { view, position ->
                    val imageView = view.findViewById<ImageView>(R.id.image_item_carousel)
                     Glide.with(imageView).load(images[position])
-                            .centerInside()
                             .into(imageView)
                 }
                 show()
