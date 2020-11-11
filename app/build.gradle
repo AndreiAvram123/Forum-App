@@ -75,6 +75,7 @@ android {
 
 dependencies {
 
+    implementation 'com.github.jama5262:CarouselView:1.1.0'
     implementation "com.github.jkwiecien:EasyImage:3.0.4"
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 

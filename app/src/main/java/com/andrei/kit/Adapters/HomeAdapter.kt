@@ -3,16 +3,20 @@ package com.andrei.kit.Adapters
 import android.net.ConnectivityManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.andrei.kit.R
+import com.andrei.kit.databinding.LayoutCarouselBinding
 import com.andrei.kit.databinding.PostItemHomePageBinding
 import com.andrei.kit.fragments.ExpandedPostFragmentDirections
 import com.andrei.kit.models.Post
 import com.google.android.material.snackbar.Snackbar
+import com.jama.carouselview.enums.IndicatorAnimationType
+import com.jama.carouselview.enums.OffsetType
 
 class HomeAdapter(
         private val removeFromFavorites : (post:Post)->Unit,
@@ -43,7 +47,7 @@ class HomeAdapter(
         fun bind(position: Int) {
             val post = getItem(position) ?: return
             binding.post = post
-            binding.postItemHomeImage.setOnClickListener {
+            binding.postCarousel.setOnClickListener {
                 if (isInternetActive()) {
                     val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(post.id)
                     Navigation.findNavController(binding.root).navigate(action)
@@ -61,6 +65,19 @@ class HomeAdapter(
                 }else{
                     displayInternetConnectionError(binding)
                 }
+            }
+
+            binding.postCarousel.apply {
+                size= 2
+                resource = R.layout.layout_carousel
+                autoPlay = false
+                indicatorAnimationType = IndicatorAnimationType.SLIDE
+                carouselOffset = OffsetType.CENTER
+                setCarouselViewListener { view, position ->
+                    val bindingCarouselItem = LayoutCarouselBinding.bind(view)
+                   bindingCarouselItem.imageURL = post.image
+                }
+                show()
             }
         }
     }
