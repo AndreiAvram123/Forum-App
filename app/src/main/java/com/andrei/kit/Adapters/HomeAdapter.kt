@@ -10,10 +10,10 @@ import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.andrei.kit.R
-import com.andrei.kit.databinding.LayoutCarouselBinding
 import com.andrei.kit.databinding.PostItemHomePageBinding
 import com.andrei.kit.fragments.ExpandedPostFragmentDirections
 import com.andrei.kit.models.Post
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.jama.carouselview.enums.IndicatorAnimationType
 import com.jama.carouselview.enums.OffsetType
@@ -72,8 +72,10 @@ class HomeAdapter(
                 size= images.size
                 indicatorAnimationType = IndicatorAnimationType.SLIDE
                 setCarouselViewListener { view, position ->
-                    val bindingCarouselItem = LayoutCarouselBinding.bind(view)
-                    bindingCarouselItem.imageURL = images[position]
+                   val imageView = view.findViewById<ImageView>(R.id.image_item_carousel)
+                    Glide.with(imageView).load(images[position])
+                            .centerInside()
+                            .into(imageView)
                 }
                 show()
             }

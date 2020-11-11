@@ -7,18 +7,27 @@
     android:layout_height="match_parent"
     tools:context=".fragments.FragmentAddPost">
 
-    <ImageView
-        android:id="@+id/post_image_add"
+    <com.jama.carouselview.CarouselView
+        android:id="@+id/carousel_add_post"
         android:layout_width="0dp"
-        android:layout_height="300dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="31dp"
-        android:layout_marginEnd="32dp"
+        android:layout_height="400dp"
+        android:cropToPadding="false"
+        app:carouselOffset="center"
+        app:indicatorAnimationType="drop"
+        app:indicatorPadding="5"
+        app:indicatorRadius="7"
+        app:indicatorSelectedColor="@color/highlight"
+        app:indicatorUnselectedColor="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/post_title_add"
-        app:srcCompat="@drawable/ic_add_image" />
+        app:resource="@layout/layout_carousel"
+        app:setAutoPlay="false"
+        app:size="10"
+        app:spacing="10"
+        tools:srcCompat="@drawable/placeholder"
+
+        />
 
     <Button
         android:id="@+id/submit_post_button"
@@ -49,16 +58,17 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:ems="10"
-        android:inputType="textPersonName"
         android:hint="Post content"
+        android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/submit_post_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/post_image_add"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintTop_toBottomOf="@+id/add_image_button"
+        app:layout_constraintVertical_bias="0.0" />
 
     <ProgressBar
         android:id="@+id/upload_progress_bar"
@@ -83,6 +93,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/post_content_add"
         tools:text="You should be careful" />
+
+    <Button
+        android:id="@+id/add_image_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Add images"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/carousel_add_post" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
