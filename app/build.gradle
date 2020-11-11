@@ -53,12 +53,12 @@ android {
 
     buildTypes {
         release {
-            manifestPlaceholders = [crashlyticsCollectionEnabled: "true", performanceLogcatEnabled:"false"]
+            manifestPlaceholders = [crashlyticsCollectionEnabled: "true", performanceLogcatEnabled:"false","performanceCollectionDisabled" :"false"]
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug{
-            manifestPlaceholders = [crashlyticsCollectionEnabled: "false", performanceLogcatEnabled:"true"]
+            manifestPlaceholders = [crashlyticsCollectionEnabled: "false", performanceLogcatEnabled:"false","performanceCollectionDisabled" :"true"]
         }
     }
     compileOptions {
