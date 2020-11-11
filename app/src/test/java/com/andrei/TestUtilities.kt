@@ -1,14 +1,11 @@
 package com.andrei
 
 import android.content.Context
-import android.net.ConnectivityManager
 import androidx.test.core.app.ApplicationProvider
 import com.andrei.dataLayer.engineUtils.AuthInterceptor
 import com.andrei.kit.R
 import com.andrei.kit.models.Post
 import com.andrei.kit.models.User
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -62,7 +59,7 @@ class TestUtilities {
             }
 
             retrofitClient = OkHttpClient.Builder()
-                    .addInterceptor(AuthInterceptor(token, context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)).build()
+                    .addInterceptor(AuthInterceptor(token)).build()
             retrofit = Retrofit.Builder().baseUrl("http://www.andreiram.co.uk")
                     .client(retrofitClient)
                     .addConverterFactory(GsonConverterFactory.create())

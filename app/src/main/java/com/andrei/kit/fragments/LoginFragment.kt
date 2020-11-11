@@ -6,17 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutLoginBinding
-import com.andrei.kit.viewModels.ViewModelUser
+import com.andrei.kit.utils.reObserve
+import com.andrei.kit.viewModels.ViewModelAuth
 import com.google.android.gms.common.SignInButton
 
 class LoginFragment : Fragment() {
 
     private lateinit var binding: LayoutLoginBinding
-    private val viewModelUser: ViewModelUser by activityViewModels()
+    private val viewModelAuth: ViewModelAuth by activityViewModels()
     private lateinit var fragmentCallback: FragmentCallback
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -24,18 +24,21 @@ class LoginFragment : Fragment() {
 
         fragmentCallback = requireActivity() as FragmentCallback
         initializeUI()
-        return binding.root
+        viewModelAuth.authenticationState.reObserve(viewLifecycleOwner,{
+            if(!it.isNullOrEmpty()) {
+                displayErrorMessage(it)
+            }
+        })
 
+        return binding.root
     }
 
 
     private fun attemptLogin() {
-        val email = binding.username.text.trim().toString()
+        val email = binding.emailLogin.text.trim().toString()
         val password = binding.password.text.trim().toString()
         if (areLoginDetailsValid(email, password)) {
-            viewModelUser.login(email, password).observe(viewLifecycleOwner, {
-
-            })
+            viewModelAuth.login(email, password)
         }
     }
 

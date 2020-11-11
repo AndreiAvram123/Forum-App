@@ -35,11 +35,6 @@ class PostRepository @Inject constructor(private val user: User,
             }
         }
     }
-    private val favoritePostsCache = mutableListOf<Post>()
-
-
-
-
 
 
     private  val TAG = PostRepository::class.java.simpleName

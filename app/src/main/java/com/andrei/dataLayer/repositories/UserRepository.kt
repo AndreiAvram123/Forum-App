@@ -1,9 +1,10 @@
 package com.andrei.dataLayer.repositories
 
+import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
-import com.andrei.kit.models.User
 import com.andrei.kit.user.UserAccountManager
 import com.andrei.dataLayer.dataMappers.UserMapper
 import com.andrei.dataLayer.dataMappers.toUser
@@ -12,27 +13,35 @@ import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.dataLayer.interfaces.UserRepositoryInterface
 import com.andrei.dataLayer.models.serialization.AuthenticationResponse
 import com.andrei.dataLayer.models.serialization.RegisterUserDTO
+import com.andrei.kit.R
+import com.andrei.kit.utils.postAndReset
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.userProfileChangeRequest
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 @ActivityScoped
 class UserRepository @Inject constructor(private val repo: UserRepositoryInterface,
                                          private val connectivityManager: ConnectivityManager,
-                                         private val userAccountManager: UserAccountManager) {
+                                         private val userAccountManager: UserAccountManager,
+                                         private val coroutineScope: CoroutineScope,
+                                         @ApplicationContext private val context: Context) {
+
+    val authenticationError = MutableLiveData<String>()
+    val registrationError = MutableLiveData<Resource<String>>()
 
     private val auth = FirebaseAuth.getInstance()
     private val responseHandler = ResponseHandler()
 
 
-     fun loginWithGoogle(googleSignInAccount: GoogleSignInAccount) = liveData {
-         emit(Resource.loading())
+     suspend fun loginWithGoogle(googleSignInAccount: GoogleSignInAccount)  {
         val credential = GoogleAuthProvider.getCredential(googleSignInAccount.idToken,null)
         try {
            val userFirebase = auth.signInWithCredential(credential).await().user
@@ -43,31 +52,39 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
                    }else{
                       saveAuthenticationData(registerUserToApi(it,null))
                     }
-               emit(Resource.success(Any()))
             }
 
         }catch (e:Exception){
-           emit(responseHandler.handleException<Any>(e,"login google"))
+            responseHandler.handleException<Any>(e,"Login with google")
+            authenticationError.postValue(context.getString(R.string.unknown_error))
         }
     }
 
 
-     fun registerWithUsernameAndPassword(username: String, email: String, password: String)   = liveData{
-       emit(Resource.loading<Any>())
-        try {
-            val firebaseUser = auth.createUserWithEmailAndPassword(email, password).await().user
-            if(firebaseUser != null){
-                val response = registerUserToApi(firebaseUser,username)
-                 if(response.userDTO !=null && response.token != null){
-                     val user = response.userDTO.toUser()
-                     updateProfilePicture(firebaseUser,user.profilePicture)
-                     updateDisplayName(firebaseUser,user.username)
-                     emit(responseHandler.handleSuccess(Any()))
-                 }
+     fun registerWithUsernameAndPassword(username: String, email: String, password: String)  {
+            registrationError.postValue(Resource.loading())
+             auth.createUserWithEmailAndPassword( email, password).addOnSuccessListener {
+                val firebaseUser = it.user
+                if (firebaseUser != null) {
+                    coroutineScope.launch {
+                        try {
+                            val response = registerUserToApi(firebaseUser, username)
+                            response.authenticationData?.let { data ->
+                                val user = data.userDTO.toUser()
+                                updateProfilePicture(firebaseUser, user.profilePicture)
+                                updateDisplayName(firebaseUser, user.username)
+                                saveAuthenticationData(response)
+                            }
+                        }catch (e:Exception){
+                            registrationError.postValue(Resource.error(context.getString(R.string.unknown_error)))
+                            responseHandler.handleException<Any>(e, "Register with Username and password")
+                        }
+                    }
+                }
+            }.addOnFailureListener {
+                registrationError.postValue(Resource.error(it.message ?: context.getString(R.string.unknown_error)))
             }
-        }catch (e:Exception){
-            emit(responseHandler.handleException<Any>(e,"Register with Username and password"))
-        }
+
     }
     //todo
     //we need to change to registration response
@@ -79,13 +96,13 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
     }
 
     private suspend fun saveAuthenticationData(response: AuthenticationResponse){
-        if(response.userDTO!=null && response.token!=null) {
-            userAccountManager.saveUserAndToken(response.userDTO.toUser(), response.token)
-        }
+         response.authenticationData?.let{
+             userAccountManager.saveUserAndToken(token = it.token,user = it.userDTO.toUser())
+         }
     }
 
     private fun isAuthenticated (authenticationResponse: AuthenticationResponse):Boolean{
-        return authenticationResponse.userDTO!=null && authenticationResponse.token!=null
+        return authenticationResponse.errors.isNullOrEmpty()
     }
 
     private suspend fun updateProfilePicture(firebaseUser: FirebaseUser,profilePicture:String){
@@ -113,24 +130,18 @@ class UserRepository @Inject constructor(private val repo: UserRepositoryInterfa
         }
     }
 
-    fun login(email: String, password: String) = liveData {
-        emit(Resource.loading<Any>())
+    suspend fun login(email: String, password: String) {
         try {
              val user = auth.signInWithEmailAndPassword(email, password).await().user
               if(user !=null){
                 val response = repo.getUserFomUID(user.uid)
                  if (isAuthenticated(response)){
                      saveAuthenticationData(response)
-                     emit(responseHandler.handleSuccess(Any()))
                  }
-            }else{
-                  //todo
-                  //put meessage here
-                emit(Resource.error<Any>("error at login"))
-            }
+             }
         }catch (e :Exception)
         {
-            emit(responseHandler.handleException<Any>(e,"login"))
+             authenticationError.postValue(e.message ?: context.getString(R.string.unknown_error))
         }
     }
 

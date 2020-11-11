@@ -36,7 +36,7 @@ object RepositoryModule {
     fun httpClient(userAccountManager: UserAccountManager,
                    connectivityManager: ConnectivityManager): OkHttpClient {
         val token = userAccountManager.getToken()
-        val interceptor = AuthInterceptor(token,connectivityManager)
+        val interceptor = AuthInterceptor(token)
         return OkHttpClient.Builder().addInterceptor(interceptor).build()
     }
 

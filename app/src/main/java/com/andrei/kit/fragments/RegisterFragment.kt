@@ -11,18 +11,30 @@ import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutSignUpBinding
 import com.andrei.kit.utils.isEmail
-import com.andrei.kit.viewModels.ViewModelUser
+import com.andrei.kit.viewModels.ViewModelAuth
 import com.andrei.kit.utils.reObserve
-import com.google.android.material.snackbar.Snackbar
 
 class RegisterFragment : Fragment() {
 
     private lateinit var binding: LayoutSignUpBinding
-    private val viewModelUser: ViewModelUser by activityViewModels()
+    private val viewModelAuth: ViewModelAuth by activityViewModels()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = LayoutSignUpBinding.inflate(inflater, container, false)
         initializeUI()
+        viewModelAuth.registrationState.reObserve(viewLifecycleOwner,{
+            hideErrors()
+            when(it.status){
+                Status.ERROR ->{
+                    displayErrorMessage(it.message!!)
+                    showButton()
+                }
+
+                else->
+                    hideButton()
+            }
+
+        })
         return binding.root
     }
 
@@ -45,18 +57,18 @@ class RegisterFragment : Fragment() {
 
 
     private fun hideButton() {
-        binding.finishSignUp.visibility = View.VISIBLE
+        binding.finishSignUp.visibility = View.INVISIBLE
     }
 
     private fun showButton() {
-        binding.finishSignUp.visibility = View.INVISIBLE
+        binding.finishSignUp.visibility = View.VISIBLE
     }
 
 
     private fun areCredentialsValid(email: String, password: String, reenteredPassword: String,
                                     nickname: String): Boolean {
         if (!email.isEmail()) {
-            displayErrorMessage(getString(R.string.error_invalid_email))
+            displayErrorMessage(getString(R.string.invalid_email))
             return false
         }
         if (password.isEmpty()) {
@@ -80,18 +92,9 @@ class RegisterFragment : Fragment() {
         val username = binding.username.text.toString().trim()
 
         if (areCredentialsValid(email, password, reenteredPassword, username)) {
-            viewModelUser.register(username, email, password).reObserve(viewLifecycleOwner, {
-                when(it.status){
-                    Status.LOADING -> {
-                    }
-                    Status.SUCCESS ->{
-                        Snackbar.make(binding.root, getString(R.string.account_created), Snackbar.LENGTH_LONG).show()
-                    }
-                    Status.ERROR ->{
-                        Snackbar.make(binding.root,"error at creating account", Snackbar.LENGTH_LONG).show()
-                    }
-                }
-            })
+            viewModelAuth.register(username = username,
+                    email= email,
+                    password= password)
             showButton()
             clearFields()
         }
