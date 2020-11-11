@@ -6,8 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.andrei.kit.R
 import com.andrei.kit.models.User
 import com.andrei.dataLayer.interfaces.dao.UserDao
-import com.andrei.kit.utils.default
-import com.andrei.kit.utils.postAndReset
+import com.andrei.kit.utils.*
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineScope
@@ -21,7 +20,7 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
                                              private val userDao: UserDao) {
 
 
-    fun getToken() = sharedPreferences.getStringNotNull(R.string.key_token)
+    fun getToken() = sharedPreferences.getStringNotNull(context.getString(R.string.key_token))
 
     val continueLoginFlow = MutableLiveData(false)
 
@@ -42,24 +41,7 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
     }
 
     fun deleteUserFromMemory() {
-        sharedPreferences.edit {
-            putString(context.getString(R.string.key_token),"")
-        }
-    }
-
-
-    private fun SharedPreferences.getStringNotNull(keyID: Int
-    ): String {
-        val value = getString(context.getString(keyID), "unknown")
-        value?.let { return it }
-        return "Unknown"
-    }
-
-
-    private fun SharedPreferences.edit(action: SharedPreferences.Editor.() -> Unit) {
-        val editor = edit()
-        action(editor)
-        editor.apply()
+        sharedPreferences.clearString(context.getString(R.string.key_user_id))
     }
 
 }
