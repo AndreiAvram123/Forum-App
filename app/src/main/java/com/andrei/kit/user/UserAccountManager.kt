@@ -10,6 +10,9 @@ import com.andrei.kit.utils.default
 import com.andrei.kit.utils.postAndReset
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ActivityScoped
@@ -27,7 +30,9 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
     suspend fun saveUserAndToken(user: User, token: String) {
         persistToken(token)
         userDao.insertUser(user)
-        continueLoginFlow.postAndReset(value = true, resetTo = false)
+         CoroutineScope( Dispatchers.Main).launch {
+           continueLoginFlow.postAndReset(value = true, resetTo = false)
+       }
     }
 
     private fun persistToken(token: String) {

@@ -9,7 +9,7 @@ import com.andrei.kit.R
 import com.andrei.kit.fragments.LoginFragment
 import com.andrei.kit.user.UserAccountManager
 import com.andrei.kit.utils.reObserve
-import com.andrei.kit.viewModels.ViewModelUser
+import com.andrei.kit.viewModels.ViewModelAuth
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
@@ -24,7 +24,7 @@ const val requestCodeGoogleSignIn = 1
 class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
     //todo
-    private val viewModelUser: ViewModelUser by viewModels()
+    private val viewModelAuth: ViewModelAuth by viewModels()
 
     @Inject
     lateinit var userAccountManager: UserAccountManager
@@ -56,20 +56,7 @@ class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
             try {
                 // Google Sign In was successful, authenticate with Firebase
                  val googleSignInAccount = task.getResult(ApiException::class.java)!!
-                 viewModelUser.loginWithGoogle(googleSignInAccount).reObserve(this,{
-                     when(it.status){
-                         Status.SUCCESS ->{
-
-                         }
-                         Status.LOADING ->{
-
-                         }
-                         Status.ERROR ->{
-
-                         }
-
-                     }
-                 })
+                 viewModelAuth.loginWithGoogle(googleSignInAccount)
 
             } catch (e: ApiException) {
                 // Google Sign In failed, update UI appropriately

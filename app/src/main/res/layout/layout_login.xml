@@ -35,12 +35,12 @@
                         android:src="@drawable/usrusr" />
 
                     <EditText
-                        android:id="@+id/username"
+                        android:id="@+id/email_login"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="15dp"
                         android:background="#00000000"
-                        android:hint="Username"
+                        android:hint="@string/enter_email"
                         android:inputType="text"
                         android:letterSpacing="0.1"
                         android:textColor="#fff"
@@ -144,12 +144,13 @@
                 android:text="@string/log_in_button_text" />
 
             <TextView
+                android:textSize="20sp"
                 android:id="@+id/register_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:letterSpacing="0.1"
-                android:text="Create Account ? Signup"
+                android:text="Sign up"
                 android:textColor="#d9e5f3" />
         </LinearLayout>
 

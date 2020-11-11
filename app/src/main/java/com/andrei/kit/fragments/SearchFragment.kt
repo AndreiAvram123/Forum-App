@@ -17,7 +17,7 @@ import com.andrei.kit.Adapters.SuggestionsAdapter
 import com.andrei.kit.databinding.FragmentSearchBinding
 import com.andrei.kit.models.User
 import com.andrei.kit.viewModels.ViewModelChat
-import com.andrei.kit.viewModels.ViewModelUser
+import com.andrei.kit.viewModels.ViewModelAuth
 import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
 import com.andrei.kit.R
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +29,7 @@ import javax.inject.Inject
 class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
     private val suggestionsAdapter: SuggestionsAdapter = SuggestionsAdapter(this)
     private lateinit var binding: FragmentSearchBinding;
-    private val viewModelUser: ViewModelUser by activityViewModels()
+    private val viewModelAuth: ViewModelAuth by activityViewModels()
     private val viewModelChat: ViewModelChat by activityViewModels()
 
     @Inject
@@ -46,7 +46,7 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
         binding = FragmentSearchBinding.inflate(inflater, container, false)
         configureRecyclerView()
         configureSearch()
-        viewModelUser.searchSuggestions.observe(viewLifecycleOwner, Observer {
+        viewModelAuth.searchSuggestions.observe(viewLifecycleOwner, Observer {
             suggestionsAdapter.data = ArrayList(it)
         })
 
@@ -82,7 +82,7 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
 
                 override fun onQueryTextChange(newQuery: String): Boolean {
                     if (newQuery.trim().isNotEmpty()) {
-                        viewModelUser.searchQuery.value = newQuery
+                        viewModelAuth.searchQuery.value = newQuery
                     } else {
                         suggestionsAdapter.data = ArrayList()
                     }

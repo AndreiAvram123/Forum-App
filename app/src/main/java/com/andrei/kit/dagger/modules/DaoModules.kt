@@ -24,7 +24,6 @@ class DaoModules {
     fun database(@ApplicationContext context: Context): LocalDatabase = LocalDatabase.getDatabase(context)
 
     @Provides
-
     fun postDao(database: LocalDatabase): RoomPostDao = database.postDao()
 
     @Provides

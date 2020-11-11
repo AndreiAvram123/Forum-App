@@ -1,5 +1,6 @@
 <resources>
 
+    <string name="unknown_error">Unknown error</string>
     <string name="google_token">472239001224-h3s6n11ceu7a6n8rtq5k6rmvjvf47rot.apps.googleusercontent.com</string>
     <string name="app_name">KIT</string>
 
@@ -22,7 +23,8 @@
     <string name="choose_password">Password</string>
     <string name="enter_email">Email</string>
     <string name="create_account_hint">Create account</string>
-    <string name="error_invalid_email">Invalid Email</string>
+    <string name="invalid_login_credentials">Invalid email or password</string>
+    <string name="invalid_email">Invalid email</string>
     <string name="no_password">No password entered</string>
     <string name="password_match">The passwords do not match</string>
     <string name="error_no_nickname">You must enter a nickname</string>

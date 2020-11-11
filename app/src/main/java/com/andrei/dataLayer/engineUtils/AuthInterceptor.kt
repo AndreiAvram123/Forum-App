@@ -1,12 +1,9 @@
 package com.andrei.dataLayer.engineUtils
 
-import android.net.ConnectivityManager
 import okhttp3.Interceptor
 import okhttp3.Response
-import java.lang.Exception
 
-class AuthInterceptor(private val token: String,
-                      private val connectivityManager: ConnectivityManager
+class AuthInterceptor(private val token: String
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -18,8 +15,4 @@ class AuthInterceptor(private val token: String,
 
         return chain.proceed(requestBuilder.build())
     }
-}
-class NoInternetException : Exception() {
-    override val message: String?
-        get() = "No internet present, cannot execute request..."
 }
