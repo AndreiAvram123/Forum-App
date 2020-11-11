@@ -41,7 +41,9 @@
 
             <com.jama.carouselview.CarouselView
                 android:id="@+id/post_carousel"
+                app:setAutoPlay="false"
                 app:indicatorAnimationType="drop"
+                app:carouselOffset="center"
                 app:indicatorRadius="7"
                 app:indicatorPadding="5"
                 app:indicatorSelectedColor="@color/highlight"

@@ -69,13 +69,10 @@ class HomeAdapter(
 
             binding.postCarousel.apply {
                 size= 2
-                resource = R.layout.layout_carousel
-                autoPlay = false
                 indicatorAnimationType = IndicatorAnimationType.SLIDE
-                carouselOffset = OffsetType.CENTER
                 setCarouselViewListener { view, position ->
                     val bindingCarouselItem = LayoutCarouselBinding.bind(view)
-                   bindingCarouselItem.imageURL = post.image
+                    bindingCarouselItem.imageURL = post.image
                 }
                 show()
             }
