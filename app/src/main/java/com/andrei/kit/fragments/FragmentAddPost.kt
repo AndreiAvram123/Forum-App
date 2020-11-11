@@ -106,7 +106,7 @@ class FragmentAddPost : Fragment() {
                         title = binding.postTitleAdd.text.toString(),
                         content = binding.postContentAdd.text.toString(),
                         userID = user.userID,
-                        imageData = drawable.toBase64()
+                        imageData = listOf(drawable.toBase64())
                 )
                 viewModelPost.uploadPost(post).observeRequest(viewLifecycleOwner, {
                     when (it.status){

@@ -6,11 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.andrei.kit.models.*
 import com.andrei.dataLayer.interfaces.dao.*
-import com.andrei.dataLayer.models.UserWithFavoritePostsCrossRef
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.internal.synchronized
 
-@Database(entities = [Post::class, Comment::class, User::class, UserWithFavoritePostsCrossRef::class, Message::class, Chat::class], version = 5, exportSchema = false)
+@Database(entities = [Post::class, Comment::class, User::class, Message::class, Chat::class], version = 6, exportSchema = false)
 abstract class LocalDatabase : RoomDatabase() {
 
     abstract fun postDao(): RoomPostDao

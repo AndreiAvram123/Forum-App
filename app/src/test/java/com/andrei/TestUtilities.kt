@@ -49,7 +49,7 @@ class TestUtilities {
                         id = testPostID,
                         user = testUser,
                         title = getString(R.string.testPostTitle),
-                        image = getString(R.string.testPostImage),
+                        images = getString(R.string.testPostImage),
                         content = getString(R.string.testPostContent),
                         date = System.currentTimeMillis(),
                         isFavorite = false,
