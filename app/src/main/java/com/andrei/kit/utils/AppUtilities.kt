@@ -48,15 +48,3 @@ fun Uri.toDrawable(context: Context): Drawable {
     val byteArray = byteArrayOutputStream.toByteArray()
     return Base64.encodeToString(byteArray, Base64.DEFAULT);
 }
-
-fun <T> LiveData<T>.observeRequest(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
-    observe(lifecycleOwner, object : Observer<T> {
-        var observed = 0
-        override fun onChanged(t: T?) {
-            observer.onChanged(t)
-            if(observed == 2 ){
-            removeObserver(this)
-            }
-        }
-    })
-}

@@ -67,16 +67,16 @@ class PostRepository @Inject constructor(private val user: User,
 
 
 
-    fun fetchPostByID(id: Int): LiveData<Resource<LiveData<Post>>> = liveData {
-        emit(Resource.loading<LiveData<Post>>())
+    fun fetchPostByID(id: Int): LiveData<Resource<Post>> = liveData {
+        emit(Resource.loading<Post>())
         try {
             val post = repo.fetchPostByID(id).toPost()
             checkPostIsBookmarked(post)
             postDao.insertPost(post)
-            val localDBPost  = postDao.getPostByID(post.id)
+            val localDBPost  = postDao.getPostByIDSuspend(post.id)
             emit(Resource.success(localDBPost))
         }catch(e:Exception){
-            emit(responseHandler.handleException<LiveData<Post>>(e,"fetch post by id"))
+            emit(responseHandler.handleException<Post>(e,"fetch post by id"))
         }
     }
 
@@ -105,7 +105,6 @@ class PostRepository @Inject constructor(private val user: User,
     }
 
      fun addPostToFavorites(post: Post) = liveData{
-        emit(Resource.loading<Any>())
         val requestData = SerializeFavoritePostRequest(postID = post.id,
         userID = user.userID)
         try {
@@ -122,7 +121,6 @@ class PostRepository @Inject constructor(private val user: User,
 
 
      fun deletePostFromFavorites(post: Post) = liveData {
-        emit(Resource.loading<Any>())
         try {
             repo.removePostFromFavorites(postID = post.id, userID = user.userID)
             post.isFavorite = false

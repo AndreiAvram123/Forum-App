@@ -25,6 +25,8 @@ import com.andrei.kit.models.User
 import com.andrei.kit.viewModels.ViewModelComments
 import com.andrei.kit.viewModels.ViewModelPost
 import com.andrei.dataLayer.models.serialization.SerializeComment
+import com.andrei.kit.utils.isConnected
+import com.andrei.kit.utils.observeOnce
 import com.andrei.kit.utils.observeRequest
 import com.andrei.kit.utils.reObserve
 import com.bumptech.glide.Glide
@@ -79,17 +81,18 @@ class ExpandedPostFragment : Fragment() {
 
     private fun attachObservers() {
 
-            viewModelPost.getPostByID(args.postID).reObserve(viewLifecycleOwner, {
+            viewModelPost.getPostByID(args.postID).observeRequest(viewLifecycleOwner, {
                 when(it.status){
                     Status.SUCCESS ->{
-                        it.data?.reObserve(viewLifecycleOwner,{newPost ->
-                            post = newPost
+                        if(it.data !=null){
+                            post = it.data
                             configureViews()
                             getComments()
-                        })
+                        }
                     }
                     Status.LOADING ->{
-
+                    //todo
+                        //loading ui
                     }
                     Status.ERROR ->{
 
@@ -112,20 +115,26 @@ class ExpandedPostFragment : Fragment() {
             binding.post = post
             binding.saveButtonExpanded.setOnClickListener {
                 if (post.isFavorite) {
-                    informUserPostRemovedFromFavorites()
-                    viewModelPost.removeFromFavorites(post)
-
+                    viewModelPost.removeFromFavorites(post).observeOnce(viewLifecycleOwner,{
+                        if(it.status == Status.SUCCESS){
+                            informUserPostRemovedFromFavorites()
+                            binding.post = post
+                            binding.notifyChange()
+                        }
+                    })
                 } else {
-                    informUserPostAddedToFavorites()
-                    viewModelPost.addPostToFavorites(post)
+                    viewModelPost.addPostToFavorites(post).observeOnce(viewLifecycleOwner, {
+                       if(it.status == Status.SUCCESS) {
+                          informUserPostAddedToFavorites()
+                           binding.post = post
+                           binding.notifyChange()
+                       }
+                    })
                 }
-                post.isFavorite = !post.isFavorite
-                binding.post = post;
-                binding.notifyChange()
             }
             binding.backButtonExpanded.setOnClickListener { Navigation.findNavController(requireActivity(), R.id.nav_host_fragment).popBackStack() }
             binding.writeCommentButton.setOnClickListener {
-                if(connectivityManager.activeNetwork !=null) {
+                if(connectivityManager.isConnected()) {
                     showCommentSheet()
                 }
             }
