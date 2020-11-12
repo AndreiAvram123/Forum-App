@@ -2,33 +2,52 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
-<androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.FragmentAddPost">
 
-    <ImageView
-        android:id="@+id/post_image_add"
+    <com.jama.carouselview.CarouselView
+        android:id="@+id/carousel_add_post"
         android:layout_width="0dp"
-        android:layout_height="300dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="31dp"
-        android:layout_marginEnd="32dp"
+        android:layout_height="wrap_content"
+        app:scaleOnScroll="false"
+        android:cropToPadding="false"
+        app:carouselOffset="center"
+        app:enableSnapping="true"
+        app:indicatorAnimationType="drop"
+        app:indicatorPadding="5"
+        app:indicatorRadius="7"
+        app:indicatorSelectedColor="@color/highlight"
+        app:indicatorUnselectedColor="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/post_title_add"
-        app:srcCompat="@drawable/ic_add_image" />
+        app:resource="@layout/layout_carousel"
+        app:setAutoPlay="false"
+        app:size="10"
+        app:spacing="10"
+        tools:srcCompat="@drawable/placeholder"
 
-    <Button
-        android:id="@+id/submit_post_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="@string/finish"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        />
+
+            <Button
+                android:id="@+id/submit_post_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/finish"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/error_message_add" />
 
     <EditText
         android:id="@+id/post_title_add"
@@ -44,32 +63,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <EditText
-        android:id="@+id/post_content_add"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="Post content"
-        app:layout_constraintBottom_toTopOf="@+id/submit_post_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/post_image_add"
-        app:layout_constraintVertical_bias="0.25" />
+            <EditText
+                android:id="@+id/post_content_add"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="32dp"
+                android:ems="10"
+                android:hint="Post content"
+                android:inputType="textPersonName"
+                app:layout_constraintBottom_toTopOf="@+id/submit_post_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/add_image_button"
+                app:layout_constraintVertical_bias="0.0" />
 
-    <ProgressBar
-        android:id="@+id/upload_progress_bar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toBottomOf="@+id/submit_post_button"
-        app:layout_constraintEnd_toEndOf="@+id/submit_post_button"
-        app:layout_constraintStart_toStartOf="@+id/submit_post_button"
-        app:layout_constraintTop_toTopOf="@+id/submit_post_button" />
+            <ProgressBar
+                android:id="@+id/upload_progress_bar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="@+id/submit_post_button"
+                app:layout_constraintEnd_toEndOf="@+id/submit_post_button"
+                app:layout_constraintStart_toStartOf="@+id/submit_post_button"
+                app:layout_constraintTop_toTopOf="@+id/submit_post_button" />
 
     <TextView
         android:id="@+id/error_message_add"
@@ -84,5 +104,17 @@
         app:layout_constraintTop_toBottomOf="@+id/post_content_add"
         tools:text="You should be careful" />
 
+    <Button
+        android:id="@+id/add_image_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Add images"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/carousel_add_post" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
