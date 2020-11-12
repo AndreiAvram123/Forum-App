@@ -19,6 +19,7 @@ import com.andrei.dataLayer.models.ServerResponse
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeMessage
+import com.andrei.kit.utils.isConnected
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -41,9 +42,12 @@ class ChatRepository @Inject constructor(
         }
     }
 
-
-    private val chatNotifications by lazy {
-        MutableLiveData<ArrayList<ChatNotificationDTO>>()
+    val friendRequests:MutableLiveData<MutableList<FriendRequest>> by lazy {
+        MutableLiveData<MutableList<FriendRequest>>().also{
+            coroutineScope.launch {
+                fetchFriendRequests(user)
+            }
+        }
     }
 
     val userChats: LiveData<List<Chat>> by lazy {
@@ -115,28 +119,34 @@ class ChatRepository @Inject constructor(
 
 
 
-    suspend fun acceptFriendRequest(request: FriendRequest):Resource<Any> {
-        return try {
+     fun acceptFriendRequest(request: FriendRequest) = liveData{
+        emit(Resource.loading<Any>())
+         try {
             val data = repo.acceptFriendRequest(request.id)
             val chat = ChatMapper.mapDtoObjectToDomainObject(data, request.receiver.userID)
             chatDao.insert(chat)
-            responseHandler.handleSuccess(Any())
+            friendRequests.value?.remove(request)
+            emit(responseHandler.handleSuccess(Any()))
         }catch(e:Exception){
-            responseHandler.handleException(e,"Accept friend request")
+            responseHandler.handleException<Any>(e,"Accept friend request")
         }
         }
 
 
-    suspend fun fetchFriendRequests(user: User): ArrayList<FriendRequest> {
-        if (connectivityManager.activeNetwork != null) {
+    private suspend fun fetchFriendRequests(user: User): ArrayList<FriendRequest> {
+        if (connectivityManager.isConnected()) {
             return ArrayList(repo.fetchFriendRequests(user.userID))
         }
         return ArrayList()
     }
 
-    suspend fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
-        if (connectivityManager.activeNetwork != null) {
+      fun sendFriendRequest(friendRequest: SerializeFriendRequest) = liveData {
+        emit(Resource.loading<Any>())
+        try {
             repo.sendFriendRequest(friendRequest)
+            emit(Resource.success(Any()))
+        }catch (e:Exception){
+            emit(responseHandler.handleException<Any>(e,"Send friend request"))
         }
     }
 

@@ -27,21 +27,9 @@ class ViewModelChat @ViewModelInject constructor(
     }
 
 
-    fun refreshFriendRequests() {
-        viewModelScope.launch {
-            friendRequests.postValue(chatRepository.fetchFriendRequests(user))
-        }
-    }
 
-    val friendRequests: MutableLiveData<ArrayList<FriendRequest>> by lazy {
-        MutableLiveData<ArrayList<FriendRequest>>().also {
-            viewModelScope.launch {
-                val data = chatRepository.fetchFriendRequests(user)
-                friendRequests.value = data
-            }
+    val friendRequests = chatRepository.friendRequests
 
-        }
-    }
 
 
     val recentMessages: LiveData<List<Message>> = Transformations.switchMap(currentChatId) {
@@ -60,22 +48,10 @@ class ViewModelChat @ViewModelInject constructor(
 
     fun sendMessage(serializeMessage: SerializeMessage) = chatRepository.pushMessage(serializeMessage)
 
-    fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
-        viewModelScope.launch {
-            chatRepository.sendFriendRequest(friendRequest)
-        }
-    }
+    fun sendFriendRequest(friendRequest: SerializeFriendRequest)  = chatRepository.sendFriendRequest(friendRequest)
 
-    fun acceptFriendRequest(request: FriendRequest) = liveData{
-        emit(Resource.loading<Any>())
-        viewModelScope.launch {
-            val response  = chatRepository.acceptFriendRequest(request)
-            if(response.status == Status.SUCCESS) {
-                friendRequests.value?.remove(request)
-            }
-            emit(response)
-        }
-    }
+
+    fun acceptFriendRequest(request: FriendRequest) = chatRepository.acceptFriendRequest(request)
 }
 
 

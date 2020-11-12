@@ -1,61 +1,61 @@
 package com.andrei.kit.fragments
 
-import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SearchView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.andrei.kit.Adapters.SuggestionsAdapter
+import com.andrei.kit.R
 import com.andrei.kit.databinding.FragmentSearchBinding
 import com.andrei.kit.models.User
-import com.andrei.kit.viewModels.ViewModelChat
+import com.andrei.kit.utils.isNotConnected
+import com.andrei.kit.utils.reObserve
 import com.andrei.kit.viewModels.ViewModelAuth
-import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
-import com.andrei.kit.R
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
-@InternalCoroutinesApi
 @AndroidEntryPoint
-class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
-    private val suggestionsAdapter: SuggestionsAdapter = SuggestionsAdapter(this)
+class SearchFragment : Fragment(){
+    private val suggestionsAdapter: SuggestionsAdapter by lazy {
+        SuggestionsAdapter()
+    }
     private lateinit var binding: FragmentSearchBinding;
     private val viewModelAuth: ViewModelAuth by activityViewModels()
-    private val viewModelChat: ViewModelChat by activityViewModels()
 
     @Inject
     lateinit var user: User
 
+    @Inject
+    lateinit var connectivityManager: ConnectivityManager
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        val connectivityManager = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (connectivityManager.activeNetwork == null) {
+        if (connectivityManager.isNotConnected()) {
             val action = SearchFragmentDirections.actionGlobalNoInternetFragment()
             findNavController().navigate(action)
         }
         binding = FragmentSearchBinding.inflate(inflater, container, false)
         configureRecyclerView()
         configureSearch()
-        viewModelAuth.searchSuggestions.observe(viewLifecycleOwner, Observer {
+
+        viewModelAuth.searchSuggestions.reObserve(viewLifecycleOwner, {
             suggestionsAdapter.data = ArrayList(it)
         })
-
 
         return binding.root
     }
 
     private fun configureRecyclerView() {
-        with(binding.recyclerViewSearchResults) {
+       binding.recyclerViewSearchResults.apply {
             adapter = suggestionsAdapter
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(context)
@@ -68,9 +68,9 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
     private fun configureSearch() {
 
         binding.searchView.setOnClickListener {
-            with(binding.searchView) {
+            binding.searchView.apply {
                 if (isIconified) {
-                    background = requireActivity().getDrawable(R.drawable.search_background_highlighted)
+                    background =  ContextCompat.getDrawable(requireContext(),R.drawable.search_background_highlighted)
                     isIconified = false
                 }
             }
@@ -84,7 +84,7 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
                     if (newQuery.trim().isNotEmpty()) {
                         viewModelAuth.searchQuery.value = newQuery
                     } else {
-                        suggestionsAdapter.data = ArrayList()
+                        suggestionsAdapter.data.clear()
                     }
                     return false
                 }
@@ -92,9 +92,5 @@ class SearchFragment : Fragment(), SuggestionsAdapter.Callback {
         }
     }
 
-    override fun sendFriendRequest(receiver: User) {
-        val friendRequest = SerializeFriendRequest(senderID = user.userID, receiverID = receiver.userID)
-        viewModelChat.sendFriendRequest(friendRequest)
-    }
 }
 

@@ -18,7 +18,7 @@ class SocialFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val adapter = FriendsViewPagerAdapter(this)
+        val adapter = SocialMediaViewPagerAdapter(this)
         binding.pager.adapter = adapter
 
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->

@@ -40,3 +40,4 @@ fun <T> LiveData<T>.observeRequest(lifecycleOwner: LifecycleOwner, observer: Obs
     })
 }
 fun ConnectivityManager.isConnected() = this.activeNetwork != null
+fun ConnectivityManager.isNotConnected() = !isConnected()

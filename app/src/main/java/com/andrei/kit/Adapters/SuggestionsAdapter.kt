@@ -5,11 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.kit.databinding.UserSuggestionBinding
 import com.andrei.kit.models.User
 import java.util.*
 
-class SuggestionsAdapter(val callback: Callback) : RecyclerView.Adapter<SuggestionsAdapter.ViewHolder>() {
+class SuggestionsAdapter : RecyclerView.Adapter<SuggestionsAdapter.ViewHolder>() {
     private var context: Context? = null
     var data: ArrayList<User> = ArrayList()
         set(value) {
@@ -39,16 +40,10 @@ class SuggestionsAdapter(val callback: Callback) : RecyclerView.Adapter<Suggesti
     inner class ViewHolder(var binding: UserSuggestionBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bindData(user: User) {
             binding.user = user
-            binding.addFriendButton.setOnClickListener {
-                callback.sendFriendRequest(user)
-                binding.addFriendButton.visibility = View.INVISIBLE
-            }
+
         }
 
     }
 
-    interface Callback {
-        fun sendFriendRequest(receiver: User)
-    }
 
 }

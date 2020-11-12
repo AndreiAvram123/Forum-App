@@ -13,6 +13,7 @@ import com.andrei.kit.viewModels.ViewModelChat
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.kit.Adapters.CustomDivider
 import com.andrei.kit.utils.observeRequest
+import com.andrei.kit.utils.reObserve
 
 
 class FriendRequestFragment : Fragment() {
@@ -25,14 +26,13 @@ class FriendRequestFragment : Fragment() {
 
         val binding = FragmentFriendRequestBinding.inflate(inflater, container, false)
 
-        with(binding.friendRequestsList) {
+       binding.friendRequestsList.apply {
             adapter = requestAdapter
             layoutManager = LinearLayoutManager(requireContext())
             addItemDecoration(CustomDivider(20))
         }
 
-        viewModelChat.refreshFriendRequests()
-        viewModelChat.friendRequests.observe(viewLifecycleOwner, {
+        viewModelChat.friendRequests.reObserve(viewLifecycleOwner, {
             requestAdapter.setData(it)
         })
         return binding.root
@@ -47,7 +47,9 @@ class FriendRequestFragment : Fragment() {
                 Status.ERROR->{
 
                 }
-                Status.LOADING ->{}
+                Status.LOADING ->{
+
+                }
 
             }
         })

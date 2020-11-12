@@ -70,7 +70,7 @@
     </fragment>
     <fragment
         android:id="@+id/friends"
-        android:name="com.andrei.kit.fragments.SocialFragment"
+        android:name="com.andrei.kit.fragments.ChatsFragment"
         android:label="FriendsFragment"/>
     <fragment
         android:id="@+id/imageZoomFragment"
