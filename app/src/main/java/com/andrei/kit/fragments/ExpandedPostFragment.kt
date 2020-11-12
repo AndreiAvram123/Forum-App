@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.Navigation
@@ -25,7 +27,9 @@ import com.andrei.kit.viewModels.ViewModelPost
 import com.andrei.dataLayer.models.serialization.SerializeComment
 import com.andrei.kit.utils.observeRequest
 import com.andrei.kit.utils.reObserve
+import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
+import com.jama.carouselview.enums.IndicatorAnimationType
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -50,14 +54,7 @@ class ExpandedPostFragment : Fragment() {
     }
 
     private val adapterComments by lazy{
-        AdapterComments().also {adapterComments->
-            binding.recyclerComments.apply {
-                adapter = adapterComments
-                setHasFixedSize(true)
-                layoutManager = LinearLayoutManager(context)
-                addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-            }
-        }
+        AdapterComments()
     }
 
     private val args: ExpandedPostFragmentArgs by navArgs()
@@ -67,10 +64,20 @@ class ExpandedPostFragment : Fragment() {
 
             binding = PostExpandedFragmentBinding.inflate(layoutInflater, container, false)
             attachObservers()
+            configureRecycleView()
             return binding.root
         }
 
-        private fun attachObservers() {
+    private fun configureRecycleView() {
+        binding.recyclerComments.apply {
+            adapter = adapterComments
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(context)
+            addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        }
+    }
+
+    private fun attachObservers() {
 
             viewModelPost.getPostByID(args.postID).reObserve(viewLifecycleOwner, {
                 when(it.status){
@@ -122,11 +129,23 @@ class ExpandedPostFragment : Fragment() {
                     showCommentSheet()
                 }
             }
-            binding.postImageExpanded.setOnClickListener {
-                // TODO: 11/11/2020
-                //val action = ExpandedPostFragmentDirections.actionGlobalImageZoomFragment(post.image, false)
-              //  findNavController().navigate(action)
+            binding.carouselPostExpanded.apply{
+                val images = post.images.split(", ")
+                size = images.size
+                indicatorAnimationType = IndicatorAnimationType.SLIDE
+                setCarouselViewListener { view, position ->
+                    val imageView = view.findViewById<ImageView>(R.id.image_item_carousel)
+                    Glide.with(imageView).load(images[position])
+                            .into(imageView)
+                   view.setOnClickListener {
+                       val action = ExpandedPostFragmentDirections.actionGlobalImageZoomFragment(images[position], false)
+                   findNavController().navigate(action)
+                   }
+                 }
+
+                show()
             }
+
         }
 
         private fun showCommentSheet() {
