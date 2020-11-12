@@ -48,7 +48,7 @@ class SearchFragment : Fragment(){
         configureSearch()
 
         viewModelAuth.searchSuggestions.reObserve(viewLifecycleOwner, {
-            suggestionsAdapter.data = ArrayList(it)
+            suggestionsAdapter.data = it.toMutableList()
         })
 
         return binding.root
@@ -64,13 +64,26 @@ class SearchFragment : Fragment(){
 
     }
 
+   private fun changeSearchViewAspect(query:String){
+       if(query.isNotEmpty()){
+           highlightSearchBar()
+       }else{
+           binding.searchView.background =  ContextCompat.getDrawable(requireContext(),R.drawable.search_background)
+       }
+   }
+
+    private fun highlightSearchBar(){
+        binding.searchView.background =  ContextCompat.getDrawable(requireContext(),R.drawable.search_background_highlighted)
+    }
+
+
 
     private fun configureSearch() {
 
         binding.searchView.setOnClickListener {
             binding.searchView.apply {
                 if (isIconified) {
-                    background =  ContextCompat.getDrawable(requireContext(),R.drawable.search_background_highlighted)
+                   highlightSearchBar()
                     isIconified = false
                 }
             }
@@ -86,6 +99,7 @@ class SearchFragment : Fragment(){
                     } else {
                         suggestionsAdapter.data.clear()
                     }
+                    changeSearchViewAspect(newQuery)
                     return false
                 }
             })

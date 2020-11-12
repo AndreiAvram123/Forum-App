@@ -12,7 +12,7 @@ import java.util.*
 
 class SuggestionsAdapter : RecyclerView.Adapter<SuggestionsAdapter.ViewHolder>() {
     private var context: Context? = null
-    var data: ArrayList<User> = ArrayList()
+    var data: MutableList<User> = ArrayList()
         set(value) {
             field = value
             notifyDataSetChanged()
