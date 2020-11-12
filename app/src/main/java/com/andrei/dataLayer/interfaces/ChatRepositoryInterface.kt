@@ -9,8 +9,8 @@ import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeMessage
 import retrofit2.http.*
 
-//todo
-//wrap in a response
+
+
 interface ChatRepositoryInterface {
 
     @GET("/api/user/{userID}/chats")

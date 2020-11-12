@@ -64,13 +64,6 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    val lastChatsMessage: LiveData<List<Int>> by lazy {
-        chatDao.getLastChatsMessage()
-    }.also {
-         coroutineScope.launch {
-             fetchLastChatsMessage()
-         }
-    }
 
     private suspend fun fetchLastChatsMessage() {
         try {

@@ -103,11 +103,18 @@ class MessengerService : Service() {
 
     private fun getEventHandler(): EventHandler = object : EventHandler {
         override fun onOpen() {
+            //no implementation needed
         }
 
-        override fun onComment(comment: String?) {}
-        override fun onClosed() {}
-        override fun onError(t: Throwable?) {}
+        override fun onComment(comment: String?) {
+            //no implementation needed
+        }
+        override fun onClosed() {
+            //no implementation needed
+        }
+        override fun onError(t: Throwable?) {
+            //no implementation needed
+        }
 
 
         override fun onMessage(event: String?, messageEvent: MessageEvent) {
