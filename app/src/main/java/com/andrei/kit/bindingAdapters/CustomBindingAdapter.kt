@@ -29,6 +29,14 @@ fun getImage(photoView: PhotoView, imageURl: String?) {
                 .into(photoView)
     }
 }
+@BindingAdapter("firstImageFromString")
+fun getFirstImageFromStringData(imageView: ImageView ,data: String?) {
+    if (!data.isNullOrEmpty()) {
+        val images = data.split(", ")
+        Glide.with(imageView).load(images.first())
+                .into(imageView)
+    }
+}
 
 @BindingAdapter("dateFromUnix")
 fun getDateFromUnix(textView: TextView, unixTime: Long) {
