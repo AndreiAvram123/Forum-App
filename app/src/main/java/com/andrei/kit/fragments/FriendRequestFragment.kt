@@ -32,7 +32,7 @@ class FriendRequestFragment : Fragment() {
             addItemDecoration(CustomDivider(20))
         }
 
-        viewModelChat.friendRequests.reObserve(viewLifecycleOwner, {
+        viewModelChat.receivedFriendRequests.reObserve(viewLifecycleOwner, {
             requestAdapter.setData(it)
         })
         return binding.root

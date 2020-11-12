@@ -61,6 +61,10 @@
     <string name="account_header">Account</string>
     <string name="account_created">We have created your account, go to login screen now</string>
     <string name="key_token">KEY_TOKEN</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_to_friends">Add to friends</string>
+    <string name="invitation_sent">Invitation sent</string>
 
 
 </resources>

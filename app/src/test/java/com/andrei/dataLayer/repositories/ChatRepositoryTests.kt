@@ -41,7 +41,7 @@ class ChatRepositoryTest {
 
     @Test
     fun shouldReturnFriendRequests() = runBlocking {
-        val fetchedData = repo.fetchFriendRequests(testUserID)
+        val fetchedData = repo.fetchReceivedFriendRequests(testUserID)
         Assert.assertNotNull(fetchedData)
     }
 
@@ -61,15 +61,10 @@ class ChatRepositoryTest {
     @Test
     fun `should return 200 response when fetching friend requests`() {
         runBlocking {
-            val response = repo.fetchFriendRequests(testUserID)
+          repo.fetchReceivedFriendRequests(testUserID)
         }
     }
 
-    @Test
-    fun `should fetch friends request return 200 response`() {
-        runBlocking {
-            val fetchedFriends = repo.fetchFriends(testUserID) }
-    }
 
 
 }

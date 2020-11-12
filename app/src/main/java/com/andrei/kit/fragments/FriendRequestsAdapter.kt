@@ -38,8 +38,6 @@ class FriendRequestsAdapter(val acceptRequest: (request: FriendRequest) -> Unit)
             binding.request = item
             binding.acceptRequestButton.setOnClickListener {
                 acceptRequest(item)
-                data.remove(item)
-                notifyItemRemoved(data.indexOf(item))
             }
 
         }

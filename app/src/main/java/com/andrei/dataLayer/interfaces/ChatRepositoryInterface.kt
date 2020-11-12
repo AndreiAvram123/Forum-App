@@ -34,11 +34,10 @@ interface ChatRepositoryInterface {
     suspend fun sendFriendRequest(@Body friendRequest: SerializeFriendRequest):ServerResponse
 
     @GET("/api/user/{userID}/receivedRequests")
-    suspend fun fetchFriendRequests(@Path("userID") userID: String): List<FriendRequest>
+    suspend fun fetchReceivedFriendRequests(@Path("userID") userID: String): List<FriendRequest>
 
-
-    @GET("/api/user/{userID}/friends")
-    suspend fun fetchFriends(@Path("userID") userID: String): List<UserDTO>
+    @GET("/api/user/{userID}/sentRequests")
+    suspend fun fetchSentFriendRequests(@Path("userID") userID: String): List<FriendRequest>
 
     @GET("/api/user/{userID}/lastMessages")
     suspend fun fetchLastChatsMessage(@Path("userID") userID: String): List<MessageDTO>

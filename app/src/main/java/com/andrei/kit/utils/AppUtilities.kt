@@ -48,3 +48,6 @@ fun Uri.toDrawable(context: Context): Drawable {
     val byteArray = byteArrayOutputStream.toByteArray()
     return Base64.encodeToString(byteArray, Base64.DEFAULT);
 }
+
+fun ConnectivityManager.isConnected() = this.activeNetwork != null
+fun ConnectivityManager.isNotConnected() = !isConnected()

@@ -2,21 +2,17 @@ package com.andrei.kit.viewModels
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.andrei.dataLayer.engineUtils.Resource
-import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.models.Chat
 import com.andrei.kit.models.Message
-import com.andrei.kit.models.User
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeMessage
 import com.andrei.dataLayer.repositories.ChatRepository
-import kotlinx.coroutines.launch
+import com.andrei.kit.utils.addAndNotify
 
 
 class ViewModelChat @ViewModelInject constructor(
-        private val chatRepository: ChatRepository,
-        private val user: User
+        private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     val currentChatId: MutableLiveData<Int> = MutableLiveData()
@@ -28,9 +24,18 @@ class ViewModelChat @ViewModelInject constructor(
 
 
 
-    val friendRequests = chatRepository.friendRequests
+    val receivedFriendRequests = chatRepository.receivedFriendRequests
 
+    private val sentFriendRequests = chatRepository.sentFriendRequests
 
+    val allFriendRequests = MediatorLiveData<MutableList<FriendRequest>>().also{
+        it.addSource(receivedFriendRequests) {newValue ->
+           it.addAndNotify(newData = newValue)
+        }
+        it.addSource(sentFriendRequests){newValue->
+            it.addAndNotify(newData = newValue)
+        }
+    }
 
     val recentMessages: LiveData<List<Message>> = Transformations.switchMap(currentChatId) {
         currentChatId.value?.let {
