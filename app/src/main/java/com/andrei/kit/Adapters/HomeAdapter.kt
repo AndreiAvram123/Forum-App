@@ -47,14 +47,14 @@ class HomeAdapter(
         fun bind(position: Int) {
             val post = getItem(position) ?: return
             binding.post = post
-            binding.postCarousel.setOnClickListener {
+            binding.postTitleHomeItem.setOnClickListener {
                 if (isInternetActive()) {
-                    val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(post.id)
-                    Navigation.findNavController(binding.root).navigate(action)
+                    goToExpandedFragment(post)
                 } else {
                      displayInternetConnectionError(binding)
                 }
             }
+
             binding.bookmarkPostItem.setOnClickListener{
                 if(isInternetActive()){
                     if(post.isFavorite){
@@ -75,9 +75,17 @@ class HomeAdapter(
                    val imageView = view.findViewById<ImageView>(R.id.image_item_carousel)
                     Glide.with(imageView).load(images[position])
                             .into(imageView)
+                  view.setOnClickListener {
+                      goToExpandedFragment(post)
+                  }
                 }
                 show()
             }
+        }
+
+        private fun goToExpandedFragment(post: Post) {
+            val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(post.id)
+            Navigation.findNavController(binding.root).navigate(action)
         }
     }
     private fun isInternetActive():Boolean{

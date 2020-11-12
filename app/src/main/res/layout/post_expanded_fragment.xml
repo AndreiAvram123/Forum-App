@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="post"
             type="com.andrei.kit.models.Post" />
@@ -44,40 +43,50 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <ImageView
-                    android:id="@+id/post_image_expanded"
+                <com.jama.carouselview.CarouselView
+                    android:id="@+id/carousel_post_expanded"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:adjustViewBounds="true"
-                    android:background="@drawable/round_image"
-                    android:scaleType="centerInside"
+                    android:layout_marginTop="8dp"
+                    android:cropToPadding="false"
+                    app:carouselOffset="center"
+                    app:enableSnapping="true"
+                    app:indicatorAnimationType="slide"
+                    app:indicatorPadding="5"
+                    app:indicatorRadius="7"
+                    app:indicatorSelectedColor="@color/highlight"
+                    app:indicatorUnselectedColor="@color/colorPrimary"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/recipe_name_expanded"
-                    tools:src="@tools:sample/backgrounds/scenic" />
+                    app:layout_constraintTop_toBottomOf="@+id/user_image_post_expanded"
+
+                    app:resource="@layout/layout_carousel"
+                    app:setAutoPlay="false"
+                    app:size="10"
+                    tools:src="@tools:sample/backgrounds/scenic"
+                    tools:srcCompat="@drawable/placeholder" />
 
                 <TextView
-                    android:id="@+id/recipe_name_expanded"
+                    android:id="@+id/post_name_expanded"
                     style="@style/important_text_large"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="16dp"
                     android:autoSizeTextType="uniform"
                     android:text="@{post.title}"
+                    app:layout_constraintBottom_toBottomOf="@+id/user_image_post_expanded"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.498"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/back_button_expanded"
-                    tools:text="Nela ion" />
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@+id/user_image_post_expanded"
+                    app:layout_constraintTop_toTopOf="@+id/user_image_post_expanded"
+                    tools:text="How to be a cactus" />
 
                 <ImageView
                     android:id="@+id/back_button_expanded"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="24dp"
                     android:src="@drawable/ic_arrow_back_black_32dp"
@@ -103,7 +112,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/post_image_expanded">
+                    app:layout_constraintTop_toBottomOf="@+id/carousel_post_expanded">
 
                     <TextView
                         android:id="@+id/author_post_expanded"
@@ -156,6 +165,17 @@
                         app:layout_constraintVertical_bias="0.0"
                         tools:text="2/17/2020" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <ImageView
+                    android:id="@+id/user_image_post_expanded"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="24dp"
+                    app:imageFromURL="@{post.user.profilePicture}"
+                    app:layout_constraintStart_toEndOf="@+id/back_button_expanded"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:srcCompat="@tools:sample/avatars" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.recyclerview.widget.RecyclerView
