@@ -22,7 +22,6 @@ import com.andrei.dataLayer.models.serialization.SerializePost
 import com.andrei.kit.utils.observeRequest
 import com.andrei.kit.utils.toBase64
 import com.andrei.kit.utils.toDrawable
-import com.bumptech.glide.Glide
 import com.jama.carouselview.enums.IndicatorAnimationType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -76,7 +75,6 @@ class FragmentAddPost : Fragment() {
         }
         binding.submitPostButton.setOnClickListener {
             if (areFieldsValid()) {
-                toggleUi()
                 uploadPost(user)
             } else {
                 displayError()
@@ -107,7 +105,7 @@ class FragmentAddPost : Fragment() {
 
     }
 
-    private fun toggleUi() {
+    private fun showLoading() {
         binding.uploadProgressBar.visibility = View.VISIBLE
         binding.postContentAdd.isEnabled = false
         binding.postTitleAdd.isEnabled = false
@@ -118,15 +116,13 @@ class FragmentAddPost : Fragment() {
 
 
     private fun uploadPost(user: User) {
-
+           showLoading()
            val imageData = mutableListOf<String>()
-        //todo
-        //maybe send each image individually
-           images.forEach {
-               imageData.add(it.file.toUri().toDrawable(requireContext()).toBase64())
-           }
 
             lifecycleScope.launch(Dispatchers.Main) {
+                images.forEach {
+                    imageData.add(it.file.toUri().toDrawable(requireContext()).toBase64())
+                }
                 val post = SerializePost(
                         title = binding.postTitleAdd.text.toString(),
                         content = binding.postContentAdd.text.toString(),
