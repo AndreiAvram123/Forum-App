@@ -8,5 +8,11 @@ import com.andrei.dataLayer.repositories.UserRepository
 class ViewModelUser @ViewModelInject constructor(
         private val userRepository: UserRepository
 ):ViewModel() {
+
     fun getUser(userID:String) = userRepository.fetchUserDetails(userID)
+
+    val friends by lazy {
+        userRepository.friends
+    }
+
 }

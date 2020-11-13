@@ -11,9 +11,3 @@ data class FriendRequest(
         @SerializedName("receiver")
         val receiver: UserDTO
 )
-
-enum class FriendRequestStatus{
-        ACCEPTED,
-        SENT,
-        RECEIVED
-}

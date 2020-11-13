@@ -67,6 +67,7 @@
     <string name="invitation_sent">Invitation sent</string>
     <string name="accept_invitation">Accept invitation</string>
     <string name="friends">You have added this person</string>
+    <string name="send_friend_request">Send friend request</string>
 
 
 </resources>

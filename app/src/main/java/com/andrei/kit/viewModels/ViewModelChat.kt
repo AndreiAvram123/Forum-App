@@ -24,9 +24,15 @@ class ViewModelChat @ViewModelInject constructor(
 
 
 
-    val receivedFriendRequests = chatRepository.receivedFriendRequests
+    val receivedFriendRequests by lazy {
+        chatRepository.receivedFriendRequests
+    }
 
-    private val sentFriendRequests = chatRepository.sentFriendRequests
+    private val sentFriendRequests by lazy {
+        chatRepository.sentFriendRequests
+    }
+
+
 
     val allFriendRequests = MediatorLiveData<MutableList<FriendRequest>>().also{
         it.addSource(receivedFriendRequests) {newValue ->

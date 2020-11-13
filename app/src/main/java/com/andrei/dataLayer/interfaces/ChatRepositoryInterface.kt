@@ -31,7 +31,7 @@ interface ChatRepositoryInterface {
 
 
     @POST("/api/friendRequests/send")
-    suspend fun sendFriendRequest(@Body friendRequest: SerializeFriendRequest):ServerResponse
+    suspend fun sendFriendRequest(@Body friendRequest: SerializeFriendRequest):FriendRequest
 
     @GET("/api/user/{userID}/receivedRequests")
     suspend fun fetchReceivedFriendRequests(@Path("userID") userID: String): List<FriendRequest>

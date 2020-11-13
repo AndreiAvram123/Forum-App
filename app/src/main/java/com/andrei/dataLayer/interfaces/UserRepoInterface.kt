@@ -6,5 +6,8 @@ import retrofit2.http.Path
 
 interface UserRepoInterface {
     @GET("/api/user/{userID}")
-    suspend fun fetchUser(@Path("userID") query: String): UserDTO
+    suspend fun fetchUser(@Path("userID") userID: String): UserDTO
+
+    @GET("/api/user/{userID}/friends")
+    suspend fun fetchUserFriends(@Path("userID") userID: String): List<UserDTO>
 }
