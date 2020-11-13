@@ -33,7 +33,9 @@ class FriendRequestFragment : Fragment() {
         }
 
         viewModelChat.receivedFriendRequests.reObserve(viewLifecycleOwner, {
-            requestAdapter.setData(it)
+            if(!it.isNullOrEmpty()) {
+                requestAdapter.setData(it)
+            }
         })
         return binding.root
     }
