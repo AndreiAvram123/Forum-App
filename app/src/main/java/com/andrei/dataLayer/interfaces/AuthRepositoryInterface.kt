@@ -5,7 +5,7 @@ import com.andrei.dataLayer.models.serialization.AuthenticationResponse
 import com.andrei.dataLayer.models.serialization.RegisterUserDTO
 import retrofit2.http.*
 
-interface UserRepositoryInterface {
+interface AuthRepositoryInterface {
 
 
     @GET("/api/user/autocomplete/{query}")

@@ -1,9 +1,11 @@
 package com.andrei.kit.bindingAdapters
 
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import com.andrei.dataLayer.models.deserialization.FriendRequestStatus
 import com.andrei.kit.R
 import com.bumptech.glide.Glide
 import com.github.chrisbanes.photoview.PhotoView
