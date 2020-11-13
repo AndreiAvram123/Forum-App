@@ -28,7 +28,7 @@ class ViewModelChat @ViewModelInject constructor(
         chatRepository.receivedFriendRequests
     }
 
-    private val sentFriendRequests by lazy {
+     val sentFriendRequests by lazy {
         chatRepository.sentFriendRequests
     }
 

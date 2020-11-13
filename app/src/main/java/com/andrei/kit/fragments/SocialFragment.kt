@@ -24,7 +24,8 @@ class SocialFragment : Fragment() {
         TabLayoutMediator(binding.tabLayout, binding.pager) { tab, position ->
             when (position) {
                 0 -> tab.text = "Chats"
-                1 -> tab.text = "Notifications"
+                1 -> tab.text = "Received"
+                2-> tab.text = "Sent"
             }
 
         }.attach()

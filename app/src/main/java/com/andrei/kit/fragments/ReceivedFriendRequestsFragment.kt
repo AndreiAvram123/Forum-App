@@ -8,15 +8,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.andrei.dataLayer.engineUtils.Status
-import com.andrei.kit.databinding.FragmentFriendRequestBinding
 import com.andrei.kit.viewModels.ViewModelChat
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.kit.Adapters.CustomDivider
+import com.andrei.kit.databinding.LayoutFragmentFriendRequestBinding
 import com.andrei.kit.utils.observeRequest
 import com.andrei.kit.utils.reObserve
 
 
-class FriendRequestFragment : Fragment() {
+class ReceivedFriendRequestsFragment private constructor() : Fragment() {
 
     private val viewModelChat: ViewModelChat by activityViewModels()
 
@@ -24,7 +24,7 @@ class FriendRequestFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
 
-        val binding = FragmentFriendRequestBinding.inflate(inflater, container, false)
+        val binding = LayoutFragmentFriendRequestBinding.inflate(inflater, container, false)
 
        binding.friendRequestsList.apply {
             adapter = requestAdapter
@@ -55,5 +55,9 @@ class FriendRequestFragment : Fragment() {
 
             }
         })
+    }
+    companion object{
+        @JvmStatic
+        fun getInstance() = ReceivedFriendRequestsFragment()
     }
 }

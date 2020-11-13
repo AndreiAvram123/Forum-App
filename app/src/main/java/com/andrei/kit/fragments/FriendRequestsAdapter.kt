@@ -1,12 +1,13 @@
 package com.andrei.kit.fragments
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.andrei.kit.databinding.RequestItemBinding
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 
-class FriendRequestsAdapter(val acceptRequest: (request: FriendRequest) -> Unit)
+class FriendRequestsAdapter(val processRequest: ((request: FriendRequest) -> Unit)? = null)
     : RecyclerView.Adapter<FriendRequestsAdapter.ViewHolder>() {
 
     private var data: ArrayList<FriendRequest> = ArrayList()
@@ -36,8 +37,12 @@ class FriendRequestsAdapter(val acceptRequest: (request: FriendRequest) -> Unit)
     inner class ViewHolder(val binding: RequestItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: FriendRequest) {
             binding.request = item
-            binding.acceptRequestButton.setOnClickListener {
-                acceptRequest(item)
+            if(processRequest != null){
+                binding.acceptRequestButton.setOnClickListener {
+                    processRequest.invoke(item)
+                }
+            }else{
+                binding.acceptRequestButton.visibility = View.GONE
             }
 
         }
