@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.andrei.kit.databinding.FragmentNoInternetBinding
 import com.andrei.kit.utils.getConnectivityManager
+import com.andrei.kit.utils.isConnected
 
 class NoInternetFragment : Fragment() {
 
@@ -18,7 +19,7 @@ class NoInternetFragment : Fragment() {
 
         val binding = FragmentNoInternetBinding.inflate(inflater, container, false)
         binding.retry.setOnClickListener {
-            if (requireContext().getConnectivityManager().activeNetwork != null) {
+            if (requireContext().getConnectivityManager().isConnected()) {
                 findNavController().popBackStack()
             }
         }

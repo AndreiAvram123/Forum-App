@@ -2,21 +2,17 @@ package com.andrei.kit.viewModels
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.andrei.dataLayer.engineUtils.Resource
-import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.models.Chat
 import com.andrei.kit.models.Message
-import com.andrei.kit.models.User
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeMessage
 import com.andrei.dataLayer.repositories.ChatRepository
-import kotlinx.coroutines.launch
+import com.andrei.kit.utils.addAndNotify
 
 
 class ViewModelChat @ViewModelInject constructor(
-        private val chatRepository: ChatRepository,
-        private val user: User
+        private val chatRepository: ChatRepository
 ) : ViewModel() {
 
     val currentChatId: MutableLiveData<Int> = MutableLiveData()
@@ -27,22 +23,19 @@ class ViewModelChat @ViewModelInject constructor(
     }
 
 
-    fun refreshFriendRequests() {
-        viewModelScope.launch {
-            friendRequests.postValue(chatRepository.fetchFriendRequests(user))
+
+    val receivedFriendRequests = chatRepository.receivedFriendRequests
+
+    private val sentFriendRequests = chatRepository.sentFriendRequests
+
+    val allFriendRequests = MediatorLiveData<MutableList<FriendRequest>>().also{
+        it.addSource(receivedFriendRequests) {newValue ->
+           it.addAndNotify(newData = newValue)
+        }
+        it.addSource(sentFriendRequests){newValue->
+            it.addAndNotify(newData = newValue)
         }
     }
-
-    val friendRequests: MutableLiveData<ArrayList<FriendRequest>> by lazy {
-        MutableLiveData<ArrayList<FriendRequest>>().also {
-            viewModelScope.launch {
-                val data = chatRepository.fetchFriendRequests(user)
-                friendRequests.value = data
-            }
-
-        }
-    }
-
 
     val recentMessages: LiveData<List<Message>> = Transformations.switchMap(currentChatId) {
         currentChatId.value?.let {
@@ -60,22 +53,10 @@ class ViewModelChat @ViewModelInject constructor(
 
     fun sendMessage(serializeMessage: SerializeMessage) = chatRepository.pushMessage(serializeMessage)
 
-    fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
-        viewModelScope.launch {
-            chatRepository.sendFriendRequest(friendRequest)
-        }
-    }
+    fun sendFriendRequest(friendRequest: SerializeFriendRequest)  = chatRepository.sendFriendRequest(friendRequest)
 
-    fun acceptFriendRequest(request: FriendRequest) = liveData{
-        emit(Resource.loading<Any>())
-        viewModelScope.launch {
-            val response  = chatRepository.acceptFriendRequest(request)
-            if(response.status == Status.SUCCESS) {
-                friendRequests.value?.remove(request)
-            }
-            emit(response)
-        }
-    }
+
+    fun acceptFriendRequest(request: FriendRequest) = chatRepository.acceptFriendRequest(request)
 }
 
 

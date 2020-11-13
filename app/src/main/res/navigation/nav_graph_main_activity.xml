@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_main_activity"
     app:startDestination="@id/home">
-
+    <!-- The ids of the fragments that are in the nav bar must match the ones inside navigation.xml-->
     <fragment
         android:id="@+id/expandedItemFragment"
         android:name="com.andrei.kit.fragments.ExpandedPostFragment"
@@ -42,8 +42,8 @@
         android:name="com.andrei.kit.fragments.FragmentUserPosts"
         android:label="FragmentMyPosts" >
         <action
-            android:id="@+id/action_my_posts_to_friendsFragment2"
-            app:destination="@id/friends" />
+            android:id="@+id/action_my_posts_to_socialFragment"
+            app:destination="@id/social" />
     </fragment>
     <fragment
         android:id="@+id/messagesFragment"
@@ -68,10 +68,6 @@
             android:id="@+id/action_home_to_settingFragment"
             app:destination="@id/settingFragment" />
     </fragment>
-    <fragment
-        android:id="@+id/friends"
-        android:name="com.andrei.kit.fragments.SocialFragment"
-        android:label="FriendsFragment"/>
     <fragment
         android:id="@+id/imageZoomFragment"
         android:name="com.andrei.kit.fragments.ImageZoomFragment"
@@ -99,4 +95,18 @@
         app:destination="@id/noInternetFragment"
         app:enterAnim="@anim/nav_default_pop_enter_anim"
         app:exitAnim="@anim/nav_default_pop_exit_anim" /><action android:id="@+id/action_global_imageZoomFragment" app:destination="@id/imageZoomFragment"/>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.andrei.kit.fragments.ProfileFragment"
+        android:label="ProfileFragment" >
+        <argument
+            android:name="userID"
+            app:argType="string" />
+    </fragment>
+    <action android:id="@+id/action_global_profileFragment" app:destination="@id/profileFragment" />
+
+    <fragment
+        android:id="@+id/social"
+        android:name="com.andrei.kit.fragments.SocialFragment"
+        android:label="SocialFragment" />
 </navigation>

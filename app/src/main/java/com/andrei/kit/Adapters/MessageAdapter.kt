@@ -83,10 +83,6 @@ class MessageAdapter(private val currentUser: User,
                 val binding = MessageImageSentBinding.inflate(inflator, parent, false)
                 return MessageImageSentViewHolder(binding)
             }
-            ViewTypes.MESSAGE_RECEIVED_IMAGE.id -> {
-                val binding = MessageImageReceivedBinding.inflate(inflator, parent, false)
-                return MessageImageReceivedViewHolder(binding)
-            }
             else -> {
                 val binding = MessageImageReceivedBinding.inflate(inflator, parent, false)
                 return MessageImageReceivedViewHolder(binding)

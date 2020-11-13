@@ -73,8 +73,7 @@ class PostRepository @Inject constructor(private val user: User,
             val post = repo.fetchPostByID(id).toPost()
             checkPostIsBookmarked(post)
             postDao.insertPost(post)
-            val localDBPost  = postDao.getPostByIDSuspend(post.id)
-            emit(Resource.success(localDBPost))
+            emit(Resource.success(post))
         }catch(e:Exception){
             emit(responseHandler.handleException<Post>(e,"fetch post by id"))
         }
@@ -144,9 +143,9 @@ class PostRepository @Inject constructor(private val user: User,
 
     private suspend fun checkPostIsBookmarked(post: Post) {
         val dbPost = postDao.getPostByIDSuspend(post.id)
-         dbPost?.let {
-         post.isFavorite = it.isFavorite
-      }
+        dbPost?.let {
+            post.isFavorite = it.isFavorite
+        }
     }
     private suspend fun mapDomainData(dtoPosts:List<PostDTO>):List<Post>{
         val mappedData =  dtoPosts.map { it.toPost() }

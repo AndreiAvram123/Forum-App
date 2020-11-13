@@ -30,7 +30,7 @@ interface RoomPostDao {
     fun getPostByID(postID: Int): LiveData<Post>
 
     @Query("SELECT * FROM post WHERE postID = :postID LIMIT 1")
-    suspend fun getPostByIDSuspend(postID: Int): Post
+    suspend fun getPostByIDSuspend(postID: Int): Post?
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

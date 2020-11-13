@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.andrei.kit.models.Chat
-import com.andrei.kit.models.Message
 import com.andrei.kit.models.User
 import com.andrei.dataLayer.dataMappers.ChatMapper
 import com.andrei.dataLayer.dataMappers.toMessage
@@ -14,11 +13,12 @@ import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.dataLayer.interfaces.ChatRepositoryInterface
 import com.andrei.dataLayer.interfaces.dao.ChatDao
 import com.andrei.dataLayer.interfaces.dao.MessageDao
-import com.andrei.dataLayer.models.ChatNotificationDTO
-import com.andrei.dataLayer.models.ServerResponse
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeMessage
+import com.andrei.kit.utils.addAndNotify
+import com.andrei.kit.utils.isConnected
+import com.andrei.kit.utils.removeAndNotify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -41,10 +41,23 @@ class ChatRepository @Inject constructor(
         }
     }
 
-
-    private val chatNotifications by lazy {
-        MutableLiveData<ArrayList<ChatNotificationDTO>>()
+    val receivedFriendRequests:MutableLiveData<MutableList<FriendRequest>> by lazy {
+        MutableLiveData<MutableList<FriendRequest>>().also{
+            coroutineScope.launch {
+                fetchReceivedFriendRequests(user)
+            }
+        }
     }
+
+    val sentFriendRequests:MutableLiveData<MutableList<FriendRequest>> by lazy {
+        MutableLiveData<MutableList<FriendRequest>>().also {
+            coroutineScope.launch {
+                fetchSentFriendRequests()
+            }
+        }
+    }
+
+
 
     val userChats: LiveData<List<Chat>> by lazy {
         liveData {
@@ -60,13 +73,6 @@ class ChatRepository @Inject constructor(
         }
     }
 
-    val lastChatsMessage: LiveData<List<Int>> by lazy {
-        chatDao.getLastChatsMessage()
-    }.also {
-         coroutineScope.launch {
-             fetchLastChatsMessage()
-         }
-    }
 
     private suspend fun fetchLastChatsMessage() {
         try {
@@ -115,28 +121,40 @@ class ChatRepository @Inject constructor(
 
 
 
-    suspend fun acceptFriendRequest(request: FriendRequest):Resource<Any> {
-        return try {
+     fun acceptFriendRequest(request: FriendRequest) = liveData{
+        emit(Resource.loading<Any>())
+         try {
             val data = repo.acceptFriendRequest(request.id)
             val chat = ChatMapper.mapDtoObjectToDomainObject(data, request.receiver.userID)
             chatDao.insert(chat)
-            responseHandler.handleSuccess(Any())
+            receivedFriendRequests.removeAndNotify(request)
+            emit(responseHandler.handleSuccess(Any()))
         }catch(e:Exception){
-            responseHandler.handleException(e,"Accept friend request")
+            responseHandler.handleException<Any>(e,"Accept friend request")
         }
         }
 
 
-    suspend fun fetchFriendRequests(user: User): ArrayList<FriendRequest> {
-        if (connectivityManager.activeNetwork != null) {
-            return ArrayList(repo.fetchFriendRequests(user.userID))
+    private suspend fun fetchReceivedFriendRequests(user: User) {
+        if (connectivityManager.isConnected()) {
+            val fetchedData = repo.fetchReceivedFriendRequests(user.userID)
+            receivedFriendRequests.addAndNotify(fetchedData.toMutableList())
         }
-        return ArrayList()
+    }
+    private suspend fun fetchSentFriendRequests() {
+        if(connectivityManager.isConnected()){
+            val fetchedData = repo.fetchSentFriendRequests(user.userID)
+            sentFriendRequests.addAndNotify(fetchedData.toMutableList())
+        }
     }
 
-    suspend fun sendFriendRequest(friendRequest: SerializeFriendRequest) {
-        if (connectivityManager.activeNetwork != null) {
+      fun sendFriendRequest(friendRequest: SerializeFriendRequest) = liveData {
+        emit(Resource.loading<Any>())
+        try {
             repo.sendFriendRequest(friendRequest)
+            emit(Resource.success(Any()))
+        }catch (e:Exception){
+            emit(responseHandler.handleException<Any>(e,"Send friend request"))
         }
     }
 

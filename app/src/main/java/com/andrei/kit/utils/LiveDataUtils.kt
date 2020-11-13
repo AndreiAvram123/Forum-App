@@ -11,7 +11,7 @@ fun <T> LiveData<T>.reObserve(owner: LifecycleOwner, observer: Observer<T>) {
     removeObserver(observer)
     observe(owner, observer)
 }
-fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+fun <T> LiveData<T>.observeOnceForValue(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
     observe(lifecycleOwner, object : Observer<T> {
         override fun onChanged(t: T?) {
             observer.onChanged(t)
@@ -39,4 +39,19 @@ fun <T> LiveData<T>.observeRequest(lifecycleOwner: LifecycleOwner, observer: Obs
         }
     })
 }
-fun ConnectivityManager.isConnected() = this.activeNetwork != null
+fun <T> MutableLiveData< MutableList<T>>.addAndNotify(newData : MutableList<T>){
+    val newValue = ArrayList<T>()
+    value?.let{
+        newData.addAll(it)
+    }
+    newValue.addAll(newData)
+    postValue(newValue)
+}
+fun <T> MutableLiveData< MutableList<T>>.removeAndNotify(itemToRemove :T){
+    val newValue = ArrayList<T>()
+    value?.let{
+        newValue.addAll(it)
+    }
+    newValue.remove(itemToRemove)
+    postValue(newValue)
+}

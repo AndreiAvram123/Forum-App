@@ -17,6 +17,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.jama.carouselview.enums.IndicatorAnimationType
 import com.jama.carouselview.enums.OffsetType
+import okhttp3.internal.notify
 
 class HomeAdapter(
         private val removeFromFavorites : (post:Post)->Unit,

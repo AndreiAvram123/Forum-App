@@ -25,13 +25,13 @@
                 android:id="@+id/write_comment_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="24dp"
                 android:layout_marginBottom="32dp"
+                android:layout_marginEnd="16dp"
                 android:clickable="true"
                 android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:srcCompat="@drawable/ic_edit_blue_24dp" />
+                app:srcCompat="@drawable/ic_baseline_comment_32" />
 
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -47,7 +47,7 @@
                     android:id="@+id/carousel_post_expanded"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:cropToPadding="false"
                     app:carouselOffset="center"
                     app:enableSnapping="true"
@@ -91,7 +91,8 @@
                     android:layout_marginTop="24dp"
                     android:src="@drawable/ic_arrow_back_black_32dp"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_baseline_arrow_back_ios_32" />
 
                 <ImageView
                     android:id="@+id/save_button_expanded"
@@ -171,7 +172,7 @@
                     android:layout_width="50dp"
                     android:layout_height="50dp"
                     android:layout_marginStart="24dp"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="16dp"
                     app:imageFromURL="@{post.user.profilePicture}"
                     app:layout_constraintStart_toEndOf="@+id/back_button_expanded"
                     app:layout_constraintTop_toTopOf="parent"

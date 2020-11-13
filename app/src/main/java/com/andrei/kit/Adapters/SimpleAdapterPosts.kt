@@ -1,5 +1,6 @@
 package com.andrei.kit.Adapters
 
+import android.net.ConnectivityManager
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
@@ -11,9 +12,13 @@ import com.andrei.kit.databinding.LayoutItemPostBinding
 import com.andrei.kit.fragments.ExpandedPostFragmentDirections
 import com.andrei.kit.utils.getConnectivityManager
 import com.andrei.kit.models.Post
+import com.andrei.kit.utils.isConnected
 import java.util.*
 
-class RecyclerViewAdapterPosts : RecyclerView.Adapter<RecyclerViewAdapterPosts.ViewHolder>() {
+class SimpleAdapterPosts(
+        private val connectivityManager: ConnectivityManager
+) : RecyclerView.Adapter<SimpleAdapterPosts.ViewHolder>() {
+
     private val posts = ArrayList<Post>()
 
     fun setData(data: List<Post>) {
@@ -38,7 +43,7 @@ class RecyclerViewAdapterPosts : RecyclerView.Adapter<RecyclerViewAdapterPosts.V
         fun bind(post: Post) {
             binding.post = post
             binding.root.setOnClickListener {
-                if (binding.root.context.getConnectivityManager().activeNetwork != null) {
+                if (connectivityManager.isConnected()) {
                     val action: NavDirections = ExpandedPostFragmentDirections.actionGlobalExpandedItemFragment(posts[adapterPosition].id)
                     Navigation.findNavController(binding.root).navigate(action)
 

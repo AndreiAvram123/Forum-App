@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.Navigation
@@ -19,14 +18,13 @@ import com.andrei.kit.R
 import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.bottomSheets.CommentBottomSheet
 import com.andrei.kit.databinding.PostExpandedFragmentBinding
-import com.andrei.kit.models.Comment
 import com.andrei.kit.models.Post
 import com.andrei.kit.models.User
 import com.andrei.kit.viewModels.ViewModelComments
 import com.andrei.kit.viewModels.ViewModelPost
 import com.andrei.dataLayer.models.serialization.SerializeComment
 import com.andrei.kit.utils.isConnected
-import com.andrei.kit.utils.observeOnce
+import com.andrei.kit.utils.observeOnceForValue
 import com.andrei.kit.utils.observeRequest
 import com.andrei.kit.utils.reObserve
 import com.bumptech.glide.Glide
@@ -115,7 +113,7 @@ class ExpandedPostFragment : Fragment() {
             binding.post = post
             binding.saveButtonExpanded.setOnClickListener {
                 if (post.isFavorite) {
-                    viewModelPost.removeFromFavorites(post).observeOnce(viewLifecycleOwner,{
+                    viewModelPost.removeFromFavorites(post).observeOnceForValue(viewLifecycleOwner,{
                         if(it.status == Status.SUCCESS){
                             informUserPostRemovedFromFavorites()
                             binding.post = post
@@ -123,7 +121,7 @@ class ExpandedPostFragment : Fragment() {
                         }
                     })
                 } else {
-                    viewModelPost.addPostToFavorites(post).observeOnce(viewLifecycleOwner, {
+                    viewModelPost.addPostToFavorites(post).observeOnceForValue(viewLifecycleOwner, {
                        if(it.status == Status.SUCCESS) {
                           informUserPostAddedToFavorites()
                            binding.post = post

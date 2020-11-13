@@ -2,11 +2,8 @@ package com.andrei.kit.Adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.NavDirections
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.andrei.kit.databinding.ItemChatBinding
-import com.andrei.kit.fragments.SocialFragmentDirections
 import com.andrei.kit.models.Chat
 
 class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
@@ -44,8 +41,6 @@ class ChatsAdapter : RecyclerView.Adapter<ChatsAdapter.ViewHolder>() {
                         notifyItemChanged(chats.indexOf(it))
                     }
                 }
-                val action: NavDirections = SocialFragmentDirections.actionGlobalMessagesFragment(chat.chatID)
-                Navigation.findNavController(binding.root).navigate(action)
             }
         }
 
