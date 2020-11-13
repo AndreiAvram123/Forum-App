@@ -39,14 +39,24 @@ fun <T> LiveData<T>.observeRequest(lifecycleOwner: LifecycleOwner, observer: Obs
         }
     })
 }
-fun <T> MutableLiveData< MutableList<T>>.addAndNotify(newData : MutableList<T>){
+fun <T> MutableLiveData< MutableList<T>>.addAndNotify(newData : List<T>){
     val newValue = ArrayList<T>()
     value?.let{
-        newData.addAll(it)
+        newValue.addAll(it)
     }
     newValue.addAll(newData)
     postValue(newValue)
 }
+
+fun <T> MutableLiveData< MutableList<T>>.addAndNotify(item : T){
+    val newValue = ArrayList<T>()
+    value?.let{
+        newValue.addAll(it)
+    }
+    newValue.add(item)
+    postValue(newValue)
+}
+
 fun <T> MutableLiveData< MutableList<T>>.removeAndNotify(itemToRemove :T){
     val newValue = ArrayList<T>()
     value?.let{

@@ -54,7 +54,6 @@ class ChatRepositoryTest {
             //and push it
             val friendRequest = SerializeFriendRequest(senderID = senderID, receiverID = receiverID)
             val response = repo.sendFriendRequest(friendRequest)
-            Assert.assertTrue(response.successful)
         }
     }
 

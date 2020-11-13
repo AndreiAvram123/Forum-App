@@ -41,6 +41,7 @@ class ChatRepository @Inject constructor(
         }
     }
 
+
     val receivedFriendRequests:MutableLiveData<MutableList<FriendRequest>> by lazy {
         MutableLiveData<MutableList<FriendRequest>>().also{
             coroutineScope.launch {
@@ -144,15 +145,14 @@ class ChatRepository @Inject constructor(
     private suspend fun fetchSentFriendRequests() {
         if(connectivityManager.isConnected()){
             val fetchedData = repo.fetchSentFriendRequests(user.userID)
-            sentFriendRequests.addAndNotify(fetchedData.toMutableList())
+            sentFriendRequests.addAndNotify(fetchedData)
         }
     }
 
       fun sendFriendRequest(friendRequest: SerializeFriendRequest) = liveData {
-        emit(Resource.loading<Any>())
         try {
-            repo.sendFriendRequest(friendRequest)
-            emit(Resource.success(Any()))
+           val response = repo.sendFriendRequest(friendRequest)
+            sentFriendRequests.addAndNotify(response)
         }catch (e:Exception){
             emit(responseHandler.handleException<Any>(e,"Send friend request"))
         }

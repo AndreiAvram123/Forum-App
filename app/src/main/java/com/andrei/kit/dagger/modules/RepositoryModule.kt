@@ -3,11 +3,8 @@ package com.andrei.kit.dagger.modules
 import android.content.Context
 import android.net.ConnectivityManager
 import com.andrei.dataLayer.engineUtils.AuthInterceptor
+import com.andrei.dataLayer.interfaces.*
 import com.andrei.kit.user.UserAccountManager
-import com.andrei.dataLayer.interfaces.ChatRepositoryInterface
-import com.andrei.dataLayer.interfaces.CommentRepoInterface
-import com.andrei.dataLayer.interfaces.PostRepositoryInterface
-import com.andrei.dataLayer.interfaces.UserRepositoryInterface
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,7 +40,10 @@ object RepositoryModule {
     fun getPostRepository(retrofit: Retrofit): PostRepositoryInterface = retrofit.create(PostRepositoryInterface::class.java)
 
     @Provides
-    fun getUserRepository(retrofit: Retrofit): UserRepositoryInterface = retrofit.create(UserRepositoryInterface::class.java)
+    fun getAuthRepository(retrofit: Retrofit): AuthRepositoryInterface = retrofit.create(AuthRepositoryInterface::class.java)
+
+    @Provides
+    fun getUserRepository(retrofit: Retrofit): UserRepoInterface = retrofit.create(UserRepoInterface::class.java)
 
     @Provides
     fun getChatRepository(retrofit: Retrofit): ChatRepositoryInterface = retrofit.create(ChatRepositoryInterface::class.java)

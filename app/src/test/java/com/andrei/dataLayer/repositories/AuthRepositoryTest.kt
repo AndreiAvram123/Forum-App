@@ -2,7 +2,7 @@ package com.andrei.dataLayer.repositories
 
 import android.os.Build
 import com.andrei.TestUtilities
-import com.andrei.dataLayer.interfaces.UserRepositoryInterface
+import com.andrei.dataLayer.interfaces.AuthRepositoryInterface
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertNotNull
 import org.junit.Before
@@ -14,12 +14,12 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
 
-class UserRepositoryTest {
-    private lateinit var repo: UserRepositoryInterface
+class AuthRepositoryTest {
+    private lateinit var repo: AuthRepositoryInterface
 
     @Before
     fun initialize() {
-        repo = TestUtilities.retrofit.create(UserRepositoryInterface::class.java)
+        repo = TestUtilities.retrofit.create(AuthRepositoryInterface::class.java)
 
     }
 
