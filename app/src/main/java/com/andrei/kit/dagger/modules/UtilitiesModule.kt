@@ -26,6 +26,7 @@ class UtilitiesModule {
     }
 
 
+
     @Provides
     fun user(): User = FirebaseAuth.getInstance().currentUser!!.toUser()
 

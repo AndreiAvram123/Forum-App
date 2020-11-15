@@ -1,4 +1,4 @@
-package com.andrei.dataLayer.repositories
+package com.andrei.dataLayer.httpTests
 
 import android.os.Build
 import com.andrei.TestUtilities
@@ -32,29 +32,9 @@ class ChatRepositoryTest {
     }
 
     @Test
-    fun shouldUploadComment() {
-        runBlocking {
-            val friendRequest = SerializeFriendRequest(senderID = testUserID, receiverID = testUserID2)
-            repo.sendFriendRequest(friendRequest)
-        }
-    }
-
-    @Test
     fun shouldReturnFriendRequests() = runBlocking {
         val fetchedData = repo.fetchReceivedFriendRequests(testUserID)
         Assert.assertNotNull(fetchedData)
-    }
-
-    @Test
-    fun `send friend request should return valid response`() {
-        runBlocking {
-            val receiverID = testUserID
-            val senderID = testUserID2
-            //create a friend request
-            //and push it
-            val friendRequest = SerializeFriendRequest(senderID = senderID, receiverID = receiverID)
-            val response = repo.sendFriendRequest(friendRequest)
-        }
     }
 
     @Test

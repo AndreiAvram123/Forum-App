@@ -68,6 +68,8 @@
     <string name="accept_invitation">Accept invitation</string>
     <string name="friends">You have added this person</string>
     <string name="send_friend_request">Send friend request</string>
+    <string name="hint_write_comment">Write a comment here</string>
+    <string name="title_write_comment">Comment</string>
 
 
 </resources>

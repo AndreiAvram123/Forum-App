@@ -17,14 +17,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.andrei.kit.Adapters.MessageAdapter
 import com.andrei.kit.databinding.MessagesFragmentBinding
 import com.andrei.kit.models.User
-import com.andrei.kit.utils.observeRequest
-import com.andrei.kit.utils.toBase64
-import com.andrei.kit.utils.toDrawable
 import com.andrei.kit.viewModels.ViewModelChat
 import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.dataLayer.models.serialization.SerializeMessage
 import com.andrei.dataLayer.serverConstants.MessageTypes
 import com.andrei.kit.Adapters.CustomDivider
+import com.andrei.kit.utils.*
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import pl.aprilapps.easyphotopicker.*
@@ -44,7 +42,13 @@ class MessagesFragment : Fragment() {
     @Inject
     lateinit var easyImage: EasyImage
 
-    private lateinit var messageAdapter: MessageAdapter
+    @Inject
+    lateinit var permissionManager:PermissionManager
+
+    private  val messageAdapter: MessageAdapter by lazy {
+        MessageAdapter(user, ::expandImage)
+    }
+
     private val args: MessagesFragmentArgs by navArgs()
 
     private val requestCodeCamera = 1
@@ -56,13 +60,12 @@ class MessagesFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         binding = MessagesFragmentBinding.inflate(inflater, container, false)
 
-        messageAdapter = MessageAdapter(user, ::expandImage)
 
         configureViews()
 
         viewModelChat.currentChatId.value = args.chatID
 
-        viewModelChat.recentMessages.observe(viewLifecycleOwner, {
+        viewModelChat.recentMessages.reObserve(viewLifecycleOwner, {
             //there is a small async problem once we start observing the recent
             //messages, we need to make sure that the live data had enough time to change the
             //messages from one chat id to another
@@ -112,11 +115,12 @@ class MessagesFragment : Fragment() {
             easyImage.openGallery(this)
         }
         binding.captureImageButton.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-               openCamera()
+            if (permissionManager.hasPermission(android.Manifest.permission.CAMERA)) {
+                openCamera()
             } else {
-                val permissions = Array(1) { android.Manifest.permission.CAMERA }
-                requestPermissions(permissions, requestCodeCamera)
+                this.requestSinglePermission(permission = android.Manifest.permission.CAMERA,
+                        requestCode = requestCodeCamera)
+
             }
         }
 

@@ -100,9 +100,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
                     android:layout_marginEnd="16dp"
-                    android:src='@{post.favorite ? @drawable/ic_favorite_red_32dp : @drawable/ic_favorite_border_black_32dp }'
+                    android:src='@{post.favorite ? @drawable/ic_baseline_star_32 : @drawable/ic_baseline_star_border_32 }'
+
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:srcCompat="@drawable/ic_baseline_star_border_32" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="0dp"

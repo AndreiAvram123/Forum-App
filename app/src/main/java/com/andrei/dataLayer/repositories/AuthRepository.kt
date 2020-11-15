@@ -2,7 +2,6 @@ package com.andrei.dataLayer.repositories
 
 import android.content.Context
 import android.net.ConnectivityManager
-import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.andrei.kit.user.UserAccountManager
@@ -11,15 +10,16 @@ import com.andrei.dataLayer.dataMappers.toUser
 import com.andrei.dataLayer.engineUtils.Resource
 import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.dataLayer.interfaces.AuthRepositoryInterface
-import com.andrei.dataLayer.models.serialization.AuthenticationResponse
+import com.andrei.dataLayer.models.serialization.AuthenticationData
 import com.andrei.dataLayer.models.serialization.RegisterUserDTO
 import com.andrei.kit.R
 import com.andrei.kit.utils.isConnected
+import com.andrei.kit.utils.updateProfilePicture
+import com.andrei.kit.utils.updateUsername
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.userProfileChangeRequest
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineScope
@@ -45,12 +45,12 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
         val credential = GoogleAuthProvider.getCredential(googleSignInAccount.idToken,null)
         try {
            val userFirebase = auth.signInWithCredential(credential).await().user
-           userFirebase?.let {
-                    val response = repo.getUserFomUID(it.uid)
-                    if (isAuthenticated(response)) {
-                        saveAuthenticationData(response)
+           userFirebase?.let { firebaseUser ->
+               val response = repo.getUserFomUID(firebaseUser.uid)
+                    if (response.authenticationData !=null) {
+                        saveAuthenticationData(response.authenticationData)
                    }else{
-                      saveAuthenticationData(registerUserToApi(it,null))
+                        registerGoogleUserToApi(firebaseUser)?.let{saveAuthenticationData(it)}
                     }
             }
 
@@ -62,19 +62,14 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
 
 
      fun registerWithUsernameAndPassword(username: String, email: String, password: String)  {
-            registrationError.postValue(Resource.loading())
              auth.createUserWithEmailAndPassword( email, password).addOnSuccessListener {
                 val firebaseUser = it.user
                 if (firebaseUser != null) {
                     coroutineScope.launch {
                         try {
-                            val response = registerUserToApi(firebaseUser, username)
-                            response.authenticationData?.let { data ->
-                                val user = data.userDTO.toUser()
-                                updateProfilePicture(firebaseUser, user.profilePicture)
-                                updateDisplayName(firebaseUser, user.username)
-                                saveAuthenticationData(response)
-                            }
+                            val authenticationData = registerUserToApi(firebaseUser, username)
+                            if(authenticationData!=null)
+                                saveAuthenticationData(authenticationData)
                         }catch (e:Exception){
                             registrationError.postValue(Resource.error(context.getString(R.string.unknown_error)))
                             responseHandler.handleException<Any>(e, "Register with Username and password")
@@ -86,37 +81,56 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
             }
 
     }
-    //todo
-    //we need to change to registration response
-    private suspend fun registerUserToApi(firebaseUser: FirebaseUser,username: String? = null) : AuthenticationResponse{
-        val registerUserDTO = RegisterUserDTO(uid = firebaseUser.uid,
-                displayName = username ?: firebaseUser.displayName!!,
-                        email = firebaseUser.email!!)
-        return repo.register(registerUserDTO)
-    }
 
-    private suspend fun saveAuthenticationData(response: AuthenticationResponse){
-         response.authenticationData?.let{
-             userAccountManager.saveUserAndToken(token = it.token,user = it.userDTO.toUser())
+
+    private suspend fun registerUserToApi(firebaseUser: FirebaseUser,username: String) :AuthenticationData?{
+       val email = firebaseUser.email
+        if(email !=null) {
+            val registerUserDTO = RegisterUserDTO(uid = firebaseUser.uid,
+                    displayName = username,
+                    email = email
+            )
+            try{
+            val response = repo.register(registerUserDTO)
+            val authenticationData = response.authenticationData
+            authenticationData?.let {
+                firebaseUser.updateProfilePicture(it.userDTO.profilePicture)
+                firebaseUser.updateUsername(username)
+                return it
+            }
+        }catch (e:Exception){
+            responseHandler.handleException<Any>(e,"Register user to api")
          }
+        }
+        return null
     }
 
-    private fun isAuthenticated (authenticationResponse: AuthenticationResponse):Boolean{
-        return authenticationResponse.authenticationData !=null
+    private suspend fun registerGoogleUserToApi(firebaseUser: FirebaseUser) : AuthenticationData?{
+        val displayName = firebaseUser.displayName
+        val email = firebaseUser.email
+        if(displayName != null && email !=null ) {
+            try {
+                val registerUserDTO = RegisterUserDTO(uid = firebaseUser.uid,
+                        displayName = displayName,
+                        email = email)
+               val response =  repo.register(registerUserDTO)
+                val authenticationData = response.authenticationData
+                authenticationData?.let{
+                    firebaseUser.updateProfilePicture(it.userDTO.profilePicture)
+                    return it
+                }
+            }catch (e:Exception){
+                responseHandler.handleException<Any>(e,"Register google user to api")
+            }
+        }
+        return null
     }
 
-    private suspend fun updateProfilePicture(firebaseUser: FirebaseUser,profilePicture:String){
-        val profileUpdates = userProfileChangeRequest {
-            photoUri = Uri.parse(profilePicture)
-        }
-        firebaseUser.updateProfile(profileUpdates).await()
+    private suspend fun saveAuthenticationData(data: AuthenticationData){
+             userAccountManager.saveUserAndToken(token = data.token,user = data.userDTO.toUser())
+
     }
-    private suspend fun updateDisplayName(firebaseUser: FirebaseUser,newDisplayName:String){
-        val profileUpdates = userProfileChangeRequest {
-            displayName = newDisplayName
-        }
-        firebaseUser.updateProfile(profileUpdates).await()
-    }
+
 
 
 
@@ -136,9 +150,7 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
              val user = auth.signInWithEmailAndPassword(email, password).await().user
               if(user !=null){
                 val response = repo.getUserFomUID(user.uid)
-                 if (isAuthenticated(response)){
-                     saveAuthenticationData(response)
-                 }
+                  response.authenticationData?.let { saveAuthenticationData(it) }
              }
         }catch (e :Exception)
         {

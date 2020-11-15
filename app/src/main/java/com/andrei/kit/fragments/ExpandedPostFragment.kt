@@ -50,7 +50,7 @@ class ExpandedPostFragment : Fragment() {
 
     lateinit var post: Post
     private val commentButtonSheet  by lazy {
-        CommentBottomSheet(::submitComment)
+        CommentBottomSheet(::submitComment,user)
     }
 
     private val adapterComments by lazy{
