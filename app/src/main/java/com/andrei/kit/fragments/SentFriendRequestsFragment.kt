@@ -9,16 +9,22 @@ import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.andrei.kit.Adapters.CustomDivider
 import com.andrei.kit.databinding.LayoutFragmentFriendRequestBinding
+import com.andrei.kit.models.User
 import com.andrei.kit.utils.reObserve
 import com.andrei.kit.viewModels.ViewModelChat
+import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class SentFriendRequestsFragment private constructor(): Fragment() {
 
     private val viewModelChat: ViewModelChat by activityViewModels()
 
+    @Inject
+    lateinit var user:User
     private val requestAdapter by lazy {
-        FriendRequestsAdapter()
+        FriendRequestsAdapter(currentUser = user)
 
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
