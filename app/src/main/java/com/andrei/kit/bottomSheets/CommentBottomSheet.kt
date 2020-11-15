@@ -5,14 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.andrei.kit.databinding.BottomSheetCommentBinding
+import com.andrei.kit.models.User
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
-class CommentBottomSheet(val callback: (commentContent: String) -> Unit) : BottomSheetDialogFragment() {
+class CommentBottomSheet(
+        private val callback: (commentContent: String) -> Unit,
+        private val user: User): BottomSheetDialogFragment() {
 
     private lateinit var binding:BottomSheetCommentBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
        binding = BottomSheetCommentBinding.inflate(inflater, container, false)
+        binding.user = user
         attachListener(binding)
         return binding.root
     }
@@ -26,9 +30,11 @@ class CommentBottomSheet(val callback: (commentContent: String) -> Unit) : Botto
         }
     }
      fun showLoading(){
-        binding.commentContent.text.clear()
-        binding.progressBar.visibility = View.VISIBLE
-        binding.submitCommentButton.visibility = View.INVISIBLE
+         binding.apply {
+             commentContent.text.clear()
+             progressBar.visibility = View.VISIBLE
+             submitCommentButton.visibility = View.INVISIBLE
+         }
     }
 
 

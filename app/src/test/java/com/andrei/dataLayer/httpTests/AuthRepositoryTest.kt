@@ -1,4 +1,4 @@
-package com.andrei.dataLayer.repositories
+package com.andrei.dataLayer.httpTests
 
 import android.os.Build
 import com.andrei.TestUtilities

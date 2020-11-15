@@ -152,9 +152,9 @@ class FragmentAddPost : Fragment() {
 
         easyImage.handleActivityResult(requestCode, resultCode, data, requireActivity(), object : DefaultCallback() {
             override fun onMediaFilesPicked(imageFiles: Array<MediaFile>, source: MediaSource) {
-                     images.clear()
-                     images.addAll(imageFiles)
-                     if(images.isNotEmpty()) {
+                     if(imageFiles.isNotEmpty()){
+                         images.clear()
+                         images.addAll(imageFiles)
                          binding.carouselAddPost.apply {
                              size = images.size
                              show()
