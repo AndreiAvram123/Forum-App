@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity() {
             message.data = bundle
             serviceMessenger.send(message)
 
-            viewModelChat.chatLink.observe(this@MainActivity, {
+            viewModelChat.chatLink.reObserve(this@MainActivity, {
                 it?.let { link ->
                     val message = Message.obtain(null, new_chat_link_message)
                     val bundle = Bundle().apply { putString(key_chats_link, link) }

@@ -28,17 +28,14 @@ class PostRepository @Inject constructor(private val user: User,
 
     private val responseHandler = ResponseHandler()
 
-    val favoritePosts: LiveData<List<Post>> by lazy {
-        postDao.getFavoritePosts().also {
-            coroutineScope.launch {
-                fetchFavoritePosts()
-            }
-        }
+    val favoritePosts: LiveData<List<Post>>  = liveData {
+        emitSource(postDao.getFavoritePosts())
+        fetchFavoritePosts()
     }
 
 
     private  val TAG = PostRepository::class.java.simpleName
-
+    
     fun getCachedPosts() = postDao.getCachedPosts().also {
         coroutineScope.launch {
             //if network is active remove old data and
