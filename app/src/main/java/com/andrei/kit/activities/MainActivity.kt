@@ -104,16 +104,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    override fun onStop() {
-        super.onStop()
-        if (mBound) {
-            unbindService(connection)
-            mBound = false
-        }
-    }
-
-
-
 
     private fun startMessengerService() {
         Intent(this, MessengerService::class.java).also {
@@ -127,12 +117,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        unbindService(connection)
-        mBound = false
+    override fun onStop() {
+        super.onStop()
+        if (mBound) {
+            unbindService(connection)
+            mBound = false
+        }
     }
-
 
     override fun onStart() {
         super.onStart()
