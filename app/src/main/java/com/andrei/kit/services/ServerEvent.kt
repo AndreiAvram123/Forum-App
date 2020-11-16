@@ -44,11 +44,10 @@ class ServerEvent  {
         }
 
         override fun onMessage(event: String?, messageEvent: MessageEvent) {
-            val data = messageEvent.data
-             if(data!=null)
-                onMessageListener?.invoke(data)
-             }
-
+            messageEvent.data?.let {
+                onMessageListener?.invoke(it)
+            }
+        }
         override fun onComment(comment: String?) {
         }
 
