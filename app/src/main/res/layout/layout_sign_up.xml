@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,14 +38,14 @@
                         android:id="@+id/email"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
+                        android:layout_marginStart="15dp"
                         android:background="#00000000"
                         android:hint="Email Address"
-                        android:inputType="text"
+                        android:inputType="textEmailAddress"
                         android:letterSpacing="0.1"
                         android:textColor="#fff"
                         android:textColorHint="#d9e5f3"
-                        android:textSize="16dp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -68,14 +69,14 @@
                         android:id="@+id/username"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
+                        android:layout_marginStart="15dp"
                         android:background="#00000000"
                         android:hint="Username"
                         android:inputType="text"
                         android:letterSpacing="0.1"
                         android:textColor="#fff"
                         android:textColorHint="#d9e5f3"
-                        android:textSize="16dp" />
+                        android:textSize="16sp" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -105,7 +106,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:gravity="center"
-
                             android:letterSpacing="0.1"
                             android:text="Already have an Account ?"
                             android:textColor="#d9e5f3" />
@@ -140,7 +140,7 @@
                         android:letterSpacing="0.1"
                         android:textColor="#fff"
                         android:textColorHint="#d9e5f3"
-                        android:textSize="16dp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -164,7 +164,7 @@
                         android:id="@+id/reenter_password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
+                        android:layout_marginStart="15dp"
                         android:background="#00000000"
                         android:hint="Reenter password"
                         android:inputType="textPassword"
@@ -207,7 +207,7 @@
 
                     <Button
                         android:id="@+id/finish_sign_up"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/finish" />
@@ -237,7 +237,7 @@
             <ImageView
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:src="@drawable/ibytes"
+                android:src="@drawable/ic_kit_logo_svg"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/back_button" />

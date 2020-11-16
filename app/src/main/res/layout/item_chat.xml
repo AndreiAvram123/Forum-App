@@ -9,7 +9,7 @@
 
         <variable
             name="chat"
-            type="com.andrew.bookapp.models.Chat" />
+            type="com.andrei.kit.models.Chat" />
 
     </data>
 

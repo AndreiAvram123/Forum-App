@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_main_activity"
     app:startDestination="@id/home">
-
+    <!-- The ids of the fragments that are in the nav bar must match the ones inside navigation.xml-->
     <fragment
         android:id="@+id/expandedItemFragment"
-        android:name="com.andrew.bookapp.fragments.ExpandedPostFragment"
+        android:name="com.andrei.kit.fragments.ExpandedPostFragment"
         android:label="fragment_expanded_item"
         tools:layout="@layout/post_expanded_fragment" >
         <argument
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/favorite_posts"
-        android:name="com.andrew.bookapp.fragments.FavoritePostsFragment"
+        android:name="com.andrei.kit.fragments.FavoritePostsFragment"
         android:label="layout_fragment_posts_data"
         tools:layout="@layout/fragment_favorite_posts" >
         <action
@@ -25,12 +25,12 @@
     </fragment>
     <fragment
         android:id="@+id/fragmentAddPost"
-        android:name="com.andrew.bookapp.fragments.FragmentAddPost"
+        android:name="com.andrei.kit.fragments.FragmentAddPost"
         android:label="layout_fragment_add_post"
         tools:layout="@layout/layout_fragment_add_post" />
     <fragment
         android:id="@+id/search"
-        android:name="com.andrew.bookapp.fragments.SearchFragment"
+        android:name="com.andrei.kit.fragments.SearchFragment"
         android:label="SearchFragment" >
         <action
             android:id="@+id/action_searchFragment_to_favoriteItems"
@@ -39,15 +39,15 @@
     <action android:id="@+id/action_global_searchFragment" app:destination="@id/search" />
     <fragment
         android:id="@+id/my_posts"
-        android:name="com.andrew.bookapp.fragments.FragmentUserPosts"
+        android:name="com.andrei.kit.fragments.FragmentUserPosts"
         android:label="FragmentMyPosts" >
         <action
-            android:id="@+id/action_my_posts_to_friendsFragment2"
-            app:destination="@id/friends" />
+            android:id="@+id/action_my_posts_to_socialFragment"
+            app:destination="@id/social" />
     </fragment>
     <fragment
         android:id="@+id/messagesFragment"
-        android:name="com.andrew.bookapp.fragments.MessagesFragment"
+        android:name="com.andrei.kit.fragments.MessagesFragment"
         android:label="MessagesFragment">
         <argument
             android:name="chatID"
@@ -56,7 +56,7 @@
     <action android:id="@+id/action_global_expandedItemFragment" app:destination="@id/expandedItemFragment" />
     <fragment
         android:id="@+id/home"
-        android:name="HomeFragment"
+        android:name="com.andrei.kit.fragments.HomeFragment"
         android:label="HomeFragment">
         <action
             android:id="@+id/action_homeFragment2_to_searchFragment"
@@ -69,12 +69,8 @@
             app:destination="@id/settingFragment" />
     </fragment>
     <fragment
-        android:id="@+id/friends"
-        android:name="com.andrew.bookapp.fragments.SocialFragment"
-        android:label="FriendsFragment"/>
-    <fragment
         android:id="@+id/imageZoomFragment"
-        android:name="com.andrew.bookapp.fragments.ImageZoomFragment"
+        android:name="com.andrei.kit.fragments.ImageZoomFragment"
         android:label="fragment_image_zoom"
         tools:layout="@layout/fragment_image_zoom" >
         <argument
@@ -87,11 +83,11 @@
     <action android:id="@+id/action_global_messagesFragment" app:destination="@id/messagesFragment" />
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.andrew.bookapp.fragments.SettingsFragment"
+        android:name="com.andrei.kit.fragments.SettingsFragment"
         android:label="SettingsFragment" />
     <fragment
         android:id="@+id/noInternetFragment"
-        android:name="com.andrew.bookapp.fragments.NoInternetFragment"
+        android:name="com.andrei.kit.fragments.NoInternetFragment"
         android:label="fragment_no_internet"
         tools:layout="@layout/fragment_no_internet" />
     <action
@@ -99,4 +95,18 @@
         app:destination="@id/noInternetFragment"
         app:enterAnim="@anim/nav_default_pop_enter_anim"
         app:exitAnim="@anim/nav_default_pop_exit_anim" /><action android:id="@+id/action_global_imageZoomFragment" app:destination="@id/imageZoomFragment"/>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.andrei.kit.fragments.ProfileFragment"
+        android:label="ProfileFragment" >
+        <argument
+            android:name="userID"
+            app:argType="string" />
+    </fragment>
+    <action android:id="@+id/action_global_profileFragment" app:destination="@id/profileFragment" />
+
+    <fragment
+        android:id="@+id/social"
+        android:name="com.andrei.kit.fragments.SocialFragment"
+        android:label="SocialFragment" />
 </navigation>

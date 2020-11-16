@@ -5,7 +5,7 @@
     <data>
         <variable
             name="post"
-            type="com.andrew.bookapp.models.Post" />
+            type="com.andrei.kit.models.Post" />
     </data>
 
 
@@ -28,28 +28,94 @@
                 style="@style/important_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
                 android:text="@{post.title}"
                 android:textSize="22sp"
+                app:layout_constraintBottom_toBottomOf="@+id/user_image_post_item"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/user_image_post_item"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Me every day" />
 
-            <ImageView
-                android:id="@+id/post_item_home_image"
+            <com.jama.carouselview.CarouselView
+                android:id="@+id/post_carousel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
-                android:adjustViewBounds="true"
+                android:layout_marginTop="8dp"
                 android:cropToPadding="false"
-                app:imageFromURL="@{post.image}"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:carouselOffset="center"
+                app:enableSnapping="true"
+                app:indicatorAnimationType="slide"
+                app:indicatorPadding="5"
+                app:indicatorRadius="7"
+                app:indicatorSelectedColor="@color/highlight"
+                app:indicatorUnselectedColor="@color/colorPrimary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/post_title_home_item"
+                app:layout_constraintTop_toBottomOf="@+id/user_image_post_item"
+                app:resource="@layout/layout_carousel"
+                app:setAutoPlay="false"
+                app:size="10"
                 tools:srcCompat="@drawable/placeholder" />
+
+            <ImageView
+                android:id="@+id/user_image_post_item"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                app:imageFromURL="@{post.user.profilePicture}"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:srcCompat="@tools:sample/avatars" />
+
+            <ImageView
+                android:id="@+id/bookmark_post_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/post_carousel"
+                android:src='@{post.favorite ? @drawable/ic_baseline_star_32 : @drawable/ic_baseline_star_border_32 }' />
+
+            <TextView
+                android:id="@+id/textView"
+                style="@style/default_style_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@{post.bookmarkTimes + ``}"
+                app:layout_constraintBottom_toBottomOf="@+id/bookmark_post_item"
+                app:layout_constraintStart_toEndOf="@+id/bookmark_post_item"
+                app:layout_constraintTop_toTopOf="@+id/bookmark_post_item"
+                tools:text="200" />
+
+            <ImageView
+                android:id="@+id/imageView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                app:layout_constraintBottom_toBottomOf="@+id/bookmark_post_item"
+                app:layout_constraintStart_toEndOf="@+id/textView"
+                app:layout_constraintTop_toTopOf="@+id/bookmark_post_item"
+                app:srcCompat="@drawable/ic_baseline_comment_32" />
+
+            <TextView
+                android:id="@+id/textView2"
+                style="@style/default_style_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="34dp"
+                android:text="@{post.numberOfComments + ``}"
+                app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+                app:layout_constraintStart_toEndOf="@+id/imageView2"
+                app:layout_constraintTop_toTopOf="@+id/imageView2"
+                tools:text="200" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </layout>

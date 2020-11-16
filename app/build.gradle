@@ -4,6 +4,10 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: "androidx.navigation.safeargs"
 apply plugin: 'kotlin-kapt'
 apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.firebase.firebase-perf'
+
 
 android {
 
@@ -22,9 +26,9 @@ android {
     }
 
     defaultConfig {
-        versionCode 3
-        versionName "1.2"
-        applicationId "com.andrew.bookapp"
+        versionCode getBuildNumber()
+        versionName "1.0.7"
+        applicationId "com.andrei.kit"
         minSdkVersion 26
         targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -44,10 +48,17 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+
+
+
     buildTypes {
         release {
+            manifestPlaceholders = [crashlyticsCollectionEnabled: "true", performanceLogcatEnabled:"false","performanceCollectionDisabled" :"false"]
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug{
+            manifestPlaceholders = [crashlyticsCollectionEnabled: "false", performanceLogcatEnabled:"false","performanceCollectionDisabled" :"true"]
         }
     }
     compileOptions {
@@ -58,81 +69,73 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    hilt {
-        enableTransformForLocalTests = true
-    }
+
 }
 
 
 dependencies {
 
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-
-    // For Robolectric tests.
-    testImplementation 'com.google.dagger:hilt-android-testing:2.28-alpha'
-    // ...with Kotlin.
-    kaptTest 'com.google.dagger:hilt-android-compiler:2.28-alpha'
-
-    // For instrumented tests.
-    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.28-alpha'
-    // ...with Kotlin.
-    kaptAndroidTest 'com.google.dagger:hilt-android-compiler:2.28-alpha'
-
-
-    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.3.72'
-
-    implementation "androidx.paging:paging-runtime:2.1.2" // For Kotlin use paging-runtime-ktx
-
-    implementation 'androidx.preference:preference:1.1.1'
-    testImplementation "androidx.arch.core:core-testing:2.1.0"
-
-
-    //HLTTTTTT
-    implementation "com.google.dagger:hilt-android:2.28-alpha"
-    kapt "com.google.dagger:hilt-android-compiler:2.28-alpha"
-    implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01'
-    // When using Kotlin.
-    kapt 'androidx.hilt:hilt-compiler:1.0.0-alpha01'
-
-
-
-
+    implementation 'com.github.jama5262:CarouselView:1.1.0'
+    implementation "com.github.jkwiecien:EasyImage:3.0.4"
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
-    kapt "android.arch.persistence.room:compiler:1.1.1"
-    def fragment_version = "1.2.4"
-    // ...
+    implementation platform('com.google.firebase:firebase-bom:25.12.0')
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-perf'
+    implementation 'com.google.android.gms:play-services-auth:19.0.0'
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.5'
+
+
+
+    implementation "androidx.paging:paging-runtime-ktx:2.1.2" // For Kotlin use paging-runtime-ktx
+
+    implementation 'androidx.preference:preference-ktx:1.1.1'
+
+
+    //Hilt
+    implementation "com.google.dagger:hilt-android:2.28-alpha"
+    kapt "com.google.dagger:hilt-android-compiler:2.28-alpha"
+    implementation 'androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02'
+    // When using Kotlin.
+    kapt 'androidx.hilt:hilt-compiler:1.0.0-alpha02'
+
+
+
+    def fragment_version = "1.2.5"
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
 
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.4.1'
-    implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.9.0'
     implementation group: 'com.launchdarkly', name: 'okhttp-eventsource', version: '2.2.0'
 
-    implementation 'com.google.android.gms:play-services-auth:18.0.0'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.2.0"
-    def room_version = "2.2.5"
+
     // Room components
-    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-runtime:2.2.5"
     implementation "androidx.room:room-ktx:2.2.5"
-    kapt "androidx.room:room-compiler:$room_version"
-    androidTestImplementation "androidx.room:room-testing:$room_version"
+    kapt "androidx.room:room-compiler:2.2.5"
+    androidTestImplementation "androidx.room:room-testing:2.2.5"
+    kapt "android.arch.persistence.room:compiler:1.1.1"
 
     def paging_version = "2.1.2"
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
     // For Kotlin use paging-runtime-ktx
-    implementation "androidx.fragment:fragment-ktx:1.2.4"
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.2.0"
 
-    implementation 'com.squareup.retrofit2:retrofit:2.7.2'
-    implementation 'com.squareup.retrofit2:converter-gson:2.7.2'
-    def nav_version = "2.2.2"
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    def nav_version = "2.3.1"
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-    implementation 'com.google.android.gms:play-services-auth:18.0.0'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
     implementation 'com.github.bumptech.glide:glide:4.11.0'
@@ -140,39 +143,37 @@ dependencies {
 
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.2.1'
 
 
-    implementation 'org.jetbrains:annotations:15.0'
-    implementation "androidx.core:core-ktx:1.3.0"
+    implementation 'org.jetbrains:annotations:16.0.1'
+    implementation "androidx.core:core-ktx:1.3.2"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 
-    debugImplementation 'androidx.fragment:fragment-testing:' + rootProject.androidxFragmentVersion
-    debugImplementation 'androidx.test:core:' + rootProject.coreVersion
+    testImplementation 'androidx.test.ext:junit:1.1.2'
 
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'org.robolectric:robolectric:4.3.1'
-    testImplementation 'androidx.test:core:' + rootProject.coreVersion
-    testImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
-    testImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
-    testImplementation 'com.google.truth:truth:' + rootProject.truthVersion
-    testAnnotationProcessor 'com.google.auto.service:auto-service:1.0-rc4'
+    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    testImplementation "org.robolectric:robolectric:4.4"
 
-    androidTestImplementation 'androidx.test:core:' + rootProject.coreVersion
-    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
-    androidTestImplementation 'androidx.test:runner:' + rootProject.runnerVersion
-    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
-    androidTestImplementation 'androidx.fragment:fragment-testing:' + rootProject.androidxFragmentVersion
-    androidTestImplementation 'com.google.truth:truth:' + rootProject.truthVersion
-    androidTestImplementation 'org.robolectric:annotations:' + rootProject.robolectricVersion
+
 }
 
 repositories {
     mavenCentral()
+}
+// Computes the build number from the current git commit
+static def getBuildNumber() {
+    return ['sh', '-c', gitExecutable() + ' rev-list HEAD --count'].execute().text.trim().toInteger()
+}
+
+// Finds the git executable on the current build environment
+static def gitExecutable() {
+    return ['sh', '-c', '/etc/profile; which git'].execute().text.trim()
 }

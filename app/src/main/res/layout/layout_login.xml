@@ -35,17 +35,17 @@
                         android:src="@drawable/usrusr" />
 
                     <EditText
-                        android:id="@+id/username"
+                        android:id="@+id/email_login"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
+                        android:layout_marginStart="15dp"
                         android:background="#00000000"
-                        android:hint="Username"
+                        android:hint="@string/enter_email"
                         android:inputType="text"
                         android:letterSpacing="0.1"
                         android:textColor="#fff"
                         android:textColorHint="#d9e5f3"
-                        android:textSize="16dp" />
+                        android:textSize="16sp" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -69,7 +69,7 @@
                         android:id="@+id/password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="15dp"
+                        android:layout_marginStart="15dp"
                         android:background="#00000000"
                         android:hint="Password"
                         android:inputType="textPassword"
@@ -127,7 +127,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    app:layout_constraintBottom_toTopOf="@+id/login_with_email_item"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -145,12 +144,13 @@
                 android:text="@string/log_in_button_text" />
 
             <TextView
+                android:textSize="20sp"
                 android:id="@+id/register_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:letterSpacing="0.1"
-                android:text="Create Account ? Signup"
+                android:text="Sign up"
                 android:textColor="#d9e5f3" />
         </LinearLayout>
 

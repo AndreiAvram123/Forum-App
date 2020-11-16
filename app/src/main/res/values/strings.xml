@@ -1,15 +1,10 @@
 <resources>
+
+    <string name="unknown_error">Unknown error</string>
+    <string name="google_token">472239001224-h3s6n11ceu7a6n8rtq5k6rmvjvf47rot.apps.googleusercontent.com</string>
     <string name="app_name">KIT</string>
-    <string name="popular_recipes_title">Here are some popular recipes</string>
 
 
-    <string name="search_history_key">SEARCH_HISTORY_KEY</string>
-    <string name="facebook_app_id">2569482526618357</string>
-    <string name="fb_login_protocol_scheme">fb2569482526618357</string>
-    <string name="welcome_activity_shown_key">welcome_activity_shown_key</string>
-
-
-    <string name="action_share">Share</string>
     <string name="action_upload">Upload</string>
     <string name="action_copy">Copy</string>
     <string name="action_print">Print</string>
@@ -28,33 +23,26 @@
     <string name="choose_password">Password</string>
     <string name="enter_email">Email</string>
     <string name="create_account_hint">Create account</string>
-    <string name="error_invalid_email">Invalid Email</string>
+    <string name="invalid_login_credentials">Invalid email or password</string>
+    <string name="invalid_email">Invalid email</string>
     <string name="no_password">No password entered</string>
     <string name="password_match">The passwords do not match</string>
     <string name="error_no_nickname">You must enter a nickname</string>
-    <string name="sign_in_facebook">Continue with Facebook</string>
     <string name="sign_in_email">Continue with Email</string>
     <string name="other_options_sign_in">See other options</string>
 
-    <string-array name="sort_parameters">
-        <item>Default</item>
-        <item>Quickest</item>
-        <item>Servings</item>
-
-    </string-array>
 
     <string name="write_comment_text">Write a commentDTO</string>
     <string name="submit_comment">Submit</string>
     <string name="key_user_id">key_user_id</string>
     <string name="key_email">key_email</string>
 
-    <string name="number_saved_posts">Saved posts : %1$d </string>
+    <string name="bookmarked_posts">Bookmarked  posts </string>
     <string name="my_posts_label">My posts</string>
     <string name="friend_fragment_label">Friends</string>
     <string name="added_to_favorites">Post added to favorites</string>
     <string name="removed_from_favorites">Post removed from favorites</string>
     <string name="please_connect_to_internet">Please connect to the internet to use this feature</string>
-    <string name="default_web_client_id">674587033588-40h9617ir14bbcohahha8rhvgck9420q.apps.googleusercontent.com</string>
     <string name="key_username">key_username</string>
     <string name="key_preferences">key_preferences</string>
 
@@ -69,19 +57,19 @@
     <string name="messages_header">Messages</string>
     <string name="sync_header">Sync</string>
 
-    <!-- Messages Preferences -->
-    <string name="signature_title">Your signature</string>
-    <string name="reply_title">Default reply action</string>
 
-    <!-- Sync Preferences -->
-    <string name="sync_title">Sync email periodically</string>
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="account_header">Account</string>
     <string name="account_created">We have created your account, go to login screen now</string>
     <string name="key_token">KEY_TOKEN</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="add_to_friends">Add to friends</string>
+    <string name="invitation_sent">Invitation sent</string>
+    <string name="accept_invitation">Accept invitation</string>
+    <string name="friends">You have added this person</string>
+    <string name="send_friend_request">Send friend request</string>
+    <string name="hint_write_comment">Write a comment here</string>
+    <string name="title_write_comment">Comment</string>
 
 
 </resources>
