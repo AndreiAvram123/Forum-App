@@ -2,7 +2,6 @@ package com.andrei.dataLayer.repositories
 
 import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
-import uk.co.coop.app.engine.settings.BaseSettingsRepository
 
 interface SessionSettingsRepository {
     var accessToken: String?

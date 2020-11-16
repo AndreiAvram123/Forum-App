@@ -1,4 +1,4 @@
-package uk.co.coop.app.engine.settings
+package com.andrei.dataLayer.repositories
 
 import android.content.Context
 import android.content.SharedPreferences

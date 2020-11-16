@@ -100,8 +100,7 @@ class PostRepository @Inject constructor(private val user: User,
             postDao.insertPosts(mapDomainData(fetchedPosts))
 
         } catch (e: java.lang.Exception) {
-            e.printStackTrace();
-            Log.e(TAG,"Error while fetching my posts")
+            responseHandler.handleException<Any>(e,"Fetching my posts")
         }
     }
 

@@ -1,4 +1,4 @@
-package uk.co.coop.app.engine.settings
+package com.andrei.dataLayer.repositories
 
 import android.annotation.TargetApi
 import android.content.Context
@@ -22,9 +22,6 @@ import javax.crypto.spec.SecretKeySpec
 import javax.security.auth.x500.X500Principal
 
 
-/**
- * Created by dant on 27/02/2018, stolen by samdc 12/07/2019
- */
 class EncryptedSharedPreferences(val context: Context, val sharedPreferences: SharedPreferences) : SharedPreferences {
 
     companion object {
