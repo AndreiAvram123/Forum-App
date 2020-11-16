@@ -103,7 +103,7 @@ class PostRepositoryTest {
     }
     @Test
     fun shouldReturnNotNulUserPosts() = runBlocking {
-        val fetchedPosts = repo.fetchMyPosts(testUserID)
+        val fetchedPosts = repo.fetchUserPosts(testUserID)
         Assert.assertNotNull(fetchedPosts)
     }
 }

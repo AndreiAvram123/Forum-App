@@ -1,7 +1,6 @@
 package com.andrei.dataLayer.repositories
 
 import android.content.Context
-import android.net.ConnectivityManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.andrei.kit.user.UserAccountManager
@@ -13,7 +12,6 @@ import com.andrei.dataLayer.interfaces.AuthRepositoryInterface
 import com.andrei.dataLayer.models.serialization.AuthenticationData
 import com.andrei.dataLayer.models.serialization.RegisterUserDTO
 import com.andrei.kit.R
-import com.andrei.kit.utils.isConnected
 import com.andrei.kit.utils.updateProfilePicture
 import com.andrei.kit.utils.updateUsername
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -29,16 +27,16 @@ import javax.inject.Inject
 
 @ActivityScoped
 class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterface,
-                                         private val connectivityManager: ConnectivityManager,
                                          private val userAccountManager: UserAccountManager,
                                          private val coroutineScope: CoroutineScope,
+                                         private val sessionSettingsRepository: SessionSettingsRepository,
+                                         private val responseHandler:ResponseHandler,
                                          @ApplicationContext private val context: Context) {
 
     val authenticationError = MutableLiveData<String>()
     val registrationError = MutableLiveData<Resource<String>>()
 
     private val auth = FirebaseAuth.getInstance()
-    private val responseHandler = ResponseHandler()
 
 
      suspend fun loginWithGoogle(googleSignInAccount: GoogleSignInAccount)  {
@@ -108,13 +106,14 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
     private suspend fun registerGoogleUserToApi(firebaseUser: FirebaseUser) : AuthenticationData?{
         val displayName = firebaseUser.displayName
         val email = firebaseUser.email
-        if(displayName != null && email !=null ) {
+        check(displayName!=null){"Display name cannot be null"}
+        check(email != null){"email cannot be null"}
             try {
                 val registerUserDTO = RegisterUserDTO(uid = firebaseUser.uid,
                         displayName = displayName,
                         email = email)
                val response =  repo.register(registerUserDTO)
-                val authenticationData = response.authenticationData
+               val authenticationData = response.authenticationData
                 authenticationData?.let{
                     firebaseUser.updateProfilePicture(it.userDTO.profilePicture)
                     return it
@@ -122,27 +121,22 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
             }catch (e:Exception){
                 responseHandler.handleException<Any>(e,"Register google user to api")
             }
-        }
-        return null
+     return null
     }
 
     private suspend fun saveAuthenticationData(data: AuthenticationData){
-             userAccountManager.saveUserAndToken(token = data.token,user = data.userDTO.toUser())
+             sessionSettingsRepository.accessToken = data.token
+             userAccountManager.saveUser(data.userDTO.toUser())
 
     }
 
-
-
-
     fun fetchSearchSuggestions(query: String) = liveData {
-        if (connectivityManager.isConnected()){
             try {
                 val fetchedSuggestions = repo.fetchSuggestions(query)
                 emit(fetchedSuggestions.map { UserMapper.mapToDomainObject(it) })
             } catch (e: Exception) {
-                e.printStackTrace()
+                responseHandler.handleException<Any>(e,"fetching user search suggestions")
             }
-        }
     }
 
     suspend fun login(email: String, password: String) {

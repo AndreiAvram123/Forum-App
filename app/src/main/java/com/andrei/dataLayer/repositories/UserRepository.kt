@@ -29,9 +29,9 @@ class UserRepository @Inject constructor(
         private val connectivityManager: ConnectivityManager,
         private val userDao: UserDao,
         private val user:User,
-        private val  coroutineScope: CoroutineScope
+        private val  coroutineScope: CoroutineScope,
+        private val responseHandler: ResponseHandler
 ) {
-    private val responseHandler = ResponseHandler()
 
 
     val friends :MutableLiveData<MutableList<User>> by lazy {

@@ -74,6 +74,21 @@ android {
 
 
 dependencies {
+    implementation 'com.squareup.moshi:moshi:1.11.0'
+    implementation 'com.squareup.moshi:moshi-adapters:1.9.2'
+    kapt 'com.squareup.moshi:moshi-kotlin-codegen:1.9.2'
+
+
+    /* JJWT (jwt tokens library) */
+    api 'io.jsonwebtoken:jjwt-api:0.10.7'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.10.7'
+    runtimeOnly('io.jsonwebtoken:jjwt-orgjson:0.10.7') {
+        exclude group: 'org.json', module: 'json' //provided by Android natively
+    }
+
+
+    /* Leak detection */
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.2'
 
     implementation 'com.github.jama5262:CarouselView:1.1.0'
     implementation "com.github.jkwiecien:EasyImage:3.0.4"

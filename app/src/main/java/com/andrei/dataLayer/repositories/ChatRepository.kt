@@ -30,10 +30,9 @@ class ChatRepository @Inject constructor(
         private val chatDao: ChatDao,
         private val connectivityManager: ConnectivityManager,
         private val user: User,
+        private val responseHandler: ResponseHandler
 
 ) {
-
-    private val responseHandler = ResponseHandler()
 
     init {
         coroutineScope.launch {

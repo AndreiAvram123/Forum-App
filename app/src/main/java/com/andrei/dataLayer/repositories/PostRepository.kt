@@ -1,5 +1,6 @@
 package com.andrei.dataLayer.repositories
 
+import android.net.ConnectivityManager
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
@@ -14,6 +15,7 @@ import com.andrei.dataLayer.interfaces.dao.RoomPostDao
 import com.andrei.dataLayer.models.*
 import com.andrei.dataLayer.models.serialization.SerializeFavoritePostRequest
 import com.andrei.dataLayer.models.serialization.SerializePost
+import com.andrei.kit.utils.isConnected
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,19 +25,22 @@ import kotlin.Exception
 class PostRepository @Inject constructor(private val user: User,
                                          private val coroutineScope: CoroutineScope,
                                          private val repo: PostRepositoryInterface,
-                                         private val postDao: RoomPostDao
+                                         private val postDao: RoomPostDao,
+                                         private val responseHandler: ResponseHandler,
+                                         private val connectivityManager: ConnectivityManager
 ) {
 
-    private val responseHandler = ResponseHandler()
 
     val favoritePosts: LiveData<List<Post>>  = liveData {
         emitSource(postDao.getFavoritePosts())
-        fetchFavoritePosts()
+        if(connectivityManager.isConnected()) {
+            fetchFavoritePosts()
+        }
     }
 
 
     private  val TAG = PostRepository::class.java.simpleName
-    
+
     fun getCachedPosts() = postDao.getCachedPosts().also {
         coroutineScope.launch {
             //if network is active remove old data and
@@ -67,7 +72,7 @@ class PostRepository @Inject constructor(private val user: User,
     fun fetchPostByID(id: Int): LiveData<Resource<Post>> = liveData {
         emit(Resource.loading<Post>())
         try {
-            val post = repo.fetchPostByID(id).toPost()
+            val post = repo.fetchPostByID(postID = id).toPost()
             checkPostIsBookmarked(post)
             postDao.insertPost(post)
             emit(Resource.success(post))
@@ -79,10 +84,10 @@ class PostRepository @Inject constructor(private val user: User,
 
     private suspend fun fetchFavoritePosts() {
         try {
-            val data = repo.fetchUserFavoritePosts(user.userID).map { it.toPost() }
+            val data = repo.fetchUserFavoritePosts(userID = user.userID)
+                    .map { it.toPost() }
             data.forEach { it.isFavorite = true }
             postDao.updatePosts(data)
-
         }catch (e:Exception){
             responseHandler.handleException<Any>(e,"Fetch favorite posts")
         }
@@ -91,7 +96,7 @@ class PostRepository @Inject constructor(private val user: User,
     fun fetchMyPosts() = liveData {
         emitSource(postDao.getAllUserPosts(user.userID))
         try {
-            val fetchedPosts = repo.fetchMyPosts(user.userID)
+            val fetchedPosts = repo.fetchUserPosts(userID = user.userID)
             postDao.insertPosts(mapDomainData(fetchedPosts))
 
         } catch (e: java.lang.Exception) {
@@ -105,8 +110,10 @@ class PostRepository @Inject constructor(private val user: User,
         userID = user.userID)
         try {
             repo.addPostToFavorites(requestData)
-            post.bookmarkTimes ++
-            post.isFavorite = true
+            post.apply {
+                bookmarkTimes++
+                isFavorite = true
+            }
             postDao.updatePost(post)
             emit(Resource.success(Any()))
 
@@ -119,8 +126,10 @@ class PostRepository @Inject constructor(private val user: User,
      fun deletePostFromFavorites(post: Post) = liveData {
         try {
             repo.removePostFromFavorites(postID = post.id, userID = user.userID)
-            post.isFavorite = false
-            post.bookmarkTimes --
+            post.apply {
+                isFavorite = false
+                bookmarkTimes --
+            }
             postDao.updatePost(post)
             emit(Resource.success(Any()))
         }catch (e:Exception){
@@ -154,7 +163,7 @@ class PostRepository @Inject constructor(private val user: User,
 
     internal suspend fun fetchNextPosts(lastPostID: Int) {
         try {
-            val fetchedData = repo.fetchNextPagePosts(lastPostID)
+            val fetchedData = repo.fetchNextPagePosts(lastPostID = lastPostID)
             postDao.insertPosts(mapDomainData(fetchedData))
         } catch (e: Exception) {
             responseHandler.handleException<Any>(e,Endpoint.RECENT_POSTS.url)
@@ -166,7 +175,7 @@ class PostRepository @Inject constructor(private val user: User,
          liveData {
             emit(Resource.loading<Post>())
             try {
-                val returnedPost = repo.uploadPost(post).toPost()
+                val returnedPost = repo.uploadPost(uploadPost = post).toPost()
                 postDao.insertPost(returnedPost)
                 emit(responseHandler.handleSuccess(returnedPost))
             }catch (e:Exception) {
