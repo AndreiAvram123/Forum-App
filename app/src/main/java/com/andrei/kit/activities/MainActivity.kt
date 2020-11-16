@@ -74,10 +74,6 @@ class MainActivity : AppCompatActivity() {
         override fun onServiceConnected(className: ComponentName, service: IBinder) {
             mBound = true
             serviceMessenger = Messenger(service)
-            val message = Message.obtain(null, new_user_id_message)
-            val bundle =  Bundle().apply { putString(key_user_id,user.userID) }
-            message.data = bundle
-            serviceMessenger.send(message)
 
             viewModelChat.chatLink.reObserve(this@MainActivity, {
                 it?.let { link ->
