@@ -11,20 +11,21 @@ import com.andrei.dataLayer.interfaces.CommentRepoInterface
 import com.andrei.dataLayer.interfaces.dao.RoomCommentDao
 import com.andrei.dataLayer.models.PostWithComments
 import com.andrei.dataLayer.models.serialization.SerializeComment
+import com.andrei.kit.utils.isConnected
 import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
 
 class CommentsRepository @Inject constructor(private val connectivityManager: ConnectivityManager,
                                              private val commentDao: RoomCommentDao,
-                                             private val repo: CommentRepoInterface) {
+                                             private val repo: CommentRepoInterface,
+                                             private val responseHandler: ResponseHandler) {
 
 
-    private val responseHandler = ResponseHandler()
 
     fun getCommentsForPost(post: Post): LiveData<PostWithComments> = liveData {
         emitSource(commentDao.getAllPostComments(post.id))
-        if (connectivityManager.activeNetwork != null) {
+        if (connectivityManager.isConnected()) {
             fetchCommentsForPost(post)
         }
     }
@@ -34,7 +35,6 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
         emit(Resource.loading<Any>())
         try {
             val fetchedData  = repo.uploadComment(comment)
-
                 commentDao.insertComment(fetchedData.toComment())
                 emit(responseHandler.handleSuccess(Any()))
 

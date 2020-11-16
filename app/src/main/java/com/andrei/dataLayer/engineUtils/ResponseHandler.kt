@@ -1,10 +1,19 @@
 package com.andrei.dataLayer.engineUtils
 
 import android.util.Log
+import com.andrei.kit.BuildConfig
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import retrofit2.HttpException
 import java.net.SocketTimeoutException
 
-open class ResponseHandler {
+  class ResponseHandler private constructor(){
+      private val firebaseCrashlytics: FirebaseCrashlytics = FirebaseCrashlytics.getInstance()
+
+      companion object {
+         @JvmStatic
+         fun getInstance() = ResponseHandler()
+      }
+
 
     private val TAG = ResponseHandler::class.java.simpleName
 
@@ -14,7 +23,7 @@ open class ResponseHandler {
 
     fun <T : Any> handleException(e: Exception,url:String): Resource<T> {
         Log.e(TAG,"Error at $url with error ${e.stackTraceToString()}")
-
+        logException(e)
         return when (e) {
             is HttpException -> Resource.error(getErrorMessage(e.code()))
             is SocketTimeoutException -> Resource.error(getErrorMessage(0))
@@ -29,6 +38,11 @@ open class ResponseHandler {
             401 -> "Unauthorised"
             404 -> "Not found"
             else -> "Something went wrong"
+        }
+    }
+    private fun logException(e:Exception){
+        if(!BuildConfig.DEBUG){
+           firebaseCrashlytics.recordException(e)
         }
     }
 }

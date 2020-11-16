@@ -74,6 +74,10 @@ android {
 
 
 dependencies {
+    implementation 'com.squareup.moshi:moshi:1.11.0'
+    implementation 'com.squareup.moshi:moshi-adapters:1.9.2'
+
+
 
     implementation 'com.github.jama5262:CarouselView:1.1.0'
     implementation "com.github.jkwiecien:EasyImage:3.0.4"

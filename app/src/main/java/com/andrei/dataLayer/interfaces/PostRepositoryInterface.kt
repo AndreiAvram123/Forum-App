@@ -23,8 +23,8 @@ interface PostRepositoryInterface {
     suspend fun fetchUserFavoritePosts(@Path("id") userID: String): ArrayList<PostDTO>
 
 
-    @GET("/api/user/{id}/posts")
-    suspend fun fetchMyPosts(@Path("id") userID: String): ArrayList<PostDTO>
+    @GET("/api/user/{userID}/posts")
+    suspend fun fetchUserPosts(@Path("userID") userID: String): ArrayList<PostDTO>
 
     @DELETE("/api/user/{userID}/removeFromFavorites/{postID}")
     suspend fun removePostFromFavorites(@Path("userID") userID: String, @Path("postID") postID: Int): ServerResponse

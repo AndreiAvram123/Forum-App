@@ -19,25 +19,15 @@ class UserAccountManager @Inject constructor(private val sharedPreferences: Shar
                                              @ApplicationContext private val context: Context,
                                              private val userDao: UserDao) {
 
-
-    fun getToken() = sharedPreferences.getStringNotNull(context.getString(R.string.key_token))
-
     val continueLoginFlow = MutableLiveData(false)
 
 
 
-    suspend fun saveUserAndToken(user: User, token: String) {
-        persistToken(token)
+    suspend fun saveUser(user: User) {
         userDao.insertUser(user)
          CoroutineScope( Dispatchers.Main).launch {
            continueLoginFlow.postAndReset(value = true, resetTo = false)
        }
-    }
-
-    private fun persistToken(token: String) {
-        sharedPreferences.edit {
-            putString(context.getString(R.string.key_token),token)
-        }
     }
 
     fun deleteUserFromMemory() {
