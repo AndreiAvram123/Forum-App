@@ -12,5 +12,5 @@
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
         tools:context=".fragments.ReceivedFriendRequestsFragment"
-        tools:listitem="@layout/request_item" />
+        tools:listitem="@layout/request_received_item" />
 </layout>

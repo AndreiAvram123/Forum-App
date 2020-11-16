@@ -143,10 +143,13 @@ class ChatRepository @Inject constructor(
         }
     }
     private suspend fun fetchSentFriendRequests() {
-        if(connectivityManager.isConnected()){
-            val fetchedData = repo.fetchSentFriendRequests(user.userID)
-            sentFriendRequests.addAndNotify(fetchedData)
-        }
+            try {
+                val fetchedData = repo.fetchSentFriendRequests(user.userID)
+                sentFriendRequests.addAndNotify(fetchedData)
+            }catch (e:Exception) {
+                responseHandler.handleException<Any>(e,"Sent friend requests")
+            }
+
     }
 
       fun sendFriendRequest(friendRequest: SerializeFriendRequest) = liveData {
