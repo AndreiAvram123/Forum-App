@@ -30,8 +30,10 @@ class ViewModelAuth @ViewModelInject constructor(
         fun loginWithGoogle(googleSignInAccount: GoogleSignInAccount) = viewModelScope.launch {  authRepository.loginWithGoogle(googleSignInAccount)}
 
 
-        fun register(username: String, email: String, password: String)  =  authRepository.registerWithUsernameAndPassword(
-                username,email,password)
+
+        fun register(username: String, email: String, password: String) = authRepository.registerWithUsernameAndPassword(
+                    username, email, password)
+
 
 
         fun login(email: String, password: String) = viewModelScope.launch {  authRepository.login(email, password)}

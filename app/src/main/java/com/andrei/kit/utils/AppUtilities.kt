@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.Uri
 import android.util.Base64
+import android.widget.EditText
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -51,3 +52,5 @@ fun Uri.toDrawable(context: Context): Drawable {
 
 fun ConnectivityManager.isConnected() = this.activeNetwork != null
 fun ConnectivityManager.isNotConnected() = !isConnected()
+
+fun EditText.getTrimmedText() = this.text.toString().trim()

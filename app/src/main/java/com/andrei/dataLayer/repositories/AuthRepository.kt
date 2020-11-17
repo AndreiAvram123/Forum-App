@@ -33,6 +33,7 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
                                          private val responseHandler:ResponseHandler,
                                          @ApplicationContext private val context: Context) {
 
+
     private val callRunner = CallRunner(responseHandler)
 
     val authenticationError = MutableLiveData<String>()
@@ -61,7 +62,7 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
     }
 
 
-     fun registerWithUsernameAndPassword(username: String, email: String, password: String) {
+      fun registerWithUsernameAndPassword(username: String, email: String, password: String) {
          auth.createUserWithEmailAndPassword(email, password).addOnSuccessListener {
              val firebaseUser = it.user
              if (firebaseUser != null) {

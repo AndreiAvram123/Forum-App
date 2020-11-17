@@ -3,7 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-
+   <data>
+       <variable
+           name="viewModelAuth"
+           type="com.andrei.kit.viewModels.ViewModelAuth" />
+   </data>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -194,7 +198,7 @@
                         android:layout_weight="1"
                         android:textColor="#009A9A"
                         android:textSize="17sp"
-                        android:visibility="invisible"
+                        app:visibleWithText="@{viewModelAuth.registrationError}"
                         tools:text="Invalid Email" />
 
                 </LinearLayout>
