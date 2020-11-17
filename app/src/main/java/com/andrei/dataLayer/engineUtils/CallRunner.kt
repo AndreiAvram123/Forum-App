@@ -9,20 +9,16 @@ import java.lang.Error
 class CallRunner (private val responseHandler: ResponseHandler){
 
 
-     fun < T> makeObservableCall(call: Call<T>,completion : suspend (data:T)->Unit)  = liveData<Result<T>>{
-        emit(Result.Loading)
-        val url = call.request().url.toString()
-        try {
-          val response = call.awaitResponse()
-            if(response.isSuccessful){
-                val body = response.body()
-                if(body !=null){
-                    completion(body)
-                    emit(responseHandler.handleSuccess(body))
-                }
-            }else{
-                emit(responseHandler.handleRequestException(Exception("Unknown"),url))
-            }
+     fun < T> makeObservableCall(call: Call<T>,completion : suspend (data:T)->Unit)  = liveData<Result<T>> {
+         emit(Result.Loading)
+         val url = call.request().url.toString()
+         try {
+             val response =  call.awaitResponse()
+             val body = response.body()
+             if (body != null) {
+                 completion(body)
+                 emit(responseHandler.handleSuccess(body))
+             }
         } catch (e: Exception) {
            emit(responseHandler.handleRequestException(e,url))
         }

@@ -13,6 +13,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import retrofit2.await
 
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
@@ -27,7 +28,7 @@ class ChatRepositoryTest {
 
     @Test
     fun shouldReturnHubLink() = runBlocking {
-        val data = repo.fetchChatURL(testUserID)
+        val data = repo.fetchChatURL(testUserID).await()
         Assert.assertNotNull(data)
     }
 
