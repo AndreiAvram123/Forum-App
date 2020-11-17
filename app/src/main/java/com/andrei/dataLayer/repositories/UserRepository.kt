@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.andrei.dataLayer.dataMappers.toUser
-import com.andrei.dataLayer.engineUtils.Resource
+import com.andrei.dataLayer.engineUtils.CallRunner
 import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.dataLayer.interfaces.UserRepoInterface
 import com.andrei.dataLayer.interfaces.dao.UserDao
@@ -30,6 +30,7 @@ class UserRepository @Inject constructor(
         private val responseHandler: ResponseHandler
 ) {
 
+    private val callRunner = CallRunner(responseHandler)
 
     val friends :MutableLiveData<MutableList<User>> by lazy {
         MutableLiveData<MutableList<User>>().also {
@@ -63,18 +64,13 @@ class UserRepository @Inject constructor(
         }
     }
 
-     fun changeProfilePicture(imageData: String, firebaseUser: FirebaseUser) = liveData{
-        emit(Resource.loading<Any>())
-            try {
-               val updateProfileImageRequest = UpdateProfileImageRequest(
-                        imageData =  imageData,
-                       userID = firebaseUser.uid
-               )
-                val user = repo.updateProfilePicture(updateProfileImageRequest)
-                firebaseUser.updateProfilePicture(user.profilePicture)
-                emit(Resource.success(Any()))
-            } catch (e: Exception) {
-                emit(responseHandler.handleRequestException<Any>(e, "Change profile pictrue"))
-            }
+     fun changeProfilePicture(imageData: String, firebaseUser: FirebaseUser)  = liveData{
+         val updateProfileImageRequest = UpdateProfileImageRequest(
+                 imageData =  imageData,
+                 userID = firebaseUser.uid
+         )
+         emitSource(callRunner.makeObservableCall(repo.updateProfilePicture(updateProfileImageRequest)){
+             firebaseUser.updateProfilePicture(user.profilePicture)
+         })
     }
 }

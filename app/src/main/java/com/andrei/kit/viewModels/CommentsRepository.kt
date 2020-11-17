@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.andrei.kit.models.Post
 import com.andrei.dataLayer.dataMappers.toComment
-import com.andrei.dataLayer.engineUtils.Resource
+import com.andrei.dataLayer.engineUtils.CallRunner
 import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.dataLayer.interfaces.CommentRepoInterface
 import com.andrei.dataLayer.interfaces.dao.RoomCommentDao
@@ -21,6 +21,7 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
                                              private val responseHandler: ResponseHandler) {
 
 
+    private val callRunner = CallRunner(responseHandler)
 
     fun getCommentsForPost(post: Post): LiveData<PostWithComments> = liveData {
         emitSource(commentDao.getAllPostComments(post.id))
@@ -30,16 +31,8 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
     }
 
 
-    fun uploadComment(comment: SerializeComment) = liveData {
-        emit(Resource.loading<Any>())
-        try {
-            val fetchedData  = repo.uploadComment(comment)
-                commentDao.insertComment(fetchedData.toComment())
-                emit(responseHandler.handleSuccess(Any()))
-
-        } catch (e: Exception) {
-            emit(responseHandler.handleRequestException<Any>(e, "Upload comment"))
-        }
+    fun uploadComment(comment: SerializeComment) = callRunner.makeObservableCall(repo.uploadComment(comment)) {
+        commentDao.insertComment(it.toComment())
     }
 
 

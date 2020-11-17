@@ -13,20 +13,20 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.andrei.dataLayer.engineUtils.Result
+import com.andrei.dataLayer.models.serialization.SerializeComment
 import com.andrei.kit.Adapters.AdapterComments
 import com.andrei.kit.R
-import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.bottomSheets.CommentBottomSheet
 import com.andrei.kit.databinding.PostExpandedFragmentBinding
 import com.andrei.kit.models.Post
 import com.andrei.kit.models.User
-import com.andrei.kit.viewModels.ViewModelComments
-import com.andrei.kit.viewModels.ViewModelPost
-import com.andrei.dataLayer.models.serialization.SerializeComment
 import com.andrei.kit.utils.isConnected
-import com.andrei.kit.utils.observeOnceForValue
+import com.andrei.kit.utils.observeOnce
 import com.andrei.kit.utils.observeRequest
 import com.andrei.kit.utils.reObserve
+import com.andrei.kit.viewModels.ViewModelComments
+import com.andrei.kit.viewModels.ViewModelPost
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.jama.carouselview.enums.IndicatorAnimationType
@@ -49,6 +49,7 @@ class ExpandedPostFragment : Fragment() {
     lateinit var connectivityManager: ConnectivityManager
 
     lateinit var post: Post
+
     private val commentButtonSheet  by lazy {
         CommentBottomSheet(::submitComment,user)
     }
@@ -78,13 +79,10 @@ class ExpandedPostFragment : Fragment() {
     }
 
     private fun attachObservers() {
-
-            viewModelPost.getPostByID(args.postID).reObserve(viewLifecycleOwner, {
-
+            viewModelPost.getPostByID(args.postID).observeOnce(viewLifecycleOwner, {
                             post = it
                             configureViews()
                             getComments()
-
 
                 }
             )
@@ -104,7 +102,7 @@ class ExpandedPostFragment : Fragment() {
             binding.saveButtonExpanded.setOnClickListener {
                 if (post.isFavorite) {
                     viewModelPost.removeFromFavorites(post).observeRequest(viewLifecycleOwner,{
-                        if(it.status == Status.SUCCESS){
+                        if(it is Result.Success){
                             informUserPostRemovedFromFavorites()
                             binding.post = post
                             binding.notifyChange()
@@ -112,7 +110,7 @@ class ExpandedPostFragment : Fragment() {
                     })
                 } else {
                     viewModelPost.addPostToFavorites(post).observeRequest(viewLifecycleOwner, {
-                       if(it.status == Status.SUCCESS) {
+                       if(it is Result.Success) {
                           informUserPostAddedToFavorites()
                            binding.post = post
                            binding.notifyChange()
@@ -155,8 +153,8 @@ class ExpandedPostFragment : Fragment() {
                     userID = user.userID)
 
             viewModelComments.uploadComment(commentToUpload).observeRequest(viewLifecycleOwner, {
-                when(it.status){
-                    Status.LOADING->{
+                when(it){
+                    is Result.Loading->{
                      commentButtonSheet.showLoading()
                     }
                     else ->

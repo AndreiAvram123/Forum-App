@@ -8,37 +8,31 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.Message
 import android.os.Messenger
-import android.util.Log
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
-import com.andrei.dataLayer.dataMappers.toUser
-import com.andrei.dataLayer.engineUtils.Status
+import com.andrei.dataLayer.engineUtils.Result
 import com.andrei.kit.R
 import com.andrei.kit.databinding.DrawerHeaderBinding
 import com.andrei.kit.databinding.LayoutMainActivityBinding
 import com.andrei.kit.models.User
-import com.andrei.kit.services.*
+import com.andrei.kit.services.MessengerService
+import com.andrei.kit.services.key_chats_link
+import com.andrei.kit.services.new_chat_link_message
 import com.andrei.kit.user.UserAccountManager
 import com.andrei.kit.utils.*
 import com.andrei.kit.viewModels.ViewModelChat
 import com.andrei.kit.viewModels.ViewModelUser
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.crashlytics.internal.model.CrashlyticsReport
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 import pl.aprilapps.easyphotopicker.DefaultCallback
 import pl.aprilapps.easyphotopicker.EasyImage
 import pl.aprilapps.easyphotopicker.MediaFile
@@ -152,7 +146,7 @@ class MainActivity : AppCompatActivity() {
                       val imageData = imageFiles.first().file.toUri().toDrawable(this@MainActivity).toBase64()
                       viewModelUser.changeProfilePicture(imageData,
                               FirebaseAuth.getInstance().currentUser!!).observeRequest(this@MainActivity,{
-                              if(it.status == Status.SUCCESS){
+                              if(it is Result.Success){
                                   Snackbar.make(binding.root,"Profile image changed, please restart the app",Snackbar.LENGTH_SHORT).show()
                             }
                       })

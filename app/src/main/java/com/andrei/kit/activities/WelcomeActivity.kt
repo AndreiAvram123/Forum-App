@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.R
 import com.andrei.kit.fragments.LoginFragment
 import com.andrei.kit.user.UserAccountManager
@@ -23,7 +22,6 @@ const val requestCodeGoogleSignIn = 1
 @AndroidEntryPoint
 class WelcomeActivity : AppCompatActivity(), LoginFragment.FragmentCallback {
 
-    //todo
     private val viewModelAuth: ViewModelAuth by viewModels()
 
     @Inject

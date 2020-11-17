@@ -13,11 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.andrei.dataLayer.engineUtils.Result
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutFragmentAddPostBinding
 import com.andrei.kit.models.User
 import com.andrei.kit.viewModels.ViewModelPost
-import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.dataLayer.models.serialization.SerializePost
 import com.andrei.kit.utils.observeRequest
 import com.andrei.kit.utils.toBase64
@@ -33,7 +33,6 @@ import pl.aprilapps.easyphotopicker.MediaFile
 import pl.aprilapps.easyphotopicker.MediaSource
 import javax.inject.Inject
 
-@InternalCoroutinesApi
 @AndroidEntryPoint
 class FragmentAddPost : Fragment() {
     private lateinit var binding: LayoutFragmentAddPostBinding
@@ -130,14 +129,14 @@ class FragmentAddPost : Fragment() {
                         imageData = imageData
                 )
                 viewModelPost.uploadPost(post).observeRequest(viewLifecycleOwner, {
-                    when (it.status){
-                        Status.SUCCESS -> {
+                    when (it){
+                        is Result.Success -> {
                           findNavController().popBackStack()
                         }
-                        Status.LOADING ->{
+                       is  Result.Loading->{
 
                         }
-                        Status.ERROR ->{
+                        is Result.Error ->{
 
                         }
 

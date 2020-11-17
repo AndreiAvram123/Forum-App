@@ -6,7 +6,6 @@ import androidx.lifecycle.liveData
 import com.andrei.kit.user.UserAccountManager
 import com.andrei.dataLayer.dataMappers.UserMapper
 import com.andrei.dataLayer.dataMappers.toUser
-import com.andrei.dataLayer.engineUtils.Resource
 import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.dataLayer.interfaces.AuthRepositoryInterface
 import com.andrei.dataLayer.models.serialization.AuthenticationData
@@ -34,7 +33,7 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
                                          @ApplicationContext private val context: Context) {
 
     val authenticationError = MutableLiveData<String>()
-    val registrationError = MutableLiveData<Resource<String>>()
+    val registrationError = MutableLiveData<String>()
 
     private val auth = FirebaseAuth.getInstance()
 
@@ -69,13 +68,13 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
                             if(authenticationData!=null)
                                 saveAuthenticationData(authenticationData)
                         }catch (e:Exception){
-                            registrationError.postValue(Resource.error(context.getString(R.string.unknown_error)))
+                            registrationError.postValue(context.getString(R.string.unknown_error))
                             responseHandler.handleRequestException<Any>(e, "Register with Username and password")
                         }
                     }
                 }
             }.addOnFailureListener {
-                registrationError.postValue(Resource.error(it.message ?: context.getString(R.string.unknown_error)))
+                registrationError.postValue(it.message ?: context.getString(R.string.unknown_error))
             }
 
     }

@@ -69,10 +69,10 @@ class PostRepository @Inject constructor(private val user: User,
 
 
     fun fetchPostByID(id: Int) :LiveData<Post> =  liveData {
-        emitSource(postDao.getPostByID(id))
         callRunner.makeCall(repo.fetchPostByID(id)){
              postDao.insertPost(it.toPost())
         }
+        emitSource(postDao.getPostByID(id))
     }
 
 

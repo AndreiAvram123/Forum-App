@@ -8,8 +8,9 @@ import com.andrei.kit.models.Chat
 import com.andrei.kit.models.User
 import com.andrei.dataLayer.dataMappers.ChatMapper
 import com.andrei.dataLayer.dataMappers.toMessage
-import com.andrei.dataLayer.engineUtils.Resource
+import com.andrei.dataLayer.engineUtils.CallRunner
 import com.andrei.dataLayer.engineUtils.ResponseHandler
+import com.andrei.dataLayer.engineUtils.Result
 import com.andrei.dataLayer.interfaces.ChatRepositoryInterface
 import com.andrei.dataLayer.interfaces.dao.ChatDao
 import com.andrei.dataLayer.interfaces.dao.MessageDao
@@ -33,6 +34,8 @@ class ChatRepository @Inject constructor(
         private val responseHandler: ResponseHandler
 
 ) {
+
+    private val callRunner = CallRunner(responseHandler)
 
     init {
         coroutineScope.launch {
@@ -95,43 +98,25 @@ class ChatRepository @Inject constructor(
         }
 
 
-     fun pushMessage(serializeMessage: SerializeMessage) = liveData{
-        emit(Resource.loading<Any>())
-         try {
-            val messageDTO  = repo.pushMessage(serializeMessage)
-             messageDao.insertMessage(messageDTO.toMessage())
-            emit(Resource.success(Any()))
-        } catch (e: Exception) {
-           responseHandler.handleRequestException<Any>(e,Endpoint.PUSH_MESSAGE.url)
-        }
-    }
+     fun pushMessage(serializeMessage: SerializeMessage) = callRunner.makeObservableCall(repo.pushMessage(serializeMessage)) {
+         messageDao.insertMessage(it.toMessage())
+     }
 
 
     fun getCachedMessages(chatID: Int) = messageDao.getRecentChatMessages(chatID)
 
 
     private suspend fun fetchChatsLink() {
-        try {
-            val link = repo.fetchChatURL(user.userID).message
-            chatLink.postValue(link)
-        }catch (e:Exception){
-             responseHandler.handleRequestException<Any>(e,Endpoint.CHAT_LINK.url)
+        callRunner.makeCall(repo.fetchChatURL(user.userID)) {
+            chatLink.postValue(it.message)
         }
     }
 
 
-
-     fun acceptFriendRequest(request: FriendRequest) = liveData{
-        emit(Resource.loading<Any>())
-         try {
-            val data = repo.acceptFriendRequest(request.id)
-            val chat = ChatMapper.mapDtoObjectToDomainObject(data, request.receiver.userID)
-            chatDao.insert(chat)
-            receivedFriendRequests.removeAndNotify(request)
-            emit(responseHandler.handleSuccess(Any()))
-        }catch(e:Exception){
-            responseHandler.handleRequestException<Any>(e,"Accept friend request")
-        }
+     fun acceptFriendRequest(request: FriendRequest) = callRunner.makeObservableCall(repo.acceptFriendRequest(request.id)){
+         val chat = ChatMapper.mapDtoObjectToDomainObject(it,request.receiver.userID)
+         chatDao.insert(chat)
+         receivedFriendRequests.removeAndNotify(request)
         }
 
 
@@ -141,37 +126,19 @@ class ChatRepository @Inject constructor(
             receivedFriendRequests.addAndNotify(fetchedData.toMutableList())
         }
     }
-    private suspend fun fetchSentFriendRequests() {
-            try {
-                val fetchedData = repo.fetchSentFriendRequests(user.userID)
-                sentFriendRequests.addAndNotify(fetchedData)
-            }catch (e:Exception) {
-                responseHandler.handleRequestException<Any>(e,"Sent friend requests")
-            }
+    private suspend fun fetchSentFriendRequests()  = callRunner.makeCall(repo.fetchSentFriendRequests(user.userID)) {
+       sentFriendRequests.addAndNotify(it)
 
     }
 
-      fun sendFriendRequest(friendRequest: SerializeFriendRequest) = liveData {
-        try {
-           val response = repo.sendFriendRequest(friendRequest)
-            sentFriendRequests.addAndNotify(response)
-        }catch (e:Exception){
-            emit(responseHandler.handleRequestException<Any>(e,"Send friend request"))
-        }
+      fun sendFriendRequest(friendRequest: SerializeFriendRequest) = callRunner.makeObservableCall(repo.sendFriendRequest(friendRequest)) {
+         sentFriendRequests.addAndNotify(it)
+
+      }
+
+
+    fun fetchNewMessages(chatID: Int) = callRunner.makeObservableCall(repo.fetchRecentMessages(chatID)) {
+        messageDao.insertMessages(it.map { messageDTO -> messageDTO.toMessage() })
     }
-
-
-
-    fun fetchNewMessages(chatID: Int) = liveData {
-         try{
-             val fetchedData = repo.fetchRecentMessages(chatID)
-             val messages = fetchedData.map { it.toMessage() }
-             messageDao.insertMessages(messages)
-             emit(Resource.success(fetchedData))
-         }catch (e:Exception){
-             emit(responseHandler.handleRequestException<Any>(e,"/api/chat/{chatID}/recentMessages"))
-         }
-    }
-
 
 }

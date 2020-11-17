@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.andrei.dataLayer.engineUtils.Status
+import com.andrei.dataLayer.engineUtils.Result
 import com.andrei.kit.viewModels.ViewModelChat
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.kit.Adapters.CustomDivider
@@ -56,14 +56,14 @@ class ReceivedFriendRequestsFragment private constructor() : Fragment() {
 
     private fun acceptRequest(request: FriendRequest) {
         viewModelChat.acceptFriendRequest(request).observeRequest(viewLifecycleOwner,{
-            when(it.status){
-                Status.SUCCESS ->{
+            when(it){
+                is Result.Success ->{
 
                 }
-                Status.ERROR->{
+                is Result.Error->{
 
                 }
-                Status.LOADING ->{
+               is  Result.Loading ->{
 
                 }
 

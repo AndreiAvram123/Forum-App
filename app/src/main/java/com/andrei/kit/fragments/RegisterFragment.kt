@@ -6,8 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.kit.R
 import com.andrei.kit.databinding.LayoutSignUpBinding
 import com.andrei.kit.utils.isEmail
@@ -22,17 +22,9 @@ class RegisterFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = LayoutSignUpBinding.inflate(inflater, container, false)
         initializeUI()
-        viewModelAuth.registrationState.reObserve(viewLifecycleOwner,{
-            hideErrors()
-            when(it.status){
-                Status.ERROR ->{
-                    displayErrorMessage(it.message!!)
-                    showButton()
-                }
-
-                else->
-                    hideButton()
-            }
+        viewModelAuth.registrationError.reObserve(viewLifecycleOwner,{
+                    displayErrorMessage(it)
+                   showButton()
 
         })
         return binding.root

@@ -9,8 +9,8 @@ import java.lang.Error
 class CallRunner (private val responseHandler: ResponseHandler){
 
 
-     fun <T> makeObservableCall(call: Call<T>,completion : suspend (data:T)->Unit)  = liveData<Resource<T>>{
-        emit(Resource.loading())
+     fun < T> makeObservableCall(call: Call<T>,completion : suspend (data:T)->Unit)  = liveData<Result<T>>{
+        emit(Result.Loading)
         val url = call.request().url.toString()
         try {
           val response = call.awaitResponse()
@@ -24,10 +24,10 @@ class CallRunner (private val responseHandler: ResponseHandler){
                 emit(responseHandler.handleRequestException(Exception("Unknown"),url))
             }
         } catch (e: Exception) {
-           emit(  responseHandler.handleRequestException(e,url))
+           emit(responseHandler.handleRequestException(e,url))
         }
     }
-    suspend fun <T> makeCall(call: Call<T>,completion:suspend (data:T)->Unit): Resource<T>{
+    suspend fun <T> makeCall(call: Call<T>,completion:suspend (data:T)->Unit): Result<T>{
 
         val url = call.request().url.toString()
         try {
@@ -35,7 +35,8 @@ class CallRunner (private val responseHandler: ResponseHandler){
             if(response.isSuccessful){
                 val body = response.body()
                 if(body !=null){
-                  return responseHandler.handleSuccess(body)
+                    completion(body)
+                    return responseHandler.handleSuccess(body)
                 }
             }
         } catch (e: Exception) {
