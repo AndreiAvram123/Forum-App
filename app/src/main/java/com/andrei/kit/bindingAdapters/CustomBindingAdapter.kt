@@ -1,10 +1,13 @@
 package com.andrei.kit.bindingAdapters
 
+import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.andrei.kit.R
 import com.bumptech.glide.Glide
 import com.github.chrisbanes.photoview.PhotoView
@@ -55,5 +58,15 @@ fun getDateFromUnix(textView: TextView, unixTime: Long) {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.UK);
             textView.text = dateFormat.format(messageDate)
         }
+    }
+}
+
+@BindingAdapter("visibleWithText")
+fun getVisibleWithText(textView: TextView, text:MutableLiveData<String>){
+    if(text.value.isNullOrEmpty()){
+        textView.visibility = View.INVISIBLE
+    }else{
+        textView.visibility = View.VISIBLE
+        textView.text = text.value
     }
 }
