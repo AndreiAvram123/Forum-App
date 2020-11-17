@@ -16,7 +16,7 @@ class ViewModelAuth @ViewModelInject constructor(
     val authenticationState by lazy {
         authRepository.authenticationError
     }
-    val registrationState by lazy {
+    val registrationError by lazy {
         authRepository.registrationError
     }
 

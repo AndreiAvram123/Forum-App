@@ -27,7 +27,7 @@ android {
 
     defaultConfig {
         versionCode getBuildNumber()
-        versionName "1.0.7"
+        versionName "1.0.8"
         applicationId "com.andrei.kit"
         minSdkVersion 26
         targetSdkVersion 29
@@ -165,6 +165,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test:rules:1.0.2'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     testImplementation "org.robolectric:robolectric:4.4"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.4.10"
 
 
 }

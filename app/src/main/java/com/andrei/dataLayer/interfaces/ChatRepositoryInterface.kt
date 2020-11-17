@@ -7,6 +7,7 @@ import com.andrei.dataLayer.models.UserDTO
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeMessage
+import retrofit2.Call
 import retrofit2.http.*
 
 
@@ -17,27 +18,27 @@ interface ChatRepositoryInterface {
     suspend fun fetchUserChats(@Path("userID") userID: String): List<ChatDTO>
 
     @POST("/api/messages/push")
-    suspend fun pushMessage(@Body serializeMessage: SerializeMessage): MessageDTO
+     fun pushMessage(@Body serializeMessage: SerializeMessage): Call<MessageDTO>
 
 
     @GET("/api/chat/{chatID}/recentMessages")
-    suspend fun fetchRecentMessages(@Path("chatID") chatID: Int): List<MessageDTO>
+     fun fetchRecentMessages(@Path("chatID") chatID: Int): Call<List<MessageDTO>>
 
     @GET("/api/chats/discover/{userID}")
-    suspend fun fetchChatURL(@Path("userID") userID: String): ServerResponse
+     fun fetchChatURL(@Path("userID") userID: String): Call<ServerResponse>
 
     @PATCH("/api/friendRequests/acceptRequest/{requestID}")
-    suspend fun acceptFriendRequest(@Path("requestID") requestID: Int): ChatDTO
+     fun acceptFriendRequest(@Path("requestID") requestID: Int): Call<ChatDTO>
 
 
     @POST("/api/friendRequests/send")
-    suspend fun sendFriendRequest(@Body friendRequest: SerializeFriendRequest):FriendRequest
+     fun sendFriendRequest(@Body friendRequest: SerializeFriendRequest): Call<FriendRequest>
 
     @GET("/api/user/{userID}/receivedRequests")
     suspend fun fetchReceivedFriendRequests(@Path("userID") userID: String): List<FriendRequest>
 
     @GET("/api/user/{userID}/sentRequests")
-    suspend fun fetchSentFriendRequests(@Path("userID") userID: String): List<FriendRequest>
+      fun fetchSentFriendRequests(@Path("userID") userID: String): Call<List<FriendRequest>>
 
     @GET("/api/user/{userID}/lastMessages")
     suspend fun fetchLastChatsMessage(@Path("userID") userID: String): List<MessageDTO>

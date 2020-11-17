@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.andrei.dataLayer.engineUtils.Status
+import com.andrei.dataLayer.engineUtils.Result
 import com.andrei.kit.Adapters.CustomDivider
 import com.andrei.kit.Adapters.HomeAdapter
 import com.andrei.kit.R
@@ -43,14 +43,14 @@ class HomeFragment : Fragment() {
 
     private fun removeFromFavorites(post:Post){
        viewModelPost.removeFromFavorites(post).observeRequest(viewLifecycleOwner,{
-           when(it.status){
-               Status.SUCCESS->{
-                homeAdapter.notifyPostChanged(post)
+           when(it) {
+               is Result.Success -> {
+                   homeAdapter.notifyPostChanged(post)
                }
-               Status.LOADING->{
+               is Result.Loading -> {
 
                }
-               Status.ERROR ->{
+               is Result.Error -> {
 
                }
 
@@ -59,18 +59,18 @@ class HomeFragment : Fragment() {
     }
     private fun addToFavorites(post:Post){
     viewModelPost.addPostToFavorites(post).observeRequest(viewLifecycleOwner,{
-          when(it.status){
-              Status.SUCCESS->{
-                  homeAdapter.notifyPostChanged(post)
-              }
-              Status.LOADING->{
+        when(it) {
+            is Result.Success -> {
+                homeAdapter.notifyPostChanged(post)
+            }
+            is Result.Loading -> {
 
-              }
-              Status.ERROR ->{
+            }
+            is Result.Error -> {
 
-              }
+            }
 
-          }
+        }
     })
     }
 

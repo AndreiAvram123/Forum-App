@@ -5,38 +5,40 @@ import com.andrei.dataLayer.models.SerializeImage
 import com.andrei.dataLayer.models.ServerResponse
 import com.andrei.dataLayer.models.serialization.SerializePost
 import com.andrei.dataLayer.models.serialization.SerializeFavoritePostRequest
+import retrofit2.Call
+import retrofit2.Response
 import retrofit2.http.*
 
 interface PostRepositoryInterface {
 
     @GET("/api/recentPosts")
-    suspend fun fetchRecentPosts(): ArrayList<PostDTO>
+    fun fetchRecentPosts(): Call<ArrayList<PostDTO>>
 
     @GET("/api/posts/page/{lastPostID}")
-    suspend fun fetchNextPagePosts(@Path("lastPostID")lastPostID: Int): List<PostDTO>
+    fun fetchNextPagePosts(@Path("lastPostID")lastPostID: Int): Call<List<PostDTO>>
 
 
     @GET("/api/post/{id}")
-    suspend fun fetchPostByID(@Path("id") postID: Int): PostDTO
+     fun fetchPostByID(@Path("id") postID: Int): Call<PostDTO>
 
     @GET("/api/user/{id}/favoritePosts")
-    suspend fun fetchUserFavoritePosts(@Path("id") userID: String): ArrayList<PostDTO>
+    fun fetchUserFavoritePosts(@Path("id") userID: String): Call<ArrayList<PostDTO>>
 
 
     @GET("/api/user/{userID}/posts")
-    suspend fun fetchUserPosts(@Path("userID") userID: String): ArrayList<PostDTO>
+     fun fetchUserPosts(@Path("userID") userID: String): Call<ArrayList<PostDTO>>
 
     @DELETE("/api/user/{userID}/removeFromFavorites/{postID}")
-    suspend fun removePostFromFavorites(@Path("userID") userID: String, @Path("postID") postID: Int): ServerResponse
+     fun removePostFromFavorites(@Path("userID") userID: String, @Path("postID") postID: Int): Call<ServerResponse>
 
     @POST("/api/posts/addToFavorites")
-    suspend fun addPostToFavorites(@Body serializeFavoritePostRequest: SerializeFavoritePostRequest) :ServerResponse
+    fun addPostToFavorites(@Body serializeFavoritePostRequest: SerializeFavoritePostRequest) :Call<ServerResponse>
 
     @POST("/api/posts/uploadImage")
     suspend fun uploadImage(@Body serializeImage: SerializeImage): ServerResponse
 
     @POST("/api/posts/create")
-    suspend fun uploadPost(@Body uploadPost: SerializePost): PostDTO
+     fun uploadPost(@Body uploadPost: SerializePost): Call<PostDTO>
 
 
 }

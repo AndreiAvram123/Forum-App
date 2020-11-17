@@ -13,6 +13,7 @@ import com.andrei.kit.R
 import com.andrei.kit.databinding.PostItemHomePageBinding
 import com.andrei.kit.fragments.ExpandedPostFragmentDirections
 import com.andrei.kit.models.Post
+import com.andrei.kit.utils.isConnected
 import com.bumptech.glide.Glide
 import com.google.android.material.snackbar.Snackbar
 import com.jama.carouselview.enums.IndicatorAnimationType
@@ -90,7 +91,7 @@ class HomeAdapter(
         }
     }
     private fun isInternetActive():Boolean{
-        return connectivityManager.activeNetwork !=null
+        return connectivityManager.isConnected()
     }
     private fun displayInternetConnectionError(binding: PostItemHomePageBinding){
         Snackbar.make(binding.root, binding.root.context.getString(R.string.no_internet_connection), Snackbar.LENGTH_SHORT)

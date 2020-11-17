@@ -11,7 +11,7 @@ fun <T> LiveData<T>.reObserve(owner: LifecycleOwner, observer: Observer<T>) {
     removeObserver(observer)
     observe(owner, observer)
 }
-fun <T> LiveData<T>.observeOnceForValue(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
     observe(lifecycleOwner, object : Observer<T> {
         override fun onChanged(t: T?) {
             observer.onChanged(t)

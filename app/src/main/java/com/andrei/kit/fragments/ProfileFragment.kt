@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
-import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.dataLayer.models.deserialization.FriendRequest
 import com.andrei.dataLayer.models.serialization.SerializeFriendRequest
 import com.andrei.kit.R
@@ -21,6 +20,7 @@ import com.andrei.kit.viewModels.ViewModelChat
 import com.andrei.kit.viewModels.ViewModelUser
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import com.andrei.dataLayer.engineUtils.Result
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
@@ -112,7 +112,7 @@ class ProfileFragment : Fragment() {
 
     private fun acceptInvitation(friendRequest:FriendRequest){
         viewModelChat.acceptFriendRequest(friendRequest).observeRequest(viewLifecycleOwner,{
-            if(it.status == Status.SUCCESS){
+            if(it is Result.Success){
                 binding.addToFriendsButton.apply {
                   usersStatus = UsersStatus.FRIENDS
                 }
@@ -122,7 +122,7 @@ class ProfileFragment : Fragment() {
     private fun sendInvitation() {
             val request = SerializeFriendRequest(senderID = user.userID,receiverID = navArgs.userID)
             viewModelChat.sendFriendRequest(request).observeRequest(viewLifecycleOwner, {
-               if(it.status == Status.ERROR){
+               if(it is Result.Error){
                    //hmm not sure what to do here
                }
             })

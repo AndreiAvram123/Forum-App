@@ -13,12 +13,14 @@ import com.andrei.dataLayer.interfaces.PostRepositoryInterface
 import com.andrei.dataLayer.interfaces.dao.RoomPostDao
 import com.andrei.dataLayer.models.serialization.SerializeFavoritePostRequest
 import kotlinx.coroutines.runBlocking
+import okhttp3.internal.wait
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import retrofit2.await
 
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
 @RunWith(RobolectricTestRunner::class)
@@ -49,26 +51,26 @@ class PostRepositoryTest {
     @Test
     fun shouldReturnPosts() {
         runBlocking {
-            repo.fetchNextPagePosts(TestUtilities.lastPostIDDB)
+            repo.fetchNextPagePosts(TestUtilities.lastPostIDDB).await()
         }
     }
 
     @Test
     fun shouldReturnPost() = runBlocking {
-        val subject = repo.fetchPostByID(testPostID)
+        val subject = repo.fetchPostByID(testPostID).await()
         Assert.assertNotNull(subject)
     }
 
     @Test
     fun shouldFetchRecentPosts() = runBlocking {
-        val fetchedData = repo.fetchRecentPosts()
+        val fetchedData = repo.fetchRecentPosts().await()
         assert(fetchedData.isNotEmpty())
     }
 
 
     @Test
     fun shouldReturnUserFavoritePost() = runBlocking {
-        val favoritePosts = repo.fetchUserFavoritePosts(testUser.userID)
+        val favoritePosts = repo.fetchUserFavoritePosts(testUser.userID).await()
         Assert.assertNotNull(favoritePosts)
     }
 
@@ -77,7 +79,7 @@ class PostRepositoryTest {
 
     @Test
     fun shouldReturnNotNullFavoritePosts() = runBlocking {
-        val fetchedFavoritePosts = repo.fetchUserFavoritePosts(testUserID)
+        val fetchedFavoritePosts = repo.fetchUserFavoritePosts(testUserID).await()
         Assert.assertNotNull(fetchedFavoritePosts)
     }
 
@@ -86,8 +88,7 @@ class PostRepositoryTest {
     @Test
     fun `add post to favorites given post and user ID` ()= runBlocking{
         val favoritePostRequest = SerializeFavoritePostRequest(postID = testPostID,userID = testUserID)
-        val response = repo.addPostToFavorites(favoritePostRequest)
-        Assert.assertTrue(response.successful)
+        val response = repo.addPostToFavorites(favoritePostRequest).await()
     }
 
 
@@ -97,13 +98,13 @@ class PostRepositoryTest {
             //add a post to favorites that we know it exists
             val favoritePostRequest = SerializeFavoritePostRequest(postID = testPostID,userID = testUserID)
            repo.addPostToFavorites(favoritePostRequest)
-            val serverResponse = repo.removePostFromFavorites(userID = favoritePostRequest.userID, postID = favoritePostRequest.postID)
+            val serverResponse = repo.removePostFromFavorites(userID = favoritePostRequest.userID, postID = favoritePostRequest.postID).await()
             Assert.assertTrue(serverResponse.successful)
         }
     }
     @Test
     fun shouldReturnNotNulUserPosts() = runBlocking {
-        val fetchedPosts = repo.fetchUserPosts(testUserID)
+        val fetchedPosts = repo.fetchUserPosts(testUserID).await()
         Assert.assertNotNull(fetchedPosts)
     }
 }

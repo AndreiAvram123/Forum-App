@@ -5,7 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.liveData
 import com.andrei.dataLayer.dataMappers.toUser
-import com.andrei.dataLayer.engineUtils.Resource
+import com.andrei.dataLayer.engineUtils.CallRunner
 import com.andrei.dataLayer.engineUtils.ResponseHandler
 import com.andrei.dataLayer.interfaces.UserRepoInterface
 import com.andrei.dataLayer.interfaces.dao.UserDao
@@ -14,14 +14,11 @@ import com.andrei.kit.models.User
 import com.andrei.kit.utils.addAndNotify
 import com.andrei.kit.utils.isConnected
 import com.andrei.kit.utils.updateProfilePicture
-import com.andrei.kit.viewModels.ViewModelUser
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 @ActivityScoped
 class UserRepository @Inject constructor(
@@ -33,6 +30,7 @@ class UserRepository @Inject constructor(
         private val responseHandler: ResponseHandler
 ) {
 
+    private val callRunner = CallRunner(responseHandler)
 
     val friends :MutableLiveData<MutableList<User>> by lazy {
         MutableLiveData<MutableList<User>>().also {
@@ -49,7 +47,7 @@ class UserRepository @Inject constructor(
                 val fetchedData = repo.fetchUser(userID)
                 userDao.insertUser(fetchedData.toUser())
             }catch (e:Exception){
-              responseHandler.handleException<User>(e,"fetch user details")
+              responseHandler.handleRequestException<User>(e,"fetch user details")
             }
         }
     }
@@ -61,23 +59,18 @@ class UserRepository @Inject constructor(
                 val transformedData = fetchedData.map { it.toUser() }
                 friends.addAndNotify(transformedData)
             }catch (e:Exception){
-                responseHandler.handleException<User>(e,"fetch friends")
+                responseHandler.handleRequestException<User>(e,"fetch friends")
             }
         }
     }
 
-     fun changeProfilePicture(imageData: String, firebaseUser: FirebaseUser) = liveData{
-        emit(Resource.loading<Any>())
-            try {
-               val updateProfileImageRequest = UpdateProfileImageRequest(
-                        imageData =  imageData,
-                       userID = firebaseUser.uid
-               )
-                val user = repo.updateProfilePicture(updateProfileImageRequest)
-                firebaseUser.updateProfilePicture(user.profilePicture)
-                emit(Resource.success(Any()))
-            } catch (e: Exception) {
-                emit(responseHandler.handleException<Any>(e, "Change profile pictrue"))
-            }
+     fun changeProfilePicture(imageData: String, firebaseUser: FirebaseUser)  = liveData{
+         val updateProfileImageRequest = UpdateProfileImageRequest(
+                 imageData =  imageData,
+                 userID = firebaseUser.uid
+         )
+         emitSource(callRunner.makeObservableCall(repo.updateProfilePicture(updateProfileImageRequest)){
+             firebaseUser.updateProfilePicture(user.profilePicture)
+         })
     }
 }

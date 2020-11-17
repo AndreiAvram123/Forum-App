@@ -15,12 +15,14 @@ import com.andrei.kit.databinding.FragmentFavoritePostsBinding
 import com.andrei.kit.utils.reObserve
 import com.andrei.kit.viewModels.ViewModelPost
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.fragment_favorite_posts.*
 import kotlinx.android.synthetic.main.fragment_favorite_posts.view.*
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class FavoritePostsFragment : Fragment() {
+
     @Inject
     lateinit var connectivityManager: ConnectivityManager
 
@@ -41,12 +43,6 @@ class FavoritePostsFragment : Fragment() {
     }
 
 
-
-    /**
-     * This method initialises all the the recyclerView
-     * with a recyclerView adapter, a layout manager
-     * and an item decoration
-     */
     private fun initializeRecyclerView() {
        binding.recyclerViewFavoritePosts.apply {
             adapter = simpleAdapterPosts

@@ -14,11 +14,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.andrei.dataLayer.engineUtils.Result
 import com.andrei.kit.Adapters.MessageAdapter
 import com.andrei.kit.databinding.MessagesFragmentBinding
 import com.andrei.kit.models.User
 import com.andrei.kit.viewModels.ViewModelChat
-import com.andrei.dataLayer.engineUtils.Status
 import com.andrei.dataLayer.models.serialization.SerializeMessage
 import com.andrei.dataLayer.serverConstants.MessageTypes
 import com.andrei.kit.Adapters.CustomDivider
@@ -75,16 +75,17 @@ class MessagesFragment : Fragment() {
             }
         })
         viewModelChat.fetchNewMessages(args.chatID).observeRequest(viewLifecycleOwner, {
-            when (it.status) {
-                Status.LOADING -> {
-                }
-
-                Status.SUCCESS -> {
+            when (it) {
+                is Result.Success ->{
                     Snackbar.make(binding.root, "New messages fetched" ,Snackbar.LENGTH_LONG).show()
                 }
-                else -> {
+                is Result.Loading->{
+
+                }
+                is Result.Error->{
                     Snackbar.make(binding.root, "Failed to get messages",Snackbar.LENGTH_LONG).show()
                 }
+                
             }
         })
 
@@ -136,22 +137,22 @@ class MessagesFragment : Fragment() {
                         chatID = args.chatID, senderID = user.userID, content = messageContent)
 
                 viewModelChat.sendMessage(message).observeRequest(viewLifecycleOwner, {
-                    when (it.status) {
-                        Status.LOADING -> {
+                    when (it) {
+                        is Result.Success -> {
+                        }
+                        is Result.Loading -> {
 
                         }
-                        Status.SUCCESS -> {
-
+                        is Result.Error -> {
                         }
-                        Status.ERROR -> {
 
-                        }
                     }
                 })
                 text.clear()
             }
         }
     }
+
 
 
     private fun configureRecyclerView() {
@@ -210,11 +211,11 @@ class MessagesFragment : Fragment() {
 
             )
             viewModelChat.sendMessage(message).observeRequest(viewLifecycleOwner, { result ->
-                when (result.status) {
-                    Status.LOADING -> {
+                when (result) {
+                   is  Result.Loading -> {
 
                     }
-                    Status.SUCCESS -> {
+                   is  Result.Success -> {
                         pushImageFromQueue()
                     }
                     else -> {
