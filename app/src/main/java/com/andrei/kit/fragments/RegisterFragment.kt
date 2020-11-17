@@ -22,11 +22,11 @@ class RegisterFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = LayoutSignUpBinding.inflate(inflater, container, false)
         initializeUI()
-        viewModelAuth.registrationError.reObserve(viewLifecycleOwner,{
+        viewModelAuth.registrationError.reObserve(viewLifecycleOwner){
                     displayErrorMessage(it)
                    showButton()
 
-        })
+        }
         return binding.root
     }
 
