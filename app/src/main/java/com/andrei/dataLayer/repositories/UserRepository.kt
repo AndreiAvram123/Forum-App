@@ -14,14 +14,11 @@ import com.andrei.kit.models.User
 import com.andrei.kit.utils.addAndNotify
 import com.andrei.kit.utils.isConnected
 import com.andrei.kit.utils.updateProfilePicture
-import com.andrei.kit.viewModels.ViewModelUser
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.coroutineContext
 
 @ActivityScoped
 class UserRepository @Inject constructor(
@@ -49,7 +46,7 @@ class UserRepository @Inject constructor(
                 val fetchedData = repo.fetchUser(userID)
                 userDao.insertUser(fetchedData.toUser())
             }catch (e:Exception){
-              responseHandler.handleException<User>(e,"fetch user details")
+              responseHandler.handleRequestException<User>(e,"fetch user details")
             }
         }
     }
@@ -61,7 +58,7 @@ class UserRepository @Inject constructor(
                 val transformedData = fetchedData.map { it.toUser() }
                 friends.addAndNotify(transformedData)
             }catch (e:Exception){
-                responseHandler.handleException<User>(e,"fetch friends")
+                responseHandler.handleRequestException<User>(e,"fetch friends")
             }
         }
     }
@@ -77,7 +74,7 @@ class UserRepository @Inject constructor(
                 firebaseUser.updateProfilePicture(user.profilePicture)
                 emit(Resource.success(Any()))
             } catch (e: Exception) {
-                emit(responseHandler.handleException<Any>(e, "Change profile pictrue"))
+                emit(responseHandler.handleRequestException<Any>(e, "Change profile pictrue"))
             }
     }
 }

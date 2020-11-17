@@ -53,7 +53,7 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
             }
 
         }catch (e:Exception){
-            responseHandler.handleException<Any>(e,"Login with google")
+            responseHandler.handleRequestException<Any>(e,"Login with google")
             authenticationError.postValue(context.getString(R.string.unknown_error))
         }
     }
@@ -70,7 +70,7 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
                                 saveAuthenticationData(authenticationData)
                         }catch (e:Exception){
                             registrationError.postValue(Resource.error(context.getString(R.string.unknown_error)))
-                            responseHandler.handleException<Any>(e, "Register with Username and password")
+                            responseHandler.handleRequestException<Any>(e, "Register with Username and password")
                         }
                     }
                 }
@@ -97,7 +97,7 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
                 return it
             }
         }catch (e:Exception){
-            responseHandler.handleException<Any>(e,"Register user to api")
+            responseHandler.handleRequestException<Any>(e,"Register user to api")
          }
         }
         return null
@@ -119,7 +119,7 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
                     return it
                 }
             }catch (e:Exception){
-                responseHandler.handleException<Any>(e,"Register google user to api")
+                responseHandler.handleRequestException<Any>(e,"Register google user to api")
             }
      return null
     }
@@ -135,7 +135,7 @@ class AuthRepository @Inject constructor(private val repo: AuthRepositoryInterfa
                 val fetchedSuggestions = repo.fetchSuggestions(query)
                 emit(fetchedSuggestions.map { UserMapper.mapToDomainObject(it) })
             } catch (e: Exception) {
-                responseHandler.handleException<Any>(e,"fetching user search suggestions")
+                responseHandler.handleRequestException<Any>(e,"fetching user search suggestions")
             }
     }
 

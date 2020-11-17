@@ -80,7 +80,7 @@ class ChatRepository @Inject constructor(
             val messages = data.map { it.toMessage() }
             messageDao.insertMessages(messages)
         }catch (e:Exception){
-            responseHandler.handleException<Any>(e,Endpoint.LAST_CHAT_MESSAGES.url)
+            responseHandler.handleRequestException<Any>(e,Endpoint.LAST_CHAT_MESSAGES.url)
         }
     }
 
@@ -90,7 +90,7 @@ class ChatRepository @Inject constructor(
             val chats = ChatMapper.mapToDomainObjects(fetchedData, user.userID)
             chatDao.insert(chats)
         }catch(e:Exception){
-             responseHandler.handleException<Any>(e,Endpoint.USERS_CHAT.url)
+             responseHandler.handleRequestException<Any>(e,Endpoint.USERS_CHAT.url)
             }
         }
 
@@ -102,7 +102,7 @@ class ChatRepository @Inject constructor(
              messageDao.insertMessage(messageDTO.toMessage())
             emit(Resource.success(Any()))
         } catch (e: Exception) {
-           responseHandler.handleException<Any>(e,Endpoint.PUSH_MESSAGE.url)
+           responseHandler.handleRequestException<Any>(e,Endpoint.PUSH_MESSAGE.url)
         }
     }
 
@@ -115,7 +115,7 @@ class ChatRepository @Inject constructor(
             val link = repo.fetchChatURL(user.userID).message
             chatLink.postValue(link)
         }catch (e:Exception){
-             responseHandler.handleException<Any>(e,Endpoint.CHAT_LINK.url)
+             responseHandler.handleRequestException<Any>(e,Endpoint.CHAT_LINK.url)
         }
     }
 
@@ -130,7 +130,7 @@ class ChatRepository @Inject constructor(
             receivedFriendRequests.removeAndNotify(request)
             emit(responseHandler.handleSuccess(Any()))
         }catch(e:Exception){
-            responseHandler.handleException<Any>(e,"Accept friend request")
+            responseHandler.handleRequestException<Any>(e,"Accept friend request")
         }
         }
 
@@ -146,7 +146,7 @@ class ChatRepository @Inject constructor(
                 val fetchedData = repo.fetchSentFriendRequests(user.userID)
                 sentFriendRequests.addAndNotify(fetchedData)
             }catch (e:Exception) {
-                responseHandler.handleException<Any>(e,"Sent friend requests")
+                responseHandler.handleRequestException<Any>(e,"Sent friend requests")
             }
 
     }
@@ -156,7 +156,7 @@ class ChatRepository @Inject constructor(
            val response = repo.sendFriendRequest(friendRequest)
             sentFriendRequests.addAndNotify(response)
         }catch (e:Exception){
-            emit(responseHandler.handleException<Any>(e,"Send friend request"))
+            emit(responseHandler.handleRequestException<Any>(e,"Send friend request"))
         }
     }
 
@@ -169,7 +169,7 @@ class ChatRepository @Inject constructor(
              messageDao.insertMessages(messages)
              emit(Resource.success(fetchedData))
          }catch (e:Exception){
-             emit(responseHandler.handleException<Any>(e,"/api/chat/{chatID}/recentMessages"))
+             emit(responseHandler.handleRequestException<Any>(e,"/api/chat/{chatID}/recentMessages"))
          }
     }
 

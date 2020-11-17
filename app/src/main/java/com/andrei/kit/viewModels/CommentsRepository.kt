@@ -12,7 +12,6 @@ import com.andrei.dataLayer.interfaces.dao.RoomCommentDao
 import com.andrei.dataLayer.models.PostWithComments
 import com.andrei.dataLayer.models.serialization.SerializeComment
 import com.andrei.kit.utils.isConnected
-import kotlinx.coroutines.InternalCoroutinesApi
 import javax.inject.Inject
 
 
@@ -39,7 +38,7 @@ class CommentsRepository @Inject constructor(private val connectivityManager: Co
                 emit(responseHandler.handleSuccess(Any()))
 
         } catch (e: Exception) {
-            emit(responseHandler.handleException<Any>(e, "Upload comment"))
+            emit(responseHandler.handleRequestException<Any>(e, "Upload comment"))
         }
     }
 

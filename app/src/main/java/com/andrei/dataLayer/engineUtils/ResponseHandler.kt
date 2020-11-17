@@ -21,8 +21,8 @@ import java.net.SocketTimeoutException
         return Resource.success(data)
     }
 
-    fun <T : Any> handleException(e: Exception,url:String): Resource<T> {
-        Log.e(TAG,"Error at $url with error ${e.stackTraceToString()}")
+    fun <T > handleRequestException(e: Exception, string: String): Resource<T> {
+        Log.e(TAG,"Error with request $string")
         logException(e)
         return when (e) {
             is HttpException -> Resource.error(getErrorMessage(e.code()))
@@ -41,6 +41,7 @@ import java.net.SocketTimeoutException
         }
     }
     private fun logException(e:Exception){
+        e.printStackTrace()
         if(!BuildConfig.DEBUG){
            firebaseCrashlytics.recordException(e)
         }

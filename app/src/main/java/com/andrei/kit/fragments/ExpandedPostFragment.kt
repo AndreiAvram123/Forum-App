@@ -79,25 +79,15 @@ class ExpandedPostFragment : Fragment() {
 
     private fun attachObservers() {
 
-            viewModelPost.getPostByID(args.postID).observeRequest(viewLifecycleOwner, {
-                when(it.status){
-                    Status.SUCCESS ->{
-                        if(it.data !=null){
-                            post = it.data
+            viewModelPost.getPostByID(args.postID).reObserve(viewLifecycleOwner, {
+
+                            post = it
                             configureViews()
                             getComments()
-                        }
-                    }
-                    Status.LOADING ->{
-                    //todo
-                        //loading ui
-                    }
-                    Status.ERROR ->{
 
-                    }
+
                 }
-
-            })
+            )
 
         }
 
@@ -113,7 +103,7 @@ class ExpandedPostFragment : Fragment() {
             binding.post = post
             binding.saveButtonExpanded.setOnClickListener {
                 if (post.isFavorite) {
-                    viewModelPost.removeFromFavorites(post).observeOnceForValue(viewLifecycleOwner,{
+                    viewModelPost.removeFromFavorites(post).observeRequest(viewLifecycleOwner,{
                         if(it.status == Status.SUCCESS){
                             informUserPostRemovedFromFavorites()
                             binding.post = post
@@ -121,7 +111,7 @@ class ExpandedPostFragment : Fragment() {
                         }
                     })
                 } else {
-                    viewModelPost.addPostToFavorites(post).observeOnceForValue(viewLifecycleOwner, {
+                    viewModelPost.addPostToFavorites(post).observeRequest(viewLifecycleOwner, {
                        if(it.status == Status.SUCCESS) {
                           informUserPostAddedToFavorites()
                            binding.post = post
